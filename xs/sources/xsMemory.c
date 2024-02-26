@@ -207,6 +207,8 @@ void fxAllocate(txMachine* the, txCreation* theCreation)
 	the->symbolTable = (txSlot **)c_malloc_uint32(theCreation->symbolModulo * sizeof(txSlot*));
 	if (!the->symbolTable)
 		fxAbort(the, XS_NOT_ENOUGH_MEMORY_EXIT);
+		
+	fxAllocateStringInfoCache(the, 4);
 
 	the->stackLimit = fxCStackLimit();
 
@@ -293,6 +295,7 @@ void fxCollect(txMachine* the, txFlag theFlag)
 	startTime(&gxMarkTime);
 #endif
 	if (theFlag & XS_COMPACT_FLAG) {
+		fxInvalidateStringInfoCache(the);
 		fxMark(the, fxMarkValue);
 		fxMarkWeakStuff(the);
 	#ifdef mxNever
@@ -513,6 +516,8 @@ void fxFree(txMachine* the)
 		c_free_uint32(the->aliasArray);
 	the->aliasArray = C_NULL;
 #endif
+
+	fxFreeStringInfoCache(the);
 
 	if (the->symbolTable)
 		c_free_uint32(the->symbolTable);

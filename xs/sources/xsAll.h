@@ -425,6 +425,8 @@ struct sxMachine {
 	txID keyIndex;
 	txID keyOffset;
 	txSlot** keyArrayHost;
+	
+	void* stringInfoCache;
 
 #if mxAliasInstance
 	txID aliasCount;
@@ -1369,6 +1371,14 @@ extern void fxBuildString(txMachine* the);
 extern txSlot* fxNewStringInstance(txMachine* the);
 extern txSlot* fxAccessStringProperty(txMachine* the, txSlot* instance, txInteger index);
 extern void fxPushSubstitutionString(txMachine* the, txSlot* string, txInteger size, txInteger offset, txSlot* match, txInteger length, txInteger count, txSlot* captures, txSlot* groups, txSlot* replace);
+
+extern void fxAllocateStringInfoCache(txMachine* the, txInteger count);
+extern void fxFreeStringInfoCache(txMachine* the);
+extern void fxInvalidateStringInfoCache(txMachine* the);
+extern txSize fxCacheUTF8Length(txMachine* the, txString string);
+extern txSize fxCacheUTF8ToUnicodeOffset(txMachine* the, txString string, txSize offset);
+extern txSize fxCacheUnicodeLength(txMachine* the, txString string);
+extern txSize fxCacheUnicodeToUTF8Offset(txMachine* the, txString string, txSize offset);
 
 /* xsRegExp.c */
 mxExport void fx_RegExp(txMachine* the);
