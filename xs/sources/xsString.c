@@ -1516,7 +1516,7 @@ void fx_String_prototype_replaceAux(txMachine* the, txInteger size, txInteger of
 		mxPushSlot(function);
 		mxCall();
 		mxPushSlot(match);
-		mxPushInteger(fxUnicodeToUTF8Offset(mxThis->value.string, offset));
+		mxPushInteger(fxUTF8ToUnicodeOffset(mxThis->value.string, offset));
 		mxPushSlot(mxThis);
 		mxRunCount(3);
 		fxToString(the, the->stack);
