@@ -145,9 +145,9 @@ txSize fxCacheUTF8ToUnicodeOffset(txMachine* the, txString string, txSize offset
 	if (info) {
 		txSize delta, sign, unicodeOffset, utf8Offset;
 		txU1* p;
-		if ((offset < 0) || (info->utf8Length < offset))
+		if (/* (offset < 0) || */ (info->utf8Length < offset))
 			return -1;
-		if ((info->ascii) || (offset == 0))
+		if ((info->ascii) /* || (offset == 0) */)
 			return offset;
 		if (offset == info->utf8Length)
 			return info->unicodeLength;
