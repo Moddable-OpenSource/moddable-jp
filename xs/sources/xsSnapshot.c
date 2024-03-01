@@ -85,7 +85,12 @@ static void fxWriteStack(txMachine* the, txSnapshot* snapshot);
 #else
 	#define mxECMAScript2024Additions 0
 #endif
-#define mxCallbacksLength (496 + mxECMAScript2023Additions + mxExplicitResourceManagementAdditions + mxECMAScript2024Additions)
+#if mxUint8ArrayBase64
+	#define mxUint8ArrayBase64Additions 6
+#else
+	#define mxUint8ArrayBase64Additions 0
+#endif
+#define mxCallbacksLength (496 + mxECMAScript2023Additions + mxExplicitResourceManagementAdditions + mxECMAScript2024Additions + mxUint8ArrayBase64Additions)
 
 static txCallback gxCallbacks[mxCallbacksLength] = {
 	fx_AggregateError,

@@ -65,6 +65,10 @@
 	#define mxExplicitResourceManagement 0
 #endif
 
+#ifndef mxUint8ArrayBase64
+	#define mxUint8ArrayBase64 0
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1203,6 +1207,18 @@ enum {
 	_unicodeSets,	
 	_waitAsync,	
 	_withResolvers,	
+#endif
+#if mxUint8ArrayBase64
+	_alphabet,
+	_fromBase64,
+	_fromHex,
+	_lastChunkHandling,
+	_read,
+	_setFromBase64,
+	_setFromHex,
+	_toBase64,
+	_toHex,
+	_written,
 #endif
 	XS_ID_COUNT
 };

@@ -59,6 +59,7 @@ C_OPTIONS = \
 	-DmxExplicitResourceManagement=1 \
 	-DmxKeysGarbageCollection=1 \
 	-DmxLockdown=1 \
+	-DmxMinusZero=1 \
 	-DmxNoConsole=1 \
 	-DmxParse=1 \
 	-DmxProfile=1 \
@@ -67,7 +68,7 @@ C_OPTIONS = \
 	-DmxSnapshot=1 \
 	-DmxRegExpUnicodePropertyEscapes=1 \
 	-DmxStringNormalize=1 \
-	-DmxMinusZero=1 \
+	-DmxUint8ArrayBase64=1 \
 	-D_IEEE_LIBM \
 	-D__LITTLE_ENDIAN \
 	-I$(INC_DIR) \

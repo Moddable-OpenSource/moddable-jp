@@ -51,6 +51,7 @@ C_OPTIONS = \
 	/D mxExplicitResourceManagement=1 \
 	/D mxKeysGarbageCollection=1 \
 	/D mxLockdown=1 \
+	/D mxMinusZero=1 \
 	/D mxNoConsole=1 \
 	/D mxParse=1 \
 	/D mxProfile=1 \
@@ -59,7 +60,7 @@ C_OPTIONS = \
 	/D mxSnapshot=1 \
 	/D mxRegExpUnicodePropertyEscapes=1 \
 	/D mxStringNormalize=1 \
-	/D mxMinusZero=1 \
+	/D mxUint8ArrayBase64=1 \
 	/D _IEEE_LIBM=1 \
 	/D __LITTLE_ENDIAN=1 \
 	/I$(INC_DIR) \
