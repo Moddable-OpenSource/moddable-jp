@@ -11,25 +11,15 @@
  *   Mountain View, CA 94042, USA.
  *
  */
+import { Sleep, PowerMode } from "sleep";
+import Timer from "timer";
 
-import WiFi from "wifi";
+let message = "Hello, world - sleep-on sample";
+trace(message + "\n");
 
-let aps = [];
+let led = new Host.LED.Default;
+led.write(1);
+Timer.delay(500);
+led.close();
 
-WiFi.mode = WiFi.Mode.station;
-
-function scan() {
-	WiFi.scan({}, ap => {
-		if (ap) {
-			if (!aps.find(value => ap.ssid == value)) {
-				aps.push(ap.ssid);
-				trace(` ${ap.ssid}\n`);
-			}
-		}
-		else
-			scan();
-	});
-}
-
-trace("Scan start\n");
-scan();
+Sleep.powerMode = PowerMode.LowPower;		// vs .ConstantLatency
