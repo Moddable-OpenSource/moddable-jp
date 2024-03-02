@@ -1946,7 +1946,10 @@ export class Tool extends TOOL {
 
 				flows.forEach((node, i) => {
 					let manifest;
-					if (node.moddable_manifest)
+					if(("comment" === node.type)&&(node.name?.startsWith("moddable_manifest"))&&(node.info?.startsWith("{"))){
+						manifest = JSON.parse(node.info);
+					}
+					else if (node.moddable_manifest)
 						manifest = {...node.moddable_manifest};
 					else if (nodeTypes[node.type])
 						manifest = {include: nodeTypes[node.type]};
