@@ -3310,8 +3310,10 @@ void fx_Uint8Array_fromBase64(txMachine* the)
 		txSlot* resultBuffer = resultView->next; \
 		src = (txU1*)(mxArgv(0)->value.string);
 		dst = (txU1*)(resultBuffer->value.reference->next->value.arrayBuffer.address + resultView->value.dataView.offset);
+		resultBuffer->value.reference->next->next->value.bufferInfo.maxLength = dstSize;
 		fxUint8ArrayFromBase64(the, src, dst, &srcSize, &dstSize, alphabet, lastChunkHandling);
-// 		fxSetArrayBufferLength(the, resultBuffer, dstSize);
+		fxSetArrayBufferLength(the, resultBuffer, dstSize);
+		resultBuffer->value.reference->next->next->value.bufferInfo.maxLength = -1;
 		resultView->value.dataView.size = dstSize;
 	}
 }
@@ -3341,8 +3343,6 @@ void fx_Uint8Array_fromHex(txMachine* the)
 		src = (txU1*)(mxArgv(0)->value.string);
 		dst = (txU1*)(resultBuffer->value.reference->next->value.arrayBuffer.address + resultView->value.dataView.offset);
 		fxUint8ArrayFromHex(the, src, dst, &srcSize, &dstSize);
-// 		fxSetArrayBufferLength(the, resultBuffer, dstSize);
-		resultView->value.dataView.size = dstSize;
 	}
 }
 
