@@ -97,7 +97,7 @@ txNumber fxAdvanceStringIndex(txString string, txNumber index, txBoolean unicode
 #if mxCESU8
 	if (unicodeFlag) {
 		txInteger character;
-		txSize offset = fxUnicodeLength(string);
+		txSize offset = fxUnicodeLength(string, C_NULL);
 		if (index >= offset)
 			return index + 1;
 		string += fxUnicodeToUTF8Offset(string, (txInteger)index);
@@ -854,8 +854,7 @@ void fx_RegExp_prototype_replace(txMachine* the)
 	}
 	list = item = fxNewInstance(the);
 	mxPushSlot(list);
-	size = fxUnicodeLength(argument->value.string);
-	utf8Size = mxStringLength(argument->value.string);
+	size = fxUnicodeLength(argument->value.string, &utf8Size);
 	former = 0;
 	for (;;) {
 		fxExecuteRegExp(the, mxThis, argument);
@@ -882,7 +881,7 @@ void fx_RegExp_prototype_replace(txMachine* the)
             mxGetIndex(0);
             fxToString(the, the->stack);
             matched = the->stack;
-            matchLength = fxUnicodeLength(matched->value.string);
+            matchLength = fxUnicodeLength(matched->value.string, C_NULL);
 
             mxPushSlot(result);
             mxGetID(mxID(_length));
@@ -1070,7 +1069,7 @@ void fx_RegExp_prototype_split(txMachine* the)
 	item = fxLastProperty(the, array);
 	if (!limit)
 		goto bail;
-	size = fxUnicodeLength(argument->value.string);
+	size = fxUnicodeLength(argument->value.string, C_NULL);
 	if (size == 0) {
 		fxExecuteRegExp(the, splitter, argument);
 		if (the->stack->kind == XS_NULL_KIND) {

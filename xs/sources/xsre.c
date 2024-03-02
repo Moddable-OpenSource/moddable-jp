@@ -673,8 +673,8 @@ void* fxCharSetCombine(txPatternParser* parser, txCharSet* set1, txCharSet* set2
 		txInteger count = 0;
 		txString string1 = set1->strings[index1];
 		txString string2 = set2->strings[index2];
-		txInteger length1 = fxUnicodeLength(string1);
-		txInteger length2 = fxUnicodeLength(string2);
+		txInteger length1 = fxUnicodeLength(string1, C_NULL);
+		txInteger length2 = fxUnicodeLength(string2, C_NULL);
 		if (op == mxCharSetUnionOp)
 			count = count1 + count2;
 		else if (op == mxCharSetSubtractOp)
@@ -726,14 +726,14 @@ void* fxCharSetCombine(txPatternParser* parser, txCharSet* set1, txCharSet* set2
 				index1++;
 				if (index1 < count1) {
 					string1 = set1->strings[index1];
-					length1 = fxUnicodeLength(string1);
+					length1 = fxUnicodeLength(string1, C_NULL);
 				}
 			}
 			if (advance & 2) {
 				index2++;
 				if (index2 < count2) {
 					string2 = set2->strings[index2];
-					length2 = fxUnicodeLength(string2);
+					length2 = fxUnicodeLength(string2, C_NULL);
 				}
 			}
 		}
@@ -1156,8 +1156,8 @@ static int fxCharSetStringsCompare(const void *p1, const void *p2)
 {
 	txString s1 = *((txString*)p1);
 	txString s2 = *((txString*)p2);
-	txInteger length1 = fxUnicodeLength(s1);
-	txInteger length2 = fxUnicodeLength(s2);
+	txInteger length1 = fxUnicodeLength(s1, C_NULL);
+	txInteger length2 = fxUnicodeLength(s2, C_NULL);
 	if (length1 > length2) return -1;
 	if (length1 < length2) return 1;
 	return c_strcmp(s2, s1);

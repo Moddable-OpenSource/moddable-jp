@@ -942,8 +942,8 @@ void fx_unicodeCompare(txMachine* the)
 		bString = fxToString(the, mxArgv(1));
 #ifdef mxMetering
 	{
-		txSize aLength = fxUnicodeLength(aString);
-		txSize bLength = fxUnicodeLength(bString);
+		txSize aLength = fxUnicodeLength(aString, C_NULL);
+		txSize bLength = fxUnicodeLength(bString, C_NULL);
 		if (aLength < bLength)
 			the->meterIndex += aLength;
 		else
