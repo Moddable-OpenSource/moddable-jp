@@ -178,7 +178,6 @@ txSize fxCacheUTF8ToUnicodeOffset(txMachine* the, txString string, txSize offset
 			}
 		}
 		p = (txU1*)string + utf8Offset;
-		unicodeOffset += sign;
 		for (;;) {
 			if ((*p & 0xC0) != 0x80) {
 				if (utf8Offset == offset)

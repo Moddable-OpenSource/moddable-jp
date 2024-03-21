@@ -2616,7 +2616,7 @@ txBoolean fxMatchRegExp(void* the, txInteger* code, txInteger* data, txString su
 	};
 	register void * const *steps = gxSteps;
 #endif
-	txInteger stop = mxStringLength(subject);
+	txInteger stop = (the) ? fxCacheUTF8Length(the, subject) : mxStringLength(subject);
 	txInteger flags = code[0];
 	txCaptureData* captures = (txCaptureData*)data;
 	txCaptureData* capture;
