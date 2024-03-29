@@ -54,6 +54,8 @@ trace(Base64.encode("hello, world") + "\n");
 <a id="hex"></a>
 ## class Hex
 
+> **Note**: Hex encoding and decoding are now supported directly in JavaScript. See the [proposal](https://tc39.es/proposal-arraybuffer-base64/) for details. The Moddable SDK no longer uses the Hex module. The Hex module is still supported for compatibility but it is not recommended for use in new code.
+
 The `Hex` class provides static functions to convert between an `ArrayBuffer` and hexadecimal encoded `String` values.
 
 ```js

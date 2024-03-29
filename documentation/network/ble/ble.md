@@ -1,6 +1,6 @@
 # BLE
-Copyright 2017-2022 Moddable Tech, Inc.<BR>
-Revised: June 20, 2022
+Copyright 2017-2024 Moddable Tech, Inc.<BR>
+Revised: March 29, 2024
 
 ## About This Document
 This document describes the Moddable SDK Bluetooth Low Energy (BLE) modules. Both client (master) and server (slave) roles are supported on Espressif ESP32, Silicon Labs Blue Gecko, Qualcomm QCA4020, and Nordic nRF52 devices.
@@ -1080,11 +1080,9 @@ let advertiser = new BLEServer;
 The read-only `localAddress` property accessor function returns the Bluetooth peripheral's local address as a [Bytes](#classbytes) object.
 
 ```javascript
-import Hex from "hex";
-
 class Advertiser extends BLEServer {
 	onReady() {
-		trace(`device address: ${Hex.toString(this.localAddress, ":")}\n`);
+		trace(`device address: ${(new Uint8Array(this.localAddress)).toHex()}\n`);
 	}
 }
 ```
