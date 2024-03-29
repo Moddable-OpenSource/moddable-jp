@@ -1,6 +1,6 @@
 # Data
-Copyright 2017-2023 Moddable Tech, Inc.<BR>
-Revised: October 24, 2023
+Copyright 2017-2024 Moddable Tech, Inc.<BR>
+Revised: March 29, 2024
 
 ## Table of Contents
 
@@ -14,6 +14,8 @@ Revised: October 24, 2023
 
 <a id="base64"></a>
 ## class Base64
+
+> **Note**: Base64 encoding and decoding are now supported directly in JavaScript. See the [Base64 proposal](https://tc39.es/proposal-arraybuffer-base64/) for details. The Moddable SDK no longer uses the Base64 module. The Base64 module is still supported for compatibility but it is not recommended for use in new code.
 
 The `Base64` class provides static functions to encode and decode using the Base64 algorithm defined in [RFC 4648](https://tools.ietf.org/html/rfc4648).
 

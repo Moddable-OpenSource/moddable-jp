@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022  Moddable Tech, Inc.
+ * Copyright (c) 2021-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -18,7 +18,6 @@
  *
  */
  
-import Base64 from "base64";
 import {Digest} from "crypt";
 
 export default {
@@ -47,7 +46,7 @@ export default {
 		response.status = 101;		// " Web Socket Protocol Handshake" - status msg
 		response.headers.set("connection", "upgrade");
 		response.headers.set("upgrade", "websocket");
-		response.headers.set("sec-websocket-accept", Base64.encode(sha1.close()));
+		response.headers.set("sec-websocket-accept", (new Uint8Array(sha1.close())).toBase64());
 
 		if (this.protocol)
 			response.headers.set("sec-websocket-protocol", this.protocol);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022  Moddable Tech, Inc.
+ * Copyright (c) 2022-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -18,7 +18,6 @@
  *
  */
 
-import Base64 from "base64";
 import BER from "ber";
 
 class Transform {
@@ -49,7 +48,7 @@ class Transform {
 		if (end < 0)
 			throw new Error("no delimiter");
 
-		return Base64.decode(source.slice(start, end));
+		return Uint8Array.fromBase64(source.slice(start, end)).buffer;
 	}
 	static privateKeyToPrivateKeyInfo(source, id = [1, 2, 840, 113549, 1, 1, 1] /* // PKCS#1 OID */) {	// https://datatracker.ietf.org/doc/html/rfc5208#section-5
 		return BER.encode([

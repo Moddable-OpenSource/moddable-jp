@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK.
  * 
@@ -14,7 +14,6 @@
 
 import {Request} from "http"
 import SecureSocket from "securesocket";
-import Base64 from "base64";
 
 const account = "FILL IN YOUR ACCOUNT";
 const token = "FILL IN YOUR TOKEN";
@@ -38,7 +37,7 @@ let request = new Request({
 	method: "POST",
 	headers: [	"content-type", "application/x-www-form-urlencoded",
 				"content-length", body.length,
-				"Authorization", "Basic " + Base64.encode(account + ":" + token)],
+				"Authorization", "Basic " + (new Uint8Array(ArrayBuffer.fromString(account + ":" + token))).toBase64()],
 	body: body,
 	response: String,
 	port: 443,

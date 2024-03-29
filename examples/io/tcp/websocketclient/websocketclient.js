@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023  Moddable Tech, Inc.
+ * Copyright (c) 2021-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -19,7 +19,6 @@
  */
  
 import Timer from "timer";
-import Base64 from "base64";
 import Logical from "logical";
 
 class WebSocketClient {
@@ -420,7 +419,7 @@ class WebSocketClient {
 					`Upgrade: websocket`,
 					`Connection: keep-alive, Upgrade`,
 					`Sec-WebSocket-Version: 13`,
-					`Sec-WebSocket-Key: ${Base64.encode(key.buffer)}`
+					`Sec-WebSocket-Key: ${key.toBase64()}`
 				];
 				if (options.protocol)
 					message.push(`Sec-WebSocket-Protocol: ${options.protocol}`);

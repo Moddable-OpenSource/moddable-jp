@@ -7,20 +7,18 @@
 	"modules": {
 		"*": [
 			"./main",
-			"$(MODULES)/network/http/*",
-			"$(MODULES)/data/base64/*"
+			"$(MODULES)/network/http/*"
 		]
 	},
 	"preload": [
-		"http",
-		"base64"
+		"http"
 	],
 	"config": {
 		"sntp": "pool.ntp.org"
 	},
     "resources": {
         "*": [
-            "$(MODULES)/crypt/data/ca106"
+            "$(MODULES)/crypt/data/ca170"
         ]
     }
 }

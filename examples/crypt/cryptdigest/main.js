@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK.
  * 
@@ -13,7 +13,6 @@
  */
 
 import {Digest, GHASH} from "crypt";
-import Base64 from "base64";
 import Bin from "bin";
 
 function H2B(hstr)
@@ -30,7 +29,7 @@ function B2H(b)
 let sha1 = new Digest("SHA1");
 sha1.write("dGhlIHNhbXBsZSBub25jZQ==");
 sha1.write("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
-let result = Base64.encode(sha1.close());
+let result = (new Uint8Array(sha1.close())).toBase64();
 
 trace(`Calculated hash: ${result}\n`);
 
