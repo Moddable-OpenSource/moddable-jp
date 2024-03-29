@@ -283,6 +283,7 @@ C_DEFINES = \
 	-DmxNoFunctionName=1 \
 	-DmxHostFunctionPrimitive=1 \
 	-DmxFewGlobalsTable=1 \
+	-DmxUint8ArrayBase64=1 \
 	-DkModdableToolsVersion=\"$(TOOLS_VERSION)\"
 ifeq ($(GOAL),debug)
 	C_DEFINES += -DMODINSTRUMENTATION=1 -DmxInstrument=1

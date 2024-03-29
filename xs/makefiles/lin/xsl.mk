@@ -71,7 +71,8 @@ C_OPTIONS +=\
 	-DmxNoFunctionLength=1\
 	-DmxNoFunctionName=1\
 	-DmxHostFunctionPrimitive=1\
-	-DmxFewGlobalsTable=1
+	-DmxFewGlobalsTable=1 \
+	-DmxUint8ArrayBase64=1
 C_OPTIONS += \
 	-Wno-misleading-indentation \
 	-Wno-implicit-fallthrough

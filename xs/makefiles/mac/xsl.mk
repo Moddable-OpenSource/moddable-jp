@@ -78,7 +78,8 @@ C_OPTIONS +=\
 	-DmxNoFunctionLength=1\
 	-DmxNoFunctionName=1\
 	-DmxHostFunctionPrimitive=1\
-	-DmxFewGlobalsTable=1
+	-DmxFewGlobalsTable=1 \
+	-DmxUint8ArrayBase64=1
 ifneq ("x$(SDKROOT)", "x")
 	C_OPTIONS += -isysroot $(SDKROOT)
 endif

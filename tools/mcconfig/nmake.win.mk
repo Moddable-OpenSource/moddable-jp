@@ -112,6 +112,7 @@ C_DEFINES = \
 	/D mxNoFunctionName=1 \
 	/D mxHostFunctionPrimitive=1 \
 	/D mxFewGlobalsTable=1 \
+	/D mxUint8ArrayBase64=1 \
 	/D kCommodettoBitmapFormat=$(COMMODETTOBITMAPFORMAT) \
 	/D kPocoRotation=$(POCOROTATION)
 !IF "$(INSTRUMENT)"=="1"
