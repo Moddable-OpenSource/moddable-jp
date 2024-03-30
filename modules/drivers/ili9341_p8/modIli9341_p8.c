@@ -100,6 +100,7 @@ typedef struct {
 	int yMin;
 	int yMax;
 	int ping;
+	uint8_t nothingSent;
 
 	uint8_t						firstFrame;
 	uint8_t						firstBuffer;
@@ -148,6 +149,13 @@ void xs_ILI9341p8_destructor(void *data)
 	spiDisplay sd = data;
 	if (!data) return;
 
+#ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
+	if (sd->startSend)
+		vSemaphoreDelete(sd->startSend);
+
+	gpio_isr_handler_remove(MODDEF_ILI9341P8_TEARINGEFFECT_PIN);
+#endif
+
 	if (sd->io_handle)
 		esp_lcd_panel_io_del(sd->io_handle);
 
@@ -160,11 +168,6 @@ void xs_ILI9341p8_destructor(void *data)
 
 	if (sd->ops)
 		vQueueDelete(sd->ops);
-	
-#ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
-	if (sd->startSend)
-		vSemaphoreDelete(sd->startSend);
-#endif
 
 	if (sd->colorsInFlight)
 		vSemaphoreDelete(sd->colorsInFlight);
@@ -279,16 +282,15 @@ void xs_ILI9341p8(xsMachine *the)
 	gpio_install_isr_service(0);
 	gpio_set_intr_type(MODDEF_ILI9341P8_TEARINGEFFECT_PIN, GPIO_INTR_NEGEDGE);
 	gpio_isr_handler_add(MODDEF_ILI9341P8_TEARINGEFFECT_PIN, tearingEffectISR, sd);
+
+	sd->startSend = xSemaphoreCreateBinary();
+	xSemaphoreGive(sd->startSend);
 #endif
 
 	sd->ops = xQueueCreate(MODDEF_ILI9341P8_OPQUEUE, sizeof(int));
 	sd->opZero = 0;
 
 	sd->colorsInFlight = xSemaphoreCreateCounting(2, 2);		// async client uses two pixel buffers
-#ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
-	sd->startSend = xSemaphoreCreateBinary();
-	xSemaphoreGive(sd->startSend);
-#endif
 
 	ili9341Init(sd);
 
@@ -398,6 +400,8 @@ void ili9341Send(PocoPixel *pixels, int byteLength, void *refcon)
 	if (!sync)
 		byteLength = -byteLength;
 
+	sd->nothingSent = 0;
+
 #ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
 	if (sd->firstBuffer) {
 		sd->firstBuffer = 0;
@@ -478,6 +482,7 @@ void ili9341Send(PocoPixel *pixels, int byteLength, void *refcon)
 		0x36, 1, 0,		// MY,MV,MX,RGB
 		0x3a, 1, 0x05,	// Pixel Format
 		0x21, 1, 1,		// pixel invert
+		0x35, 1, 0x00,	// tearing effect pin on (v-blanking only)
 
 		// Rongstar: ---- ST7789V Frame rate setting ----
 		0xb2, 5, 0x0c, 0x0c, 0x00, 0x33, 0x33,
@@ -490,6 +495,7 @@ void ili9341Send(PocoPixel *pixels, int byteLength, void *refcon)
 		0xc3, 1, 0x0b,
 		0xc4, 1, 0x20,
 		0xc6, 1, 0x0f,
+		0xc6, 1, 0x15,	// frame rate (50 FPS)
 		0xd0, 2, 0xa4, 0xa1,
 
 		// Rongstar: ---- ST7789V Gamma setting ----
@@ -537,6 +543,9 @@ void ili9341Begin(void *refcon, CommodettoCoordinate x, CommodettoCoordinate y, 
 {
 	spiDisplay sd = refcon;
 	uint16_t xMin, xMax, yMin, yMax;
+	if (sd->nothingSent)
+		xSemaphoreGive(sd->colorsInFlight);
+	sd->nothingSent = 1;
 
 	xMin = x + MODDEF_ILI9341P8_COLUMN_OFFSET;
 	yMin = y + MODDEF_ILI9341P8_ROW_OFFSET;
@@ -587,6 +596,11 @@ void ili9341End(void *refcon)
 #ifdef MODDEF_ILI9341P8_BACKLIGHT_PIN
 		modGPIOWrite(&sd->backlight, MODDEF_ILI9341P8_BACKLIGHT_ON);
 #endif
+	}
+
+	if (sd->nothingSent) {
+		xSemaphoreGive(sd->colorsInFlight);
+		sd->nothingSent = 0;
 	}
 }
 
