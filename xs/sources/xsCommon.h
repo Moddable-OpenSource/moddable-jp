@@ -53,12 +53,12 @@
 	#define __has_builtin(x) 0
 #endif
 
-#ifndef mxECMAScript2023
-	#define mxECMAScript2023 1
-#endif
-
 #ifndef mxECMAScript2024
 	#define mxECMAScript2024 1
+#endif
+
+#ifndef mxECMAScript2023
+	#define mxECMAScript2023 1
 #endif
 
 #ifndef mxExplicitResourceManagement
@@ -66,7 +66,7 @@
 #endif
 
 #ifndef mxUint8ArrayBase64
-	#define mxUint8ArrayBase64 0
+	#define mxUint8ArrayBase64 1
 #endif
 
 #ifdef __cplusplus
@@ -130,6 +130,8 @@ typedef struct {
 	#endif
 #endif
 #if mxExplicitResourceManagement
+	#define XS_MINOR_VERSION 5
+#elif mxUint8ArrayBase64
 	#define XS_MINOR_VERSION 4
 #else
 	#define XS_MINOR_VERSION 3
