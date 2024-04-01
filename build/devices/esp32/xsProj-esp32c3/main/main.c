@@ -315,14 +315,14 @@ void app_main() {
 
 #ifdef mxDebug
 	QueueHandle_t uartQueue;
-	uart_driver_install(USE_UART, UART_FIFO_LEN * 2, 0, 8, &uartQueue, 0);
+	uart_driver_install(USE_UART, UART_HW_FIFO_LEN(USE_UART) * 2, 0, 8, &uartQueue, 0);
 	xTaskCreate(debug_task, "debug", (768 + XT_STACK_EXTRA) / sizeof(StackType_t), uartQueue, 8, NULL);
 	#if MODDEF_ECMA419_ENABLED
 		builtinUsePin(USE_UART_TX);
 		builtinUsePin(USE_UART_RX);
 	#endif
 #else
-	uart_driver_install(USE_UART, UART_FIFO_LEN * 2, 0, 0, NULL, 0);
+	uart_driver_install(USE_UART, UART_HW_FIFO_LEN(USE_UART) * 2, 0, 0, NULL, 0);
 #endif
 
 #endif	// !USE_USB
