@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2023  Moddable Tech, Inc.
+ * Copyright (c) 2019-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -39,6 +39,7 @@
 #include "hal/uart_types.h"
 //#include "soc/uart_caps.h"
 #include "soc/uart_struct.h"
+#include "soc/interrupts.h"
 
 // local versions of UART register management to avoid issues with uart.c
 #define uart_disable_intr_mask(dev, disable_mask) _uart_disable_intr_mask(dev, disable_mask)
@@ -67,6 +68,7 @@ struct SerialRecord {
 	uint8_t		useCount;
 	uint8_t		txInterruptEnabled;
 	uint8_t		hasOnReadableOrWritable;
+	uint8_t		uart_intr;
 	uart_dev_t	*uart_reg;
 	uint32_t	transmit;
 	uint32_t	receive;
@@ -173,11 +175,16 @@ void xs_serial_constructor(xsMachine *the)
 	serial->isReadable = 0;
 	serial->isWritable = 0;
 #if UART_NUM_MAX > 2
-	if (2 == uart)
+	if (2 == uart) {
 		serial->uart_reg = &UART2;
+		serial->uart_intr = ETS_UART2_INTR_SOURCE;
+	}
 	else
 #endif
+	{
 		serial->uart_reg = uart ? &UART1 : &UART0;
+		serial->uart_intr = uart ? ETS_UART1_INTR_SOURCE : ETS_UART0_INTR_SOURCE;
+	}
 	serial->useCount = 1;
 	serial->hasOnReadableOrWritable = hasReadable || hasWritable;
 
@@ -187,7 +194,7 @@ void xs_serial_constructor(xsMachine *the)
 		serial->the = the;
 
 		// store callbacks & configure interrupts
-		err = esp_intr_alloc(uart_periph_signal[uart].irq, 0, serial_isr, serial, NULL);
+		err = esp_intr_alloc(serial->uart_intr, 0, serial_isr, serial, NULL);
 		if (err)
 			xsUnknownError("uart_isr_register failed");
 
