@@ -3369,6 +3369,7 @@ void fx_Uint8Array_prototype_setFromBase64(txMachine* the)
 	src = (txU1*)(mxArgv(0)->value.string);
 	dst = (txU1*)(buffer->value.reference->next->value.arrayBuffer.address + view->value.dataView.offset);
 	fxUint8ArrayFromBase64(the, src, dst, &srcSize, &dstSize, alphabet, lastChunkHandling);
+	mxPush(mxObjectPrototype);
 	property = fxLastProperty(the, fxNewObjectInstance(the));
 	property = fxNextIntegerProperty(the, property, srcSize, mxID(_read), XS_NO_FLAG);
 	property = fxNextIntegerProperty(the, property, dstSize, mxID(_written), XS_NO_FLAG);
@@ -3397,6 +3398,7 @@ void fx_Uint8Array_prototype_setFromHex(txMachine* the)
 	src = (txU1*)(mxArgv(0)->value.string);
 	dst = (txU1*)(buffer->value.reference->next->value.arrayBuffer.address + view->value.dataView.offset);
 	fxUint8ArrayFromHex(the, src, dst, &srcSize, &dstSize);
+	mxPush(mxObjectPrototype);
 	property = fxLastProperty(the, fxNewObjectInstance(the));
 	property = fxNextIntegerProperty(the, property, srcSize, mxID(_read), XS_NO_FLAG);
 	property = fxNextIntegerProperty(the, property, dstSize, mxID(_written), XS_NO_FLAG);
