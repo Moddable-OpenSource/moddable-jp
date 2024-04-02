@@ -33,6 +33,18 @@
 				"pins/servo": "$(MODULES)/pins/servo/servo",
 				"*": "$(MODULES)/pins/servo/sim/*"
 			}
+		},
+		"lin": {
+			"modules": {
+				"pins/servo": "$(MODULES)/pins/servo/servo",
+				"*": "$(MODULES)/pins/servo/sim/*"
+			}
+		},
+		"win": {
+			"modules": {
+				"pins/servo": "$(MODULES)/pins/servo/servo",
+				"*": "$(MODULES)/pins/servo/sim/*"
+			}
 		}
 	}
 }

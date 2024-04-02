@@ -178,6 +178,10 @@
 		kStateClosing = 2,
 		kStateTerminated = 3
 	};
+#elif __linux
+
+#else
+	#error "platform not supported"
 #endif
 
 #define kIMABytesPerChunk (68)
@@ -331,6 +335,9 @@ static void updateActiveStreams(modAudioOut out);
 #if PICO_BUILD || defined(__ets__) || ESP32 || defined(_WIN32)
 	void deliverCallbacks(void *the, void *refcon, uint8_t *message, uint16_t messageLength);
 	void queueCallback(modAudioOut out, xsIntegerValue id, xsIntegerValue stream);
+#endif
+#if __linux
+	static void queueCallback(modAudioOut out, xsIntegerValue id, xsIntegerValue stream);
 #endif
 
 static void doLock(modAudioOut out);
@@ -684,6 +691,11 @@ void xs_audioout_start(xsMachine *the)
 	}
 #endif
 }
+
+#if __linux
+	static void queueCallback(modAudioOut out, xsIntegerValue id, xsIntegerValue stream) {
+	}
+#endif
 
 void xs_audioout_stop(xsMachine *the)
 {
