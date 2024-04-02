@@ -63,7 +63,6 @@ C_OPTIONS = \
 	-DmxSnapshot=1 \
 	-DmxRegExpUnicodePropertyEscapes=1 \
 	-DmxStringNormalize=1 \
-	-DmxUint8ArrayBase64=1 \
 	-D_IEEE_LIBM \
 	-D__LITTLE_ENDIAN \
 	-I$(INC_DIR) \

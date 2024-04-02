@@ -60,7 +60,6 @@ C_OPTIONS = \
 	/D mxSnapshot=1 \
 	/D mxRegExpUnicodePropertyEscapes=1 \
 	/D mxStringNormalize=1 \
-	/D mxUint8ArrayBase64=1 \
 	/D _IEEE_LIBM=1 \
 	/D __LITTLE_ENDIAN=1 \
 	/I$(INC_DIR) \

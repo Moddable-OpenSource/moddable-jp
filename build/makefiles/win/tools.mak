@@ -247,7 +247,6 @@ C_OPTIONS = \
 	/D mxNoFunctionName=1 \
 	/D mxHostFunctionPrimitive=1 \
 	/D mxFewGlobalsTable=1 \
-	/D mxUint8ArrayBase64=1 \
 	/D mxMessageWindowClass=\"fxMessageWindowClassX\" \
 	/D kModdableToolsVersion=\"$(TOOLS_VERSION)\" \
 	/I$(XS_DIR)\includes \
