@@ -1,7 +1,7 @@
 # Moddable SDK
 
-Copyright 2017-2023 Moddable Tech, Inc.<BR>
-Revised: November 20, 2023
+Copyright 2017-2024 Moddable Tech, Inc.<BR>
+Revised: April 3, 2024
 
 ## Modern software development for microcontrollers
 
@@ -101,7 +101,7 @@ To use the Moddable SDK with ESP32-based devices, you need to:
 1. Install the [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md)
 2. Install [ESP32 tools](./documentation/devices/esp32.md)
 
-The Moddable SDK supports [many devices](./documentation/devices/esp32.md#platforms) built on ESP32, ESP32-S2, ESP32-S3, and ESP32-C3, including the devices shown below.
+The Moddable SDK supports [many devices](./documentation/devices/esp32.md#platforms) built on ESP32, ESP32-S2, ESP32-S3, ESP32-C3, ESP32-C6 and ESP32-H2, including the devices shown below.
 
 | | | |
 | :---: | :---: | :---: |
