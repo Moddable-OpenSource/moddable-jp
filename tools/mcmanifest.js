@@ -928,10 +928,13 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 
 		for (var result of tool.outlineFontFiles) {
 			var source = result.source;
-			
-			if (!tool.getenv("FONTBM"))
-				throw new Error("$(FONTBM) environment variable not set. Is fontbm installed?");
-			
+
+			if (!tool.getenv("FONTBM")) {
+				if (tool.spawn(tool.windows ? "where" : "which", "fontbm") !== 0) 
+					throw new Error("$(FONTBM) environment variable not set. Is fontbm installed?");
+				tool.setenv("FONTBM", "fontbm");
+			}
+
 			result.faces.forEach(face => {
 				const name = face.name + "-" + face.size;
 
@@ -1713,9 +1716,12 @@ export class Tool extends TOOL {
 					if (this.manifestPath)
 						throw new Error("'" + name + "': too many manifests!");
 					path = this.resolveFilePath(name);
-					if (!path)
+					if (path)
+						this.manifestPath = path;
+					else if (name.startsWith("http://") || name.startsWith("https://"))
+						this.manifestPath = name;
+					else
 						throw new Error("'" + name + "': manifest not found!");
-					this.manifestPath = path;
 				}
 				break;
 			}
@@ -1750,8 +1756,32 @@ export class Tool extends TOOL {
 		if (userHome !== undefined) this.environment.USERHOME = userHome; 
 
 		if (this.manifestPath) {
-			var parts = this.splitPath(this.manifestPath);
-			this.currentDirectory = this.mainPath = parts.directory;
+			if (this.manifestPath.startsWith("http://") || this.manifestPath.startsWith("https://")) {
+				const url = new URL(this.manifestPath);
+				const directory = "repos/" + url.hostname + url.pathname;
+				if (directory.endsWith(".git"))
+					directory = directory.slice(0, -4);
+
+				const parts = directory.split("/");
+				const path = this.createDirectories(this.outputPath ?? this.buildPath, "tmp", parts.at(-1));
+				const manifest = {
+					include: [
+						{
+							git: url.origin + url.pathname
+						}
+					]
+				};
+				if (url.hash)
+					manifest.include[0].include = url.hash.slice(1);
+				this.manifestPath = path + "/generated_manifest.json";
+				this.writeFileString(this.manifestPath, JSON.stringify(manifest, null, "\t"));
+
+				this.currentDirectory = this.mainPath = path;
+			}
+			else {
+				var parts = this.splitPath(this.manifestPath);
+				this.currentDirectory = this.mainPath = parts.directory;
+			}
 		}
 		else {
 			path = this.resolveFilePath("." + this.slash + "manifest.json");
