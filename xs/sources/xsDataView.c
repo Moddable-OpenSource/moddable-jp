@@ -3421,7 +3421,9 @@ void fx_Uint8Array_prototype_toBase64(txMachine* the)
 		mxTypeError("this is no Uint8Array instance");
 	fxUint8ArrayGetBase64Options(the, 0, &alphabet, C_NULL);
 	srcSize = fxCheckDataViewSize(the, view, buffer, XS_IMMUTABLE);
-	dstSize = (((srcSize + 2) / 3) * 4) + 1;
+	if (srcSize > (((0x7FFFFFFF >> 2) * 3) - 2))
+		fxAbort(the, XS_NOT_ENOUGH_MEMORY_EXIT);
+	dstSize = (((srcSize + 2) / 3) << 2);
 	fxStringBuffer(the, mxResult, C_NULL, dstSize);
 	src = (txU1*)buffer->value.reference->next->value.arrayBuffer.address + view->value.dataView.offset;
 	dst = (txU1*)mxResult->value.string;
@@ -3468,7 +3470,9 @@ void fx_Uint8Array_prototype_toHex(txMachine* the)
 	if (dispatch->value.typedArray.dispatch->constructorID != mxID(_Uint8Array))
 		mxTypeError("this is no Uint8Array instance");
 	srcSize = fxCheckDataViewSize(the, view, buffer, XS_IMMUTABLE);
-	dstSize = (srcSize * 2) + 1;
+	if (srcSize > (0x7FFFFFFF >> 1))
+		fxAbort(the, XS_NOT_ENOUGH_MEMORY_EXIT);
+	dstSize = (srcSize << 1);
 	fxStringBuffer(the, mxResult, C_NULL, dstSize);
 	src = (txU1*)buffer->value.reference->next->value.arrayBuffer.address + view->value.dataView.offset;
 	dst = (txU1*)mxResult->value.string;
