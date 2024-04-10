@@ -1,5 +1,3 @@
-// #pragma ident "@(#)k_tan.c 1.5 04/04/22 SMI"
-
 /*
  * ====================================================
  * Copyright 2004 Sun Microsystems, Inc.  All Rights Reserved.
@@ -10,16 +8,17 @@
  * ====================================================
  */
 
-/* INDENT OFF */
 /* __kernel_tan( x, y, k )
- * kernel tan function on [-pi/4, pi/4], pi/4 ~ 0.7854
+ * kernel tan function on ~[-pi/4, pi/4] (except on -0), pi/4 ~ 0.7854
  * Input x is assumed to be bounded by ~pi/4 in magnitude.
  * Input y is the tail of x.
  * Input k indicates whether tan (if k = 1) or -1/tan (if k = -1) is returned.
  *
  * Algorithm
  *	1. Since tan(-x) = -tan(x), we need only to consider positive x.
- *	2. if x < 2^-28 (hx<0x3e300000 0), return x with inexact if x!=0.
+ *	2. Callers must return tan(-0) = -0 without calling here since our
+ *	   odd polynomial is not evaluated in a way that preserves -0.
+ *	   Callers may do the optimization tan(x) ~ x for tiny x.
  *	3. tan(x) is approximated by a odd polynomial of degree 27 on
  *	   [0,0.67434]
  *		  	         3             27
@@ -44,8 +43,7 @@
  *		       = 1 - 2*(tan(y) - (tan(y)^2)/(1+tan(y)))
  */
 
-#include "fdlibm.h"
-
+#include "math_private.h"
 static const double xxx[] = {
 		 3.33333333333334091986e-01,	/* 3FD55555, 55555563 */
 		 1.33333333333201242699e-01,	/* 3FC11111, 1110FE7A */
@@ -73,31 +71,10 @@ static const double xxx[] = {
 double
 __kernel_tan(double x, double y, int iy) {
 	double z, r, v, w, s;
-	int ix, hx;
+	int32_t ix, hx;
 
-	hx = __HI(x);		/* high word of x */
+	GET_HIGH_WORD(hx,x);
 	ix = hx & 0x7fffffff;			/* high word of |x| */
-	if (ix < 0x3e300000) {			/* x < 2**-28 */
-		if ((int) x == 0) {		/* generate inexact */
-			if (((ix | __LO(x)) | (iy + 1)) == 0)
-				return one / fabs(x);
-			else {
-				if (iy == 1)
-					return x;
-				else {	/* compute -1 / (x+y) carefully */
-					double a, t;
-
-					z = w = x + y;
-					__LO(z) = 0;
-					v = y - (z - x);
-					t = a = -one / w;
-					__LO(t) = 0;
-					s = one + t * z;
-					return t + a * (s + t * v);
-				}
-			}
-		}
-	}
 	if (ix >= 0x3FE59428) {	/* |x| >= 0.6744 */
 		if (hx < 0) {
 			x = -x;
@@ -138,10 +115,10 @@ __kernel_tan(double x, double y, int iy) {
 		/* compute -1.0 / (x+r) accurately */
 		double a, t;
 		z = w;
-		__LO(z) = 0;
+		SET_LOW_WORD(z,0);
 		v = r - (z - x);	/* z+v = r+x */
 		t = a = -1.0 / w;	/* a = -1.0/w */
-		__LO(t) = 0;
+		SET_LOW_WORD(t,0);
 		s = 1.0 + t * z;
 		return t + a * (s + t * v);
 	}

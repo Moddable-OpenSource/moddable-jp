@@ -1,5 +1,4 @@
 
-/* @(#)e_atanh.c 1.3 95/01/18 */
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -12,7 +11,7 @@
  *
  */
 
-/* __ieee754_atanh(x)
+/* atanh(x)
  * Method :
  *    1.Reduced x to positive by atanh(-x) = -atanh(x)
  *    2.For x>=0.5
@@ -30,35 +29,25 @@
  *
  */
 
-#include "fdlibm.h"
+#include "math_private.h"
 
-#ifdef __STDC__
 static const double one = 1.0, huge = 1e300;
-#else
-static double one = 1.0, huge = 1e300;
-#endif
+static const double zero = 0.0;
 
-static double zero = 0.0;
-
-#ifdef __STDC__
-	double __ieee754_atanh(double x)
-#else
-	double __ieee754_atanh(x)
-	double x;
-#endif
+double
+__ieee754_atanh(double x)
 {
 	double t;
-	int hx,ix;
-	unsigned lx;
-	hx = __HI(x);		/* high word */
-	lx = __LO(x);		/* low word */
+	int32_t hx,ix;
+	u_int32_t lx;
+	EXTRACT_WORDS(hx,lx,x);
 	ix = hx&0x7fffffff;
 	if ((ix|((lx|(-lx))>>31))>0x3ff00000) /* |x|>1 */
 	    return (x-x)/(x-x);
 	if(ix==0x3ff00000) 
 	    return x/zero;
 	if(ix<0x3e300000&&(huge+x)>zero) return x;	/* x<2**-28 */
-	__HI(x) = ix;		/* x <- |x| */
+	SET_HIGH_WORD(x,ix);
 	if(ix<0x3fe00000) {		/* x < 0.5 */
 	    t = x+x;
 	    t = 0.5*s_log1p(t+t*x/(one-x));
