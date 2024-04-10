@@ -3206,7 +3206,7 @@ static void fxUint8ArrayFromBase64(txMachine* the, txU1* srcStart, txU1* dstStar
 			if (bufferLength < 4)
 				continue;
 		}
-		*read = src - srcStart;
+		*read = (txSize)(src - srcStart);
 		buffer[0] = (buffer[0] << 2) | ((buffer[1] & 0x30) >> 4);
 		buffer[1] = ((buffer[1] & 0x0F) << 4) | ((buffer[2] & 0x3C) >> 2);
 		buffer[2] = ((buffer[2] & 0x03) << 6) | (buffer[3] & 0x3F);
@@ -3223,7 +3223,7 @@ static void fxUint8ArrayFromBase64(txMachine* the, txU1* srcStart, txU1* dstStar
 		if ((done) || (remaining == 0))
 			break;
 	}
-	*written = dst - dstStart;
+	*written = (txSize)(dst - dstStart);
 }
 
 static void fxUint8ArrayFromHex(txMachine* the, txU1* srcStart, txU1* dstStart, txSize* read, txSize* written)
@@ -3247,8 +3247,8 @@ static void fxUint8ArrayFromHex(txMachine* the, txU1* srcStart, txU1* dstStart, 
 		srcSize -= 2;
 		dstSize--;
 	}
-	*read = src - srcStart;
-	*written = dst - dstStart;
+	*read = (txSize)(src - srcStart);
+	*written = (txSize)(dst - dstStart);
 }
 
 static void fxUint8ArrayGetBase64Options(txMachine* the, txInteger argi, txU1** alphabet, txInteger* lastChunkHandling)
@@ -3296,7 +3296,7 @@ void fx_Uint8Array_fromBase64(txMachine* the)
 	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
 		mxTypeError("string is no string");
 	fxUint8ArrayGetBase64Options(the, 1, &alphabet, &lastChunkHandling);
-	srcSize = c_strlen(mxArgv(0)->value.string);
+	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
 	dstSize = (((srcSize + 3) / 4) * 3);
 	mxPush(mxUint8ArrayConstructor);
 	mxNew();
@@ -3326,7 +3326,7 @@ void fx_Uint8Array_fromHex(txMachine* the)
 	txU1* dst;
 	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
 		mxTypeError("string is no string");
-	srcSize = c_strlen(mxArgv(0)->value.string);
+	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
 	if (srcSize & 1)
 		mxSyntaxError("string has odd length");
 	dstSize = srcSize >> 1;
@@ -3364,7 +3364,7 @@ void fx_Uint8Array_prototype_setFromBase64(txMachine* the)
 	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
 		mxTypeError("string is no string");
 	fxUint8ArrayGetBase64Options(the, 1, &alphabet, &lastChunkHandling);
-	srcSize = c_strlen(mxArgv(0)->value.string);
+	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
 	dstSize = fxCheckDataViewSize(the, view, buffer, XS_MUTABLE);
 	src = (txU1*)(mxArgv(0)->value.string);
 	dst = (txU1*)(buffer->value.reference->next->value.arrayBuffer.address + view->value.dataView.offset);
@@ -3391,7 +3391,7 @@ void fx_Uint8Array_prototype_setFromHex(txMachine* the)
 		mxTypeError("this is no Uint8Array instance");
 	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
 		mxTypeError("string is no string");
-	srcSize = c_strlen(mxArgv(0)->value.string);
+	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
 	if (srcSize & 1)
 		mxSyntaxError("string has odd length");
 	dstSize = fxCheckDataViewSize(the, view, buffer, XS_MUTABLE);
