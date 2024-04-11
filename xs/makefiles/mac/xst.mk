@@ -66,6 +66,7 @@ C_OPTIONS = \
 	-DmxSloppy=1 \
 	-DmxSnapshot=1 \
 	-DmxRegExpUnicodePropertyEscapes=1 \
+	-DmxStringInfoCacheLength=4 \
 	-DmxStringNormalize=1 \
 	-DmxMinusZero=1 \
 	-D_IEEE_LIBM \

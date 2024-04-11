@@ -208,7 +208,7 @@ void fxAllocate(txMachine* the, txCreation* theCreation)
 	if (!the->symbolTable)
 		fxAbort(the, XS_NOT_ENOUGH_MEMORY_EXIT);
 		
-	fxAllocateStringInfoCache(the, 4);
+	fxAllocateStringInfoCache(the);
 
 	the->stackLimit = fxCStackLimit();
 

@@ -37,6 +37,8 @@
 
 #include "xsAll.h"
 
+#if mxStringInfoCacheLength
+
 typedef struct sxStringInfo txStringInfo;
 typedef struct sxStringInfoCache txStringInfoCache;
 
@@ -58,12 +60,12 @@ struct sxStringInfoCache {
 
 static txStringInfo* fxCacheStringInfo(txMachine* the, txString string);
 
-void fxAllocateStringInfoCache(txMachine* the, txInteger count)
+void fxAllocateStringInfoCache(txMachine* the)
 {
-	txStringInfoCache* cache = c_malloc(sizeof(txStringInfoCache) + ((count - 1) * sizeof(txStringInfo)));
+	txStringInfoCache* cache = c_malloc(sizeof(txStringInfoCache) + ((mxStringInfoCacheLength - 1) * sizeof(txStringInfo)));
 	if (cache == C_NULL)
 		fxAbort(the, XS_NOT_ENOUGH_MEMORY_EXIT);
-	cache->count = count;
+	cache->count = mxStringInfoCacheLength;
 	cache->head = 0;
 	cache->tail = 0;
 	the->stringInfoCache = cache;
@@ -260,6 +262,7 @@ txSize fxCacheUnicodeToUTF8Offset(txMachine* the, txString string, txSize offset
 	}
 	return fxUnicodeToUTF8Offset(string, offset);
 }
+#endif
 
 #define mxStringInstanceLength(INSTANCE) ((txIndex)fxUnicodeLength(instance->next->value.string, C_NULL))
 #define mxCacheStringInstanceLength(INSTANCE) ((txIndex)fxCacheUnicodeLength(the, instance->next->value.string))
