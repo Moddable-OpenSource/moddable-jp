@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2019 Shinya Ishikawa
+ *   Copyright (c) 2019-2024 Shinya Ishikawa, 2024 RChikamura
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -19,54 +19,208 @@
  */
 import SMBus from "pins/smbus";
 
-class LDO {
+function vToByte(v, steps, points) {
+  if (v < points[0]) {
+    return 0;
+  }
+  let base = 0;
+  for (let i = 1; i < points.length; i++) {
+    const step = steps[i - 1];
+    if (v < points[i]) {
+      return base + (v - points[i - 1]) * step;
+    }
+    base += (points[i] - points[i - 1]) * step;
+  }
+  return base;
+}
+
+function byteToV(byte, points, steps) {
+  if (byte <= 0) {
+    return points[0]
+  }
+  let base = 0;
+  for (let i = 1; i < points.length; i++) {
+    const step = steps[i - 1];
+    const delta = (points[i] - points[i - 1]) * step;
+    if (byte <= base + delta) {
+      return points[i - 1] + (byte - base) / step;
+    }
+    base += delta;
+  }
+  // should not be here since the byte value is over the maximum
+  return points[points.length - 1] + (byte - base) / steps[steps.length - 1];
+
+}
+class DCDC {
   #parent;
-  #register;
-  #offsetV;
-  #offsetEn;
-  constructor({ register, parent, offsetV, offsetEn }) {
+  #registerV;
+  #mask;
+  #points;
+  #steps;
+
+  constructor({ registerV, parent, mask, points, steps }) {
     this.#parent = parent;
-    this.#register = register;
-    this.#offsetV = offsetV;
-    this.#offsetEn = offsetEn;
+    this.#registerV = registerV;
+    this.#mask = mask;
+    this.#points = points;
+    this.#steps = steps;
   }
 
   set voltage(v) {
-    const vdata = v > 3300 ? 15 : v / 100 - 18;
-    const mask = ~(0xff << this.#offsetV);
+    const byte = vToByte(v, this.#points, this.#steps);
     this.#parent.writeByte(
-      this.#register,
-      (this.#parent.readByte(this.#register) & mask) | (vdata << this.#offsetV)
+      this.#registerV,
+      (this.#parent.readByte(this.#registerV) & this.#mask) |
+      (byte & ~this.#mask)
+    );
+  }
+  get voltage() {
+    let byte = this.#parent.readByte(this.#registerV);
+    return byteToV(byte & this.#mask, this.#points, this.#steps)
+  }
+}
+
+class LDO {
+  #parent;
+  #registerV;
+  #registerEn;
+  #offsetEn;
+  #points;
+  #steps;
+  constructor({ registerV, registerEn, parent, offsetEn, points, steps }) {
+    this.#parent = parent;
+    this.#registerV = registerV;
+    this.#registerEn = registerEn;
+    this.#offsetEn = offsetEn;
+    this.#points = points;
+    this.#steps = steps;
+  }
+
+  set voltage(v) {
+    const byte = vToByte(v, this.#points, this.#steps)
+    this.#parent.writeByte(
+      this.#registerV,
+      (this.#parent.readByte(this.#registerV) & 0x1f) | byte
     );
   }
 
   get voltage() {
-    return (
-      ((this.#parent.readByte(this.#register) >> this.#offsetV) + 18) * 100
-    );
+    const byte = this.#parent.readByte(this.#registerV) & 0x1f;
+    return byteToV(byte);
   }
 
   set enable(enable) {
     const mask = 0x01 << this.#offsetEn;
     if (enable) {
-      this.#parent.writeByte(0x12, this.#parent.readByte(0x12) | mask);
+      this.#parent.writeByte(
+        this.#registerEn,
+        this.#parent.readByte(this.#registerEn) | mask
+      );
     } else {
-      this.#parent.writeByte(0x12, this.#parent.readByte(0x12) & ~mask);
+      this.#parent.writeByte(
+        this.#registerEn,
+        this.#parent.readByte(this.#registerEn) & ~mask
+      );
     }
   }
 
   get enable() {
-    return Boolean((this.#parent.readByte(0x12) >> this.#offsetEn) & 1);
+    return Boolean(
+      (this.#parent.readByte(this.#registerEn) >> this.#offsetEn) & 1
+    );
   }
 }
 
 export default class AXP2101 extends SMBus {
   constructor(it) {
     super({ address: 0x34, ...it });
-    this._dledo1 = new LDO({
-      register: 0x34,
+
+    this._dcdc1 = new DCDC({
+      registerV: 0x82,
       parent: this,
-      offsetV: 5,
+      points: [1500, 3400],
+      steps: [1 / 100],
+      mask: 0xe0,
+    });
+    this._dcdc2 = new DCDC({
+      registerV: 0x83,
+      parent: this,
+      points: [500, 1200, 1600],
+      steps: [1 / 10, 1 / 20],
+      mask: 0x80,
+    });
+    this._dcdc3 = new DCDC({
+      registerV: 0x84,
+      parent: this,
+      points: [500, 1200, 1540, 1600, 3400],
+      steps: [1 / 10, 1 / 20, 0, 1 / 20],
+      mask: 0x80,
+    });
+    this._dcdc4 = new DCDC({
+      registerV: 0x85,
+      parent: this,
+      points: [500, 1200, 1840],
+      steps: [1 / 10, 1 / 20],
+      mask: 0x80,
+    });
+    this._dcdc5 = new DCDC({
+      registerV: 0x86,
+      parent: this,
+      points: [1400, 3700],
+      steps: [1 / 100],
+      mask: 0xe0,
+    });
+
+    const PARAM_A = {
+      parent: this,
+      points: [500, 1400],
+      steps: [1 / 50],
+    };
+    const PARAM_B = {
+      parent: this,
+      points: [500, 3500],
+      steps: [1 / 100],
+    };
+    this._aldo1 = new LDO({
+      ...PARAM_B,
+      registerV: 0x92,
+      registerEn: 0x90,
+      offsetEn: 0,
+    });
+    this._aldo2 = new LDO({
+      ...PARAM_B,
+      registerV: 0x93,
+      registerEn: 0x90,
+      offsetEn: 1,
+    });
+    this._aldo3 = new LDO({
+      ...PARAM_B,
+      registerV: 0x94,
+      registerEn: 0x90,
+      offsetEn: 2,
+    });
+    this._aldo4 = new LDO({
+      ...PARAM_B,
+      registerV: 0x95,
+      registerEn: 0x90,
+      offsetEn: 3,
+    });
+    this._bldo1 = new LDO({
+      ...PARAM_B,
+      registerV: 0x96,
+      registerEn: 0x90,
+      offsetEn: 4,
+    });
+    this._bldo2 = new LDO({
+      ...PARAM_B,
+      registerV: 0x97,
+      registerEn: 0x90,
+      offsetEn: 5,
+    });
+    this._dldo1 = new LDO({
+      ...PARAM_B,
+      registerV: 0x99,
+      registerEn: 0x90,
       offsetEn: 7,
     });
   }
@@ -112,37 +266,26 @@ export default class AXP2101 extends SMBus {
   }
 
   powerOff() {
-    this.writeByte(0x10, this.readByte(0x10) | 0b00000001);
+    this.writeByte(0x10, this.readByte(0x10) | 0b00000010); // POWERON Negative Edge IRQ(ponne_irq_en) enable
+    this.writeByte(0x25, 0b00011011); // sleep and wait for wakeup
+    Timer.delay(100);
+    this.writeByte(0x10, 0b00110001); // power off
   }
 
-  setChargeEnable(enable) {
-    if (enable) {
-      this.writeByte(0x33, this.readByte(0x33) | 0b10000000);
-    } else {
-      this.writeByte(0x33, this.readByte(0x33) | 0b10000000);
-    }
+  setChargeEnable(_enable) {
+    throw new Error("not implemented");
   }
 
-  setChargeCurrent(state) {
-    this.writeByte(0x33, (this.readByte(0x33) & 0xf0) | (state & 0x0f));
+  setChargeCurrent(_state) {
+    throw new Error("not implemented");
   }
 
-  setADCEnable(channel, enable) {
-    const mask = 0x01 << channel;
-    if (enable) {
-      this.writeByte(0x82, this.readByte(0x82) | mask);
-    } else {
-      this.writeByte(0x82, this.readByte(0x82) & ~mask);
-    }
+  setADCEnable(_channel, _enable) {
+    throw new Error("not implemented");
   }
 
   setCoulometerEnable(channel, enable) {
-    const mask = 0x01 << channel;
-    if (enable) {
-      this.writeByte(0x12, this.readByte(0x12) | mask);
-    } else {
-      this.writeByte(0x12, this.readByte(0x12) & ~mask);
-    }
+    throw new Error("not implemented");
   }
 
   _getCoulometerCharge() {
@@ -162,6 +305,7 @@ export default class AXP2101 extends SMBus {
 
   getBatteryVoltage() {
     const ADCLSB = 1.1 / 1000.0;
+    // TODO: implement
   }
 
   getBatteryLevel() {
@@ -173,37 +317,37 @@ export default class AXP2101 extends SMBus {
   getBatteryPower() {
     const VOLTAGE_LSB = 1.1;
     const CURRENT_LCS = 0.5;
-    return (VOLTAGE_LSB * CURRENT_LCS * this._read24Bit(0x70)) / 1000.0;
+    return (VOLTAGE_LSB * CURRENT_LCS * this.#read24Bit(0x70)) / 1000.0;
   }
 
   getVBUSVoltage() {
     const ADC_LSB = 1.7 / 1000.0;
-    return ADC_LSB * this._read12Bit(0x5a);
+    return ADC_LSB * this.#read12Bit(0x5a);
   }
 
   getVBUSCurrent() {
     const ADC_LSB = 0.375;
-    return ADC_LSB * this._read12Bit(0x5c)
+    return ADC_LSB * this.#read12Bit(0x5c);
   }
 
   getAXP173Temperature() {
     const ADC_LSB = 0.1;
     const OFFSET_DEG_C = -144.7;
-    return ADC_LSB * this._read12Bit(0x5e) + OFFSET_DEG_C
+    return ADC_LSB * this.#read12Bit(0x5e) + OFFSET_DEG_C;
   }
 
   getTSTemperature() {
     const ADC_LSB = 0.1;
     const OFFSET_DEG_C = -144.7;
-    return ADC_LSB * this._read12Bit(0x62) + OFFSET_DEG_C
+    return ADC_LSB * this.#read12Bit(0x62) + OFFSET_DEG_C;
   }
 
-  _read24Bit(address) {
+  #read24Bit(address) {
     const buff = this.readBlock(address, 3);
     return (buff[0] << 16) + (buff[1] << 8) + buff[2];
   }
 
-  _read12Bit(address) {
+  #read12Bit(address) {
     const buff = this.readBlock(address, 2);
     return (buff[0] << 4) + buff[1];
   }

@@ -53,16 +53,20 @@
 	#define __has_builtin(x) 0
 #endif
 
-#ifndef mxECMAScript2023
-	#define mxECMAScript2023 1
-#endif
-
 #ifndef mxECMAScript2024
 	#define mxECMAScript2024 1
 #endif
 
+#ifndef mxECMAScript2023
+	#define mxECMAScript2023 1
+#endif
+
 #ifndef mxExplicitResourceManagement
 	#define mxExplicitResourceManagement 0
+#endif
+
+#ifndef mxUint8ArrayBase64
+	#define mxUint8ArrayBase64 1
 #endif
 
 #ifdef __cplusplus
@@ -126,6 +130,8 @@ typedef struct {
 	#endif
 #endif
 #if mxExplicitResourceManagement
+	#define XS_MINOR_VERSION 5
+#elif mxUint8ArrayBase64
 	#define XS_MINOR_VERSION 4
 #else
 	#define XS_MINOR_VERSION 3
@@ -1203,6 +1209,18 @@ enum {
 	_unicodeSets,	
 	_waitAsync,	
 	_withResolvers,	
+#endif
+#if mxUint8ArrayBase64
+	_alphabet,
+	_fromBase64,
+	_fromHex,
+	_lastChunkHandling,
+	_read,
+	_setFromBase64,
+	_setFromHex,
+	_toBase64,
+	_toHex,
+	_written,
 #endif
 	XS_ID_COUNT
 };

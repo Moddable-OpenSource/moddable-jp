@@ -4,7 +4,6 @@ flags: [module]
 ---*/
 
 import {Digest, GHASH} from "crypt";
-import Base64 from "base64";
 import Bin from "bin";
 
 function H2B(hstr)
@@ -21,7 +20,7 @@ function B2H(b)
 let sha1 = new Digest("SHA1");
 sha1.write("dGhlIHNhbXBsZSBub25jZQ==");
 sha1.write("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
-let result = Base64.encode(sha1.close());
+let result = (new Uint8Array(sha1.close())).toBase64();
 assert.sameValue("s3pPLMBiTxaQ9kYGzzhZRbK+xOo=", result, "SHA1");
 
 let ghash = new GHASH(H2B("0x66e94bd4ef8a2c3b884cfa59ca342b2e"));

@@ -1630,6 +1630,13 @@ mxExport void fx_TypedArray_prototype_toStringTag_get(txMachine* the);
 mxExport void fx_TypedArray_prototype_values(txMachine* the);
 mxExport void fx_TypedArray_prototype_with(txMachine* the);
 
+mxExport void fx_Uint8Array_fromBase64(txMachine* the);
+mxExport void fx_Uint8Array_fromHex(txMachine* the);
+mxExport void fx_Uint8Array_prototype_setFromBase64(txMachine* the);
+mxExport void fx_Uint8Array_prototype_setFromHex(txMachine* the);
+mxExport void fx_Uint8Array_prototype_toBase64(txMachine* the);
+mxExport void fx_Uint8Array_prototype_toHex(txMachine* the);
+
 extern void fxBuildDataView(txMachine* the);
 extern void fxConstructArrayBufferResult(txMachine* the, txSlot* constructor, txInteger length);
 

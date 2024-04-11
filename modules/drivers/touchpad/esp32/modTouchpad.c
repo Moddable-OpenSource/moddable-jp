@@ -127,7 +127,7 @@ void xs_touchpad(xsMachine *the)
 		xsSlot tmp;
 
 		xsmcGet(tmp, xsArg(0), xsID_onReadable);
-		touchpad->onReadable = xsToReference(tmp);
+		touchpad->onReadable = xsmcToReference(tmp);
 
 		xsSetHostHooks(xsThis, (xsHostHooks *)&xsTouchpadHooks);
 	}

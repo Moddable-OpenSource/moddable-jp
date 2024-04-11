@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022  Moddable Tech, Inc.
+ * Copyright (c) 2022-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK.
  * 
@@ -29,7 +29,7 @@ const notFound = {
 
 let server = new HTTPServer({
 	io: Listener,
-	port: 80,
+	port: 8080,
 	onConnect(connection) {
 		connection.accept({
 			onRequest(request) {
@@ -131,7 +131,7 @@ router.set("/ws", {
 /*
 	WebSocket client for testing
 */
-const ws = new WebSocket("ws://localhost/ws");
+const ws = new WebSocket("ws://localhost:8080/ws");
 ws.binaryType = "arraybuffer";
 ws.addEventListener("open", event => {
 	ws.send("hello");

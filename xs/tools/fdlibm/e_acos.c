@@ -1,5 +1,4 @@
 
-/* @(#)e_acos.c 1.3 95/01/18 */
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -11,7 +10,7 @@
  * ====================================================
  */
 
-/* __ieee754_acos(x)
+/* acos(x)
  * Method :                  
  *	acos(x)  = pi/2 - asin(x)
  *	acos(-x) = pi/2 + asin(x)
@@ -35,17 +34,15 @@
  * Function needed: sqrt
  */
 
-#include "fdlibm.h"
+#include "math_private.h"
 
-#ifdef __STDC__
-static const double 
-#else
-static double 
-#endif
+static const double
 one=  1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */
 pi =  3.14159265358979311600e+00, /* 0x400921FB, 0x54442D18 */
-pio2_hi =  1.57079632679489655800e+00, /* 0x3FF921FB, 0x54442D18 */
-pio2_lo =  6.12323399573676603587e-17, /* 0x3C91A626, 0x33145C07 */
+pio2_hi =  1.57079632679489655800e+00; /* 0x3FF921FB, 0x54442D18 */
+static volatile double
+pio2_lo =  6.12323399573676603587e-17; /* 0x3C91A626, 0x33145C07 */
+static const double
 pS0 =  1.66666666666666657415e-01, /* 0x3FC55555, 0x55555555 */
 pS1 = -3.25565818622400915405e-01, /* 0xBFD4D612, 0x03EB6F7D */
 pS2 =  2.01212532134862925881e-01, /* 0x3FC9C155, 0x0E884455 */
@@ -57,19 +54,17 @@ qS2 =  2.02094576023350569471e+00, /* 0x40002AE5, 0x9C598AC8 */
 qS3 = -6.88283971605453293030e-01, /* 0xBFE6066C, 0x1B8D0159 */
 qS4 =  7.70381505559019352791e-02; /* 0x3FB3B8C5, 0xB12E9282 */
 
-#ifdef __STDC__
-	double __ieee754_acos(double x)
-#else
-	double __ieee754_acos(x)
-	double x;
-#endif
+double
+__ieee754_acos(double x)
 {
 	double z,p,q,r,w,s,c,df;
-	int hx,ix;
-	hx = __HI(x);
+	int32_t hx,ix;
+	GET_HIGH_WORD(hx,x);
 	ix = hx&0x7fffffff;
 	if(ix>=0x3ff00000) {	/* |x| >= 1 */
-	    if(((ix-0x3ff00000)|__LO(x))==0) {	/* |x|==1 */
+	    u_int32_t lx;
+	    GET_LOW_WORD(lx,x);
+	    if(((ix-0x3ff00000)|lx)==0) {	/* |x|==1 */
 		if(hx>0) return 0.0;		/* acos(1) = 0  */
 		else return pi+2.0*pio2_lo;	/* acos(-1)= pi */
 	    }
@@ -94,7 +89,7 @@ qS4 =  7.70381505559019352791e-02; /* 0x3FB3B8C5, 0xB12E9282 */
 	    z = (one-x)*0.5;
 	    s = sqrt(z);
 	    df = s;
-	    __LO(df) = 0;
+	    SET_LOW_WORD(df,0);
 	    c  = (z-df*df)/(s+df);
 	    p = z*(pS0+z*(pS1+z*(pS2+z*(pS3+z*(pS4+z*pS5)))));
 	    q = one+z*(qS1+z*(qS2+z*(qS3+z*qS4)));

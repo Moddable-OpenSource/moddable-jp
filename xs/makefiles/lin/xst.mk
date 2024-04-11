@@ -54,6 +54,7 @@ C_OPTIONS = \
 	-DmxExplicitResourceManagement=1 \
 	-DmxKeysGarbageCollection=1 \
 	-DmxLockdown=1 \
+	-DmxMinusZero=1 \
 	-DmxNoConsole=1 \
 	-DmxParse=1 \
 	-DmxProfile=1 \
@@ -62,9 +63,6 @@ C_OPTIONS = \
 	-DmxSnapshot=1 \
 	-DmxRegExpUnicodePropertyEscapes=1 \
 	-DmxStringNormalize=1 \
-	-DmxMinusZero=1 \
-	-D_IEEE_LIBM \
-	-D__LITTLE_ENDIAN \
 	-I$(INC_DIR) \
 	-I$(PLT_DIR) \
 	-I$(SRC_DIR) \
@@ -192,7 +190,6 @@ OBJECTS = \
 	$(TMP_DIR)/e_atanh.o \
 	$(TMP_DIR)/e_cosh.o \
 	$(TMP_DIR)/e_exp.o \
-	$(TMP_DIR)/e_fmod.o \
 	$(TMP_DIR)/e_hypot.o \
 	$(TMP_DIR)/e_log.o \
 	$(TMP_DIR)/e_log10.o \
@@ -200,6 +197,7 @@ OBJECTS = \
 	$(TMP_DIR)/e_rem_pio2.o \
 	$(TMP_DIR)/e_sinh.o \
 	$(TMP_DIR)/k_cos.o \
+	$(TMP_DIR)/k_exp.o \
 	$(TMP_DIR)/k_rem_pio2.o \
 	$(TMP_DIR)/k_sin.o \
 	$(TMP_DIR)/k_tan.o \
@@ -207,9 +205,7 @@ OBJECTS = \
 	$(TMP_DIR)/s_atan.o \
 	$(TMP_DIR)/s_cos.o \
 	$(TMP_DIR)/s_expm1.o \
-	$(TMP_DIR)/s_ilogb.o \
 	$(TMP_DIR)/s_log1p.o \
-	$(TMP_DIR)/s_logb.o \
 	$(TMP_DIR)/s_scalbn.o \
 	$(TMP_DIR)/s_sin.o \
 	$(TMP_DIR)/s_tan.o \
@@ -242,6 +238,7 @@ $(OBJECTS): $(PLT_DIR)/xsPlatform.h
 $(OBJECTS): $(SRC_DIR)/xsCommon.h
 $(OBJECTS): $(SRC_DIR)/xsAll.h
 $(OBJECTS): $(SRC_DIR)/xsScript.h
+$(OBJECTS): $(TLS_DIR)/fdlibm/math_private.h
 $(TMP_DIR)/%.o: %.c
 	@echo "#" $(NAME) $(GOAL) ": cc" $(<F)
 	@echo $(CC) $< $(C_OPTIONS) -c -o $@

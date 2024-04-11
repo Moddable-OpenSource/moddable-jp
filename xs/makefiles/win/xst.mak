@@ -51,6 +51,7 @@ C_OPTIONS = \
 	/D mxExplicitResourceManagement=1 \
 	/D mxKeysGarbageCollection=1 \
 	/D mxLockdown=1 \
+	/D mxMinusZero=1 \
 	/D mxNoConsole=1 \
 	/D mxParse=1 \
 	/D mxProfile=1 \
@@ -59,9 +60,6 @@ C_OPTIONS = \
 	/D mxSnapshot=1 \
 	/D mxRegExpUnicodePropertyEscapes=1 \
 	/D mxStringNormalize=1 \
-	/D mxMinusZero=1 \
-	/D _IEEE_LIBM=1 \
-	/D __LITTLE_ENDIAN=1 \
 	/I$(INC_DIR) \
 	/I$(PLT_DIR) \
 	/I$(SRC_DIR) \
@@ -158,7 +156,6 @@ OBJECTS = \
 	$(TMP_DIR)\e_atanh.obj \
 	$(TMP_DIR)\e_cosh.obj \
 	$(TMP_DIR)\e_exp.obj \
-	$(TMP_DIR)\e_fmod.obj \
 	$(TMP_DIR)\e_hypot.obj \
 	$(TMP_DIR)\e_log.obj \
 	$(TMP_DIR)\e_log10.obj \
@@ -166,6 +163,7 @@ OBJECTS = \
 	$(TMP_DIR)\e_rem_pio2.obj \
 	$(TMP_DIR)\e_sinh.obj \
 	$(TMP_DIR)\k_cos.obj \
+	$(TMP_DIR)\k_exp.obj \
 	$(TMP_DIR)\k_rem_pio2.obj \
 	$(TMP_DIR)\k_sin.obj \
 	$(TMP_DIR)\k_tan.obj \
@@ -173,9 +171,7 @@ OBJECTS = \
 	$(TMP_DIR)\s_atan.obj \
 	$(TMP_DIR)\s_cos.obj \
 	$(TMP_DIR)\s_expm1.obj \
-	$(TMP_DIR)\s_ilogb.obj \
 	$(TMP_DIR)\s_log1p.obj \
-	$(TMP_DIR)\s_logb.obj \
 	$(TMP_DIR)\s_scalbn.obj \
 	$(TMP_DIR)\s_sin.obj \
 	$(TMP_DIR)\s_tan.obj \
@@ -198,6 +194,7 @@ $(BIN_DIR)\$(NAME).exe : $(OBJECTS)
 		/out:$(BIN_DIR)\$(NAME).exe
 
 $(OBJECTS) : $(TLS_DIR)\xst.h
+$(OBJECTS) : $(TLS_DIR)\fdlibm\math_private.h
 $(OBJECTS) : $(PLT_DIR)\xsPlatform.h
 $(OBJECTS) : $(SRC_DIR)\xsCommon.h
 $(OBJECTS) : $(SRC_DIR)\xsAll.h

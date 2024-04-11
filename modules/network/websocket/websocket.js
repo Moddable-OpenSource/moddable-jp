@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -25,7 +25,6 @@
 */
 
 import {Socket, Listener} from "socket";
-import Base64 from "base64";
 import Logical from "logical";
 import {Digest} from "crypt";
 import Timer from "timer";
@@ -134,7 +133,7 @@ function callback(message, value) {
 			"Upgrade: websocket\r\n",
 			"Connection: keep-alive, Upgrade\r\n",
 			"Sec-WebSocket-Version: 13\r\n",
-			"Sec-WebSocket-Key: ", Base64.encode(key.buffer) + "\r\n",
+			"Sec-WebSocket-Key: ", key.toBase64() + "\r\n",
 		];
 
 		if (this.protocol)
@@ -376,7 +375,7 @@ trace("partial header!!\n");		//@@ untested
 						"HTTP/1.1 101 Web Socket Protocol Handshake\r\n",
 						"Connection: Upgrade\r\n",
 						"Upgrade: websocket\r\n",
-						"Sec-WebSocket-Accept: ", Base64.encode(sha1.close()), "\r\n",
+						"Sec-WebSocket-Accept: ", new Uint8Array(sha1.close()).toBase64(), "\r\n",
 					]
 
 					if (this.protocol) {

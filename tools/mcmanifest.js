@@ -928,23 +928,34 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 
 		for (var result of tool.outlineFontFiles) {
 			var source = result.source;
-			
-			if (!tool.getenv("FONTBM"))
-				throw new Error("$(FONTBM) environment variable not set. Is fontbm installed?");
-			
+
+			if (!tool.getenv("FONTBM")) {
+				if (tool.spawn(tool.windows ? "where" : "which", "fontbm") !== 0) 
+					throw new Error("$(FONTBM) environment variable not set. Is fontbm installed?");
+				tool.setenv("FONTBM", "fontbm");
+			}
+
 			result.faces.forEach(face => {
 				const name = face.name + "-" + face.size;
 
+				const characterFiles = (("string" === typeof face.characterFiles) ? [face.characterFiles] : (face.characterFiles ?? []));
+				characterFiles.forEach((file, i) => {
+					characterFiles[i] = tool.resolveFilePath(file);
+					if (!characterFiles[i])
+						throw new Error(`characterFile "${file}" not found`);
+				});
+				
 				let line = Array.of("$(RESOURCES_DIR)", tool.slash, ("-alpha" === face.suffix) ? `${name}.fnt` : `${name}.bf4`, ": ", source,
 							" ", "$(RESOURCES_DIR)", tool.slash, name + ".txt",
 							" ", "$(RESOURCES_DIR)", tool.slash, name + ".json");
 				if (face.localization)
 					line.push(" ", "$(RESOURCES_DIR)", tool.slash, "locals.mhi");
+				characterFiles.forEach(file => line.push(" ", file));
 				this.line.apply(this, line);
 				this.echo(tool, "fontbm ", name);
 
 				let characters = face.characters ?? "";
-				let blocks = ("string" === typeof face.blocks) ? [face.blocks] : (face.blocks ?? (characters ? [] : ["Basic Latin"]));
+				const blocks = ("string" === typeof face.blocks) ? [face.blocks] : (face.blocks ?? (characters ? [] : ["Basic Latin"]));
 				blocks.forEach(block => {
 					const info = UncodeRanges.find(info => info.category === block);
 					if (!info)
@@ -967,8 +978,10 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 				if (former !== options)
 					tool.writeFileString(path, options);				
 
-				const localization = face.localization ? `--chars-file "$(RESOURCES_DIR)${tool.slash}locals.txt"` : "";
-				this.line(`\t$(FONTBM) --font-file ${source} --font-size ${face.size} --output "$(RESOURCES_DIR)${tool.slash}${name}" --texture-crop-width --texture-crop-height --texture-name-suffix none --data-format bin ${face.kern ? "--kerning-pairs regular" : ""} ${face.monochrome ? "--monochrome" : ""} --chars-file "$(RESOURCES_DIR)${tool.slash}${name}.txt" ${localization}`);
+				characterFiles.push(`$(RESOURCES_DIR)${tool.slash}${name}.txt`);
+				if (face.localization)
+					characterFiles.push(`$(RESOURCES_DIR)${tool.slash}${tool.localsName}.txt`);
+				this.line(`\t$(FONTBM) --font-file ${source} --font-size ${face.size} --output "$(RESOURCES_DIR)${tool.slash}${name}" --texture-crop-width --texture-crop-height --texture-name-suffix none --data-format bin ${face.kern ? "--kerning-pairs regular" : ""} ${face.monochrome ? "--monochrome" : ""} ${characterFiles.map(file => "--chars-file \"" + file + "\"").join(" ")}`);
 				if ("-alpha" === face.suffix) {
 					this.line("$(RESOURCES_DIR)", tool.slash, name + "-alpha.bmp", ": ", "$(RESOURCES_DIR)", tool.slash, `${name}.fnt`);
 					this.line("\tpng2bmp ", "$(RESOURCES_DIR)", tool.slash, name + ".png", ` -a -o $(@D) ${face.monochrome ? "-m" : ""} -r `, tool.rotation, " -t");
@@ -1703,9 +1716,12 @@ export class Tool extends TOOL {
 					if (this.manifestPath)
 						throw new Error("'" + name + "': too many manifests!");
 					path = this.resolveFilePath(name);
-					if (!path)
+					if (path)
+						this.manifestPath = path;
+					else if (name.startsWith("http://") || name.startsWith("https://"))
+						this.manifestPath = name;
+					else
 						throw new Error("'" + name + "': manifest not found!");
-					this.manifestPath = path;
 				}
 				break;
 			}
@@ -1740,8 +1756,32 @@ export class Tool extends TOOL {
 		if (userHome !== undefined) this.environment.USERHOME = userHome; 
 
 		if (this.manifestPath) {
-			var parts = this.splitPath(this.manifestPath);
-			this.currentDirectory = this.mainPath = parts.directory;
+			if (this.manifestPath.startsWith("http://") || this.manifestPath.startsWith("https://")) {
+				const url = new URL(this.manifestPath);
+				const directory = "repos/" + url.hostname + url.pathname;
+				if (directory.endsWith(".git"))
+					directory = directory.slice(0, -4);
+
+				const parts = directory.split("/");
+				const path = this.createDirectories(this.outputPath ?? this.buildPath, "tmp", parts.at(-1));
+				const manifest = {
+					include: [
+						{
+							git: url.origin + url.pathname
+						}
+					]
+				};
+				if (url.hash)
+					manifest.include[0].include = url.hash.slice(1);
+				this.manifestPath = path + "/generated_manifest.json";
+				this.writeFileString(this.manifestPath, JSON.stringify(manifest, null, "\t"));
+
+				this.currentDirectory = this.mainPath = path;
+			}
+			else {
+				var parts = this.splitPath(this.manifestPath);
+				this.currentDirectory = this.mainPath = parts.directory;
+			}
 		}
 		else {
 			path = this.resolveFilePath("." + this.slash + "manifest.json");

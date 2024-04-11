@@ -1812,6 +1812,18 @@ const txString gxIDStrings[XS_ID_COUNT] = {
 	"waitAsync",	
 	"withResolvers",
 #endif
+#if mxUint8ArrayBase64
+	"alphabet",
+	"fromBase64",
+	"fromHex",
+	"lastChunkHandling",
+	"read",
+	"setFromBase64",
+	"setFromHex",
+	"toBase64",
+	"toHex",
+	"written",
+#endif
 };
 
 #if mxCanonicalNaN

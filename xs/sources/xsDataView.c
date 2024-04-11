@@ -336,6 +336,22 @@ void fxBuildDataView(txMachine* the)
 		mxPop();
 	}
 	mxPop();
+	
+#if mxUint8ArrayBase64
+	mxPush(mxUint8ArrayConstructor);
+    instance = fxToInstance(the, the->stack);
+ 	slot = fxLastProperty(the, instance);
+	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Uint8Array_fromBase64), 1, mxID(_fromBase64), XS_DONT_ENUM_FLAG);
+	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Uint8Array_fromHex), 1, mxID(_fromHex), XS_DONT_ENUM_FLAG);
+    mxGetID(mxID(_prototype));
+    instance = fxToInstance(the, the->stack);
+ 	slot = fxLastProperty(the, instance);
+	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Uint8Array_prototype_setFromBase64), 1, mxID(_setFromBase64), XS_DONT_ENUM_FLAG);
+	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Uint8Array_prototype_setFromHex), 1, mxID(_setFromHex), XS_DONT_ENUM_FLAG);
+	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Uint8Array_prototype_toBase64), 0, mxID(_toBase64), XS_DONT_ENUM_FLAG);
+	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Uint8Array_prototype_toHex), 0, mxID(_toHex), XS_DONT_ENUM_FLAG);
+	mxPop();
+#endif
 }
 
 txInteger fxArgToByteLength(txMachine* the, txInteger argi, txInteger length)
@@ -2276,7 +2292,7 @@ void fx_TypedArray_prototype_slice(txMachine* the)
 				txByte* resultAddress = resultData->value.arrayBuffer.address;
 				address += view->value.dataView.offset;
 				resultAddress += resultView->value.dataView.offset;
-				c_memcpy(resultAddress, address + (start << shift), count << shift);
+				c_memmove(resultAddress, address + (start << shift), count << shift);
 				mxMeterSome(((txU4)(count)) * 2);
 			}
 			else {
@@ -3091,3 +3107,382 @@ void fxUint8ClampedSetter(txMachine* the, txSlot* data, txInteger offset, txSlot
 	mxMeterOne();
 }
 
+#if mxUint8ArrayBase64
+
+static const char gxBase64Alphabet[] ICACHE_FLASH_ATTR = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const char gxBase64URLAlphabet[] ICACHE_FLASH_ATTR = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+static const char gxHexAlphabet[] ICACHE_FLASH_ATTR = "0123456789abcdef";
+
+enum {
+	mxBase64Loose,
+	mxBase64StopBeforePartial,
+	mxBase64Strict,
+};
+
+static txU1 fxSkipAsciiWhitespace(txU1** src)
+{
+	txU1* p = *src;
+	txU1 c;
+	while ((c = c_read8(p))) {
+		if ((c != 0x09) && (c != 0x0A) && (c != 0x0C) && (c != 0x0D) && (c != 0x20))
+			 break;
+		p++;
+	}
+	*src = p;
+	return c;
+}
+
+static void fxUint8ArrayFromBase64(txMachine* the, txU1* srcStart, txU1* dstStart, txSize* read, txSize* written, txU1* alphabet, txInteger lastChunkHandling)
+{
+	txU1* src = srcStart;
+	txU1* dst = dstStart;
+	txSize remaining = *written;
+	txBoolean url = (alphabet == (txU1*)gxBase64URLAlphabet) ? 1 : 0, done = 0;
+	txU1 byte, buffer[4];
+	txSize bufferIndex, bufferLength = 0;
+	
+	if (remaining == 0) {
+		*read = 0;
+		return;
+	}
+	for (;;) {
+		byte = fxSkipAsciiWhitespace(&src);
+		if (byte == 0) {
+			if (bufferLength == 0)
+				break;
+			if (lastChunkHandling == mxBase64StopBeforePartial)
+				break;
+			if ((lastChunkHandling == mxBase64Strict) || (bufferLength == 1))
+				mxSyntaxError("invalid string");
+			if (bufferLength == 2)
+				buffer[2] = 0;
+			buffer[3] = 0;
+			done = 1;
+		}
+		else if (byte == '=') {
+			if (bufferLength < 2)	
+				mxSyntaxError("invalid string");
+			src++;
+			byte = fxSkipAsciiWhitespace(&src);
+			if (bufferLength == 2)	{
+				if (byte == 0) {
+					if (lastChunkHandling == mxBase64StopBeforePartial)
+						break;
+					mxSyntaxError("invalid string");
+				}
+				if (byte == '=') {
+					src++;
+					byte = fxSkipAsciiWhitespace(&src);
+				}
+				buffer[2] = 0;
+			}
+			if (byte != 0)
+				mxSyntaxError("invalid string");
+			buffer[3] = 0;
+			done = 1;
+		} 
+		else {
+			if (('A' <= byte) && (byte <= 'Z'))
+				byte = byte - 'A';
+			else if (('a' <= byte) && (byte <= 'z'))
+				byte = byte - 'a' + 26;
+			else if (('0' <= byte) && (byte <= '9'))
+				byte = byte - '0' + 52;
+			else if ((byte == '+') && !url)
+				byte = 62;
+			else if ((byte == '-') && url)
+				byte = 62;
+			else if ((byte == '/') && !url)
+				byte = 63;
+			else if ((byte == '_') && url)
+				byte = 63;
+			else
+				mxSyntaxError("invalid string");
+			if (((remaining == 1) && (bufferLength == 2)) || ((remaining == 2) && (bufferLength == 3)))
+				break;
+			buffer[bufferLength] = byte;
+			bufferLength++;
+			src++;
+			if (bufferLength < 4)
+				continue;
+		}
+		*read = (txSize)(src - srcStart);
+		buffer[0] = (buffer[0] << 2) | ((buffer[1] & 0x30) >> 4);
+		buffer[1] = ((buffer[1] & 0x0F) << 4) | ((buffer[2] & 0x3C) >> 2);
+		buffer[2] = ((buffer[2] & 0x03) << 6) | (buffer[3] & 0x3F);
+		bufferLength--;
+		if ((lastChunkHandling == mxBase64Strict) && (bufferLength < 3) && (buffer[bufferLength] != 0))
+			mxSyntaxError("invalid string");
+		bufferIndex = 0;
+		while ((bufferIndex < bufferLength) && (remaining > 0)) {
+			*dst++ = buffer[bufferIndex];
+			bufferIndex++;
+			remaining--;
+		}
+		bufferLength = 0;
+		if ((done) || (remaining == 0))
+			break;
+	}
+	*written = (txSize)(dst - dstStart);
+}
+
+static void fxUint8ArrayFromHex(txMachine* the, txU1* srcStart, txU1* dstStart, txSize* read, txSize* written)
+{
+#define mxFromHex(X) \
+	if (('0' <= X) && (X <= '9')) X = X - '0'; \
+	else if (('A' <= X) && (X <= 'Z')) X = X - 'A' + 10; \
+	else if (('a' <= X) && (X <= 'z')) X =  X - 'a' + 10; \
+	else mxSyntaxError("invalid string")
+
+	txU1* src = srcStart;
+	txU1* dst = dstStart;
+	txSize srcSize = *read;
+	txSize dstSize = *written;
+	while ((srcSize > 0) && (dstSize > 0)) {
+		txU1 high = c_read8(src++); 
+		txU1 low = c_read8(src++); 
+		mxFromHex(high);
+		mxFromHex(low);
+		*dst++ = (high << 4) + low;
+		srcSize -= 2;
+		dstSize--;
+	}
+	*read = (txSize)(src - srcStart);
+	*written = (txSize)(dst - dstStart);
+}
+
+static void fxUint8ArrayGetBase64Options(txMachine* the, txInteger argi, txU1** alphabet, txInteger* lastChunkHandling)
+{
+	if ((mxArgc > argi) && !mxIsUndefined(mxArgv(argi))) {
+		if (!mxIsReference(mxArgv(argi)))
+			mxTypeError("options is no object");
+		mxPushSlot(mxArgv(argi));
+		mxGetID(mxID(_alphabet));
+		if (!mxIsUndefined(the->stack)) {
+			if (!mxIsStringPrimitive(the->stack))
+				mxTypeError("options.alphabet is no string");
+			if (!c_strcmp(the->stack->value.string, "base64url"))
+				*alphabet = (txU1*)gxBase64URLAlphabet;
+			else if (c_strcmp(the->stack->value.string, "base64"))
+				mxTypeError("options.alphabet is neither 'base64' nor 'base64url'");
+		}
+		mxPop();
+		if (lastChunkHandling) {
+			mxPushSlot(mxArgv(argi));
+			mxGetID(mxID(_lastChunkHandling));
+			if (!mxIsUndefined(the->stack)) {
+				if (!mxIsStringPrimitive(the->stack))
+					mxTypeError("options.lastChunkHandling is no string");
+				if (!c_strcmp(the->stack->value.string, "stop-before-partial"))
+					*lastChunkHandling = mxBase64StopBeforePartial;
+				else if (!c_strcmp(the->stack->value.string, "strict"))
+					*lastChunkHandling = mxBase64Strict;
+				else if (c_strcmp(the->stack->value.string, "loose"))
+					mxTypeError("options.lastChunkHandling is neither 'loose' nor 'strict' nor 'stop-before-partial'");
+			}
+			mxPop();
+		}
+	}
+}
+
+void fx_Uint8Array_fromBase64(txMachine* the)
+{
+	txSize srcSize;
+	txSize dstSize;
+	txU1* alphabet = (txU1*)gxBase64Alphabet;
+	txInteger lastChunkHandling = mxBase64Loose;
+	txU1* src;
+	txU1* dst;
+	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
+		mxTypeError("string is no string");
+	fxUint8ArrayGetBase64Options(the, 1, &alphabet, &lastChunkHandling);
+	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
+	dstSize = (((srcSize + 3) / 4) * 3);
+	mxPush(mxUint8ArrayConstructor);
+	mxNew();
+	mxPushInteger(dstSize);
+	mxRunCount(1);
+	mxPullSlot(mxResult);
+	{
+		txSlot* resultInstance = fxCheckTypedArrayInstance(the, mxResult); \
+		txSlot* resultDispatch = resultInstance->next; \
+		txSlot* resultView = resultDispatch->next; \
+		txSlot* resultBuffer = resultView->next; \
+		src = (txU1*)(mxArgv(0)->value.string);
+		dst = (txU1*)(resultBuffer->value.reference->next->value.arrayBuffer.address + resultView->value.dataView.offset);
+		resultBuffer->value.reference->next->next->value.bufferInfo.maxLength = dstSize;
+		fxUint8ArrayFromBase64(the, src, dst, &srcSize, &dstSize, alphabet, lastChunkHandling);
+		fxSetArrayBufferLength(the, resultBuffer, dstSize);
+		resultBuffer->value.reference->next->next->value.bufferInfo.maxLength = -1;
+		resultView->value.dataView.size = dstSize;
+	}
+}
+
+void fx_Uint8Array_fromHex(txMachine* the)
+{
+	txSize srcSize;
+	txSize dstSize;
+	txU1* src;
+	txU1* dst;
+	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
+		mxTypeError("string is no string");
+	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
+	if (srcSize & 1)
+		mxSyntaxError("string has odd length");
+	dstSize = srcSize >> 1;
+	mxPush(mxUint8ArrayConstructor);
+	mxNew();
+	mxPushInteger(dstSize);
+	mxRunCount(1);
+	mxPullSlot(mxResult);
+	{
+		txSlot* resultInstance = fxCheckTypedArrayInstance(the, mxResult); \
+		txSlot* resultDispatch = resultInstance->next; \
+		txSlot* resultView = resultDispatch->next; \
+		txSlot* resultBuffer = resultView->next; \
+		src = (txU1*)(mxArgv(0)->value.string);
+		dst = (txU1*)(resultBuffer->value.reference->next->value.arrayBuffer.address + resultView->value.dataView.offset);
+		fxUint8ArrayFromHex(the, src, dst, &srcSize, &dstSize);
+	}
+}
+
+void fx_Uint8Array_prototype_setFromBase64(txMachine* the)
+{
+	txSlot* instance = fxCheckTypedArrayInstance(the, mxThis);
+	txSlot* dispatch = instance->next;
+	txSlot* view = dispatch->next;
+	txSlot* buffer = view->next;
+	txU1* alphabet = (txU1*)gxBase64Alphabet;
+	txInteger lastChunkHandling = mxBase64Loose;
+	txSize srcSize;
+	txSize dstSize;
+	txU1* src;
+	txU1* dst;
+	txSlot* property;
+	if (dispatch->value.typedArray.dispatch->constructorID != mxID(_Uint8Array))
+		mxTypeError("this is no Uint8Array instance");
+	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
+		mxTypeError("string is no string");
+	fxUint8ArrayGetBase64Options(the, 1, &alphabet, &lastChunkHandling);
+	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
+	dstSize = fxCheckDataViewSize(the, view, buffer, XS_MUTABLE);
+	src = (txU1*)(mxArgv(0)->value.string);
+	dst = (txU1*)(buffer->value.reference->next->value.arrayBuffer.address + view->value.dataView.offset);
+	fxUint8ArrayFromBase64(the, src, dst, &srcSize, &dstSize, alphabet, lastChunkHandling);
+	mxPush(mxObjectPrototype);
+	property = fxLastProperty(the, fxNewObjectInstance(the));
+	property = fxNextIntegerProperty(the, property, srcSize, mxID(_read), XS_NO_FLAG);
+	property = fxNextIntegerProperty(the, property, dstSize, mxID(_written), XS_NO_FLAG);
+	mxPullSlot(mxResult);
+}
+
+void fx_Uint8Array_prototype_setFromHex(txMachine* the)
+{
+	txSlot* instance = fxCheckTypedArrayInstance(the, mxThis);
+	txSlot* dispatch = instance->next;
+	txSlot* view = dispatch->next;
+	txSlot* buffer = view->next;
+	txSize srcSize;
+	txSize dstSize;
+	txU1* src;
+	txU1* dst;
+	txSlot* property;
+	if (dispatch->value.typedArray.dispatch->constructorID != mxID(_Uint8Array))
+		mxTypeError("this is no Uint8Array instance");
+	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
+		mxTypeError("string is no string");
+	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
+	if (srcSize & 1)
+		mxSyntaxError("string has odd length");
+	dstSize = fxCheckDataViewSize(the, view, buffer, XS_MUTABLE);
+	src = (txU1*)(mxArgv(0)->value.string);
+	dst = (txU1*)(buffer->value.reference->next->value.arrayBuffer.address + view->value.dataView.offset);
+	fxUint8ArrayFromHex(the, src, dst, &srcSize, &dstSize);
+	mxPush(mxObjectPrototype);
+	property = fxLastProperty(the, fxNewObjectInstance(the));
+	property = fxNextIntegerProperty(the, property, srcSize, mxID(_read), XS_NO_FLAG);
+	property = fxNextIntegerProperty(the, property, dstSize, mxID(_written), XS_NO_FLAG);
+	mxPullSlot(mxResult);
+}
+
+void fx_Uint8Array_prototype_toBase64(txMachine* the)
+{
+	txSlot* instance = fxCheckTypedArrayInstance(the, mxThis);
+	txSlot* dispatch = instance->next;
+	txSlot* view = dispatch->next;
+	txSlot* buffer = view->next;
+	txU1* alphabet = (txU1*)gxBase64Alphabet;
+	txU1* src;
+	txU1* dst;
+	txSize srcSize;
+	txSize dstSize;
+	txU1 a, b, c;
+	if (dispatch->value.typedArray.dispatch->constructorID != mxID(_Uint8Array))
+		mxTypeError("this is no Uint8Array instance");
+	fxUint8ArrayGetBase64Options(the, 0, &alphabet, C_NULL);
+	srcSize = fxCheckDataViewSize(the, view, buffer, XS_IMMUTABLE);
+	if (srcSize > (((0x7FFFFFFF >> 2) * 3) - 2))
+		fxAbort(the, XS_NOT_ENOUGH_MEMORY_EXIT);
+	dstSize = (((srcSize + 2) / 3) << 2);
+	fxStringBuffer(the, mxResult, C_NULL, dstSize);
+	src = (txU1*)buffer->value.reference->next->value.arrayBuffer.address + view->value.dataView.offset;
+	dst = (txU1*)mxResult->value.string;
+	while (srcSize > 2) {
+		a = c_read8(src++);
+		b = c_read8(src++);
+		c = c_read8(src++);
+		*dst++ = c_read8(alphabet + ((a & 0xfc) >> 2));
+		*dst++ = c_read8(alphabet + (((a & 0x3) << 4) | ((b & 0xf0) >> 4)));
+		*dst++ = c_read8(alphabet + (((b & 0xf) << 2) | ((c & 0xc0) >> 6)));
+		*dst++ = c_read8(alphabet + (c & 0x3f));
+		srcSize -= 3;
+	}
+	if (srcSize == 2) {
+		a = c_read8(src++);
+		b = c_read8(src++);
+		*dst++ = c_read8(alphabet + ((a & 0xfc) >> 2));
+		*dst++ = c_read8(alphabet + (((a & 0x3) << 4) | ((b & 0xf0) >> 4)));
+		*dst++ = c_read8(alphabet + ((b & 0xf) << 2));
+		*dst++ = '=';
+	}
+	else if (srcSize == 1) {
+		a = c_read8(src++);
+		*dst++ = c_read8(alphabet + ((a & 0xfc) >> 2));
+		*dst++ = c_read8(alphabet + ((a & 0x3) << 4));
+		*dst++ = '=';
+		*dst++ = '=';
+	}
+	*dst++ = 0;
+}
+
+void fx_Uint8Array_prototype_toHex(txMachine* the)
+{
+	txSlot* instance = fxCheckTypedArrayInstance(the, mxThis);
+	txSlot* dispatch = instance->next;
+	txSlot* view = dispatch->next;
+	txSlot* buffer = view->next;
+	txU1* alphabet = (txU1*)gxHexAlphabet;
+	txU1* src;
+	txU1* dst;
+	txSize srcSize;
+	txSize dstSize;
+	txU1 a;
+	if (dispatch->value.typedArray.dispatch->constructorID != mxID(_Uint8Array))
+		mxTypeError("this is no Uint8Array instance");
+	srcSize = fxCheckDataViewSize(the, view, buffer, XS_IMMUTABLE);
+	if (srcSize > (0x7FFFFFFF >> 1))
+		fxAbort(the, XS_NOT_ENOUGH_MEMORY_EXIT);
+	dstSize = (srcSize << 1);
+	fxStringBuffer(the, mxResult, C_NULL, dstSize);
+	src = (txU1*)buffer->value.reference->next->value.arrayBuffer.address + view->value.dataView.offset;
+	dst = (txU1*)mxResult->value.string;
+	while (srcSize > 0) {
+		a = c_read8(src++);
+		*dst++ = c_read8(alphabet + ((a & 0xf0) >> 4));
+		*dst++ = c_read8(alphabet + (a & 0x0f));
+		srcSize--;
+	}
+	*dst++ = 0;
+}
+
+#endif
