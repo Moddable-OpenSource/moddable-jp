@@ -109,7 +109,7 @@ txSerialMachine fxOpenNetwork(txSerialTool self, uint32_t value)
 		machine->networkSocket = CFSocketCreate(kCFAllocatorDefault, PF_INET, SOCK_STREAM, IPPROTO_TCP, kCFSocketReadCallBack, fxReadNetwork, &context);
 		CFSocketError err = CFSocketConnectToAddress(machine->networkSocket, CFDataCreate(kCFAllocatorDefault, (const UInt8*)&address, sizeof(address)), (CFTimeInterval)10);
 		if (err) {
-			fprintf(stderr,"Error opening network: %ld.\n",err);
+			fprintf(stderr,"Error opening network: %ld.\n (Unable to connect to JavaScript debugger (xsbug). Is it running?)\n",err);
 			exit(1);
 		}
 		machine->networkSource = CFSocketCreateRunLoopSource(NULL, machine->networkSocket, 0);
