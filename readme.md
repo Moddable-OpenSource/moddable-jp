@@ -1,7 +1,7 @@
 # Moddable SDK
 
 Copyright 2017-2024 Moddable Tech, Inc., 2024 Shinya Ishikawa<BR>
-改訂: 2024年4月3日
+改訂： 2024年4月3日
 
 ## マイクロコントローラーのためのモダンなソフトウェア開発
 
@@ -56,21 +56,21 @@ Moddable SDKはデジタル（GPIO）、アナログ、PWM、およびI2Cを含�
 
 ## 入門 {/*examples*/}
 
-1. Moddable SDK を使用するには、まずコンピュータにインストールする必要があります。これには、このリポジトリのダウンロード、開発ツールのインストール、コマンドラインでの設定の構成、および Moddable SDK ツールのビルドが含まれます。
+1. Moddable SDKを使用するには、まずコンピュータにインストールする必要があります。これには、このリポジトリのダウンロード、開発ツールのインストール、コマンドラインでの設定の構成、およびModdable SDKツールのビルドが含まれます。
 
-	`documentation` ディレクトリの [入門ガイド](./documentation/Moddable%20SDK%20-%20Getting%20Started.md) では、Moddable SDK のインストールプロセス全体を詳しく説明しています。
+	`documentation` ディレクトリの [入門ガイド](./documentation/Moddable%20SDK%20-%20Getting%20Started.md) では、Moddable SDKのインストールプロセス全体を詳しく説明しています。
 
-2. Moddable SDK をインストールしたら、ハードウェアシミュレータでアプリをビルドして実行できます。
+2. Moddable SDKをインストールしたら、ハードウェアシミュレータでアプリをビルドして実行できます。
 
-3. 特定のデバイスで開発するには、そのデバイス用の追加ツールと SDK をインストールする必要があります。各デバイスのセットアッププロセスは異なりますが、通常は追加の SDK、ドライバー、および開発ツールをインストールすることを含みます。
+3. 特定のデバイスで開発するには、そのデバイス用の追加ツールとSDKをインストールする必要があります。各デバイスのセットアッププロセスは異なりますが、通常は追加のSDK、ドライバー、および開発ツールをインストールすることを含みます。
 
-特定のデバイスの SDK とツールは Moddable によって作成または維持されていませんが、それらをインストールし、Moddable SDK での開発を開始するための詳細な指示を提供しています。以下のセクションでは、サポートしているデバイスのいくつかのセットアップ手順/開発ガイドへのリンクを提供しています。
+特定のデバイスのSDKとツールはModdableによって作成または維持されていませんが、それらをインストールし、Moddable SDKでの開発を開始するための詳細な指示を提供しています。以下のセクションでは、サポートしているデバイスのいくつかのセットアップ手順/開発ガイドへのリンクを提供しています。
 
 ### ハードウェアシミュレータ
 
 <a href="./documentation/tools/tools.md#simulator"><img src="./documentation/assets/tools/screen-test.png" width=100></a>
 
-Moddable SDK には、macOS、Linux、Windows で動作するシミュレータが含まれています。これらは入門に最適であり、開発の加速にも非常に役立ちます。
+Moddable SDKには、macOS、Linux、Windowsで動作するシミュレータが含まれています。これらは入門に最適であり、開発の加速にも非常に役立ちます。
 
 シミュレータを使用するには、[Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md) をインストールするだけです。
 
@@ -78,7 +78,7 @@ Moddable SDK には、macOS、Linux、Windows で動作するシミュレータ�
 
 ### Espressif ESP8266
 
-ESP8266 ベースのデバイスで Moddable SDK を使用するには：
+ESP8266ベースのデバイスでModdable SDKを使用するには：
 
 1. [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md) をインストールします。
 2. [ESP8266 ツール](./documentation/devices/esp8266.md) をインストールします。
@@ -96,7 +96,7 @@ Moddable SDKはESP8266をベースにした[多くのデバイス](./documentati
 
 ### Espressif ESP32
 
-ESP32ベースのデバイスでModdable SDKを使用するには、以下の手順が必要です:
+ESP32ベースのデバイスでModdable SDKを使用するには、以下の手順が必要です：
 
 1. [Moddable SDKをインストールする](./documentation/Moddable%20SDK%20-%20Getting%20Started.md)
 2. [ESP32ツールをインストールする](./documentation/devices/esp32.md)
@@ -114,12 +114,12 @@ Moddable SDKはESP32, ESP32-S2, ESP32-S3, ESP32-C3, ESP32-C6, ESP32-H2をベー�
 
 ### Raspberry Pi Pico
 
-PicoデバイスでModdable SDKを使用するには、以下の手順が必要です:
+PicoデバイスでModdable SDKを使用するには、以下の手順が必要です：
 
 1. [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md)をインストールする
 2. [Picoツール](./documentation/devices/pico.md)をインストールする
 
-Moddable SDKは、以下に示すボードを含むRaspberry Pi Picoで構築された[多くのデバイス](./documentation/devices/pico.md#platforms)をサポートしています:
+Moddable SDKは、以下に示すボードを含むRaspberry Pi Picoで構築された[多くのデバイス](./documentation/devices/pico.md#platforms)をサポートしています：
 
 | | | |
 | :---: | :---: | :---: |
@@ -129,13 +129,13 @@ Moddable SDKは、以下に示すボードを含むRaspberry Pi Picoで構築さ
 
 ### Nordic Semiconductor nRF52
 
-nRF52デバイスでModdable SDKを使用するには、以下の手順が必要です:
+nRF52デバイスでModdable SDKを使用するには、以下の手順が必要です：
 
 1. [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md)をインストールする
 2. [nRF5ツール](./documentation/devices/nrf52.md)をインストールする
-3. [ブートローダー](./documentation/devices/nrf52.md#install-bootloader)をインストールする。これはModdable Fourには不要です。Moddable Fourにはブートローダーがプリインストールされています。
+3. [ブートローダー](./documentation/devices/nrf52.md#install-bootloader)をインストールする。これはModdable Fourには不要です。Moddable Fourにはブートローダーがプリインストールされています
 
-Moddable SDKは、以下に示すボードを含むnRF52で構築された[多くのデバイス](./documentation/devices/nrf52.md#platforms)をサポートしています:
+Moddable SDKは、以下に示すボードを含むnRF52で構築された[多くのデバイス](./documentation/devices/nrf52.md#platforms)をサポートしています：
 
 | | | |
 | :---: | :---: | :---: |
@@ -148,17 +148,17 @@ Moddable SDKは、以下に示すボードを含むnRF52で構築された[多�
 
 ### Silicon Labs Gecko
 
-Moddable SDKをGeckoデバイスで使用するには、以下の手順が必要です:
+Moddable SDKをGeckoデバイスで使用するには、以下の手順が必要です：
 
 1. [Moddable SDKのインストール](./documentation/Moddable%20SDK%20-%20Getting%20Started.md)
 2. [Geckoツールのインストール](./documentation/devices/gecko/GeckoBuild.md)
 
-以下の開発者リソースも利用可能です:
+以下の開発者リソースも利用可能です：
 
 - [Silicon Labs GeckoのModdable SDKサポート](https://blog.moddable.com/blog/gecko/) ブログポスト
 - [Moddable SDKでBluetooth Low Energyサポートが利用可能に](https://blog.moddable.com/blog/ble/) ブログポスト
 
-Moddable SDKは以下の四つのGeckoボードをサポートしています。
+Moddable SDKは以下の4つのGeckoボードをサポートしています。
 
 | | | | |
 | :---: | :---: | :---: | :---: |
@@ -200,20 +200,20 @@ ESP8266とESP32で様々なSPIディスプレイをテストしました。こ�
 
 Moddable SDKリポジトリには、以下のトップレベルディレクトリが含まれています：
 
-- [**build**](./build): 特定のマイクロコントローラーターゲット、シミュレーター、および `tools` ディレクトリのビルドツール用の make ファイルが必要なファイル。
-- [**contributed**](./contributed): Moddable API を使用するための有用な技術を示す非公式のプロジェクトとモジュール。
-- [**documentation**](./documentation): Moddable SDK のすべてのドキュメント。ドキュメントはマークダウン形式で提供されます。
-- [**examples**](./examples): Moddable SDK のさまざまな機能のサンプルアプリ。[readme.md](examples/readme.md) ドキュメントは、サンプルのビルド方法と、目的の種類のサンプルを見つけるのに役立つ情報を提供します。
-- [**license**](./license): Moddable SDK に含まれるソフトウェアのライセンス契約。コントリビューターライセンス契約もここにあります。
-- [**modules**](./modules): Moddable SDK のランタイムを構成するソフトウェアモジュール。これには、通信、グラフィックス、ユーザーインターフェース、ハードウェアアクセス、暗号プリミティブ、およびデバイスドライバーが含まれます。すべてのモジュールには JavaScript API があります。多くのモジュールは部分的に C で実装されています。
-- [**tools**](./tools): Moddable SDK を使用してアプリケーションを構築するためのツール。これには、画像形式の変換、画像圧縮、画像回転、フォント圧縮、ローカライゼーション文字列の処理、リソースのコンパイル、JSON マニフェストファイルからのアプリケーションのビルド用のコマンドラインツールが含まれます。さらに、XSデバッガーである xsbug もここにあります。
-- [**xs**](./xs): コンパイラーとリンカーを含む XS JavaScript エンジン、および test262 実行シェル。
+- [**build**](./build): 特定のマイクロコントローラーターゲット、シミュレーター、および `tools` ディレクトリのビルドツール用のmakeファイルが必要なファイル。
+- [**contributed**](./contributed): Moddable APIを使用するための有用な技術を示す非公式のプロジェクトとモジュール。
+- [**documentation**](./documentation): Moddable SDKのすべてのドキュメント。ドキュメントはマークダウン形式で提供されます。
+- [**examples**](./examples): Moddable SDKのさまざまな機能のサンプルアプリ。[readme.md](examples/readme.md) ドキュメントは、サンプルのビルド方法と、目的の種類のサンプルを見つけるのに役立つ情報を提供します。
+- [**license**](./license): Moddable SDKに含まれるソフトウェアのライセンス契約。コントリビューターライセンス契約もここにあります。
+- [**modules**](./modules): Moddable SDKのランタイムを構成するソフトウェアモジュール。これには、通信、グラフィックス、ユーザーインターフェース、ハードウェアアクセス、暗号プリミティブ、およびデバイスドライバーが含まれます。すべてのモジュールにはJavaScript APIがあります。多くのモジュールは部分的にCで実装されています。
+- [**tools**](./tools): Moddable SDKを使用してアプリケーションを構築するためのツール。これには、画像形式の変換、画像圧縮、画像回転、フォント圧縮、ローカライゼーション文字列の処理、リソースのコンパイル、JSONマニフェストファイルからのアプリケーションのビルド用のコマンドラインツールが含まれます。さらに、XSデバッガーであるxsbugもここにあります。
+- [**xs**](./xs): コンパイラーとリンカーを含むXS JavaScriptエンジン、およびtest262実行シェル。
 
 ## API ドキュメント
 
-Moddable SDK によってサポートされる JavaScript API は、[documentation](./documentation) ディレクトリの一連のドキュメントで文書化されています。ドキュメントは広範なリファレンスで、多数の例があります。主要な [Piu ドキュメント](./documentation/piu/piu.md) だけで100ページ以上あります。すべてのドキュメントはマークダウン形式で提供されます。
+Moddable SDKによってサポートされるJavaScript APIは、[documentation](./documentation) ディレクトリの一連のドキュメントで文書化されています。ドキュメントは広範なリファレンスで、多数の例があります。主要な [Piu ドキュメント](./documentation/piu/piu.md) だけで100ページ以上あります。すべてのドキュメントはマークダウン形式で提供されます。
 
-そのディレクトリの [readme](./documentation#api-documentation-for-modules) ドキュメントで API ドキュメントの概要をご覧ください。
+そのディレクトリの [readme](./documentation#api-documentation-for-modules) ドキュメントでAPIドキュメントの概要をご覧ください。
 
 ## リソース {/*resources*/}
 
