@@ -200,7 +200,7 @@ ESP8266とESP32で様々なSPIディスプレイをテストしました。こ�
 
 Moddable SDKリポジトリには、以下のトップレベルディレクトリが含まれています：
 
-- [**build**](./build): 特定のマイクロコントローラーターゲット、シミュレーター、および `tools` ディレクトリのビルドツール用のmakeファイルが必要なファイル。
+- [**build**](./build): 特定のマイクロコントローラーターゲットに必要なファイル群、シミュレーター、および `tools` ディレクトリのビルドツール用のmakefile。
 - [**contributed**](./contributed): Moddable APIを使用するための有用な技術を示す非公式のプロジェクトとモジュール。
 - [**documentation**](./documentation): Moddable SDKのすべてのドキュメント。ドキュメントはマークダウン形式で提供されます。
 - [**examples**](./examples): Moddable SDKのさまざまな機能のサンプルアプリ。[readme.md](examples/readme.md) ドキュメントは、サンプルのビルド方法と、目的の種類のサンプルを見つけるのに役立つ情報を提供します。
