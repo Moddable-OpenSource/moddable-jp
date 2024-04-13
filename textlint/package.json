@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "textlint": "textlint --rulesdir=. \"../**/*.md\""
+    "textlint": "textlint --rulesdir=. --ignore-path=\"./.textlintignore\" \"../**/*.md\" "
   },
   "keywords": [],
   "author": "Shinya Ishikawa <ishikawa.s.1027@gmail.com> (https://meganetaaan.github.io/)",

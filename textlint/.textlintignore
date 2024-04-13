@@ -1,0 +1,6 @@
+# 未翻訳の英文に対して日本語のルールを適用してエラーが出ている。翻訳するまでは除外指定する。
+../documentation/devices/gecko/GeckoBuild.md
+../documentation/drivers/neostrand/neostrand.md
+../documentation/piu/ae motion export.md
+../documentation/piu/piu.md
+../documentation/xs/mods.md
