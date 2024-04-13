@@ -1,251 +1,145 @@
 # Moddable SDK
 
-Copyright 2017-2024 Moddable Tech, Inc.<BR>
-Revised: April 3, 2024
+Copyright 2017-2020 Moddable Tech, Inc., 2024 Shinya Ishikawa<BR>
+改訂： 2020年2月11日<BR>
+翻訳： 2024年4月13日
 
-## Modern software development for microcontrollers
 
-**The Moddable SDK is a combination of development tools and runtime software to create applications for microcontrollers.**
+## マイクロコントローラーのためのモダンなソフトウェア開発
 
-Microcontrollers are highly constrained devices compared to modern computers and mobile devices. A typical microcontroller used with the Moddable SDK has about 45 KB of free memory, 1 MB of Flash ROM, and runs at 80 MHz. The Moddable SDK uses many different techniques, both at build time and at run time, to work efficiently on these devices.
+**Moddable SDKは、マイクロコントローラー用のアプリケーションを作成するための開発ツールとランタイムソフトウェアの組み合わせです。**
 
-<a href="https://tc39.es/ecma262/">![JS logo](./documentation/assets/moddable/js.png)</a>
+マイクロコントローラーは、現代のコンピューターやモバイルデバイスと比べると、大幅に制約のあるデバイスです。Moddable SDKが対象とする代表的なマイクロコントローラーは、約45 KBの空きメモリ、1 MBのフラッシュROMを持ち、80 MHzで動作します。Moddable SDKは、こうした制約の中でも効率的に動作するために、ビルド時とランタイムの両方で様々な技術を使用します。
 
-The primary programming language for development is JavaScript. The XS JavaScript engine at the center of the Moddable SDK implements the [2023 JavaScript language standard](https://262.ecma-international.org/14.0/) with better than 99% conformance.<sup>[[1](#footnotes)]</sup> The constraints of the target microcontroller may limit the number of language features that can be used in combination by a single application.
+![JS logo](./documentation/assets/moddable/js.png)
 
-The JavaScript language implemented in the Moddable SDK is the same language used in web pages and Node.js. The microcontroller that the scripts run on, however, is very different from a personal computer, server, or mobile device. These differences often require a different approach to using JavaScript. The APIs and objects in the Moddable SDK are quite different, being designed with the goal of minimizing memory use. Bring your existing experience with JavaScript, but be prepared to think about performance, code size, and memory use in a different way.<sup>[[2](#footnotes)]</sup>
+開発の主要なプログラミング言語はJavaScriptです。Moddable SDKの中核をなすXS JavaScriptエンジンは、[2019年のJavaScript言語標準](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf)に99％以上準拠しています。<sup>[[1](#footnotes)]</sup> ただし、対象マイクロコントローラーの制約により、1つのアプリケーションで使用できる言語機能の組み合わせには制限がある場合があります。
 
-As much as practical, the Moddable SDK is implemented in JavaScript. Portions of the Moddable SDK are implemented in C for performance or direct access to native APIs.<sup>[[3](#footnotes)]</sup> There is no C++.
+Moddable SDKで実装されているJavaScript言語は、WebページやNode.jsで使用されるものと同じですが、スクリプトが実行されるマイクロコントローラーは、パソコンやサーバー、モバイルデバイスとは大きく異なります。こうした違いから、JavaScriptの使い方にも異なるアプローチが必要となることが少なくありません。Moddable SDKのAPIやオブジェクトは、メモリ使用を最小限に抑えることを目的として設計されており、かなり異なる特徴を持っています。JavaScriptに関する既存の経験を活かしつつ、パフォーマンス、コードサイズ、メモリ使用について異なる考え方をもつ必要があります。<sup>[[2](#footnotes)]</sup>
 
-A significant part of building efficient software for microcontrollers occurs at build time. The Moddable SDK contains many tools and options for the build process.<sup>[[4](#footnotes)]</sup> Take time to learn about these to get the best results.
+可能な限り、Moddable SDKはJavaScriptで実装されています。パフォーマンス向上やネイティブAPIへの直接アクセスのために、Moddable SDKの一部はCで実装されています。<sup>[[3](#footnotes)]</sup> C++は使用されていません。
+
+マイクロコントローラー向けに効率的なソフトウェアを構築する上で重要な部分は、ビルド時の処理です。Moddable SDKには、ビルドプロセスのための多様なツールとオプションが盛り込まれています。<sup>[[4](#footnotes)]</sup> 最良の結果を得るために、これらについて学ぶ時間を取ることをおすすめします。
 
 <a id="footnotes"></a>
-> <sup>[1]</sup> *See also: [XS Conformance](./documentation/xs/XS%20Conformance.md)*<BR>
-<sup>[2]</sup> *See also: [XS Differences](./documentation/xs/XS%20Differences.md)*<BR>
-<sup>[3]</sup> *See also: [XS in C](./documentation/xs/XS%20in%20C.md)*<BR>
-<sup>[4]</sup> *See also: [Tools](./documentation/tools/tools.md), [manifest](documentation/tools/manifest.md)*
+> <sup>[1]</sup> *参照: [XS 準拠](./documentation/xs/XS%20Conformance.md)*<BR>
+<sup>[2]</sup> *参照: [XS の違い](./documentation/xs/XS%20Differences.md)*<BR>
+<sup>[3]</sup> *参照: [C言語でのXS](./documentation/xs/XS%20in%20C.md)*<BR>
+<sup>[4]</sup> *参照: [ツール](./documentation/tools/tools.md), [マニフェスト](documentation/tools/manifest.md)*
 
-## Major features
+## 主要機能
 
-### Networking
+### 通信
 
-The Moddable SDK implements network sockets and a variety of standard, secure networking protocols built on sockets including HTTP/HTTPS, WebSockets, MQTT, mDNS, DNS, SNTP, and telnet.
+Moddable SDKはネットワークソケットと、HTTP/HTTPS、WebSocket、DNS、SNTP、telnetを含む様々な標準的で安全な通信プロトコルを実装しています。
 
-There is also Bluetooth Low Energy (BLE) protocol support for both BLE peripheral and central device development.
+また、Bluetooth Low Energy（BLE）プロトコルのサポートもあり、BLEペリフェラルおよびセントラルデバイスの開発が可能です。
 
-### Graphics
+### グラフィックス
 
-Two APIs for building modern user interfaces are available:
+現代的なユーザーインターフェースを構築するための2つのAPIが利用可能です：
 
-- **Commodetto**, a bitmap graphics library that provides a 2D graphics API. Commodetto includes the lightweight **Poco** rendering engine, a display list renderer able to efficiently render a single scanline at a time, saving considerable memory by eliminating the need for a frame buffer.
-- **Piu**, a user interface framework built on top of Commodetto. Piu is an object-based framework that makes it easier to create complex, responsive layouts.
+- **Commodetto**、ビットマップグラフィックスライブラリで、2DグラフィックスAPIを提供します。Commodettoには、軽量な**Poco**レンダリングエンジンが含まれており、フレームバッファを必要とせずに一度に1つのスキャンラインを効率的にレンダリングするディスプレイリストレンダラーです。
+- **Piu**、Commodettoの上に構築されたユーザーインターフェースフレームワークです。Piuはオブジェクトベースのフレームワークで、複雑でレスポンスの良いレイアウトを簡単に作成できます。
 
-The Moddable SDK also includes command line tools for image format conversion, image compression, image rotation, font compression, localization, and more. The build system automatically makes use of these tools.
+Moddable SDKには、画像形式の変換、画像圧縮、画像回転、フォント圧縮などのコマンドラインツールも含まれています。ビルドシステムは自動的にこれらのツールを使用します。
 
-### Hardware
+### ハードウェア
 
-The Moddable SDK implements a variety of hardware protocols including digital (GPIO), analog, PWM, and I2C. A number of drivers for common off-the-shelf sensors and [corresponding example apps](./examples/drivers) are also available.
+Moddable SDKは、デジタル（GPIO）、アナログ、PWM、I2Cを含む様々なハードウェアプロトコルを実装しています。一般的な市販のセンサー用の多数のドライバーと[対応するサンプルアプリ](./examples/drivers)も利用可能です。
 
-### Source level debugger
+### デバッガー
 
-The `xsbug` JavaScript source level debugger is a full-featured debugger that supports debugging modules and applications for XS platforms.
+`xsbug` JavaScriptデバッガーは、XSプラットフォームのモジュールやアプリケーションのデバッグをサポートするフル機能のデバッガーです。
 
-Similar to other debuggers, `xsbug` supports setting breakpoints, browsing source code, and inspection of the call stack and variables. The `xsbug` debugger additionally provides real-time instrumentation to track memory usage and profile application and resource consumption.
+他のデバッガーと同様に、`xsbug`はブレークポイントの設定、ソースコードの閲覧、コールスタックと変数の検査をサポートします。さらに、`xsbug`デバッガーはリアルタイムの計測を提供し、メモリ使用量を追跡し、アプリケーションとリソース消費をプロファイリングします。
 
-> *See also: [xsbug documentation](./documentation/xs/xsbug.md)*
+> *参照: [xsbug ドキュメント](./documentation/xs/xsbug.md)*
 
-## Getting Started
+## 入門
 
-1. To do anything with the Moddable SDK, you have to install it on your computer. This involves downloading this repository, installing some development tools, configuring settings over the command line, and building the Moddable SDK tools.
+### ステップ 1: 環境を設定する
 
-	The [Getting Started Guide](./documentation/Moddable%20SDK%20-%20Getting%20Started.md) in the `documentation` directory walks you through the whole process of installing the Moddable SDK.
+[Getting Started](documentation/Moddable%20SDK%20-%20Getting%20Started.md) ドキュメントは、macOS、Linux、Windows用のModdable SDKのインストール、設定、ビルドの手順をステップバイステップで提供しています。また、ModdableハードウェアモジュールやESP8266、ESP32マイクロコントローラー用のサンプルアプリのビルド方法も含まれています。
 
-2. With the Moddable SDK installed, you can build and run apps on hardware simulators.
+Silicon Labs Geckoデバイスのビルドと設定の指示は [Gecko Build](documentation/devices/gecko/GeckoBuild.md) にあります。
 
-3. To develop for a particular device, you need to install additional tools and SDKs for that device. The setup process for each device is different, but usually involves installing some additional SDKs, drivers, and development tools.
+### ステップ 2: サンプルアプリを試す
 
-The SDKs and tools for a particular device are not created or maintained by Moddable, but we do provide detailed instructions to help you install them and get started developing for them with the Moddable SDK. The section below provides links to the setup instructions/developer guides for some of the devices we support.
+[examples](./examples) フォルダには、Moddable SDKの多くの機能の使い方を示す150以上のサンプルアプリが含まれています。多くの例は、特定の機能の使い方を示すために1ページ未満のソースコードからなります。
 
-### Hardware simulators
+すべてのサンプルがすべてのデバイスと互換性があるわけではないことに注意してください。[readme.md](examples/readme.md) ドキュメントは、サンプルのビルド方法と、目的のサンプルを見つけるのに役立つ情報を提供します。
 
-<a href="./documentation/tools/tools.md#simulator"><img src="./documentation/assets/tools/screen-test.png" width=100></a>
+Moddable SDKがサポートするマイクロコントローラーと開発ボードについての情報は **サポートされるハードウェア** セクションを参照してください。まだハードウェアを持っていない場合、Moddable SDKにはmacOS、Linux、Windows上で動作するシミュレータも含まれています。これらは始めるのに最適であり、開発を加速するのに役立ちます。
 
-The Moddable SDK includes simulators that run on macOS, Linux, and Windows. These are a great way to get started, and are invaluable as development accelerators.
+### ステップ 3: 独自のアプリをビルドする
 
-To use the simulator, you simply need to install the [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md).
+サンプルアプリをカスタマイズする準備ができたら、または最初から自分のアプリをビルドする準備ができたら、[documentation](./documentation) とすべてのJavaScript APIのソースコードが使えます。すべてのドキュメントはマークダウン形式で提供されています。Moddable SDKのランタイムを構成するソフトウェアモジュールは [modules](./modules) ディレクトリにあります。
 
-A [video demonstration](https://www.youtube.com/watch?v=7GKOm3Tayjs) and information about the simulator is available in the **Simulator** section of the [tools documentation](./documentation/tools/tools.md).
+**documentation**、**examples**、**modules** ディレクトリは、情報を簡単に見つけるために共通の構造を持っています。
 
-### ESP8266 by Espressif
+- **base**: 時刻、タイマー、デバッグ、計測、UUIDを含む基本的なランタイム機能
+- **commodetto**: ビットマップグラフィックスライブラリ
+- **crypt**: 暗号プリミティブとTLS
+- **data**: Base64およびhexエンコーディング
+- **drivers**: ディスプレイ、タッチ入力、センサー、エキスパンダーのデバイスドライバー
+- **files**: ファイル、フラッシュ、設定、リソース、zipを含むストレージ機能
+- **network**: ソケットとソケットをベースにしたプロトコル（HTTP、WebSockets、DNS、SNTP、telnet、TLS）; また、Wi-FiとBLE API
+- **pins**: ハードウェアプロトコルを含むデジタル（GPIO）、アナログ、PWM、I2C
+- **piu**: ユーザーインターフェースフレームワーク
 
-To use the Moddable SDK with ESP8266-based devices, you need to:
+## 対応ハードウェア
 
-1. Install the [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [ESP8266 tools](./documentation/devices/esp8266.md)
+![Moddable hardware](./documentation/assets/moddable/moddable-hardware.png)
 
-The Moddable SDK supports [many devices](./documentation/devices/esp8266.md#platforms) built on ESP8266, including the devices shown below.
+**Moddable One**、**Moddable Two**、**Moddable Three** は、開発者が容易にModdable SDKを探索できる、手頃な価格のハードウェアモジュールです。各デバイスのGetting Startedガイドは以下で利用可能です：
 
-| | | |
-| :---: | :---: | :---: |
-| <a href="./documentation/devices/moddable-one.md"><img src="./documentation/assets/devices/moddable-one.png" width=125></a><BR>Moddable One<sup>[[5](#footnotes2)]</sup> | <a href="./documentation/devices/esp8266.md"><img src="./documentation/assets/devices/esp8266.png" width=125></a><BR>Node MCU ESP8266<sup>[[6](#footnotes2)]</sup> | <a href="./documentation/devices/moddable-three.md"><img src="./documentation/assets/devices/moddable-three.png" width=125></a><BR>Moddable Three<sup>[[7](#footnotes2)]</sup>
+- [Moddable One](./documentation/devices/moddable-one.md)
+- [Moddable Two](./documentation/devices/moddable-two.md)
+- [Moddable Three](./documentation/devices/moddable-three.md)
 
-<a id="footnotes2"></a>
-> <sup>[5]</sup> *See also: [Moddable One Developer Guide](./documentation/devices/moddable-one.md), Moddable [product page](https://www.moddable.com/product)*<BR>
-<sup>[6]</sup> *See also: [Using the Moddable SDK with ESP8266](./documentation/devices/esp8266.md)*<BR>
-<sup>[7]</sup> *See also: [Moddable Three Developer Guide](./documentation/devices/moddable-three.md)*<BR>
+![Platforms](./documentation/assets/moddable/platforms.png)
 
-### ESP32 by Espressif
+Moddable SDKは、EspressifのESP8266とESP32、Silicon LabsのGecko 4モデル、およびQualcommのQCA4020 CDBもサポートしています。
 
-To use the Moddable SDK with ESP32-based devices, you need to:
+サポートされているプラットフォームの完全なリストについては、examplesフォルダの [readme.md](examples/readme.md) ドキュメントの **ターゲットプラットフォーム** セクションを参照してください。
 
-1. Install the [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [ESP32 tools](./documentation/devices/esp32.md)
+## ディスプレイ
 
-The Moddable SDK supports [many devices](./documentation/devices/esp32.md#platforms) built on ESP32, ESP32-S2, ESP32-S3, ESP32-C3, ESP32-C6 and ESP32-H2, including the devices shown below.
+![Displays](./documentation/assets/moddable/displays.jpg)
 
-| | | |
-| :---: | :---: | :---: |
-| <a href="./documentation/devices/moddable-two.md"><img src="./documentation/assets/devices/moddable-two.png" width=125></a><BR>Moddable Two<sup>[[8](#footnotes3)]</sup> | <a href="./documentation/devices/esp32.md">![ESP32](./documentation/assets/devices/esp32.png)</a><BR>Node MCU ESP32<sup>[[9](#footnotes3)]</sup> | <a href="./documentation/devices/esp32.md#platforms">![M5Stack](./documentation/assets/devices/m5stack.png)</a><BR>M5Stack
-| <a href="./documentation/devices/esp32.md#platforms">![M5Stack Fire](./documentation/assets/devices/m5stack-fire.png)</a><BR>M5Stack Fire | <a href="./documentation/devices/esp32.md#platforms">![M5Stick C](./documentation/assets/devices/m5stick-c.png)</a><BR>M5Stick C |  <a href="./documentation/devices/esp32.md#platforms">![M5Atom](./documentation/assets/devices/m5atom.png)</a><BR>M5Atom Matrix
+ESP8266とESP32で様々なSPIディスプレイをテストしました。これらのディスプレイのビデオデモは[当社のウェブサイトで](http://www.moddable.com/display)公開されています。配線ガイドは [documentation/displays](./documentation/displays) フォルダにあります。対応するディスプレイおよびタッチドライバのソースコードは [modules/drivers](./modules/drivers) フォルダにあります。
 
-<a id="footnotes3"></a>
-> <sup>[8]</sup> *See also: [Moddable Two Developer Guide](./documentation/devices/moddable-two.md), Moddable [product page](https://www.moddable.com/product)*<BR>
-<sup>[9]</sup> *See also: [Using the Moddable SDK with ESP32](./documentation/devices/esp32.md)*<BR>
+## ソースツリー
 
-### Pico by Raspberry Pi
+Moddable SDKリポジトリには、以下のトップレベルディレクトリが含まれています。
 
-To use the Moddable SDK with Pico devices, you need to:
+- **build**: 特定のマイクロコントローラーターゲットに必要なファイル群、シミュレーター、および `tools` ディレクトリのビルドツール用のmakefileです。
+- **documentation**: Moddable SDKのすべてのドキュメント。ドキュメントはマークダウン形式で提供されます。
+- **examples**: Moddable SDKのさまざまな機能のサンプルアプリ。[readme.md](examples/readme.md) ドキュメントは、サンプルを構築するためのガイドを提供し、求める種類のサンプルを見つけるのに役立つ情報を提供します。
+- **license**: Moddable SDKに提供されるソフトウェアのライセンス契約。ここにはコントリビューターライセンス契約もあります。
+- **modules**: Moddable SDKのランタイムを構成するソフトウェアモジュール。これには、通信、グラフィックス、ユーザーインターフェース、ハードウェアアクセス、暗号プリミティブ、およびデバイスドライバーが含まれます。すべてのモジュールにはJavaScript APIがあります。多くのモジュールは部分的にCで実装されています。
+- **tools**: Moddable SDKを使用してアプリケーションを構築するためのツール。これには、画像形式の変換、画像圧縮、画像回転、フォント圧縮、ローカライゼーション文字列の処理、リソースのコンパイル、JSONマニフェストファイルからのアプリケーションのビルド用のコマンドラインツールが含まれます。さらに、XSのデバッガーであるxsbugもここにあります。
+- **xs**: XS JavaScriptエンジンを含むそのコンパイラとリンカー、およびtest262の実行シェル。
 
-1. Install the [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [Pico tools](./documentation/devices/pico.md)
+## ライセンス
 
-The Moddable SDK supports [many devices](./documentation/devices/pico.md#platforms) built with the Raspberry Pi Pico, including the boards shown below:
+Moddable SDKは、GPL 3.0、LGPL 3.0、Apache 2.0、およびCreative Commons Attribution 4.0ライセンスの組み合わせの下で提供されています。[license](./licenses)ディレクトリには、使用されているライセンスとライセンスオプションに関する追加情報が含まれています。Moddableのウェブサイトにある[licensing article](http://www.moddable.com/license)では、追加の背景情報と商用ライセンスオプションについて説明しています。
 
-| | | |
-| :---: | :---: | :---: |
-| <a href="./documentation/devices/pico.md"><img src="./documentation/assets/devices/pi-pico_w.png" width=65></a><BR>Raspberry Pi<BR>Pico W | <a href="./documentation/devices/pico.md"><img src="./documentation/assets/devices/pico-display.png" width=65></a><BR>Pimoroni<BR>Pico Display | <a href="./documentation/devices/pico.md"><img src="./documentation/assets/devices/pico-ili9341.png" width=120></a><BR>ili9341
-| <a href="./documentation/devices/pico.md"><img src="./documentation/assets/devices/pico-adafruit-qt-py-rp2040.png" width=85></a><BR>Adafruit QT Py | <a href="./documentation/devices/pico.md"><img src="./documentation/assets/devices/pico-sparkfun-pro-micro-rp2040.png" width=160></a><BR>Sparkfun Pro Micro | <a href="./documentation/devices/pico.md"><img src="./documentation/assets/devices/pico-lilygo-t-display-rp2040.png" width=160></a><BR> LILYGO T-Display
+## セキュリティ問題
 
+私たちはModdable SDKにセキュリティホールがないように努力していますが、すべてを排除することはほぼ不可能です。セキュリティ研究者が私たちのソフトウェアに潜在的なセキュリティ問題を特定した場合、[issue](./issues)を開くことを奨励します。これらにはできるだけ迅速に対応します。希望する場合は、[メール](mailto:info@moddable.com)でセキュリティ問題を報告することもできます。
 
-### nRF52 by Nordic Semiconductor
+## 質問がありますか？気軽にお問い合わせください
 
-To use the Moddable SDK with nRF52 devices, you need to:
-
-1. Install the [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [nRF5 tools](./documentation/devices/nrf52.md)
-3. Install [a bootloader](./documentation/devices/nrf52.md#install-bootloader). This is not necessary for the Moddable Four as the bootloader is pre-installed on Moddable Four.
-
-The Moddable SDK supports [many devices](./documentation/devices/nrf52.md#platforms) built with the nRF52, including the boards shown below:
-
-| | | |
-| :---: | :---: | :---: |
-| <a href="./documentation/devices/moddable-four.md"><img src="./documentation/assets/devices/moddable-four.png" width=125></a><BR>Moddable Four<sup>[[10](#footnotes4)]</sup> | <a href="./documentation/devices/nrf52.md"><img src="./documentation/assets/devices/nrf52-pca10056.png" width=125></a><BR>Nordic DK pca10056 | <a href="./documentation/devices/nrf52.md"><img src="./documentation/assets/devices/nrf52-sparkfun.png" width=125></a><BR>Sparkfun Pro nRF52840 |
-| <a href="./documentation/devices/nrf52.md"><img src="./documentation/assets/devices/nrf52-makerdiary.png" width=125></a><BR>Makerdiary nRF52840 MDK | <a href="./documentation/devices/nrf52.md"><img src="./documentation/assets/devices/nrf52-xiao.png" width=125></a><BR>seeed XIAO-nRF52840 | <a href="./documentation/devices/nrf52.md"><img src="./documentation/assets/devices/nrf52-itsybitsy.png" width=125></a><BR>Adafruit ItsyBitsy nRF52840 |
-
-<a id="footnotes4"></a>
-> <sup>[10]</sup> *See also: [Moddable Four Developer Guide](./documentation/devices/moddable-four.md), Moddable [product page](https://www.moddable.com/product)*<BR>
-
-
-### Gecko by Silicon Labs
-
-To use the Moddable SDK with Gecko devices, you need to:
-
-1. Install the [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [Gecko tools](./documentation/devices/gecko/GeckoBuild.md)
-
-The following developer resources are also available:
-
-- [Silicon Labs Gecko support in Moddable SDK](https://blog.moddable.com/blog/gecko/) blog post
-- [Bluetooth Low Energy Support Now Available in Moddable SDK](https://blog.moddable.com/blog/ble/) blog post
-
-The Moddable SDK supports four Gecko boards, shown below.
-
-| | | | |
-| :---: | :---: | :---: | :---: |
-| <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://www.silabs.com/content/dam/siliconlabs/images/products/microcontrollers/32-bit_mcus/giant_gecko/giant-gecko-starter-kit.jpg" width=125></a><BR>Giant Gecko | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://blog.moddable.com/blog/wp-content/uploads/2018/05/gecko-1-300x179.jpg" width=125></a><BR>Mighty Gecko | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://siliconlabs-h.assetsadobe.com/is/image//content/dam/siliconlabs/images/products/Bluetooth/thunderboard/thunderbord-sense-down-2.jpg?" width=125></a><BR>Thunderboard Sense 2 | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://siliconlabs-h.assetsadobe.com/is/image//content/dam/siliconlabs/images/products/Bluetooth/bluetooth_low_energy/bluegiga_bluetooth_low_energy_modules/blue-gecko-soc-kit.jpg?" width=125></a><BR>Blue Gecko
-
-### QCA4020 by Qualcomm
-
-<a href="./documentation/devices/qca4020/README.md"><img src="https://blog.moddable.com/blog/wp-content/uploads/2019/04/qca4020-image.png" width=175></a>
-
-To use the Moddable SDK with the QCA4020, you need to:
-
-1. Install the [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [QCA4020 tools](./documentation/devices/qca4020/README.md)
-
-The following developer resources are also available:
-
-- [Qualcomm QCA4020 Now Supported by Moddable SDK](https://blog.moddable.com/blog/qca4020/) blog post by Moddable
-- [QCA4020 Getting Started with the Moddable SDK](https://developer.qualcomm.com/project/qca4020-getting-started-moddable-sdk) blog post on the Qualcomm Developer Network
-- [QCA4020 Modern UI Application Development with the Moddable SDK](https://developer.qualcomm.com/project/qca4020-modern-ui-application-development-moddable-sdk) blog post on the Qualcomm Developer Network
-
-### WebAssembly (Wasm)
-
-<a href="./documentation/devices/wasm.md">![](./documentation/assets/devices/wasm.gif)</a>
-
-WebAssembly is supported in modern web browsers, both on computers and mobile devices. The Wasm support in the Moddable SDK is compatible with Safari, FireFox, and Chrome browsers.
-
-To use the Moddable SDK with WebAssembly, you need to:
-
-1. Install the [Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md) for your host platform
-2. Install [Wasm tools](./documentation/devices/wasm.md)
-
-## Displays
-
-<a href="http://www.moddable.com/display">![Displays](./documentation/assets/moddable/displays.jpg)</a>
-
-We have tested a variety of SPI displays with the ESP8266 and ESP32. Video demonstrations of these displays are [on our website](http://www.moddable.com/display). Wiring guides are available in the [documentation/displays](./documentation/displays) directory. The source code for the corresponding display and touch drivers is available in the [modules/drivers](./modules/drivers) directory.
-
-## Source tree
-
-The Moddable SDK repository contains the following top level directories:
-
-- [**build**](./build): Files required for specific microcontroller targets, the simulator, and make files for build tools in the `tools` directory.
-- [**contributed**](./contributed): Unofficial projects and modules that show useful techniques for working with the Moddable API.
-- [**documentation**](./documentation): All the documentation for the Moddable SDK. Documentation is provided in markdown format.
-- [**examples**](./examples): Example applications for many of the capabilities of the Moddable SDK. The [readme.md](examples/readme.md) document provides a guide to building the examples and information to help you find the types of examples you are looking for.
-- [**license**](./license): The license agreements for the software provided in the Moddable SDK. The Contributor License Agreements are here as well.
-- [**modules**](./modules): The software modules that make up the runtime of the Moddable SDK. These include networking, graphics, user interface, hardware access, cryptographic primitives, and device drivers. All modules have a JavaScript API. Many modules are implemented in part using C.
-- [**tools**](./tools): Tools to build applications using the Moddable SDK. These include command line tools for image format conversion, image compression, image rotation, font compression, processing localization strings, compiling resources, and building applications from JSON manifest files. In addition, xsbug, the XS source level debugger, is here.
-- [**xs**](./xs): The XS JavaScript engine including its compiler and linker, and the test262 execution shell.
-
-## API Documentation
-
-The JavaScript APIs supported by the Moddable SDK are documented in a suite of documents in the [documentation](./documentation) directory. The documentation is an extensive reference, with numerous examples. The primary [Piu document](./documentation/piu/piu.md) alone is over 100 pages. All documentation is provided in markdown format.
-
-See the [readme](./documentation#api-documentation-for-modules) document in that directory for an overview of the API documents.
-
-## Resources
-
-In addition to the documentation and examples in this repository, we have several resources for developers.
-
-| | |
-| :---: | :---|
-|<img src="https://miro.medium.com/fit/c/262/262/0*Vrsgi6r4Y0T_P9nd.png" width=50> | Our [Gitter chatroom](https://gitter.im/embedded-javascript/moddable) is a great place to ask questions and discuss the Moddable SDK with members of the Moddable team and other developers. |
-| <img src="https://static.thenounproject.com/png/1453176-200.png" width=60> | The [Moddable blog](https://blog.moddable.com) contains in-depth posts about new features and the Moddable, interesting projects by Moddable, and important updates to the Moddable SDK and XS JavaScript engine.
-| <img src="https://www.moddable.com/images/book/book-hero-full-vert.png" width=200> | [IoT Development for ESP32 and ESP8266 with JavaScript](https://www.moddable.com/book) is a book written by members of the Moddable team, [Peter Hoddie](https://www.moddable.com/peter-hoddie) and [Lizzie Prader](https://www.moddable.com/lizzie-prader).
-| <img src="https://m.media-amazon.com/images/I/51ak-nNiHdL.jpg" width=70> | [実践Moddable JavaScriptではじめるIoTアプリケーション (技術の泉シリーズ](https://meganetaaan.hatenablog.com/entry/2020/09/13/011403) is a book written by developer Shinya Ishikawa.
-| <img src="https://static.thenounproject.com/png/2067146-200.png" width=50> | [Detailed release notes](https://github.com/Moddable-OpenSource/moddable/releases) for updates to the Moddable SDK are posted regularly on GitHub. |
-| <img src="./documentation/assets/getting-started/ts-logo-256.svg" width=50> | The Moddable SDK build tools have support TypeScript, so you can use build-time type checking in your embedded code. Details on the [blog](https://blog.moddable.com/blog/typescript/). |
-
-## Licensing
-
-The Moddable SDK is provided under a combination of licenses that includes GPL 3.0, LGPL 3.0, Apache 2.0, and Creative Commons Attribution 4.0 Licenses. The [license](./licenses) directory contains additional information on the licenses used and licensing options. The [licensing article](http://www.moddable.com/license) on the Moddable web site describes additional background and a commercial licensing option.
-
-## Security issues
-
-We work to ensure that there are no security holes in the Moddable SDK. Still, it is nearly impossible to eliminate them all. Security researchers who identify potential security issues with our software are encouraged to open an [open an issue](./issues). We will respond to these as quickly as we can. If you prefer, you may instead report security issues by [email](mailto:info@moddable.com).
-
-## Questions? We're here to help
-
-If you're an independent developer, we recommend you [start a discussion](./discussions) or join us in our [Gitter chatroom](https://gitter.im/embedded-javascript/moddable) if you have a question or want to talk about your projects. If you have trouble getting started or find any bugs, please [open an issue](./issues). We'll respond as quickly as practical, and other developers can benefit from the answers to your questions.
+個人開発者の場合は[issue](./issues)を開くことをお勧めします。できるだけ迅速に対応し、他の開発者もあなたの質問に対する回答から利益を得ることができます。
 
 <a href="http://www.moddable.com">![Moddable logo](./documentation/assets/moddable/moddable.png)</a>
 
-To learn more about Moddable, see [our website](http://www.moddable.com).
+Moddableについてもっと知りたい場合は、[私達のWebサイト](http://www.moddable.com)をご覧ください。
 
-For companies interested in the benefits of using JavaScript and the Moddable SDK to power your products, Moddable provides consulting services to help you get started. We're available to help with design, implementation, training, and support.
+自社製品へのJavaScriptとModdable SDKの活用に関心のある企業のために、Moddableは導入支援コンサルティングサービスを提供しています。設計、実装、トレーニング、サポートを支援します。
 
-You can also reach out to us on Twitter ([@moddabletech](https://twitter.com/moddabletech)). Following us on Twitter is the best way to keep up with what we’re doing—we post announcements about new blog posts there, along with other Moddable news.
+Twitter（[@moddabletech](https://twitter.com/moddabletech)）でもお問い合わせいただけます。Twitterでフォローすることで、私たちがの最新の取り組みを知ることができます。新しいブログ記事の告知やその他のModdableに関するニュースも投稿しています。
 
-You can contact us directly by e-mail at [info@moddable.com](mailto:info@moddable.com).
+直接メールでお問い合わせいただくこともできます：[info@moddable.com](mailto:info@moddable.com).
