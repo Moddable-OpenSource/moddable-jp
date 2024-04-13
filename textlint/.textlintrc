@@ -1,0 +1,11 @@
+{
+  "plugins": {},
+  "filters": {},
+  "rules": {
+    "preset-jtf-style": {},
+    "prh": {
+      "rulePaths": ["./prh.yml"],
+      "checkBlockQuote": true
+    }
+  }
+}
