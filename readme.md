@@ -3,21 +3,21 @@
 Copyright 2017-2024 Moddable Tech, Inc., 2024 Shinya Ishikawa<BR>
 改訂: 2024年4月3日
 
-## マイクロコントローラーのための現代的なソフトウェア開発
+## マイクロコントローラーのためのモダンなソフトウェア開発
 
 **Moddable SDKは、マイクロコントローラー用のアプリケーションを作成するための開発ツールとランタイムソフトウェアの組み合わせです。**
 
-マイクロコントローラーは、現代のコンピューターやモバイルデバイスと比較して大幅に制約があるデバイスです。Moddable SDKで使用される典型的なマイクロコントローラーは、約45 KBの空きメモリ、1 MBのフラッシュROMを持ち、80 MHzで動作します。Moddable SDKは、これらのデバイスで効率的に動作するために、ビルド時とランタイムの両方で多くの異なる技術を使用します。
+マイクロコントローラーは、現代のコンピューターやモバイルデバイスと比べると、大幅に制約のあるデバイスです。Moddable SDKが対象とする代表的なマイクロコントローラーは、約45 KBの空きメモリ、1 MBのフラッシュROMを持ち、80 MHzで動作します。Moddable SDKは、こうした制約の中でも効率的に動作するために、ビルド時とランタイムの両方で様々な技術を使用します。
 
 <a href="https://tc39.es/ecma262/">![JS logo](./documentation/assets/moddable/js.png)</a>
 
-開発の主要なプログラミング言語はJavaScriptです。Moddable SDKの中心にあるXS JavaScriptエンジンは、[2023年のJavaScript言語標準](https://262.ecma-international.org/14.0/)を99％以上準拠しています。<sup>[[1](#footnotes)]</sup> ターゲットマイクロコントローラーの制約により、単一のアプリケーションで組み合わせて使用できる言語機能の数が制限される場合があります。
+開発の主要なプログラミング言語はJavaScriptです。Moddable SDKの中核をなすXS JavaScriptエンジンは、[2023年のJavaScript言語標準](https://262.ecma-international.org/14.0/)に99％以上準拠しています。<sup>[[1](#footnotes)]</sup> ただし、対象マイクロコントローラーの制約により、1つのアプリケーションで使用できる言語機能の組み合わせには制限がある場合があります。
 
-Moddable SDKで実装されているJavaScript言語は、WebページやNode.jsで使用されるのと同じ言語です。ただし、スクリプトが実行されるマイクロコントローラーは、個人用コンピューター、サーバー、またはモバイルデバイスとは非常に異なります。これらの違いは、JavaScriptの使用方法に異なるアプローチを必要とすることが多いです。Moddable SDKのAPIやオブジェクトは、メモリ使用を最小限に抑えることを目的として設計されており、かなり異なります。JavaScriptに関する既存の経験を活かしつつ、パフォーマンス、コードサイズ、メモリ使用について異なる方法で考える準備をしてください。<sup>[[2](#footnotes)]</sup>
+Moddable SDKで実装されているJavaScript言語は、WebページやNode.jsで使用されるものと同じですが、スクリプトが実行されるマイクロコントローラーは、パソコンやサーバー、モバイルデバイスとは大きく異なります。こうした違いから、JavaScriptの使い方にも異なるアプローチが必要となることが少なくありません。Moddable SDKのAPIやオブジェクトは、メモリ使用を最小限に抑えることを目的として設計されており、かなり異なる特徴を持っています。JavaScriptに関する既存の経験を活かしつつ、パフォーマンス、コードサイズ、メモリ使用について異なる考え方をもつ必要があります。<sup>[[2](#footnotes)]</sup>
 
 可能な限り、Moddable SDKはJavaScriptで実装されています。パフォーマンス向上やネイティブAPIへの直接アクセスのために、Moddable SDKの一部はCで実装されています。<sup>[[3](#footnotes)]</sup> C++は使用されていません。
 
-マイクロコントローラー用の効率的なソフトウェアを構築する重要な部分は、ビルド時に発生します。Moddable SDKには、ビルドプロセスのための多くのツールとオプションが含まれています。<sup>[[4](#footnotes)]</sup> これらについて学ぶことで、最良の結果を得ることができます。
+マイクロコントローラー向けに効率的なソフトウェアを構築する上で重要な部分は、ビルド時の処理です。Moddable SDKには、ビルドプロセスのための多様なツールとオプションが盛り込まれています。<sup>[[4](#footnotes)]</sup> 最良の結果を得るために、これらについて学ぶ時間を取ることをおすすめします。
 
 <a id="footnotes"></a>
 > <sup>[1]</sup> *参照: [XS 準拠](./documentation/xs/XS%20Conformance.md)*<BR>
@@ -27,28 +27,28 @@ Moddable SDKで実装されているJavaScript言語は、WebページやNode.js
 
 ## 主要機能
 
-### ネットワーキング
+### 通信
 
-Moddable SDKはネットワークソケットと、HTTP/HTTPS、WebSockets、MQTT、mDNS、DNS、SNTP、およびtelnetを含む様々な標準的なセキュアなネットワーキングプロトコルを実装しています。
+Moddable SDKはネットワークソケットと、HTTP/HTTPS、WebSocket、MQTT、mDNS、DNS、SNTP、およびtelnetを含む様々な標準的でセキュアな通信プロトコルを実装しています。
 
-また、BLE周辺機器および中央デバイス開発のためのBluetooth Low Energy（BLE）プロトコルのサポートもあります。
+また、Bluetooth Low Energy（BLE）プロトコルのサポートもあり、BLEペリフェラルおよびセントラルデバイスの開発が可能です。
 
 ### グラフィックス
 
-現代のユーザーインターフェースを構築するための2つのAPIが利用可能です：
+モダンなユーザーインターフェースを構築するための2つのAPIが利用可能です：
 
 - **Commodetto**、ビットマップグラフィックスライブラリで、2DグラフィックスAPIを提供します。Commodettoには、軽量な**Poco**レンダリングエンジンが含まれており、フレームバッファを必要とせずに一度に1つのスキャンラインを効率的にレンダリングするディスプレイリストレンダラーです。
-- **Piu**、Commodettoの上に構築されたユーザーインターフェースフレームワークです。Piuはオブジェクトベースのフレームワークで、複雑でレスポンシブなレイアウトを作成するのを容易にします。
+- **Piu**、Commodettoの上に構築されたユーザーインターフェースフレームワークです。Piuはオブジェクトベースのフレームワークで、複雑でレスポンシブなレイアウトを簡単に作成できます。
 
 Moddable SDKには、画像形式の変換、画像圧縮、画像回転、フォント圧縮、ローカリゼーションなどのコマンドラインツールも含まれています。ビルドシステムは自動的にこれらのツールを使用します。
 
 ### ハードウェア
 
-Moddable SDKはデジタル（GPIO）、アナログ、PWM、およびI2Cを含む様々なハードウェアプロトコルを実装しています。一般的な市販のセンサー用の多数のドライバーと[対応する例示アプリ](./examples/drivers)も利用可能です。
+Moddable SDKはデジタル（GPIO）、アナログ、PWM、およびI2Cを含む様々なハードウェアプロトコルを実装しています。一般的な市販のセンサー用の多数のドライバーと[対応するサンプルアプリ](./examples/drivers)も利用可能です。
 
-### ソースレベルデバッガー
+### デバッガー
 
-`xsbug` JavaScriptソースレベルデバッガーは、XSプラットフォームのモジュールおよびアプリケーションのデバッグをサポートするフル機能を備えたデバッガーです。
+`xsbug` JavaScriptデバッガーは、XSプラットフォームのモジュールやアプリケーションのデバッグをサポートするフル機能を備えたデバッガーです。
 
 他のデバッガーと同様に、`xsbug`はブレークポイントの設定、ソースコードの閲覧、コールスタックと変数の検査をサポートします。さらに、`xsbug`デバッガーはリアルタイムの計測を提供し、メモリ使用量を追跡し、アプリケーションとリソース消費のプロファイルを提供します。
 
@@ -70,13 +70,13 @@ Moddable SDKはデジタル（GPIO）、アナログ、PWM、およびI2Cを含�
 
 <a href="./documentation/tools/tools.md#simulator"><img src="./documentation/assets/tools/screen-test.png" width=100></a>
 
-Moddable SDK には、macOS、Linux、Windows で動作するシミュレータが含まれています。これらは入門に最適であり、開発の加速にも非常に価値があります。
+Moddable SDK には、macOS、Linux、Windows で動作するシミュレータが含まれています。これらは入門に最適であり、開発の加速にも非常に役立ちます。
 
 シミュレータを使用するには、[Moddable SDK](./documentation/Moddable%20SDK%20-%20Getting%20Started.md) をインストールするだけです。
 
-シミュレータに関する [ビデオデモンストレーション](https://www.youtube.com/watch?v=7GKOm3Tayjs) および情報は、[ツールドキュメント](./documentation/tools/tools.md) の **シミュレータ** セクションで利用可能です。
+シミュレータに関する [動画デモ](https://www.youtube.com/watch?v=7GKOm3Tayjs) および情報は、[ツールドキュメント](./documentation/tools/tools.md) の **シミュレータ** セクションで利用可能です。
 
-### Espressif の ESP8266
+### Espressif ESP8266
 
 ESP8266 ベースのデバイスで Moddable SDK を使用するには：
 
@@ -94,7 +94,7 @@ Moddable SDKはESP8266をベースにした[多くのデバイス](./documentati
 <sup>[6]</sup> *参照: [ESP8266でModdable SDKを使用する](./documentation/devices/esp8266.md)*<BR>
 <sup>[7]</sup> *参照: [Moddable Three 開発者ガイド](./documentation/devices/moddable-three.md)*<BR>
 
-### EspressifのESP32
+### Espressif ESP32
 
 ESP32ベースのデバイスでModdable SDKを使用するには、以下の手順が必要です:
 
@@ -112,7 +112,7 @@ Moddable SDKはESP32, ESP32-S2, ESP32-S3, ESP32-C3, ESP32-C6, ESP32-H2をベー�
 > <sup>[8]</sup> *参照: [Moddable Two 開発者ガイド](./documentation/devices/moddable-two.md), Moddable [製品ページ](https://www.moddable.com/product)*<BR>
 <sup>[9]</sup> *参照: [ESP32でModdable SDKを使用する](./documentation/devices/esp32.md)*<BR>
 
-### Raspberry PiのPico
+### Raspberry Pi Pico
 
 PicoデバイスでModdable SDKを使用するには、以下の手順が必要です:
 
@@ -127,7 +127,7 @@ Moddable SDKは、以下に示すボードを含むRaspberry Pi Picoで構築さ
 | <a href="./documentation/devices/pico.md"><img src="./documentation/assets/devices/pico-adafruit-qt-py-rp2040.png" width=85></a><BR>Adafruit QT Py | <a href="./documentation/devices/pico.md"><img src="./documentation/assets/devices/pico-sparkfun-pro-micro-rp2040.png" width=160></a><BR>Sparkfun Pro Micro | <a href="./documentation/devices/pico.md"><img src="./documentation/assets/devices/pico-lilygo-t-display-rp2040.png" width=160></a><BR> LILYGO T-Display
 
 
-### Nordic SemiconductorのnRF52
+### Nordic Semiconductor nRF52
 
 nRF52デバイスでModdable SDKを使用するには、以下の手順が必要です:
 
@@ -146,7 +146,7 @@ Moddable SDKは、以下に示すボードを含むnRF52で構築された[多�
 > <sup>[10]</sup> *参照: [Moddable Four 開発者ガイド](./documentation/devices/moddable-four.md), Moddable [製品ページ](https://www.moddable.com/product)*<BR>
 
 
-### シリコンラボのGecko
+### Silicon Labs Gecko
 
 Moddable SDKをGeckoデバイスで使用するには、以下の手順が必要です:
 
@@ -164,7 +164,7 @@ Moddable SDKは以下の四つのGeckoボードをサポートしています。
 | :---: | :---: | :---: | :---: |
 | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://www.silabs.com/content/dam/siliconlabs/images/products/microcontrollers/32-bit_mcus/giant_gecko/giant-gecko-starter-kit.jpg" width=125></a><BR>Giant Gecko | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://blog.moddable.com/blog/wp-content/uploads/2018/05/gecko-1-300x179.jpg" width=125></a><BR>Mighty Gecko | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://siliconlabs-h.assetsadobe.com/is/image//content/dam/siliconlabs/images/products/Bluetooth/thunderboard/thunderbord-sense-down-2.jpg?" width=125></a><BR>Thunderboard Sense 2 | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://siliconlabs-h.assetsadobe.com/is/image//content/dam/siliconlabs/images/products/Bluetooth/bluetooth_low_energy/bluegiga_bluetooth_low_energy_modules/blue-gecko-soc-kit.jpg?" width=125></a><BR>Blue Gecko
 
-### QualcommのQCA4020
+### Qualcomm QCA4020
 
 <a href="./documentation/devices/qca4020/README.md"><img src="https://blog.moddable.com/blog/wp-content/uploads/2019/04/qca4020-image.png" width=175></a>
 
