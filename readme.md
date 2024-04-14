@@ -7,7 +7,7 @@ Copyright 2017-2024 Moddable Tech, Inc., 2024 Shinya Ishikawa<BR>
 
 **Moddable SDKは、マイクロコントローラー用のアプリケーションを作成するための開発ツールとランタイムソフトウェアの組み合わせです。**
 
-マイクロコントローラーは、現代のコンピューターやモバイルデバイスと比べると、大幅に制約のあるデバイスです。Moddable SDKが対象とする代表的なマイクロコントローラーは、約45 KBの空きメモリ、1 MBのフラッシュROMを持ち、80 MHzで動作します。Moddable SDKは、こうした制約の中でも効率的に動作するために、ビルド時とランタイムの両方で様々な技術を使用します。
+マイクロコントローラーは、現在主流であるコンピューターやモバイルデバイスと比べると、大幅に制約のあるデバイスです。Moddable SDKが対象とする代表的なマイクロコントローラーは、約45 KBの空きメモリ、1 MBのフラッシュROMを持ち、80 MHzで動作します。Moddable SDKは、こうした制約の中でも効率的に動作するために、ビルド時とランタイムの両方で様々な技術を使用します。
 
 <a href="https://tc39.es/ecma262/">![JS logo](./documentation/assets/moddable/js.png)</a>
 
@@ -177,13 +177,13 @@ Moddable SDKをQCA4020で使用するには、以下の手順が必要です：
 
 - Moddableによる[Qualcomm QCA4020がModdable SDKに対応](https://blog.moddable.com/blog/qca4020/)したブログ投稿
 - Qualcomm Developer Network上の[QCA4020 Moddable SDKでの入門](https://developer.qualcomm.com/project/qca4020-getting-started-moddable-sdk)ブログ投稿
-- Qualcomm Developer Network上の[QCA4020 Moddable SDKを使用した現代的なUIアプリケーション開発](https://developer.qualcomm.com/project/qca4020-modern-ui-application-development-moddable-sdk)ブログ投稿
+- Qualcomm Developer Network上の[QCA4020 Moddable SDKを使用したモダンUIアプリケーション開発](https://developer.qualcomm.com/project/qca4020-modern-ui-application-development-moddable-sdk)ブログ投稿
 
 ### WebAssembly (Wasm)
 
 <a href="./documentation/devices/wasm.md">![](./documentation/assets/devices/wasm.gif)</a>
 
-WebAssemblyは、コンピュータやモバイルデバイスの現代のWebブラウザでサポートされています。Moddable SDKのWasmサポートは、Safari、FireFox、Chromeブラウザと互換性があります。
+WebAssemblyは、コンピュータやモバイルデバイスのモダンWebブラウザでサポートされています。Moddable SDKのWasmサポートは、Safari、FireFox、Chromeブラウザと互換性があります。
 
 Moddable SDKをWebAssemblyで使用するには、以下の手順が必要です：
 
