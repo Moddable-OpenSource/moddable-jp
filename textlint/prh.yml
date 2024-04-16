@@ -1,3 +1,6 @@
 # prh version
 version: 1
 rules:
+  - expected: ローカライゼーション
+    patterns:
+      - ローカリゼーション
