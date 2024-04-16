@@ -54,7 +54,7 @@ Moddable SDKはデジタル（GPIO）、アナログ、PWM、およびI2Cを含�
 
 > *参照: [xsbug ドキュメント](./documentation/xs/xsbug.md)*
 
-## 入門 {/*examples*/}
+## 入門
 
 1. Moddable SDKを使用するには、まずコンピュータにインストールする必要があります。これには、このリポジトリのダウンロード、開発ツールのインストール、コマンドラインでの設定の構成、およびModdable SDKツールのビルドが含まれます。
 
@@ -215,7 +215,7 @@ Moddable SDKによってサポートされるJavaScript APIは、[documentation]
 
 そのディレクトリの [readme](./documentation#api-documentation-for-modules) ドキュメントでAPIドキュメントの概要をご覧ください。
 
-## リソース {/*resources*/}
+## リソース
 
 このリポジトリのドキュメントと例に加えて、開発者向けのいくつかのリソースがあります。
 
@@ -228,15 +228,15 @@ Moddable SDKによってサポートされるJavaScript APIは、[documentation]
 | <img src="https://static.thenounproject.com/png/2067146-200.png" width=50> | Moddable SDKのアップデートに関する [詳細なリリースノート](https://github.com/Moddable-OpenSource/moddable/releases) は、定期的にGitHubに投稿されます。 |
 | <img src="./documentation/assets/getting-started/ts-logo-256.svg" width=50> | Moddable SDKのビルドツールはTypeScriptをサポートしているため、組み込みコードでビルド時の型チェックを使用できます。詳細は [ブログ](https://blog.moddable.com/blog/typescript/) にて。
 
-## ライセンス {/*licensing*/}
+## ライセンス
 
-Moddable SDKは、GPL 3.0、LGPL 3.0、Apache 2.0、およびCreative Commons Attribution 4.0ライセンスを含むライセンスの組み合わせの下で提供されています。[ライセンス](./licenses) ディレクトリには使用されているライセンスとライセンスオプションに関する追加情報が含まれています。Moddableウェブサイトの [ライセンス記事](http://www.moddable.com/license) では、追加の背景と商用ライセンスオプションを説明しています。
+Moddable SDKは、GPL 3.0、LGPL 3.0、Apache 2.0、およびCreative Commons Attribution 4.0ライセンスを含むライセンスの組み合わせの下で提供されています。(./licenses) ディレクトリには使用されているライセンスとライセンスオプションに関する追加情報が含まれています。Moddableウェブサイトの [ライセンス記事](http://www.moddable.com/license) では、追加の背景と商用ライセンスオプションを説明しています。
 
-## セキュリティ問題 {#security-issues}
+## セキュリティ問題
 
 Moddable SDKにセキュリティホールがないように努めています。しかし、すべてを排除することはほぼ不可能です。セキュリティ研究者の方々が当社のソフトウェアに潜在的なセキュリティ問題を特定した場合は、[問題を報告する](./issues)ことを奨励します。これらにはできるだけ迅速に対応します。もし希望される場合は、[メール](mailto:info@moddable.com)でセキュリティ問題を報告することもできます。
 
-## 質問がありますか？気軽にお問い合わせください {#questions-we-are-here-to-help}
+## 質問がありますか？気軽にお問い合わせください
 
 個人開発者の場合、質問があるか、プロジェクトについて話したい場合は、[ディスカッションを開始する](./discussions)か、[Gitterチャットルーム](https://gitter.im/embedded-javascript/moddable)に参加することをお勧めします。始めるのに困ったり、バグを見つけたりした場合は、[問題を報告してください](./issues)。できるだけ早く対応しますし、他の開発者もあなたの質問に対する回答から利益を得ることができます。
 
