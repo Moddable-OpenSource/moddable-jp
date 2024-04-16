@@ -1,3 +1,9 @@
+本リポジトリは[Moddable](https://github.com/Moddable-OpenSource/moddable)の日本語翻訳プロジェクトです。
+
+翻訳作業に参加したい方は[日本語翻訳プロジェクトのREADME](./translation_readme.md)を最初にお読みください。
+
+---
+
 # Moddable SDK
 
 Copyright 2017-2024 Moddable Tech, Inc., 2024 Shinya Ishikawa<BR>
