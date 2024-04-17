@@ -9,6 +9,9 @@
 			"hz": 20000000,
 			"flipX": false,
 			"flipY": false
+		},
+		"poco": {
+			"dma": 1
 		}
 	},
 	"modules": {
