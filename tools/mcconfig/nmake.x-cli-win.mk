@@ -99,6 +99,7 @@ C_DEFINES = \
 	/D mxNoFunctionName=1 \
 	/D mxHostFunctionPrimitive=1 \
 	/D mxFewGlobalsTable=1 \
+	/D mxStringInfoCacheLength=4 \
 	/D kModdableToolsVersion=\"$(TOOLS_VERSION)\"
 !IF "$(INSTRUMENT)"=="1"
 C_DEFINES = $(C_DEFINES) \
