@@ -1,6 +1,6 @@
 # Moddable Two Developer Guide
-Copyright 2019-2022 Moddable Tech, Inc.<BR>
-Revised: March 22, 2022
+Copyright 2019-2024 Moddable Tech, Inc.<BR>
+Revised: April 20, 2024
 
 This document provides information about Moddable Two, including details about its pins and other components, how to build and deploy apps, and links to other development resources.
 
@@ -80,16 +80,16 @@ You can use other SPI sensors even if your app uses the display.
 | GP35     | I/O | Connects to ESP32 GPIO35 |
 | GP27     | I/O | Connects to ESP32 GPIO27 |
 | GP26     | I/O | Connects to ESP32 GPIO26 |
-| VIN      | I/O | VIN is a 5V pin that can be used to power the Moddable Two. If the board is powered by one of the other 5V inputs this pin can be used for external 5V power. This is an unregulated pin; VIN is a direct connection to the 5V input sources. Connects to other 5V inputs and LM1117-3.3 voltage regulator. |
+| VIN      | I/O | VIN is a 5V pin that can be used to power Moddable Two. If the board is powered by one of the other 5V inputs this pin can be used for external 5V power. This is an unregulated pin; VIN is a direct connection to the 5V input sources. Connects to other 5V inputs and LM1117-3.3 voltage regulator. |
 | GP17     | I/O | Connects to ESP32 GPIO17 |
 | GP16     | I/O | Connects to ESP32 GPIO16 |
 | GP0      | I/O | Connects to ESP32 GPIO0 |
 
 #### Power
 
-The Moddable Two is a 3.3V device. 5V power is regulated to 3.3V by a LM1117-3.3 voltage regulator (see data sheet for specs). Testing of Moddable Two has been with typical 5V 0.5amp USB source power.
+Moddable Two is a 3.3V device. 5V power is regulated to 3.3V by a LM1117-3.3 voltage regulator (see data sheet for specs). Testing of Moddable Two has been with typical 5V 0.5amp USB source power.
 
-Power can be supplied to the Moddable Two via the following:
+Power can be supplied to Moddable Two via the following:
 
 * 5V - Micro USB connector
 * 5V - Moddable Programmer connector
@@ -146,7 +146,7 @@ After you've set up your host environment and ESP32 tools, take the following st
 <a id="troubleshooting"></a>
 ## Troubleshooting
 
-See the Troubleshooting section of the [ESP32 documentation](./esp32.md) for a list of common issues and how to resolve them.
+See the Troubleshooting section of the [ESP32 documentation](./esp32.md#troubleshooting) for a list of common issues and how to resolve them.
 
 <a id="development-resources"></a>
 ## Development Resources
