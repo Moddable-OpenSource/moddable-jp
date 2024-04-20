@@ -833,12 +833,14 @@ void fx_String_raw(txMachine* the)
 
 void fx_String_prototype_at(txMachine* the)
 {
-	txString string = fxCoerceToString(the, mxThis);
-	txNumber index = (mxArgc > 0) ? c_trunc(fxToNumber(the, mxArgv(0))) : C_NAN;
+	txNumber index;
+
+	fxCoerceToString(the, mxThis);
+	index = (mxArgc > 0) ? c_trunc(fxToNumber(the, mxArgv(0))) : C_NAN;
 	if (c_isnan(index) || (index == 0))
 		index = 0;
 	else if (index < 0) {
-		index += fxCacheUnicodeLength(the, string);
+		index += fxCacheUnicodeLength(the, mxThis->value.string);
 		if (index < 0)
 			return;
 	}
