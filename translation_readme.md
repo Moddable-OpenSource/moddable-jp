@@ -51,3 +51,14 @@ npm run textlint
 - 翻訳の進め方に関する相談、提案は [issue](https://github.com/Moddable-OpenSource/moddable-jp/issues/) で行います
 - issueを立てるまでもないカジュアルなやりとりなど、プロジェクトメンバー間のコミュニケーションには、 Discordサーバーを使用しています
 - [Discordサーバーの招待リンク](https://discord.gg/7vT4Mde9u2)から参加してください
+
+## 自動翻訳
+
+ChatGPTなどのAIを使った自動翻訳を利用できます。
+[`ChatGPT Markdown Translator`](https://github.com/smikitky/chatgpt-md-translator)を使うとマークダウンの文書単位で自動翻訳にかけることができます。
+ツールの設定例（`.env`と`prompt.md`）を[`chatgpt-md-translator`](./chatgpt-md-translator/)に置いていますので活用してください。
+
+### 注意点
+
+- `ChatGPT Markdown Translator`を使う際、出力ファイルのオプション（`-o`）を与えない場合は、**元ファイルを上書きする**挙動になるので注意してください
+- 出力される翻訳のクオリティは**80点程度**であり、誤訳や用語の表記ゆれを多く含みます。プルリクエストを作成する前に、**必ず全文を自身でチェックしてください**
