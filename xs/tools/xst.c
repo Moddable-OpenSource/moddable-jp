@@ -407,7 +407,7 @@ int main(int argc, char* argv[])
 								fseek(file, 0, SEEK_END);
 								size_t size = ftell(file);
 								fseek(file, 0, SEEK_SET);
-								buffer = malloc(size + 1);
+								buffer = c_malloc(size + 1);
 								if (!buffer)
 									xsUnknownError("not enough memory");
 								if (size != fread(buffer, 1, size, file))	
@@ -917,7 +917,7 @@ void* fxRunFileThread(void* it)
 			fxUnlockMutex(&(pool->countMutex));
 			
 			fxRunContext(pool, context);
-			free(context);
+			c_free(context);
 		}
 		else if (pool->count < 0) {
 			fxUnlockMutex(&(pool->countMutex));
