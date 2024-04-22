@@ -1,40 +1,40 @@
-# Contributing to the Moddable SDK
+# Moddable SDK への貢献
 
-Updated May 20, 2020
+更新日：2020年5月20日
 
-Want to contribute to the Moddable SDK? Great! We welcome all kinds of contributions. There are many ways to get involved and help out, including:
+Moddable SDKに貢献したいですか？素晴らしい！私たちはあらゆる種類の貢献を歓迎します。次のように支援する方法は多くあります：
 
-- Reporting issues
-- Requesting features
-- Submitting pull requests
-- Creating sample projects
+- Issueを報告する
+- 機能をリクエストする
+- Pull Requestを送信する
+- サンプルプロジェクトを作成する
 
 <a id="reporting-issues"></a>
-## Reporting issues
+## Issueを報告する
 
-If you find a bug or have trouble using the Moddable SDK, please [open an issue](https://github.com/Moddable-OpenSource/moddable/issues). We'll respond as quickly as practical. By open an issue, other developers will benefit from the answers to your questions.
+Moddable SDKの使用中にバグを見つけたり、トラブルがあったりした場合は、[Issueを作成してください](https://github.com/Moddable-OpenSource/moddable/issues)。できるだけ早く対応します。Issueを作成することで、他の開発者もあなたの質問に対する回答から恩恵を得ることができます。
 
-Before you open an issue, search the repository to see if someone else has already reported it. If they have, please add comments to the existing thread.
+Issueを作成する前に、リポジトリを検索して、すでに誰かが報告していないか確認してください。すでに報告されている場合は、既存のスレッドにコメントを追加してください。
 
 <a id="requesting-features"></a>
-## Requesting features
+## 機能をリクエストする
 
-To request a new feature, please [open an issue](https://github.com/Moddable-OpenSource/moddable/issues).
+新しい機能をリクエストするには、[Issueを作成してください](https://github.com/Moddable-OpenSource/moddable/issues)。
 
-Before you open an issue, search the repository to see if someone else has already requested the feature. If they have, please add comments to the existing thread about why you'd like to see the feature added.
+Issueを作成する前に、リポジトリを検索して、すでに誰かがその機能をリクエストしていないか確認してください。すでにリクエストされている場合は、その機能を追加してほしい理由について既存のスレッドにコメントを追加してください。
 
 <a id="pull-requests"></a>
-## Submitting pull requests
+## Pull Requestを送信
 
-To add a new feature to the Moddable SDK, fix typos in our [documentation](./documentation), or fix bugs in our [examples](./examples), please [submit a pull request](https://github.com/Moddable-OpenSource/moddable/pulls).
+Moddable SDKに新しい機能を追加したり、[ドキュメント](./documentation)の誤字を修正したり、[サンプル](./examples)のバグを修正する場合は、[Pull Requestを送信してください](https://github.com/Moddable-OpenSource/moddable/pulls)。
 
-Before we can accept pull requests, we ask that you complete a Contributor License Agreement (CLA) and e-mail it to us at [info@moddable.com](mailto:info@moddable.com). The contributor license agreements are in the files [Moddable CLA - individual.pdf](https://github.com/Moddable-OpenSource/moddable/blob/public/licenses/Moddable%20CLA%20-%20individual.pdf) and [Moddable CLA - corporate.pdf](https://github.com/Moddable-OpenSource/moddable/blob/public/licenses/Moddable%20CLA%20-%20corporate.pdf).
+Pull Requestを受け入れる前に、Contributor License Agreement（CLA）を記入し、[info@moddable.com](mailto:info@moddable.com) 宛にメールで送信していただくことをお願いしています。Contributor License Agreementは、[Moddable CLA - individual.pdf](https://github.com/Moddable-OpenSource/moddable/blob/public/licenses/Moddable%20CLA%20-%20individual.pdf) および [Moddable CLA - corporate.pdf](https://github.com/Moddable-OpenSource/moddable/blob/public/licenses/Moddable%20CLA%20-%20corporate.pdf) のファイルになります。
 
-> For more information about why we require a CLA, see the [licenses document](./licenses/readme.md#contributor-license-agreement).
+> CLAが必要な理由についての詳細は、[ライセンス文書](./licenses/readme.md#contributor-license-agreement)をご覧ください。
 
 <a id="sample-projects"></a>
-## Creating sample projects
+## サンプルプロジェクトの作成
 
-We'd love to see what you make with the Moddable SDK! Please share with us on Twitter [@moddabletech](https://www.twitter.com/moddabletech) or our [chatroom on Gitter](https://gitter.im/embedded-javascript/moddable).
+Moddable SDKで作成したものをぜひ見せてください！Twitter [@moddabletech](https://www.twitter.com/moddabletech) や [Gitterのチャットルーム](https://gitter.im/embedded-javascript/moddable) で共有してください。
 
-We'd also love to help share your work. The [`contributed` directory](./contributed) of this repository contains community-contributed modules and code. Feel free to submit a pull request to add your projects to this directory.
+私たちはあなたの作品を共有するのを手伝いたいと考えています。このリポジトリの[`contributed`ディレクトリ](./contributed)には、コミュニティから寄贈されたモジュールやコードが含まれています。このディレクトリにあなたのプロジェクトを追加するために、プルリクエストを自由に送信してください。
