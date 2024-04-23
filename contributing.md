@@ -37,4 +37,4 @@ Pull Requestを受け入れる前に、Contributor License Agreement（CLA）を
 
 Moddable SDKで作成したものをぜひ見せてください！Twitter [@moddabletech](https://www.twitter.com/moddabletech) や [Gitterのチャットルーム](https://gitter.im/embedded-javascript/moddable) で共有してください。
 
-私たちはあなたの作品を共有するのを手伝いたいと考えています。このリポジトリの[`contributed`ディレクトリ](./contributed)には、コミュニティから寄贈されたモジュールやコードが含まれています。このディレクトリにあなたのプロジェクトを追加するために、プルリクエストを自由に送信してください。
+私たちはあなたの作品を共有するのを手伝いたいと考えています。このリポジトリの[`contributed`ディレクトリ](./contributed)には、コミュニティから寄贈されたモジュールやコードが含まれています。このディレクトリにあなたのプロジェクトを追加するために、Pull Requestを自由に送信してください。
