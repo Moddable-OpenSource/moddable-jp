@@ -70,6 +70,15 @@ static int fxShouldStress()
 }
 #endif
 
+#if mxNoChunks
+	#if FUZZING
+		extern void *fxMemMalloc_noforcefail(size_t size);
+		#define c_malloc_noforcefail(size) fxMemMalloc_noforcefail(size)
+	#else
+		#define c_malloc_noforcefail c_malloc
+	#endif
+#endif
+
 #define mxChunkFlag 0x80000000
 
 static txSize fxAdjustChunkSize(txMachine* the, txSize size);
@@ -438,7 +447,7 @@ void* fxFindChunk(txMachine* the, txSize size, txBoolean *once)
 	}
 #endif
 #if mxNoChunks
-	chunk = c_malloc(size);
+	chunk = c_malloc_noforcefail(size);
 	if (!chunk)
 		fxAbort(the, XS_NOT_ENOUGH_MEMORY_EXIT);
 	chunk->size = size;
@@ -1880,7 +1889,7 @@ void fxSweep(txMachine* the)
 		aSize = chunk->size;
 		if (aSize & mxChunkFlag) {
 			aSize &= ~mxChunkFlag;
-			temporary = malloc(aSize);		// not c_malloc, to avoid failures when shuffling heap during fuzzing
+			temporary = c_malloc_noforcefail(aSize);
 			if (!temporary)
 				fxAbort(the, XS_NOT_ENOUGH_MEMORY_EXIT);		// should never happen
 			c_memcpy(temporary, chunk, aSize);
