@@ -211,13 +211,15 @@ static void fx_createRealm(xsMachine* the);
 static void fx_detachArrayBuffer(xsMachine* the);
 static void fx_done(xsMachine* the);
 static void fx_evalScript(xsMachine* the);
-#if FUZZING || FUZZILLI
+#if FUZZING
 static void fx_fillBuffer(txMachine *the);
 void fx_nop(xsMachine *the);
 void fx_assert_throws(xsMachine *the);
+#if FUZZILLI
 static void fx_memoryFail(txMachine *the);
+#endif
 extern int gxStress;
-static int gxMemoryFail;
+int gxMemoryFail;		// not thread safe
 #endif
 static void fx_gc(xsMachine* the);
 static void fx_runScript(xsMachine* the);
@@ -1698,14 +1700,157 @@ void fx_setTimer(txMachine* the, txNumber interval, txBoolean repeat)
 	*mxResult = the->scratch;
 }
 
-/* FUZZILLI */
+/* native memory stress */
 
-#if FUZZILLI
-#include <stdint.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <assert.h>
+#if FUZZING
+
+// oss-fuzz limits to 2.5 GB, so 2 GB here to be comfortably under that
+//#define mxXSMemoryLimit 0x80000000
+
+#if mxXSMemoryLimit
+
+struct sxMemoryBlock {
+	struct sxMemoryBlock	*next;
+	struct sxMemoryBlock	*prev;
+	struct sxMemoryBlock	*address;
+	size_t					size;
+};
+typedef struct sxMemoryBlock txMemoryBlock;
+
+static txMemoryBlock *gBlocks[256];
+static size_t gBlocksSize = 0;
+
+static uint8_t hashAddress(void *addr)
+{
+	txU8 sum = (uintptr_t)addr;
+
+	sum = (~sum) + (sum << 18); // sum = (sum << 18) - sum - 1;
+	sum = sum ^ (sum >> 31);
+	sum = sum * 21; // sum = (sum + (sum << 2)) + (sum << 4);
+	sum = sum ^ (sum >> 11);
+	sum = sum + (sum << 6);
+	sum = sum ^ (sum >> 22);
+
+	return (uint8_t)sum;
+}
+
+static void linkMemoryBlock(void *address, size_t size)
+{
+	uint8_t index = hashAddress(address);
+	txMemoryBlock *block = malloc(sizeof(txMemoryBlock));		// assuming this will never fail (nearly true)
+
+	block->address = address;
+	block->prev = C_NULL;
+	block->size = size;
+
+	block->next = gBlocks[index];
+	if (gBlocks[index])
+		gBlocks[index]->prev = block;
+	gBlocks[index] = block;
+	
+	gBlocksSize += size;
+}
+
+static void unlinkMemoryBlock(void *address)
+{
+	uint8_t index = hashAddress(address);
+
+	txMemoryBlock *block = gBlocks[index];
+	while (block && (block->address != address))
+		block = block->next;
+
+	if (block->next)
+		block->next->prev = block->prev;
+
+	if (block->prev)
+		block->prev->next = block->next;
+	else
+		gBlocks[index] = block->next;
+
+	gBlocksSize -= block->size;
+
+	free(block);
+}
+
+static size_t getMemoryBlockSize(void *address)
+{
+	uint8_t index = hashAddress(address);
+	txMemoryBlock *block = gBlocks[index];
+	while (block && (block->address != address))
+		block = block->next;
+	return block->size;
+}
+
+#if mxNoChunks
+void *fxMemMalloc_noforcefail(size_t size)
+{
+	if ((size + gBlocksSize) > mxXSMemoryLimit)
+		return NULL;
+
+	void *result = malloc(size);
+	linkMemoryBlock(result, size);
+	return result;
+}
+#endif
+
+void *fxMemMalloc(size_t size)
+{
+	if (gxMemoryFail && !--gxMemoryFail)
+		return NULL;
+
+	if ((size + gBlocksSize) > mxXSMemoryLimit)
+		return NULL;
+
+	void *result = malloc(size);
+	linkMemoryBlock(result, size);
+	
+	return result;
+}
+
+void *fxMemCalloc(size_t a, size_t b)
+{
+	if (gxMemoryFail && !--gxMemoryFail)
+		return NULL;
+
+	size_t size = a * b;
+	if ((size + gBlocksSize) > mxXSMemoryLimit)
+		return NULL;
+
+	void *result = calloc(a, b);
+	linkMemoryBlock(result, size);
+
+	return result;
+}
+
+void *fxMemRealloc(void *a, size_t b)
+{
+	if (gxMemoryFail && !--gxMemoryFail)
+		return NULL;
+ 
+	if ((b - getMemoryBlockSize(a) + gBlocksSize) > mxXSMemoryLimit)
+		return NULL;
+
+	unlinkMemoryBlock(a);
+	a = realloc(a, b);
+	linkMemoryBlock(a, b);
+	
+	return a;
+}
+
+void fxMemFree(void *m)
+{
+	unlinkMemoryBlock(m);
+	free(m);
+}
+
+#else // 0 == mxXSMemoryLimit
+
+#if mxNoChunks
+void *fxMemMalloc_noforcefail(size_t size)
+{
+	return malloc(size);
+}
+#endif
 
 void *fxMemMalloc(size_t size)
 {
@@ -1735,6 +1880,19 @@ void fxMemFree(void *m)
 {
 	free(m);
 }
+
+#endif // mxXSMemoryLimit
+
+#endif	// FUZZING
+
+/* FUZZILLI */
+
+#if FUZZILLI
+#include <stdint.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <assert.h>
 
 #define SHM_SIZE 0x100000
 #define MAX_EDGES ((SHM_SIZE - 4) * 8)
@@ -1825,9 +1983,15 @@ void fx_fuzzilli(xsMachine* the)
 				// this code is so buggy its bound to trip
 				// different sanitizers
 				size_t s = -1;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 				txSize txs = s + 1;
+#pragma GCC diagnostic pop
 				char buf[2];
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
 				char* bufptr = &buf;
+#pragma GCC diagnostic pop
 				bufptr[4] = (buf[0] == buf[1]) ? 0 : 1;
 				*((volatile char *)0) = 0;
 
@@ -1983,13 +2147,13 @@ int fuzz(int argc, char* argv[])
 #endif 
 #if OSSFUZZ
 
+static int lsan_disabled;
+
 #if mxMetering
 #ifndef mxFuzzMeter
 	// highest rate for test262 corpus was 2147483800
 	#define mxFuzzMeter (214748380)
 #endif
-
-static int lsan_disabled;
 
 // allow toggling ASAN leak-checking
 __attribute__((used)) int __lsan_is_turned_off()
@@ -2131,6 +2295,7 @@ void fx_assert_throws(xsMachine *the)
 	}
 }
 
+#if FUZZILLI
 void fx_memoryFail(txMachine *the)
 {
 	xsResult = xsInteger(gxMemoryFail);
@@ -2142,6 +2307,7 @@ void fx_memoryFail(txMachine *the)
 		xsUnknownError("invalid");
 	gxMemoryFail = count;
 }
+#endif
 
 #endif
 

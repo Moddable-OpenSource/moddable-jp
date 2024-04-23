@@ -123,7 +123,7 @@ extern void fxUnscheduleSharedTimer(txSharedTimer* timer);
 
 #define mxCESU8 1
 
-#if FUZZILLI
+#if FUZZING
 extern void *fxMemMalloc(size_t size);
 extern void *fxMemCalloc(size_t a, size_t b);
 extern void *fxMemRealloc(void *a, size_t b);
@@ -132,7 +132,9 @@ extern void fxMemFree(void *m);
 #define c_malloc(a) fxMemMalloc(a)
 #define c_calloc(a, b) fxMemCalloc(a, b)
 #define c_realloc(a, b) fxMemRealloc(a, b)
+#define c_malloc_uint32(a) c_malloc(a)
 #define c_free(p) fxMemFree(p)
+#define c_free_uint32(p) c_free(p)
 #endif
 
 #endif /* __XST__ */
