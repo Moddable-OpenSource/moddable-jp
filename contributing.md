@@ -6,7 +6,7 @@ Moddable SDKに貢献したいですか？素晴らしい！私たちはあら�
 
 - Issueを報告する
 - 機能をリクエストする
-- Pull Requestを送信する
+- Pull Requestを作成する
 - サンプルプロジェクトを作成する
 
 <a id="reporting-issues"></a>
@@ -24,9 +24,9 @@ Issueを作成する前に、リポジトリを検索して、すでに誰かが
 Issueを作成する前に、リポジトリを検索して、すでに誰かがその機能をリクエストしていないか確認してください。すでにリクエストされている場合は、その機能を追加してほしい理由について既存のスレッドにコメントを追加してください。
 
 <a id="pull-requests"></a>
-## Pull Requestを送信
+## Pull Requestを作成
 
-Moddable SDKに新しい機能を追加したり、[ドキュメント](./documentation)の誤字を修正したり、[サンプル](./examples)のバグを修正する場合は、[Pull Requestを送信してください](https://github.com/Moddable-OpenSource/moddable/pulls)。
+Moddable SDKに新しい機能を追加したり、[ドキュメント](./documentation)の誤字を修正したり、[サンプル](./examples)のバグを修正する場合は、[Pull Requestを作成してください](https://github.com/Moddable-OpenSource/moddable/pulls)。
 
 Pull Requestを受け入れる前に、Contributor License Agreement（CLA）を記入し、[info@moddable.com](mailto:info@moddable.com) 宛にメールで送信していただくことをお願いしています。Contributor License Agreementは、[Moddable CLA - individual.pdf](https://github.com/Moddable-OpenSource/moddable/blob/public/licenses/Moddable%20CLA%20-%20individual.pdf) および [Moddable CLA - corporate.pdf](https://github.com/Moddable-OpenSource/moddable/blob/public/licenses/Moddable%20CLA%20-%20corporate.pdf) のファイルになります。
 
@@ -37,4 +37,4 @@ Pull Requestを受け入れる前に、Contributor License Agreement（CLA）を
 
 Moddable SDKで作成したものをぜひ見せてください！Twitter [@moddabletech](https://www.twitter.com/moddabletech) や [Gitterのチャットルーム](https://gitter.im/embedded-javascript/moddable) で共有してください。
 
-私たちはあなたの作品を共有するのを手伝いたいと考えています。このリポジトリの[`contributed`ディレクトリ](./contributed)には、コミュニティから寄贈されたモジュールやコードが含まれています。このディレクトリにあなたのプロジェクトを追加するために、Pull Requestを自由に送信してください。
+私たちはあなたの作品を共有するのを手伝いたいと考えています。このリポジトリの[`contributed`ディレクトリ](./contributed)には、コミュニティから寄贈されたモジュールやコードが含まれています。このディレクトリにあなたのプロジェクトを追加するために、Pull Requestを自由に作成してください。
