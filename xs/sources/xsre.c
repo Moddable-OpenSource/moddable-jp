@@ -10427,7 +10427,7 @@ void fx_String_prototype_toCase(txMachine* the, txBoolean flag)
 {
 	txString string = mxThis->value.string;
 	txInteger stringLength = mxStringLength(string);
-	mxMeterSome(fxUnicodeLength(string));
+	mxMeterSome(fxUnicodeLength(string, C_NULL));
 	if (stringLength) {
 		txString p, r;
 		txInteger c;
