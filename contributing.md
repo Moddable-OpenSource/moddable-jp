@@ -4,24 +4,24 @@
 
 Moddable SDKに貢献したいですか？素晴らしい！私たちはあらゆる種類の貢献を歓迎します。次のように支援する方法は多くあります：
 
-- Issueを報告する
+- issueを報告する
 - 機能をリクエストする
 - Pull Requestを作成する
 - サンプルプロジェクトを作成する
 
 <a id="reporting-issues"></a>
-## Issueを報告する
+## issueを報告する
 
-Moddable SDKの使用中にバグを見つけたり、トラブルがあったりした場合は、[Issueを作成してください](https://github.com/Moddable-OpenSource/moddable/issues)。できるだけ早く対応します。Issueを作成することで、他の開発者もあなたの質問に対する回答から恩恵を得ることができます。
+Moddable SDKの使用中にバグを見つけたり、トラブルがあったりした場合は、[issueを作成してください](https://github.com/Moddable-OpenSource/moddable/issues)。できるだけ早く対応します。issueを作成することで、他の開発者もあなたの質問に対する回答から恩恵を得ることができます。
 
-Issueを作成する前に、リポジトリを検索して、すでに誰かが報告していないか確認してください。すでに報告されている場合は、既存のスレッドにコメントを追加してください。
+issueを作成する前に、リポジトリを検索して、すでに誰かが報告していないか確認してください。すでに報告されている場合は、既存のスレッドにコメントを追加してください。
 
 <a id="requesting-features"></a>
 ## 機能をリクエストする
 
-新しい機能をリクエストするには、[Issueを作成してください](https://github.com/Moddable-OpenSource/moddable/issues)。
+新しい機能をリクエストするには、[issueを作成してください](https://github.com/Moddable-OpenSource/moddable/issues)。
 
-Issueを作成する前に、リポジトリを検索して、すでに誰かがその機能をリクエストしていないか確認してください。すでにリクエストされている場合は、その機能を追加してほしい理由について既存のスレッドにコメントを追加してください。
+issueを作成する前に、リポジトリを検索して、すでに誰かがその機能をリクエストしていないか確認してください。すでにリクエストされている場合は、その機能を追加してほしい理由について既存のスレッドにコメントを追加してください。
 
 <a id="pull-requests"></a>
 ## Pull Requestを作成
