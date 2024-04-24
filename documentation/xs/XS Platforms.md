@@ -1,6 +1,6 @@
 # XS Platforms
-Copyright 2016-2023 Moddable Tech, Inc.<BR>
-Revised: August 31, 2023
+Copyright 2016-2024 Moddable Tech, Inc.<BR>
+Revised: April 22, 2024
 
 ## History
 
@@ -610,3 +610,27 @@ On systems with POSIX threads and on Windows, to use the default implementation 
 			txMachine* waiterLink;
 
 Obviously, on systems with a single thread, `Atomics.wait` always fails and `Atomics.wake` always returns zero.
+
+### Strings
+
+XS has several options to control the behavior of strings.
+
+#### Internal representation
+
+By default, XS stores strings in UTF-8 encoding. This is convenient in many ways, but results in some subtle differences with standard JavaScript which assumes UTF-16. In particular, the handling of surrogate pairs is different. For environments where stricter conformance is a priority, the internal encoding can be changed to [CESU-8](https://en.wikipedia.org/wiki/CESU-8), a way of encoding UTF-16 in UTF-8. More precisely, XS uses [Modified UTF-8 from Java](https://en.wikipedia.org/wiki/UTF-8#Modified_UTF-8), which is CESU-8 with special handling of NULL characters.
+
+To have XS use CESU-8 encoding as its internal representation, define `mxCESU` when building XS. Note that any native code that interacts with XS strings will need to use CESU-8 as well.
+
+#### Cache
+
+To limit memory use, XS stores minimal information about strings. This is valuable for runtimes where RAM is limited. However, as strings get longer it can result in reduced performance. Platforms working with longer strings generally have more RAM. For this situation, XS has an optional string cache that can be enabled to store additional information about strings. This information is only stored for the most recently used strings, not each string, so it is relatively small.
+
+To enable the string cache, define `mxStringInfoCacheLength` to the number of string cache entries. The recommended default is `4`, which stores additional information about the four mostly recent used strings. This can be increased, but it should generally be a small number as cache searches are linear. The string cache is off by default, as if `mxStringInfoCacheLength` is defined as `0`.
+
+#### Normalize
+
+The JavaScript function [String.prototype.normalize](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize) is useful but obscure: most applications don't use it. The implementation is remarkably large because of required data tables. Consequently, it is disabled by default for most platforms. Platforms that want to support String.prototype.normalize must define `mxStringNormalize` to `1`.
+
+#### Unicode property escapes
+
+Unicode property escapes are supported by XS, but because of the large data tables required to implement the feature, they are not enabled by default on all platforms. An error is thrown if they are used on an unsupported platform. To enable Unicode property escapes, define `mxRegExpUnicodePropertyEscapes` when building XS.
