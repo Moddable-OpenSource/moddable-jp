@@ -1,33 +1,33 @@
-# Moddable SDK – Licenses
+# Moddable SDK – ライセンス
 Copyright 2017-2022 Moddable Tech, Inc.
 
-Revised: February 14, 2022
+改訂： 2022年2月14日
 
-This directory contains documents related to licensing.
+このディレクトリには、ライセンスに関連するドキュメントが含まれています。
 
-> **Note**: Software licenses are complicated. Consult with legal counsel to understand how these licenses apply to your situation.
+> **注意**: ソフトウェアライセンスは複雑です。これらのライセンスがあなたの状況にどのように適用されるかを理解するために、弁護士に相談してください。
 
-The license or licenses that apply to a given file are noted at the top of each source code file. In the absence of a specific license, no license is implied.
+特定のファイルに適用されるライセンスは、各ソースコードファイルの先頭に記載されています。特定のライセンスがない場合、ライセンスは記載されません。
 
-### GPL 3.0 and LGPL 3.0
-The majority of software in the Moddable SDK is provided under the GPL 3.0 or LGPL 3.0. The text of these licenses is provided in [`gpl-3.0.txt`](gpl-3.0.txt) and [`lgpl-3.0.txt`](lgpl-3.0.txt).
+### GPL 3.0 および LGPL 3.0
+Moddable SDKの大部分のソフトウェアは、GPL 3.0またはLGPL 3.0の下で提供されています。これらのライセンスのテキストは、[`gpl-3.0.txt`](gpl-3.0.txt) および [`lgpl-3.0.txt`](lgpl-3.0.txt) に提供されています。
 
-As a general rule, software for build tools is licensed under GPL 3.0 and runtime software is licensed under LGPL 3.0.
+一般的に、ビルドツールのソフトウェアはGPL 3.0の下でライセンスされ、ランタイムソフトウェアはLGPL 3.0の下でライセンスされます。
 
-The GPL 3.0 and LGPL 3.0 give product developers and product users very broad rights. We believe this is good for everyone. We also recognize that because of the far reaching freedoms granted by these licenses, not all developers are yet able or willing to use code carrying these licenses in their products. For these situations, Moddable also offers a conventional commercial software license for the Moddable SDK.
+GPL 3.0およびLGPL 3.0は、製品開発者と製品ユーザーに非常に広範な権利を与えます。これは皆にとって良いことだと考えています。また、これらのライセンスによって付与される広範な自由のために、すべての開発者が自分たちの製品でこれらのライセンスを持つコードを使用することできないやこと望んでないことを認識しています。このような状況のために、ModdableはModdable SDKのための従来の商用ソフトウェアライセンスも提供しています。
 
-### Creative Commons
-The example code in the Moddable SDK is provided under the Creative Commons [Attribution 4.0 International](http://creativecommons.org/licenses/by/4.0/) license.
+### クリエイティブ・コモンズ
+Moddable SDKのサンプルコードは、クリエイティブ・コモンズ [Attribution 4.0 International](http://creativecommons.org/licenses/by/4.0/) ライセンスの下で提供されています。
 
 ### Apache 2.0
-Some of the software in the Moddable SDK, primarily that related to the XS JavaScript engine, is derived from work done by the Kinoma team as an independent company and part of Marvell Semiconductor. XS is licensed by Marvell under the Apache 2.0 license. Files that carry the Apache license from Marvell and have since been modified as part of the Moddable SDK carry both the GPL 3.0 (or LGPL 3.0) license and the original Apache license.
+Moddable SDKに含まれるソフトウェアの一部、特にXS JavaScriptエンジンに関連するものは、独立した企業としてのKinomaチームによる作業、およびMarvell Semiconductorの一部としての作業から派生しています。XSはMarvellによってApache 2.0ライセンスの下でライセンスされています。MarvellからのApacheライセンスを持つファイルは、Moddable SDKの一部として変更されて以来、GPL 3.0（またはLGPL 3.0）ライセンスと元のApacheライセンスの両方を持っています。
 
-The [`license/NOTICE`](NOTICE) file contains the license grant by Marvell Semiconductor, from the [KinomaJS](https://github.com/Kinoma/kinomajs/) repository on GitHub.
+[`license/NOTICE`](NOTICE) ファイルにはGitHub上の [KinomaJS](https://github.com/Kinoma/kinomajs/) リポジトリ上にあるMarvell Semiconductorにライセンス付与されたものが含まれています。
 
 ### SIL OPEN FONT LICENSE Version 1.1
-Some of the fonts in the Moddable SDK are provided under the SIL OPEN FONT LICENSE Version 1.1 license. The text of this license is provided in [OFL.txt](./OFT.txt).
+Moddable SDKに含まれるいくつかのフォントは、SIL OPEN FONT LICENSE Version 1.1ライセンスの下で提供されています。このライセンスのテキストは [OFL.txt](./OFT.txt) に提供されています。
 
 ### Contributor License Agreement
-Moddable welcomes third party contributions to the Moddable SDK. Before we can accept a change, we ask that you complete a Contributor License Agreement. This ensures all users of the Moddable SDK that you have the right to make the contribution, and that they can continue to use the Moddable SDK with your changes under the existing licenses. The contributor license agreements are in the files [Moddable CLA - individual.pdf](Moddable%20CLA%20-%20individual.pdf) and [Moddable CLA - corporate.pdf](Moddable%20CLA%20-%20corporate.pdf).
+Moddableは、Moddable SDKへの第三者の貢献を歓迎します。変更を受け入れる前に、コントリビューターライセンス契約を完了していただく必要があります。これにより、Moddable SDKのすべてのユーザーに対して、あなたが貢献を行う権利を持っていること、そして彼らが既存のライセンスの下であなたの変更を含むModdable SDKを引き続き使用できることが保証されます。コントリビューターライセンス契約は、[Moddable CLA - individual.pdf](Moddable%20CLA%20-%20individual.pdf) および [Moddable CLA - corporate.pdf](Moddable%20CLA%20-%20corporate.pdf) のファイルになります。
 
-The Moddable CLAs are based on the [individual](https://www.apache.org/licenses/icla.pdf) and [corporate](https://www.apache.org/licenses/cla-corporate.pdf) Apache CLAs, which are also used by [Google](https://cla.developers.google.com/about).
+ModdableのCLAは、[individual](https://www.apache.org/licenses/icla.pdf) および [corporate](https://www.apache.org/licenses/cla-corporate.pdf) のApache CLAに基づいており、これは [Google](https://cla.developers.google.com/about) によっても使用されています。
