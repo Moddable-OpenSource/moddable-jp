@@ -403,6 +403,13 @@ void fx_fuzzilli(xsMachine* the)
 	}
 }
 
+#ifdef mxMetering
+static xsBooleanValue xsAlwaysWithinComputeLimit(xsMachine* machine, xsUnsignedValue index)
+{
+	return 1;
+}
+#endif
+
 int fuzz(int argc, char* argv[])
 {
 	char helo[] = "HELO";
