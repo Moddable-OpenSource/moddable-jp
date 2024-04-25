@@ -179,6 +179,8 @@ OBJECTS = \
 	$(TMP_DIR)/textencoder.o \
 	$(TMP_DIR)/modBase64.o \
 	$(TMP_DIR)/xst.o \
+	$(TMP_DIR)/xst262.o \
+	$(TMP_DIR)/xstFuzz.o \
 	$(TMP_DIR)/e_acos.o \
 	$(TMP_DIR)/e_acosh.o \
 	$(TMP_DIR)/e_asin.o \

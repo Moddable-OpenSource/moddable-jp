@@ -116,7 +116,6 @@ extern void fxUnscheduleSharedTimer(txSharedTimer* timer);
 #define mxScheduleSharedTimer fxScheduleSharedTimer
 #define mxUnscheduleSharedTimer fxUnscheduleSharedTimer
 
-
 #if INTPTR_MAX == INT64_MAX
 	#define mx32bitID 1
 #endif
@@ -136,5 +135,87 @@ extern void fxMemFree(void *m);
 #define c_free(p) fxMemFree(p)
 #define c_free_uint32(p) c_free(p)
 #endif
+
+#if mxWindows
+	#include <direct.h>
+	#include <errno.h>
+	#include <process.h>
+	typedef CONDITION_VARIABLE txCondition;
+	typedef CRITICAL_SECTION txMutex;
+    typedef DWORD txThread;
+	#define fxCreateCondition(CONDITION) InitializeConditionVariable(CONDITION)
+	#define fxCreateMutex(MUTEX) InitializeCriticalSection(MUTEX)
+	#define fxDeleteCondition(CONDITION) (void)(CONDITION)
+	#define fxDeleteMutex(MUTEX) DeleteCriticalSection(MUTEX)
+	#define fxLockMutex(MUTEX) EnterCriticalSection(MUTEX)
+	#define fxUnlockMutex(MUTEX) LeaveCriticalSection(MUTEX)
+	#define fxSleepCondition(CONDITION,MUTEX) SleepConditionVariableCS(CONDITION,MUTEX,INFINITE)
+	#define fxWakeAllCondition(CONDITION) WakeAllConditionVariable(CONDITION)
+	#define fxWakeCondition(CONDITION) WakeConditionVariable(CONDITION)
+	#define mxCurrentThread() GetCurrentThreadId()
+	#define mxMonotonicNow() ((txNumber)GetTickCount64())
+#else
+	#include <dirent.h>
+	#include <pthread.h>
+	#include <sys/stat.h>
+	typedef pthread_cond_t txCondition;
+	typedef pthread_mutex_t txMutex;
+	typedef pthread_t txThread;
+	#define fxCreateCondition(CONDITION) pthread_cond_init(CONDITION,NULL)
+	#define fxCreateMutex(MUTEX) pthread_mutex_init(MUTEX,NULL)
+	#define fxDeleteCondition(CONDITION) pthread_cond_destroy(CONDITION)
+	#define fxDeleteMutex(MUTEX) pthread_mutex_destroy(MUTEX)
+	#define fxLockMutex(MUTEX) pthread_mutex_lock(MUTEX)
+	#define fxUnlockMutex(MUTEX) pthread_mutex_unlock(MUTEX)
+	#define fxSleepCondition(CONDITION,MUTEX) pthread_cond_wait(CONDITION,MUTEX)
+	#define fxWakeAllCondition(CONDITION) pthread_cond_broadcast(CONDITION)
+	#define fxWakeCondition(CONDITION) pthread_cond_signal(CONDITION)
+	#define mxCurrentThread() pthread_self()
+	#define mxMonotonicNow() fxDateNow()
+#endif
+
+typedef struct sxAgent txAgent;
+typedef struct sxAgentCluster txAgentCluster;
+typedef struct sxAgentReport txAgentReport;
+typedef struct sxJob txJob;
+
+struct sxAgent {
+	txAgent* next;
+#if mxWindows
+    HANDLE thread;
+#else
+	pthread_t thread;
+#endif
+	int scriptLength;
+	char script[1];
+};
+
+struct sxAgentReport {
+	txAgentReport* next;
+	char message[1];
+};
+
+struct sxAgentCluster {
+	txMutex mainMutex;
+
+	txAgent* firstAgent;
+	txAgent* lastAgent;
+	
+	int count;
+	txCondition countCondition;
+	txMutex countMutex;
+
+	void* dataBuffer;
+	txCondition dataCondition;
+	txMutex dataMutex;
+	int dataValue;
+
+	txAgentReport* firstReport;
+	txAgentReport* lastReport;
+	txMutex reportMutex;
+};
+
+extern char *gxAbortStrings[];
+extern txAgentCluster gxAgentCluster;
 
 #endif /* __XST__ */
