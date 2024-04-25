@@ -724,6 +724,10 @@ ifeq ($(INSTRUMENT),1)
 	C_DEFINES += -DMODINSTRUMENTATION=1 -DmxInstrument=1
 endif
 
+ifeq($(NRF52_CUSTOM_PWM_FREQ),1)
+	C_DEFINES += -DNRF52_CUSTOM_PWM_FREQ=1
+endif
+
 ifeq ($(USE_WDT),1)
 	C_FLAGS += -DUSE_WATCHDOG=1
 endif
