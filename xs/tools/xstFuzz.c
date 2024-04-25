@@ -102,7 +102,8 @@ struct sxMemoryBlock {
 };
 typedef struct sxMemoryBlock txMemoryBlock;
 
-static txMemoryBlock *gBlocks[256];
+#define kMemoryBlockCount (256)		// update hashAddress if this is changed
+static txMemoryBlock *gBlocks[kMemoryBlockCount];
 static size_t gBlocksSize = 0;
 
 static uint8_t hashAddress(void *addr)
@@ -164,6 +165,15 @@ static size_t getMemoryBlockSize(void *address)
 	while (block && (block->address != address))
 		block = block->next;
 	return block->size;
+}
+
+void freeMemoryBlocks(void)
+{
+	int i;
+	for (i = 0; i < kMemoryBlockCount; i++) {
+		while (gBlocks[i])
+			fxMemFree(gBlocks[i]->address);
+	}
 }
 
 #if mxNoChunks
@@ -658,8 +668,13 @@ int fuzz_oss(const uint8_t *Data, size_t script_size)
 	}
 	xsEndMetering(machine);
 	fxDeleteScript(machine->script);
+	int abortStatus = machine->abortStatus;
 	xsDeleteMachine(machine);
 	free(buffer);
+
+	if ((XS_TOO_MUCH_COMPUTATION_EXIT == abortStatus) || (XS_NOT_ENOUGH_MEMORY_EXIT == abortStatus))
+		freeMemoryBlocks();		// clean-up if computation or memory limits exceeded
+
 	return 0;
 }
 
