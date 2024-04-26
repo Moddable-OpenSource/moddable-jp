@@ -1215,7 +1215,7 @@ enum {
 	_fromBase64,
 	_fromHex,
 	_lastChunkHandling,
-	_read,
+	_read_,
 	_setFromBase64,
 	_setFromHex,
 	_toBase64,
