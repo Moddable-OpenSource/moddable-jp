@@ -17,7 +17,7 @@
 
 - 本プロジェクトに参加するには、Githubのアカウントが必要です
 - 「翻訳者」または「レビュアー」として参加できます
-    - 翻訳者：後述の「翻訳作業の流れ」に則ってプルリクエストを作成してください。**初回のプルリクエストを送る際は、[Contributor License Agreement（CLA）](https://github.com/Moddable-OpenSource/moddable/tree/public/licenses#contributor-license-agreement)へのサインが必要です**
+    - 翻訳者：後述の「翻訳作業の流れ」に則ってPull Requestを作成してください。**初回のPull Requestを送る際は、[Contributor License Agreement（CLA）](https://github.com/Moddable-OpenSource/moddable/tree/public/licenses#contributor-license-agreement)へのサインが必要です**
     - レビュアー：日本語能力とModdableの知識が十分にあると認められる方はレビュアーとして参加できます。[ししかわ](https://github.com/meganetaaan)まで連絡してください
 
 ## 翻訳作業の流れ
@@ -36,9 +36,9 @@ npm install #初回のみ
 npm run textlint
 ```
 
-- プルリクエストを作成します
+- Pull Requestを作成します
     - 1名以上のレビュアーがレビューして修正依頼または承認を行います
-    - プルリクエストをマージします
+    - Pull Requestをマージします
 
 ### 公式リポジトリの更新に追従する
 
@@ -61,4 +61,4 @@ ChatGPTなどのAIを使った自動翻訳を利用できます。
 ### 注意点
 
 - `ChatGPT Markdown Translator`を使う際、出力ファイルのオプション（`-o`）を与えない場合は、**元ファイルを上書きする**挙動になるので注意してください
-- 出力される翻訳のクオリティは**80点程度**であり、誤訳や用語の表記ゆれを多く含みます。プルリクエストを作成する前に、**必ず全文を自身でチェックしてください**
+- 出力される翻訳のクオリティは**80点程度**であり、誤訳や用語の表記ゆれを多く含みます。Pull Requestを作成する前に、**必ず全文を自身でチェックしてください**
