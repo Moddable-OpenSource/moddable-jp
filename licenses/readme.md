@@ -25,7 +25,7 @@ Moddable SDKに含まれるソフトウェアの一部、特にXS JavaScriptエ�
 [`license/NOTICE`](NOTICE) ファイルにはGitHub上の [KinomaJS](https://github.com/Kinoma/kinomajs/) リポジトリ上にあるMarvell Semiconductorにライセンス付与されたものが含まれています。
 
 ### SIL OPEN FONT LICENSE Version 1.1
-Moddable SDKに含まれるいくつかのフォントは、SIL OPEN FONT LICENSE Version 1.1ライセンスの下で提供されています。このライセンスのテキストは [OFL.txt](./OFT.txt) に提供されています。
+Moddable SDKに含まれるいくつかのフォントは、SIL OPEN FONT LICENSE Version 1.1ライセンスの下で提供されています。このライセンスのテキストは [OFL.txt](./OFL.txt) に提供されています。
 
 ### Contributor License Agreement
 Moddableは、Moddable SDKへの第三者の貢献を歓迎します。変更を受け入れる前に、コントリビューターライセンス契約を完了していただく必要があります。これにより、Moddable SDKのすべてのユーザーに対して、あなたが貢献を行う権利を持っていること、そして彼らが既存のライセンスの下であなたの変更を含むModdable SDKを引き続き使用できることが保証されます。コントリビューターライセンス契約は、[Moddable CLA - individual.pdf](Moddable%20CLA%20-%20individual.pdf) および [Moddable CLA - corporate.pdf](Moddable%20CLA%20-%20corporate.pdf) のファイルになります。
