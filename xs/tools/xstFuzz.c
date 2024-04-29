@@ -451,25 +451,7 @@ int fuzz(int argc, char* argv[])
 
 	while (1) {
 		int error = 0;
-		char action[4];
-		ssize_t nread = read(REPRL_CRFD, action, 4);
-		fflush(0);		//@@
-		if (nread != 4 || memcmp(action, "exec", 4) != 0) {
-			fprintf(stderr, "Unknown action: %s\n", action);
-			c_exit(-1);
-		}
-
-		size_t script_size = 0;
-		read(REPRL_CRFD, &script_size, 8);
-
-		ssize_t remaining = (ssize_t)script_size;
-		char* buffer = (char *)malloc(script_size + 1);
-		ssize_t rv = read(REPRL_DRFD, buffer, (size_t) remaining);
-		if (rv <= 0) {
-			fprintf(stderr, "Failed to load script\n");
-			c_exit(-1);
-		}
-		buffer[script_size] = 0;	// required when debugger active
+		char *buffer = NULL;
 
 		gxStress = 0;
 		gxMemoryFail = 0;
@@ -504,6 +486,28 @@ int fuzz(int argc, char* argv[])
 				xsResult = xsNewHostFunction(fx_memoryFail, 1);
 				xsSet(xsGlobal, xsID("memoryFail"), xsResult);
 
+				// wait for the script
+				char action[4];
+				ssize_t nread = read(REPRL_CRFD, action, 4);
+				fflush(0);		//@@
+				if (nread != 4 || memcmp(action, "exec", 4) != 0) {
+					fprintf(stderr, "Unknown action: %s\n", action);
+					c_exit(-1);
+				}
+
+				size_t script_size = 0;
+				read(REPRL_CRFD, &script_size, 8);
+
+				ssize_t remaining = (ssize_t)script_size;
+				buffer = (char *)malloc(script_size + 1);
+				ssize_t rv = read(REPRL_DRFD, buffer, (size_t) remaining);
+				if (rv <= 0) {
+					fprintf(stderr, "Failed to load script\n");
+					c_exit(-1);
+				}
+				buffer[script_size] = 0;	// required when debugger active
+
+				// run the script
 				txSlot* realm = mxProgram.value.reference->next->value.module.realm;
 				txStringCStream aStream;
 				aStream.buffer = buffer;
