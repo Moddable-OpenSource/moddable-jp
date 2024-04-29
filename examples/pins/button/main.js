@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK.
  * 
@@ -20,15 +20,17 @@ import Digital from "pins/digital";
 
 const BUTTON_PIN = 0;
 
-trace(`Using pin ${BUTTON_PIN} for button.`);
+trace(`Using pin ${BUTTON_PIN} for button.\n`);
 
 const button = new Digital(BUTTON_PIN, Digital.InputPullUp);
 let previous = 0;
 Timer.repeat(() => {
 	const current = button.read();
 	if (current !== previous) {
-		if (current)
-			trace("button was pressed\n");
+		if (!current)
+			trace("button pressed\n");
+		else
+			trace("button released\n");
 		previous = current;
 	}
 }, 100);
