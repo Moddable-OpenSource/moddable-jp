@@ -1,6 +1,6 @@
 # Moddable Two Developer Guide
 Copyright 2019-2024 Moddable Tech, Inc.<BR>
-Revised: April 20, 2024
+Revised: April 29, 2024
 
 This document provides information about Moddable Two, including details about its pins and other components, how to build and deploy apps, and links to other development resources.
 
@@ -192,7 +192,7 @@ The brightness of the backlight may be set at build time in the `config` section
 You can also set the brightness on the command line when building with `mcconfig`. Here it is set to 50%.
 
 ```text
-mcconfig -d -m -p esp32/moddable_two backlight=50
+mcconfig -d -m -p esp32/moddable_two brightness=50
 ```
 
 The `setup/target` module for Moddable Two installs a global variable named `backlight` that you can use to adjust the backlight in your code. Here it is set to 80%.
