@@ -668,12 +668,16 @@ int fuzz_oss(const uint8_t *Data, size_t script_size)
 	}
 	xsEndMetering(machine);
 	fxDeleteScript(machine->script);
+#if mxXSMemoryLimit
 	int abortStatus = machine->abortStatus;
+#endif
 	xsDeleteMachine(machine);
 	free(buffer);
 
+#if mxXSMemoryLimit
 	if ((XS_TOO_MUCH_COMPUTATION_EXIT == abortStatus) || (XS_NOT_ENOUGH_MEMORY_EXIT == abortStatus))
 		freeMemoryBlocks();		// clean-up if computation or memory limits exceeded
+#endif
 
 	return 0;
 }
