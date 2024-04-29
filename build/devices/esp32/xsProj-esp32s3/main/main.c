@@ -197,7 +197,7 @@ printf("fifo_init - bad size: %ld\r\n", size);
 static void debug_task(void *pvParameter)
 {
 #if (USE_USB == 2)
-	const usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 2048, .tx_buffer_size = 64 };
+	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 2048, .tx_buffer_size = 64 };
 	usb_serial_jtag_driver_install(&cfg);
 #endif
 
