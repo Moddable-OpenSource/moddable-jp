@@ -1,4 +1,4 @@
-# Moddable SDK – 始め方
+# Moddable SDK – 入門
 ### Moddable SDKのインストールとツールのビルド方法
 Copyright 2016-2023 Moddable Tech, Inc.<BR>
 改訂： 2023年10月12日
