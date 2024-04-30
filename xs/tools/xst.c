@@ -68,6 +68,7 @@ static void fx_createRealm(xsMachine* the);
 static void fx_detachArrayBuffer(xsMachine* the);
 static void fx_evalScript(xsMachine* the);
 static void fx_gc(xsMachine* the);
+static void fx_metering(xsMachine* the);
 static void fx_runScript(xsMachine* the);
 
 extern void fx_clearTimer(txMachine* the);
@@ -95,13 +96,6 @@ char *gxAbortStrings[] = {
 };
 
 txAgentCluster gxAgentCluster;
-
-#ifdef mxMetering
-static xsBooleanValue xsAlwaysWithinComputeLimit(xsMachine* machine, xsUnsignedValue index)
-{
-	return 1;
-}
-#endif
 
 #if OSSFUZZ
 int omain(int argc, char* argv[]) 
@@ -191,10 +185,10 @@ int main(int argc, char* argv[])
 		xsCreation* creation = &_creation;
 		xsMachine* machine;
         machine = xsCreateMachine(creation, "xst", NULL);
+		xsBeginMetering(machine, NULL, 0);
+		{
  		if (profiling)
 			fxStartProfiling(machine);
-		xsBeginMetering(machine, xsAlwaysWithinComputeLimit, 0x7FFFFFFF);
-		{
 
 		xsBeginHost(machine);
 		{
@@ -273,10 +267,10 @@ int main(int argc, char* argv[])
 		}
 		fxCheckUnhandledRejections(machine, 1);
 		xsEndHost(machine);
-		}
-		xsEndMetering(machine);
  		if (profiling)
 			fxStopProfiling(machine, C_NULL);
+		}
+		xsEndMetering(machine);
 		if (machine->abortStatus) {
 			char *why = (machine->abortStatus <= XS_UNHANDLED_REJECTION_EXIT) ? gxAbortStrings[machine->abortStatus] : "unknown";
 			fprintf(stderr, "Error: %s\n", why);
@@ -315,6 +309,7 @@ void fxBuildAgent(xsMachine* the)
 	slot = fxNextHostFunctionProperty(the, slot, fx_detachArrayBuffer, 1, xsID("detachArrayBuffer"), XS_DONT_ENUM_FLAG); 
 	slot = fxNextHostFunctionProperty(the, slot, fx_gc, 1, xsID("gc"), XS_DONT_ENUM_FLAG); 
 	slot = fxNextHostFunctionProperty(the, slot, fx_evalScript, 1, xsID("evalScript"), XS_DONT_ENUM_FLAG); 
+	slot = fxNextHostFunctionProperty(the, slot, fx_metering, 1, xsID("metering"), XS_DONT_ENUM_FLAG); 
 	slot = fxNextSlotProperty(the, slot, global, xsID("global"), XS_GET_ONLY);
 
 	slot = fxLastProperty(the, fxToInstance(the, global));
@@ -372,6 +367,13 @@ void fx_evalScript(xsMachine* the)
 	aStream.size = mxStringLength(fxToString(the, mxArgv(0)));
 	fxRunScript(the, fxParseScript(the, &aStream, fxStringGetter, mxProgramFlag | mxDebugFlag), mxRealmGlobal(realm), C_NULL, mxRealmClosures(realm)->value.reference, C_NULL, mxProgram.value.reference);
 	mxPullSlot(mxResult);
+}
+
+void fx_metering(xsMachine* the)
+{
+#ifdef mxMetering
+	xsResult = xsNumber(the->meterIndex);
+#endif	
 }
 
 void fx_print(xsMachine* the)
