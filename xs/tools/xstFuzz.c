@@ -33,7 +33,6 @@ extern void fxRunProgramFile(txMachine* the, txString path, txUnsigned flags);
 
 #if OSSFUZZ
 static int fuzz_oss(const uint8_t *Data, size_t script_size);
-static int lsan_disabled;
 #endif
 
 #if FUZZING
@@ -53,9 +52,6 @@ int gxMemoryFail;		// not thread safe
 
 void fxAbortFuzz(xsMachine* the) 
 {
- #if OSSFUZZ
-	lsan_disabled = 1;		// disable leak checking
- #endif
 }
 
 void fxBuildFuzz(xsMachine* the) 
@@ -565,12 +561,6 @@ int fuzz(int argc, char* argv[])
 	#define mxFuzzMeter (214748380)
 #endif
 
-// allow toggling ASAN leak-checking
-__attribute__((used)) int __lsan_is_turned_off()
-{
-	return lsan_disabled;
-}
-
 static xsBooleanValue xsWithinComputeLimit(xsMachine* machine, xsUnsignedValue index)
 {
 	// may be useful to print current index for debugging
@@ -587,8 +577,6 @@ extern void modInstallTextDecoder(xsMachine *the);
 
 int fuzz_oss(const uint8_t *Data, size_t script_size)
 {
-	lsan_disabled = 0;
-
 	xsCreation _creation = {
 		1 * 1024 * 1024, 	/* initialChunkSize */
 		1 * 1024 * 1024, 	/* incrementalChunkSize */
