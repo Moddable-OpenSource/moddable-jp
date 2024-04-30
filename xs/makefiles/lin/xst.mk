@@ -80,7 +80,7 @@ ifeq ($(GOAL),debug)
 		C_OPTIONS += -DFUZZING=1
 	endif
 	ifneq ($(OSSFUZZ),0)
-		C_OPTIONS += -DOSSFUZZ=1 -DmxMetering=1
+		C_OPTIONS += -DOSSFUZZ=1 -DmxMetering=1 -DmxXSMemoryLimit=0x80000000
 		ifneq ($(FUZZ_METER),0)
 			C_OPTIONS += -DmxFuzzMeter=$(FUZZ_METER)
 		endif
