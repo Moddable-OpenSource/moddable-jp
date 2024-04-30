@@ -46,6 +46,8 @@ OSSFUZZ ?= 0
 OSSFUZZ_JSONPARSE ?= 0
 FUZZING ?= 0
 
+METERING ?= 0
+
 C_OPTIONS = \
 	-fno-common \
 	$(MACOS_ARCH) \
@@ -118,6 +120,10 @@ ifeq ($(GOAL),debug)
 	endif
 	ifneq ($(FUZZILLI),0)
 		C_OPTIONS += -DFUZZILLI=1 -fsanitize-coverage=trace-pc-guard
+	endif
+	
+	ifneq ($(METERING),0)
+		C_OPTIONS += -DmxMetering=1
 	endif
 endif
 
