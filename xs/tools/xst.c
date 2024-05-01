@@ -27,6 +27,9 @@ extern void fx_print(xsMachine* the);
 extern void fxAbortFuzz(xsMachine* the);
 extern void fxBuildAgent(xsMachine* the);
 extern void fxBuildFuzz(xsMachine* the);
+extern txScript* fxLoadScript(txMachine* the, txString path, txUnsigned flags);
+extern void fxFulfillModuleFile(txMachine* the);
+extern void fxRejectModuleFile(txMachine* the);
 extern void fxRunLoop(txMachine* the);
 extern void fxRunModuleFile(txMachine* the, txString path);
 extern void fxRunProgramFile(txMachine* the, txString path, txUnsigned flags);
@@ -78,10 +81,6 @@ static void fx_setInterval(txMachine* the);
 static void fx_setTimeout(txMachine* the);
 static void fx_setTimer(txMachine* the, txNumber interval, txBoolean repeat);
 
-static void fxFulfillModuleFile(txMachine* the);
-static void fxRejectModuleFile(txMachine* the);
-
-static txScript* fxLoadScript(txMachine* the, txString path, txUnsigned flags);
 
 char *gxAbortStrings[] = {
 	"debugger",
@@ -132,6 +131,8 @@ int main(int argc, char* argv[])
 		if (argv[argi][0] != '-')
 			continue;
 		if (!strcmp(argv[argi], "-l"))
+			continue;
+		if (!strcmp(argv[argi], "-lc"))
 			continue;
 		if (!strcmp(argv[argi], "-h"))
 			fxPrintUsage();
@@ -360,12 +361,15 @@ void fx_gc(xsMachine* the)
 
 void fx_evalScript(xsMachine* the)
 {
-	txSlot* realm = mxProgram.value.reference->next->value.module.realm;
+	txSlot* realm;
+	txSlot* module = mxFunctionInstanceHome(mxFunction->value.reference)->value.home.module;
+	if (!module) module = mxProgram.value.reference;
+	realm = mxModuleInstanceInternal(module)->value.module.realm;
 	txStringStream aStream;
 	aStream.slot = mxArgv(0);
 	aStream.offset = 0;
 	aStream.size = mxStringLength(fxToString(the, mxArgv(0)));
-	fxRunScript(the, fxParseScript(the, &aStream, fxStringGetter, mxProgramFlag | mxDebugFlag), mxRealmGlobal(realm), C_NULL, mxRealmClosures(realm)->value.reference, C_NULL, mxProgram.value.reference);
+	fxRunScript(the, fxParseScript(the, &aStream, fxStringGetter, mxProgramFlag | mxDebugFlag), mxRealmGlobal(realm), C_NULL, mxRealmClosures(realm)->value.reference, C_NULL, module);
 	mxPullSlot(mxResult);
 }
 

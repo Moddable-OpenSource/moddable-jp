@@ -24,6 +24,9 @@
 #include "yaml.h"
 
 extern void fxBuildAgent(xsMachine* the);
+extern txScript* fxLoadScript(txMachine* the, txString path, txUnsigned flags);
+extern void fxFulfillModuleFile(txMachine* the);
+extern void fxRejectModuleFile(txMachine* the);
 extern void fxRunLoop(txMachine* the);
 extern void fxRunModuleFile(txMachine* the, txString path);
 extern void fxRunProgramFile(txMachine* the, txString path, txUnsigned flags);
@@ -97,6 +100,11 @@ static void fxRunContext(txPool* pool, txContext* context);
 static int fxRunTestCase(txPool* pool, txContext* context, char* path, txUnsigned flags, int async, char* message);
 static int fxStringEndsWith(const char *string, const char *suffix);
 
+static void fxBuildCompartmentGlobals(txMachine* the);
+static void fxLoadHook(txMachine* the);
+static void fxRunProgramFileInCompartment(txMachine* the, txString path, txUnsigned flags);
+static void fxRunModuleFileInCompartment(txMachine* the, txString path);
+
 static int lockdown = 0;
 
 int main262(int argc, char* argv[]) 
@@ -160,6 +168,10 @@ int main262(int argc, char* argv[])
 	for (argi = 1; argi < argc; argi++) {
 		if (!strcmp(argv[argi], "-l")) {
 			lockdown = 1;
+			continue;
+		}
+		if (!strcmp(argv[argi], "-lc")) {
+			lockdown = -1;
 			continue;
 		}
 		if (argv[argi][0] == '-')
@@ -762,7 +774,7 @@ int fxRunTestCase(txPool* pool, txContext* context, char* path, txUnsigned flags
 	machine = xsCreateMachine(creation, "xst262", NULL);
 	xsBeginHost(machine);
 	{
-		xsVars(1);
+		xsVars(5);
 		xsTry {
 			fxBuildAgent(the);
 			c_strcpy(buffer, pool->harnessPath);
@@ -792,10 +804,18 @@ int fxRunTestCase(txPool* pool, txContext* context, char* path, txUnsigned flags
 			if (lockdown)
 				xsCall0(xsGlobal, xsID("lockdown"));
 			the->rejection = &xsVar(0);
-			if (flags)
-				fxRunProgramFile(the, path, flags);
-			else
-				fxRunModuleFile(the, path);
+			if (flags) {
+				if (lockdown < 0)
+					fxRunProgramFileInCompartment(the, path, flags);
+				else
+					fxRunProgramFile(the, path, flags);
+			}
+			else {
+				if (lockdown < 0)
+					fxRunModuleFileInCompartment(the, path);
+				else
+					fxRunModuleFile(the, path);
+			}
 			fxRunLoop(the);
 			if (xsTest(xsVar(0))) 
 				xsThrow(xsVar(0));
@@ -854,3 +874,86 @@ int fxStringEndsWith(const char *string, const char *suffix)
 	size_t suffixLength = strlen(suffix);
 	return (stringLength >= suffixLength) && (0 == strcmp(string + (stringLength - suffixLength), suffix));
 }
+
+void fxBuildCompartmentGlobals(txMachine* the)
+{
+	txSlot* realm = mxProgram.value.reference->next->value.module.realm;
+	txSlot* global = mxRealmGlobal(realm)->value.reference;
+	txSlot* environment = mxRealmClosures(realm)->value.reference;
+	txSlot* slot;
+	txSlot* property;
+	
+	mxPush(mxObjectPrototype);
+	property = fxLastProperty(the, fxNewHostObject(the, NULL));
+	slot = global->next->next;
+	while (slot) {
+		if (slot->ID > mxID(_globalThis)) {
+// 			fprintf(stderr, "%s\n", fxGetKeyName(the, slot->ID));
+			property = fxNextSlotProperty(the, property, slot, slot->ID, XS_NO_FLAG);
+		}
+		slot = slot->next;
+	}
+	slot = environment->next->next;
+	while (slot) {
+		if (slot->kind == XS_CLOSURE_KIND) {
+// 			fprintf(stderr, "%s\n", fxGetKeyName(the, slot->ID));
+			property = fxNextSlotProperty(the, property, slot->value.closure, slot->ID, XS_NO_FLAG);
+		}
+		slot = slot->next;
+	}
+	mxPullSlot(mxResult);
+}
+
+void fxLoadHook(txMachine* the)
+{
+	xsVars(2);
+	xsVar(0) = xsNewObject();
+	xsSet(xsVar(0), xsID("namespace"), xsArg(0));
+	xsVar(1) = xsGet(xsGlobal, xsID("Promise"));
+	xsResult = xsCall1(xsVar(1), xsID("resolve"), xsVar(0));
+}
+
+void fxRunModuleFileInCompartment(txMachine* the, txString path)
+{
+	xsVar(1) = xsNewObject();
+	fxBuildCompartmentGlobals(the);
+	xsSet(xsVar(1), xsID("globals"), xsResult);
+	xsVar(2) = xsNewHostFunction(fxLoadHook, 1);
+	xsSet(xsVar(1), xsID("loadHook"), xsVar(2));
+	xsVar(2) = xsNew1(xsGlobal, xsID("Compartment"), xsVar(1));
+	xsResult = xsCall1(xsVar(2), xsID("import"), xsString(path));
+	xsVar(3) = xsNewHostFunction(fxFulfillModuleFile, 1);
+	xsVar(4) = xsNewHostFunction(fxRejectModuleFile, 1);
+	xsCall2(xsResult, xsID("then"), xsVar(3), xsVar(4));
+}
+
+void fxRunProgramFileInCompartment(txMachine* the, txString path, txUnsigned flags)
+{
+	xsVar(1) = xsNewObject();
+	fxBuildCompartmentGlobals(the);
+	xsSet(xsVar(1), xsID("globals"), xsResult);
+
+	xsVar(2) = xsNewHostFunction(fxLoadHook, 1);
+	xsSet(xsVar(1), xsID("loadHook"), xsVar(2));
+	xsVar(2) = xsNew1(xsGlobal, xsID("Compartment"), xsVar(1));
+	{
+		txSlot* module = mxVarv(2)->value.reference;
+		txSlot* realm = mxModuleInstanceInternal(module)->value.module.realm;
+		txScript* script = fxLoadScript(the, path, flags);
+
+		xsVar(1) = xsGet(xsGlobal, xsID("$262"));
+		xsVar(1) = xsGet(xsVar(1), xsID("evalScript"));
+		mxFunctionInstanceHome(mxVarv(1)->value.reference)->value.home.module = module;
+			
+		mxModuleInstanceInternal(module)->value.module.id = fxID(the, path);
+		fxRunScript(the, script, mxRealmGlobal(realm), C_NULL, mxRealmClosures(realm)->value.reference, C_NULL, module);
+	}
+}
+
+
+
+
+
+
+
+
