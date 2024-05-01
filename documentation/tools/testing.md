@@ -1,207 +1,207 @@
-# Testing the Moddable SDK
-Copyright 2020-2022 Moddable Tech, Inc.<BR>
-Revised: August 31, 2022
+# Moddable SDKのテスト
+著作権2020-2022 Moddable Tech, Inc.<BR>
+改訂： 2022年8月31日
 
-## Table of Contents
+## 目次
 
-* [Introduction](#intro)
-* [Tests](#tests)
-	* [JavaScript Language Tests (TEST262)](#javascript-tests)
-	* [Moddable SDK Tests](#moddable-tests)
-* [test262 Test App](#test262-app)
-* [testmc Test App](#testmc-app)
-* [Running Tests on the Simulator](#testing-on-simulator)
-* [Writing Tests for the Moddable SDK](#writing-tests)
-	* [Structure of a Test](#writing-structure)
-	* [Importing Modules to Test](#writing-importing)
-	* [Pass or Fail?](#writing-pass-fail)
-	* [Asynchronous Tests](#writing-async)
-	* [Assertions](#writing-assert)
-	* [Test Fixtures](#writing-fixtures)
-	* [Keep Tests Small](#writing-small)
-	* [Minimize Assumptions about the Environment](#writing-assumptions)
-	* [Network Tests](#writing-network)
-	* [Graphics Tests](#writing-graphics)
-	* [Piu Touch Interaction Tests](#writing-touch)
-* [Reference for Writing Tests](#test-writing-reference)
+* [はじめに](#intro)
+* [テスト](#tests)
+	* [JavaScript言語テスト (TEST262)](#javascript-tests)
+	* [Moddable SDKテスト](#moddable-tests)
+* [test262テストアプリ](#test262-app)
+* [testmcテストアプリ](#testmc-app)
+* [シミュレーターでのテスト実行](#testing-on-simulator)
+* [Moddable SDKのためのテストの書き方](#writing-tests)
+	* [テストの構造](#writing-structure)
+	* [テストするモジュールのインポート](#writing-importing)
+	* [合格か不合格か？](#writing-pass-fail)
+	* [非同期テスト](#writing-async)
+	* [アサーション](#writing-assert)
+	* [テストフィクスチャ](#writing-fixtures)
+	* [テストを小さく保つ](#writing-small)
+	* [環境についての仮定を最小限にする](#writing-assumptions)
+	* [ネットワークテスト](#writing-network)
+	* [グラフィックステスト](#writing-graphics)
+	* [Piuタッチインタラクションテスト](#writing-touch)
+* [テストの書き方に関する参考資料](#test-writing-reference)
 
 <a id="intro"></a>
-## Introduction
-This document explains how to run unit tests implemented in JavaScript in the Moddable SDK. There are three parts to running the tests:
+## はじめに
+このドキュメントでは、Moddable SDKで実装されたJavaScriptのユニットテストを実行する方法について説明します。テストを実行するには3つの部分があります：
 
-- **Tests**. The unit tests perform tests for success and failure conditions. They are implemented in JavaScript and their source code is stored in `.js` files.
-- **Test app**. The test app is responsible for running the unit tests. It executes on the device under test.
-- **Test runner**. The test runner is responsible for selecting the tests to run, coordinating with the test app to execute each test, and collecting the test results. The xsbug debugger is the test runner for the Moddable SDK.
+- **テスト**. ユニットテストは成功条件と失敗条件のテストを行います。これらはJavaScriptで実装され、ソースコードは `.js` ファイルに保存されています。
+- **テストアプリ**. テストアプリはユニットテストを実行する責任があります。テスト対象のデバイス上で実行されます。
+- **テストランナー**. テストランナーは実行するテストを選択し、テストアプリと協調して各テストを実行し、テスト結果を収集する責任があります。xsbugデバッガーはModdable SDKのテストランナーです。
 
-The separation of the tests, test app, and test runner allows large test suites to run on resource constrained embedded devices.
+テスト、テストアプリ、テストランナーの分離により、リソースが制約された組み込みデバイス上で大規模なテストスイートを実行できます。
 
-> **Note**: The test runner uses the xsbug communication channel to coordinate test execution with the test app. A consequence of this is that release builds cannot be used to run tests.
+> **注意**: テストランナーはxsbug通信チャネルを使用してテストアプリとテスト実行を調整します。その結果、リリースビルドはテスト実行に使用できません。
 
 <a id="tests"></a>
-## Tests
+## テスト
 
-The Moddable SDK uses two separate tests suites, one for the JavaScript language and another for the Moddable SDK runtime. The following two section introduce these test suites and how to install them.
+Moddable SDKは、JavaScript言語用とModdable SDKランタイム用の2つの別々のテストスイートを使用しています。以下の2セクションでは、これらのテストスイートとそのインストール方法について紹介します。
 
 <a id="javascript-tests"></a>
-### JavaScript Language Tests (TEST262)
-TEST262 is a the official suite of conformance tests from TC39, the ECMAScript (JavaScript) language committee. It is defined in the [Ecma-414](https://www.ecma-international.org/publications-and-standards/standards/ecma-414/) standard. These tests are run by all JavaScript engines to ensure compatibility, interoperability, and conformance with the specification.
+### JavaScript言語テスト（TEST262）
+TEST262は、ECMAScript（JavaScript）言語委員会であるTC39からの公式な適合性テストスイートです。これは[Ecma-414](https://www.ecma-international.org/publications-and-standards/standards/ecma-414/)標準で定義されています。これらのテストは、すべてのJavaScriptエンジンによって実行され、仕様に対する互換性、相互運用性、および適合性を保証するために行われます。
 
-The TEST262 tests are located in a repository on GitHub.
+TEST262テストはGitHubのリポジトリにあります。
 
 ```
 git clone https://github.com/tc39/test262
 ```
 
-> Note: The `xst` tool may be used to [run test262 tests](../xs/xst.md#test262) on the local computer from the command line.
+> 注：`xst`ツールは、コマンドラインからローカルコンピュータで[test262テストを実行する](../xs/xst.md#test262)ために使用できます。
 
 <a id="moddable-tests"></a>
-### Moddable SDK Tests
-The Moddable SDK tests are a suite of tests created by Moddable to validate the correctness and consistency the implementations across different device targets. The tests cover a wide range of functionality including hardware I/O, networking, graphics, data, and more. Because of differences in hardware capabilities and features supported in each port, not all tests will pass in all environments.
+### Moddable SDKテスト
+Moddable SDKテストは、Moddableによって作成されたテストスイートで、異なるデバイスターゲット間の実装の正確性と一貫性を検証します。テストはハードウェアI/O、ネットワーキング、グラフィックス、データなど、幅広い機能をカバーしています。各ポートでサポートされているハードウェアの機能と特徴の違いにより、すべての環境ですべてのテストが合格するわけではありません。
 
-The Moddable SDK tests are located in the Moddable SDK repository at `$MODDABLE/tests`.
+Moddable SDKのテストは、`$MODDABLE/tests`にあるModdable SDKリポジトリに位置しています。
 
-The Moddable SDK tests must be copied into test262 `test` directory.
+Moddable SDKのテストは、test262の`test`ディレクトリにコピーする必要があります。
 
 ```
 cp -r $MODDABLE/tests <path-to-test262-repository>/test/moddable
 ```
 
-> **Note**: To run the Moddable SDK tests you must install the TEST262 tests, even if you do not intend to run the TEST262 tests.
+> **注**: Moddable SDKのテストを実行するには、TEST262のテストをインストールする必要があります。TEST262のテストを実行する予定がない場合でもです。
 
 <a id="test262-app"></a>
-## test262 Test App
+## test262 テストアプリ
 
-The test262 test app is a Moddable app to run the tests in test262. It includes an implementation of the TEST262 test harness required by its tests. The test262 app is located in `$MODDABLE/tools/test262`.
+test262テストアプリは、test262のテストを実行するModdableアプリです。これには、そのテストに必要なTEST262テストハーネスの実装が含まれています。test262アプリは`$MODDABLE/tools/test262`に位置しています。
 
-> **Note**: The test262 test app requires a total of about 128 KB of free memory to run. It cannot run on devices with less free memory, such as the ESP8266.
+> **注**: test262テストアプリは、実行するために約128 KBの空きメモリが必要です。ESP8266のような空きメモリが少ないデバイスでは実行できません。
 
-### Build `test262` Test App
-Build the `test262` app with the `-d` debug option as you would any other Moddable app.
+### Build `test262` テストアプリ
+他のModdableアプリと同様に、`-d`デバッグオプションを使用して`test262`アプリをビルドします。
 
 ```
 cd $MODDABLE/tools/test262
 mcconfig -d -m -p esp32
 ```
 
-> Note: These instructions assume that the environment is set up to build for your target device.
+> 注: これらの指示は、ターゲットデバイスのビルド環境が設定されていることを前提としています。
 
-> Note: The examples in this document are for the `esp32` platform. To build for other platforms, use the corresponding platform identifier.
+> 注意: このドキュメントの例は `esp32` プラットフォーム用です。他のプラットフォーム用にビルドする場合は、対応するプラットフォーム識別子を使用してください。
 
-### Configure xsbug for Tests
+### xsbug でテストを設定する
 
-In `xsbug`, select the `Preferences` menu.
+`xsbug` で、`Preferences` メニューを選択します。
 
-Turn off the `On Exceptions` slider and turn on the `Test` tab. See the circled items in the image below:
+`On Exceptions` スライダーをオフにし、`Test` タブをオンにします。下の画像で囲まれた項目を参照してください：
 
 <img src="../assets/tools/testing/test-xsbug-prefs.png" width=794>
 
-The TEST tab will appear at the top of the window.
+ウィンドウの上部にTESTタブが表示されます。
 
-> Note: Disabling "Break: On exception" is necessary because many tests intentionally trigger exceptions.
+> 注意: 多くのテストが意図的に例外を引き起こすため、「Break: On exception」を無効にすることが必要です。
 
-### Locate Tests
+### テストの位置を特定する
 
-The first time TEST262 is run, you need to configure xsbug with the location of the test repository.
+TEST262を初めて実行するとき、xsbugでテストリポジトリの場所を設定する必要があります。
 
 <img src="../assets/tools/testing/test-xsbug-locate.png" width=340>
 
-Select the `REPOSITORY...` item and a file selection dialog appears. Select the directory `test262` of the repository that you cloned from GitHub.
+`REPOSITORY...` 項目を選択し、ファイル選択ダイアログが表示されます。GitHubからクローンしたリポジトリの `test262` ディレクトリを選択します。
 
-The `REPOSITORY...` item is replaced with a list of the test categories.
+`REPOSITORY...` 項目はテストカテゴリのリストに置き換えられます。
 
 <img src="../assets/tools/testing/test-categories.png" width=335>
 
-### Select Tests
+### テストの選択
 
-Clicking to the left of a category or individual test selects that test or category to run. The bullet indicates the tests selected to run.
+カテゴリまたは個々のテストの左側をクリックすると、そのテストまたはカテゴリが実行されるように選択されます。黒丸は実行されるテストを示します。
 
 <img src="../assets/tools/testing/test-select.png" width=344>
 
-You may also use the `SELECT` text field to type in the name of the test(s) that you would like to run.
+また、`SELECT` テキストフィールドを使用して、実行したいテストの名前を入力することもできます。
 
-### Run Tests
+### テストの実行
 
-Click the "Play" button to start the tests:
+"Play" ボタンをクリックしてテストを開始します：
 
 <img src="../assets/tools/testing/test-run.png" width=344>
 
-The "Play" button turns into a "Stop" button and the number of tests run and results update as the tests run.
+"Play" ボタンは "Stop" ボタンに変わり、テストの実行数と結果が更新されます。
 
 <img src="../assets/tools/testing/test-running.png" width=340>
 
-Press the "Stop" button to stop the tests.
+"Stop" ボタンを押してテストを停止します。
 
-While the tests run, the `REPORT` item displays the currently running test.
+テストが実行されている間、`REPORT` 項目には現在実行中のテストが表示されます。
 
-> **Note**: Most test262 tests run very quickly but some take a very long time.
+> **注記**: ほとんどの test262 テストは非常に迅速に実行されますが、一部は非常に時間がかかることがあります。
 
-### View Results
+### 結果の表示
 
-When the run of tests is complete, the "Stop" button changes back to a "Play" button.
+テストの実行が完了すると、"Stop" ボタンは再び "Play" ボタンに戻ります。
 
 <img src="../assets/tools/testing/test-results.png" width=1179>
 
-Next to the "Play" button is a status line with the number of failed, passed, and skipped tests.
+"Play" ボタンの隣には、失敗、成功、スキップしたテストの数を示すステータスラインがあります。
 
-The `REPORT` item can be opened to view the failures. The `LOG` pane contains output including errors and exceptions.
+`REPORT` アイテムを開くと、失敗が表示されます。`LOG` パネルにはエラーや例外を含む出力が含まれています。
 
-> **Note**: The tests intentionally create failure conditions which generate exceptions that appear in the log. An exception does not necessarily indicate a test failure. The tests operate with valid and invalid inputs to verify both success conditions and failure conditions.
+> **注意**: テストは意図的に失敗条件を作り出し、ログに表示される例外が発生します。例外が必ずしもテストの失敗を示すわけではありません。テストは有効な入力と無効な入力の両方を検証して、成功条件と失敗条件を確認します。
 
-If you hover the mouse pointer over the `REPORT` item, an icon appears. Clicking on this icon puts the results into a text file that you can save.
+`REPORT` アイテムの上にマウスポインタを置くと、アイコンが表示されます。このアイコンをクリックすると、結果をテキストファイルに出力して保存できます。
 
 <img src="../assets/tools/testing/test-report.png" width=372>
 
 <a id="testmc-app"></a>
-## testmc Test App
+## testmc テストアプリ
 
-The `testmc` test app is a Moddable app to run tests specific to the Moddable SDK. It is similar to the `test262` app and operates in the same way. However, `testmc` is configured for validation of Moddable SDK modules rather than the JavaScript language.
+`testmc` テストアプリは、Moddable SDKに特有のテストを実行するModdableアプリです。`test262` アプリと似ており、同じように動作します。ただし、`testmc` はJavaScript言語ではなく、Moddable SDKモジュールの検証用に設定されています。
 
-The `testmc` app is located in `$MODDABLE/tools/testmc`.
+`testmc` アプリは `$MODDABLE/tools/testmc` に位置しています。
 
-> **Important**: You must use the `test262` app to run the TEST262 tests. You must use the `testmc` app to run the Moddable SDK tests.
+> **重要**: TEST262テストを実行するには `test262` アプリを使用する必要があります。Moddable SDKテストを実行するには `testmc` アプリを使用する必要があります。
 
-### Build `testmc` Test App
+### `testmc` テストアプリのビルド
 
-Similar to other Moddable apps, build the `testmc` app.
+他のModdableアプリと同様に、`testmc`アプリをビルドします。
 
 ```
 cd $MODDABLE/tools/testmc
 mcconfig -d -m -p esp32
 ```
 
-To run network tests, you need to include the `ssid` and `password` on the `mcconfig` line:
+ネットワークテストを実行するには、`mcconfig`行に`ssid`と`password`を含める必要があります：
 
 ```
 cd $MODDABLE/tools/testmc
 mcconfig -d -m -p esp32 ssid=<ssid> password=<password>
 ```
-> Note: To run tests that require a screen, use include the subplatform identifier when building (e.g. `esp32/moddable_two`, not just `esp32`) so the screen driver is included.
+> 注意: 画面が必要なテストを実行する場合は、ビルド時にサブプラットフォーム識別子を含めてください（例：`esp32/moddable_two`、`esp32`だけではなく）。これにより、スクリーンドライバが含まれます。
 
-### Run Tests
+### テストの実行
 
-The tests appear as a `moddable` category in the Test list.
+テストはテストリストの`moddable`カテゴリに表示されます。
 
 <img src="../assets/tools/testing/test-moddable-category.png" width=365>
 
-Once the testmc test app is running and the tests are in place, selecting tests, running tests, and viewing results is done in the same way as test262 tests.
+testmcテストアプリが実行され、テストが配置されると、test262テストと同じ方法でテストの選択、実行、結果の表示が行われます。
 
 <a id="testing-on-simulator"></a>
-## Running Tests on the Simulator
-The test262 and testmc test apps may also be run on the mcsim, the Moddable SDK's simulator. This is useful for verifying that the simulator is providing consistent results with the target device and for developing tests. Of course, tests which depend on features the simulator does not support, such as hardware I/O, will fail.
+## シミュレータでのテストの実行
+test262およびtestmcテストアプリは、Moddable SDKのシミュレータであるmcsimでも実行できます。これは、シミュレータがターゲットデバイスと一致した結果を提供していることを確認し、テストの開発に役立ちます。もちろん、ハードウェアI/Oなど、シミュレータがサポートしていない機能に依存するテストは失敗します。
 
-The process of running on the simulator is the same in xsbug. When the simulator launches, there is one change that must be made to the simulator options.  Set the "Reload on Abort" switch to "on". If this is not set, testing will stall after the first test is run.
+シミュレータでの実行プロセスはxsbugで同じです。シミュレータが起動すると、シミュレータオプションに変更を加える必要があります。「Reload on Abort」スイッチを「on」に設定します。これが設定されていない場合、最初のテストが実行された後にテストが停止します。
 
 <img src="../assets/tools/testing/test-simulator.png" width=300>
 
 <a id="writing-tests"></a>
-## Writing Tests for the Moddable SDK
-Tests for the Moddable SDK are written in the same way as TEST262 tests. If you aren't yet familiar with how to write tests for TEST262, the following sections will get you started.
+## Moddable SDKのテストの作成
+Moddable SDKのテストはTEST262テストと同じ方法で書かれます。まだTEST262のテストの書き方に慣れていない場合、以下のセクションが参考になります。
 
 <a id="writing-structure"></a>
-### Structure of a Test
-Each test file has two parts: the frontmatter and the test script. The frontmatter uses the [YAML](https://en.wikipedia.org/wiki/YAML) mark-up format. The frontmatter appears first and contains meta-data about the test. The test script follows the frontmatter.
+### テストの構造
+各テストファイルには2つの部分があります：frontmatterとテストスクリプトです。frontmatterは[YAML](https://en.wikipedia.org/wiki/YAML)マークアップ形式を使用します。frontmatterは最初に現れ、テストに関するメタデータを含んでいます。テストスクリプトはfrontmatterの後に続きます。
 
-Here's a very basic test:
+こちらは非常に基本的なテストです：
 
 ```js
 /*---
@@ -210,9 +210,9 @@ flags: [module]
 assert.sameValue("Java" + "Script", "JavaScript");
 ```
 
-The `module` flag tells the test runner that the test should loaded as an ECMAScript module, not a program.  If the `module` flag is not present, the test is run as a program. All tests written for the Moddable SDK should include the `module` flag because nearly all scripts in the Moddable SDK are executed as modules.
+`module`フラグは、テストがプログラムではなくECMAScriptモジュールとしてロードされるべきであることをテストランナーに伝えます。`module`フラグが存在しない場合、テストはプログラムとして実行されます。Moddable SDK用に書かれたすべてのテストには`module`フラグが含まれるべきです。なぜなら、Moddable SDKのほとんどのスクリプトはモジュールとして実行されるからです。
 
-In addition to flags, the frontmatter may contain a short description of the test or a longer informational section:
+フラグに加えて、frontmatterにはテストの短い説明や、より長い情報セクションが含まれることがあります：
 
 ```
 /*---
@@ -226,9 +226,9 @@ flags: [module]
 ---*/
 ```
 
-The frontmatter is required. If it is not present, the test script will not be executed. If the frontmatter is incorrect, the test script may not run correctly.
+frontmatterは必須です。存在しない場合、テストスクリプトは実行されません。frontmatterが正しくない場合、テストスクリプトが正しく実行されない可能性があります。
 
-By convention, the copyright notice appears immediately before or after the frontmatter, but always before the test script.
+慣例により、著作権表示はfrontmatterの直前または直後に配置されますが、テストスクリプトの前に配置されます。
 
 ```
 /*---js
@@ -243,11 +243,11 @@ flags: [module]
 assert.sameValue("Java" + "Script", "JavaScript");
 ```
 
-The `async` field is introduced below, for creating tests that run asynchronously. See the TEST262 documentation for a [reference guide](https://github.com/tc39/test262/blob/main/INTERPRETING.md#metadata) to the frontmatter fields.
+以下で紹介される`async`フィールドは、非同期で実行されるテストを作成するために導入されます。frontmatterフィールドの[リファレンスガイド](https://github.com/tc39/test262/blob/main/INTERPRETING.md#metadata)については、TEST262のドキュメントを参照してください。
 
 <a id="writing-importing"></a>
-### Importing Modules to Test
-The Moddable SDK contains an extensive collection of modules. You may write tests to verify the correct operation of those modules, or you may use those modules as part of your tests. To incorporate a module from the Moddable SDK into your test, simply import it.
+### モジュールのインポート
+Moddable SDKには多くのモジュールが含まれています。これらのモジュールの正しい動作を検証するためのテストを書くことも、テストの一部としてこれらのモジュールを使用することもできます。テストにModdable SDKからモジュールを取り入れるには、単にそれをインポートします。
 
 ```js
 /*---
@@ -257,13 +257,13 @@ import structuredClone from "structuredClone";
 ...
 ```
 
-The `import` statement is available because the `module` flag is set in the frontmatter.
+`import` ステートメントは、frontmatterに `module` フラグが設定されているため使用できます。
 
-The modules that are available to import from the Moddable SDK are determined by the testmc application. You can review its [manifest.json](https://github.com/Moddable-OpenSource/moddable/blob/public/tools/testmc/manifest.json#L29) file to see the modules it includes. If your tests need other modules, you can add them to the testmc manifest.
+Moddable SDKからインポートできるモジュールは、testmcアプリケーションによって決定されます。その [manifest.json](https://github.com/Moddable-OpenSource/moddable/blob/public/tools/testmc/manifest.json#L29) ファイルを確認して、含まれているモジュールを確認できます。テストに他のモジュールが必要な場合は、testmcマニフェストに追加することができます。
 
 <a id="writing-pass-fail"></a>
-### Pass or Fail?
-A test is considered to have passed if it runs to the end without generating an unhandled exception. A test is considered to have failed if it exits with an unhandled exception. The earlier example that confirmed that the concatenation of `"Java"` and `"Script"` is `"JavaScript"` passes because it does not throw an unhandled exception. The following test always fails because `undefined` is not an object.
+### 合格か不合格か？
+テストは、未処理の例外を生成せずに最後まで実行された場合、合格とみなされます。未処理の例外で終了した場合、テストは不合格とみなされます。先の例で、`"Java"` と `"Script"` の連結が `"JavaScript"` であることを確認したテストは、未処理の例外を投げないため合格です。次のテストは常に失敗します。なぜなら `undefined` はオブジェクトではないからです。
 
 ```js
 /*---
@@ -272,7 +272,7 @@ flags: [module]
 undefined.toString();
 ```
 
-Sometimes a test wants to verify that a failure occurs. The preceding example is expected to fail with a `TypeError`.  There are several ways to do this. One convenient way is using the frontmatter. The frontmatter has an optional `negative` item which causes the test runner to consider the test to have failed if it exits with no error and to pass only if it exits with an unhandled exception of the expected type. This modified test passes, if a `TypeError` is thrown as required by the JavaScript language.
+時には、テストが失敗することを確認したい場合もあります。前述の例は `TypeError` で失敗することが期待されています。これを行う方法はいくつかあります。便利な方法の1つはfrontmatterを使用することです。frontmatterにはオプションの `negative` 項目があり、これによりテストランナーはエラーなしで終了した場合にテストを失敗とみなし、期待されるタイプの未処理例外でのみ終了した場合に合格とみなします。この修正されたテストは、JavaScript言語によって要求されるように `TypeError` が投げられた場合に合格します。
 
 ```js
 /*---
@@ -284,8 +284,8 @@ undefined.toString();
 ```
 
 <a id="writing-async"></a>
-### Asynchronous Tests
-Some tests must run asynchronously, including network operations, timers, and any test that uses Promises. The default way of determining that the test passed or failed does not work for asynchronous tests, because the test result is not known when the end of the test script is reached. The asynchronous operation must complete to know that the test has passed. Writing tests that run asynchronously is possible with a few changes to how the test is written. First, add the `async` flag to the frontmatter.
+### 非同期テスト {/*examples*/}
+一部のテストは非同期で実行する必要があります。これには、ネットワーク操作、タイマー、およびPromiseを使用するテストが含まれます。非同期テストの場合、テストスクリプトの終わりに到達した時点でテストの合格または不合格がわからないため、テストが合格したか失敗したかを判断するデフォルトの方法は機能しません。非同期操作が完了して初めてテストが合格したかどうかがわかります。非同期で実行するテストを書くことは、テストの書き方を少し変更することで可能です。まず、フロントマターに`async`フラグを追加します。
 
 ```js
 /*---
@@ -293,7 +293,7 @@ flags: [module,async]
 ---*/
 ```
 
-The test is not considered finished until the `$DONE` function is called by the tests. If `$DONE` is called with no arguments, the test is considered to have passed; if `$DONE` is called with an argument, the test is considered to have failed. Until `$DONE` is called, the test continues running. The following test shows an example:
+テストは、テストによって`$DONE`関数が呼び出されるまで終了とはみなされません。`$DONE`が引数なしで呼び出された場合、テストは合格とみなされます。引数付きで`$DONE`が呼び出された場合、テストは失敗とみなされます。`$DONE`が呼び出されるまで、テストは実行を続けます。以下のテストは例を示しています：
 
 ```js
 /*---
@@ -307,7 +307,7 @@ flags: [module,async]
 });
 ```
 
-You may have noticed that the above did not use the `assert.sameValue` function to test that `value` is equal to the expected `123`. That's because the test must call `$DONE` with the result of the test. To allow common asserts to be used in asynchronous tests, `testmc` provides the `$DO` function. Using `$DO` the test can be rewritten as follows:
+上記では、`assert.sameValue` 関数を使用して `value` が期待される `123` と等しいかをテストしていませんでした。それは、テストがテストの結果を `$DONE` に渡さなければならないからです。非同期テストで一般的なアサートを使用できるようにするために、`testmc` は `$DO` 関数を提供しています。`$DO` を使用すると、テストは次のように書き直すことができます：
 
 ```js
 /*---
@@ -318,7 +318,7 @@ flags: [module,async]
 }));
 ```
 
-The above test works if the promise is resolved. But, what if the promise was rejected instead? In that case, the test runs indefinitely because it has no rejection handler. To make it easy to detect asynchronous tests that are running for too long, `testmc` provides the `$TESTMC.timeout` function, which causes an asynchronous test to fail if it runs longer than the expected number of milliseconds.
+上記のテストは、Promiseが解決された場合に機能します。しかし、Promiseが拒否された場合はどうでしょうか？その場合、拒否ハンドラがないため、テストは無期限に実行されます。非同期テストが長時間実行されていることを簡単に検出するために、`testmc` は `$TESTMC.timeout` 関数を提供しており、これにより、テストが予想されるミリ秒数よりも長く実行されると、非同期テストが失敗します。
 
 ```js
 /*---
@@ -330,13 +330,13 @@ flags: [module,async]
 $TESTMC.timeout(500, "timeout on promise resolve");
 ```
 
-Asynchronous tests are more difficult to write than synchronous tests, just as asynchronous code is more challenging to write than synchronous code When getting started, take care and try to follow the patterns of existing tests that already work.
+非同期テストは同期テストよりも書くのが難しいですし、非同期コードも同期コードよりも書くのが難しいです。始めるときは注意を払い、すでに機能している既存のテストのパターンに従うようにしてください。
 
 <a id="writing-assert"></a>
-### Assertions
-The TEST262 runtime contains an `assert` global variable with a few basic assertions. Where possible, tests should use these for consistency and readability. All the assertion functions throw an exception if the expected condition is not met.
+### アサーション {#examples}
+TEST262ランタイムには、基本的なアサーションをいくつか持つ`assert`グローバル変数が含まれています。可能な限り、テストではこれらを使用して一貫性と可読性を保つべきです。すべてのアサーション関数は、期待される条件が満たされない場合に例外を投げます。
 
-The most basic assertion is the `assert` function, which throws if passed a false value:
+最も基本的なアサーションは`assert`関数で、偽の値が渡された場合に例外を投げます：
 
 ```js
 assert(false);					// throws
@@ -346,30 +346,30 @@ assert(3 === 3);				// does not throw
 assert(Array.isArray(5), "expected Array");	// throws
 ```
 
-Note that `assert` accepts an optional second parameter that contains a message describing the failure. These messages are helpful when reviewing test results to understand where a failure occurred.
+`assert`は、失敗を説明するメッセージを含むオプショナルな第二パラメータを受け入れることに注意してください。これらのメッセージは、テスト結果をレビューする際に、どこで失敗が発生したかを理解するのに役立ちます。
 
-The `assert.sameValue` and `assert.notSameValue` are used to compare two JavaScript values, typically an expected value against an actual value. Like `assert`, there is an optional argument for a message that describes the test.
+`assert.sameValue`と`assert.notSameValue`は、通常、期待される値と実際の値を比較するために使用されます。`assert`と同様に、テストを説明するメッセージのためのオプショナルな引数があります。
 
 ```js
-assert.sameValue(result, 12, "expected result of 12");
-assert.notSameValue(result, 12, "expected result different from 12");
+assert.sameValue(result, 12, "期待される結果は12");
+assert.notSameValue(result, 12, "期待される結果は12と異なる");
 ```
 
-By convention the first argument to `assert.sameValue` and `assert.notSameValue` is the value generated by the test. The second value is the expected result of the test.
+慣例により、`assert.sameValue`と`assert.notSameValue`への最初の引数はテストによって生成された値です。2番目の値はテストの期待される結果です。
 
-The `assert.throws` function is used to confirm that an operation results in a specific error being thrown. The same result can be achieved using `try`/`catch` block, but the `assert.throws` function is more concise and readable. The first argument to `assert.throws` is the constructor of the expected error to be generated. The second argument is a function to execute; the function is expected to throw an instance of the error constructor passed in the first argument. The optional final argument is a message describing the failure, as with other assert functions.
+`assert.throws` 関数は、操作が特定のエラーを投げることを確認するために使用されます。同じ結果は `try`/`catch` ブロックを使用して達成できますが、`assert.throws` 関数はより簡潔で読みやすいです。`assert.throws` の最初の引数は生成される予定のエラーのコンストラクタです。2番目の引数は実行する関数で、この関数は最初の引数で渡されたエラーコンストラクタのインスタンスを投げることが期待されます。オプションの最終引数は、他のアサート関数と同様、失敗を説明するメッセージです。
 
 ```js
 assert.throws(SyntaxError, () => Timer.delay(), "one argument required")
 ```
 
-If `Timer.delay` throws a `SyntaxError`, the `assert.throws` catches the exception and returns, so the test passes. If `Timer.delay` does not throw the expected `SyntaxError`, `assert.throws` throws an exception which causes the test to fail.
+もし `Timer.delay` が `SyntaxError` を投げる場合、`assert.throws` は例外をキャッチして返し、テストは合格します。もし `Timer.delay` が期待された `SyntaxError` を投げない場合、`assert.throws` は例外を投げ、そのためテストは失敗します。
 
 <a id="writing-fixtures"></a>
-### Test Fixtures
-When writing tests for a specific module, there is often some data or code that you want to share between the several tests that are split across several files. This shared data or code is referred to as a fixture. When writing tests for testmc, test fixtures are simply additional modules. Those modules can be imported by your test using an `import` statement.
+### テストフィクスチャ
+特定のモジュールのテストを書くとき、いくつかのテストが複数のファイルに分割されている間、共有したいデータやコードがしばしばあります。この共有されたデータやコードはフィクスチャとして参照されます。testmcのテストを書くとき、テストフィクスチャは単に追加のモジュールです。これらのモジュールはテストで `import` ステートメントを使用してインポートできます。
 
-Consider a test that reads values from a temperature sensor. It wants to confirm that sensor readings taken back-to-back are stable, by comparing only the integer part and discarding the fractional portion. A test fixture could add a function to compare two values as integers. Here's the test fixture, stored in a file named "integerFixture.js" in the same directory as the tests that use it.
+温度センサーから値を読み取るテストを考えてみましょう。連続して取得したセンサーの読み取り値が安定していることを確認するために、整数部分のみを比較し、小数部分は無視します。テストフィクスチャは、2つの値を整数として比較する関数を追加することができます。こちらがそのテストフィクスチャで、"integerFixture.js"というファイル名でテストを使用する同じディレクトリに保存されています。
 
 ```js
 assert.sameInteger = function (actual, expected, reason) {
@@ -380,7 +380,7 @@ assert.sameInteger = function (actual, expected, reason) {
 }
 ```
 
-This test fixture adds a `sameInteger` function to the `assert` global. The `assert.sameInteger` can then be used as usual:
+このテストフィクスチャは、グローバルの`assert`に`sameInteger`関数を追加します。その後、通常通り`assert.sameInteger`を使用できます：
 
 ```js
 /*---
@@ -391,7 +391,7 @@ const sensor = device.sensor.temperature;
 assert.sameInteger(sensor.sample().temperature, sensor.sample().temperature);
 ```
 
-A text fixture may also export data. For example, a test fixture might provide an object for testing JSON serialization:
+テストフィクスチャはデータもエクスポートすることがあります。例えば、テストフィクスチャはJSONシリアライゼーションのテスト用のオブジェクトを提供するかもしれません：
 
 ```js
 export default {
@@ -401,27 +401,27 @@ export default {
 }
 ```
 
-Note that that test fixture modules are not tests, so they must not have the YAML frontmatter used to identify tests. They can, of course, still have a description and copyright notice using JavaScript comments.
+テストフィクスチャモジュールはテストではないため、テストを識別するために使用されるYAML frontmatterを持つべきではありません。もちろん、JavaScriptコメントを使用して説明や著作権通知を含むことはできます。
 
 <a id="writing-small"></a>
-### Keep Tests Small
-The primary purpose of `testmc` is to run tests on a resource-constrained microcontroller. To achieve that, the tests themselves must be kept small. The source code to the test module and any test fixtures is downloaded to the microcontroller where they are compiled to byte-code by the XS JavaScript engine. The source code uses RAM as does the compiled byte-code. And, of course, the test requires memory to run. Most of the time this is not a problem. Out-of-memory exceptions have occurred when using large existing tests designed to run on computers rather than microcontrollers. Usually the problem can be solved by breaking the test up into several different source code files, using a test fixture for code and data shared across tests.
+### テストを小さく保つ
+`testmc`の主な目的は、リソースが制限されたマイクロコントローラーでテストを実行することです。これを実現するために、テスト自体は小さく保たれる必要があります。テストモジュールと任意のテストフィクスチャのソースコードはマイクロコントローラーにダウンロードされ、そこでXS JavaScriptエンジンによってバイトコードにコンパイルされます。ソースコードはRAMを使用し、コンパイルされたバイトコードも同様です。もちろん、テストの実行にもメモリが必要です。ほとんどの場合、これは問題になりません。大きな既存のテストをマイクロコントローラーではなくコンピューターで実行するように設計した場合に、メモリ不足の例外が発生したことがあります。通常、問題は複数の異なるソースコードファイルにテストを分割することで解決できます。これにより、テスト間で共有されるコードとデータのためのテストフィクスチャを使用します。
 
-A good rule of thumb is to keep the source code of the test script under 100 lines, and the total lines, including any fixtures, under 200. Some microcontrollers have quite a bit of memory, so much larger files will work. But, to ensure tests can run in as many environments as possible, they should be written to follow these guidelines.
+テストスクリプトのソースコードは100行以下に保ち、フィクスチャを含む全体の行数は200行以下にするというのが一般的なルールです。一部のマイクロコントローラはかなりのメモリを持っているため、もっと大きなファイルでも動作します。しかし、テストができるだけ多くの環境で実行できるようにするために、これらのガイドラインに従って書かれるべきです。
 
-The tests in TEST262 itself are are often just a few lines of code. Keeping tests small is also convenient for debugging when a problem arises. If a test file contains hundreds of tests, it is more difficult to isolate and debug test failures. A test file that is focused on exercising a particular area provides a more easily understood result in the test logs.
+TEST262自体のテストは、しばしば数行のコードだけです。テストを小さく保つことは、問題が発生したときのデバッグにも便利です。テストファイルに数百のテストが含まれている場合、テストの失敗を特定してデバッグすることがより困難になります。特定の領域を検証することに焦点を当てたテストファイルは、テストログでの結果をより容易に理解できます。
 
 <a id="writing-assumptions"></a>
-### Minimize Assumptions about the Environment
-Each test is run in a fresh virtual machine. This helps to ensure consistent test results because each test executes independently of the tests that ran before it. But there are limits to how much a test can be isolated from those that ran earlier.
+### 環境についての仮定を最小限にする
+各テストは新しい仮想マシンで実行されます。これにより、各テストがそれ以前に実行されたテストから独立して実行されるため、一貫したテスト結果が保証されます。しかし、以前に実行されたテストからどれだけテストを隔離できるかには限界があります。
 
-A test for the file system will create, delete, and modify files. Such tests should clean-up after themselves, by removing any temporary files. However, this is imperfect. If the test fails, it will not have a chance to clean-up. Therefore, in general tests should be written so they work even if previous tests did not properly clean-up.
+ファイルシステムのテストでは、ファイルの作成、削除、変更が行われます。このようなテストは、一時ファイルを削除することで後始末を行うべきです。しかし、これは完璧ではありません。テストが失敗した場合、後始末の機会を得られないことがあります。したがって、一般的には、以前のテストが適切に後始末を行っていなくても機能するようにテストを記述するべきです。
 
-While each test is run in a separate virtual machine, the microcontroller itself does not reboot between each test because rebooting would make running a suite of tests much slower. When a virtual machine is closed, all resources it owns are freed. This releases all memory, closes all files, ends all network connections, etc. However, there is some state that remains. For example, the state of the network connection is not changed: if the microcontroller remains connected to Wi-Fi. This is convenient as it allows a sequence of network tests to run quickly without each test having to establish a Wi-Fi connection. However, a test written to assume Wi-Fi begins in a disconnected state may fail. Such a test should first explicitly disconnect from Wi-Fi.
+各テストは別々の仮想マシンで実行されますが、テストの間にマイクロコントローラ自体が再起動することはありません。再起動すると、テストスイートの実行が大幅に遅くなるためです。仮想マシンが閉じられると、それが所有するすべてのリソースが解放されます。これにより、すべてのメモリが解放され、すべてのファイルが閉じられ、すべてのネットワーク接続が終了します。しかし、いくつかの状態は残ります。例えば、ネットワーク接続の状態は変わりません：マイクロコントローラがWi-Fiに接続したままの場合です。これは便利ですが、各テストがWi-Fi接続を確立する必要がないため、一連のネットワークテストを迅速に実行できます。しかし、Wi-Fiが切断された状態から開始することを前提としたテストは失敗する可能性があります。そのようなテストは、最初に明示的にWi-Fiから切断するべきです。
 
 <a id="writing-network"></a>
-### Network Tests
-When writing tests that use the network, the first step is to make sure the microcontroller is connected to a network. The testmc runtime includes a `$NETWORK` global to help with network tests, and it includes a `connected` property that can be used to wait for a network connection to be available.
+### ネットワークテスト
+ネットワークを使用するテストを書く際の最初のステップは、マイクロコントローラがネットワークに接続されていることを確認することです。testmcランタイムにはネットワークテストを支援するための`$NETWORK`グローバルが含まれており、ネットワーク接続が利用可能になるのを待つために使用できる`connected`プロパティが含まれています。
 
 ```js
 /*---
@@ -433,15 +433,15 @@ new Client(...);
 ...
 ```
 
-If a network connection cannot be established, the promise returned by `$NETWORK.connected` will be rejected, causing an exception to be thrown and the test to fail.
+ネットワーク接続が確立できない場合、`$NETWORK.connected`によって返されるPromiseは拒否され、例外が投げられ、テストが失敗します。
 
-See the reference section on the `$NETWORK` global below for additional support for network tests.
+ネットワークテストの追加サポートについては、以下の`$NETWORK`グローバルに関するリファレンスセクションを参照してください。
 
 <a id="writing-graphics"></a>
-### Graphics Tests
-When writing tests to validate the correct operation of graphics rendering operations, a common challenge is determining if the image is drawn correctly. A common solution is to store an image containing the expected result to compare against the rendered image. This approach is impractical when testing on microcontroller with limited storage space. Instead, testmc provides a function to generate a checksum for the rendered image. The checksum is just a handful of bytes and so can be easily incorporated into the test script itself. In addition, because the checksum is generated as the image is sent to the output device, it requires no additional memory to buffer the expected image.
+### グラフィックステスト
+グラフィックスレンダリング操作の正しい動作を検証するテストを書く際の一般的な課題は、画像が正しく描画されているかを判断することです。一般的な解決策は、期待される結果を含む画像を保存して、レンダリングされた画像と比較することです。このアプローチは、ストレージスペースが限られているマイクロコントローラでのテストでは実用的ではありません。代わりに、testmcはレンダリングされた画像のチェックサムを生成する機能を提供します。チェックサムはほんの数バイトであり、テストスクリプト自体に簡単に組み込むことができます。さらに、チェックサムは画像が出力デバイスに送信されるときに生成されるため、期待される画像をバッファするための追加メモリは必要ありません。
 
-When running testmc, the standard `screen` global variable is extended to support checksums. Each time the display is updated, a checksum is automatically generated for the image drawn. The following test uses Poco to draw a 100 pixel square rectangle in blue, and confirms that it generates the expected checksum.
+testmcを実行するとき、標準の`screen`グローバル変数はチェックサムをサポートするように拡張されます。表示が更新されるたびに、描画された画像のチェックサムが自動的に生成されます。以下のテストでは、Pocoを使用して青色の100ピクセルの正方形の長方形を描画し、期待されるチェックサムが生成されることを確認します。
 
 ```js
 /*---
@@ -461,11 +461,11 @@ render.end();
 assert.sameValue("bdae73e6e02019bdbc080589058c0135", screen.checksum, "100x100 blue square");
 ```
 
-Notice that before drawing the test asserts that the screen used as an output renders 16-bit RGB565 little-endian pixels. That's because the checksum generated depends on the pixel format. If the screen uses a different pixel format, the checksum will not match. Test can be written to work with several different pixel formats by including the expected checksum for each pixel format.
+テストを描画する前に、出力として使用されるスクリーンが16ビットRGB565リトルエンディアンピクセルをレンダリングすることを確認します。これは、生成されるチェックサムがピクセル形式に依存するためです。スクリーンが異なるピクセル形式を使用している場合、チェックサムは一致しません。テストは、各ピクセル形式に対する期待されるチェックサムを含めることで、いくつかの異なるピクセル形式で動作するように書くことができます。
 
-If the blue color is changed from `255, 0, 0` to `128, 0, 0` the checksums don't match. But, if the blue color is changed to `254, 0, 1`, the checksums still match. That is because 565 pixels ignore the low bits of the color. If the image is rendered with 24 or 32 bit pixels, there would be a mismatch because all the colors bits are used.
+青色を`255, 0, 0`から`128, 0, 0`に変更するとチェックサムは一致しません。しかし、青色を`254, 0, 1`に変更すると、チェックサムは一致します。これは、565ピクセルが色の低ビットを無視するためです。画像が24ビットまたは32ビットのピクセルでレンダリングされる場合、すべての色ビットが使用されるため、不一致が生じます。
 
-Image checksums also work with screens generated by the Piu user interface framework. However, because Piu does not render immediately, a slightly different technique is required. The testmc application provides the `screen.checkImage` function to verify images rendered using Piu. The function allows Piu to render the update pending and then confirms that the image Piu rendered has the expected checksum.
+画像のチェックサムは、Piuユーザーインターフェースフレームワークによって生成された画面でも機能します。ただし、Piuは即座にレンダリングしないため、少し異なる技術が必要です。testmcアプリケーションは、Piuを使用してレンダリングされた画像を検証するための`screen.checkImage`関数を提供します。この関数は、Piuが更新を保留してレンダリングすることを許可し、その後、Piuがレンダリングした画像が期待されるチェックサムを持っていることを確認します。
 
 ```js
 /*---
@@ -491,10 +491,10 @@ screen.checkImage("b2342b9d128b17b544c8a1e7c4ff652d");
 ```
 
 <a id="writing-touch"></a>
-### Piu Touch Interaction Tests
-Testing the correct operation of applications with an interactive user interface is done by sending simulated touch events to the application. testmc extends the `screen` object with functions to send touch begin, touch moved, and touch end events. These events are routed to Piu and handled as usual. Because delivery of touch events is asynchronous, the functions used to send touch events for testing are asynchronous.
+### Piu タッチインタラクションテスト {/*examples*/}
+インタラクティブなユーザーインターフェースを持つアプリケーションの正しい操作をテストするには、シミュレートされたタッチイベントをアプリケーションに送信します。testmcは、タッチ開始、タッチ移動、タッチ終了イベントを送信する関数で`screen`オブジェクトを拡張します。これらのイベントはPiuにルーティングされ、通常どおり処理されます。タッチイベントの配信は非同期であるため、テスト用のタッチイベントを送信するために使用される関数も非同期です。
 
-The following test sends a touch begin event. The behavior confirms that the expected touch id and coordinates are received. If the touch began event is not received by the behavior within a half second, the test fails with a timeout.
+次のテストでは、タッチ開始イベントを送信します。この動作は、期待されるタッチIDと座標が受信されることを確認します。もしタッチ開始イベントが半秒以内に動作によって受信されない場合、テストはタイムアウトで失敗します。
 
 ```js
 /*---
@@ -518,49 +518,49 @@ $TESTMC.timeout(500, "timeout for doTouchBegan");
 await screen.doTouchBegan(0, 10, 20);
 ```
 
-When incorporating a Piu behavior in a test, the behavior's class should extend `$TESTMC.Behavior` instead of `Behavior`. This automatically wraps all methods to allow them to throw exceptions to fail the test and, consequently, for `assert` functions to be used as-is.
+テストにPiuの振る舞いを取り入れる場合、振る舞いのクラスは`Behavior`ではなく`$TESTMC.Behavior`を継承するべきです。これにより、すべてのメソッドが例外を投げてテストを失敗させるように自動的にラップされ、結果として`assert`関数がそのまま使用できるようになります。
 
 <a id="test-writing-reference"></a>
-## Reference for Writing Tests
-The testmc application adds features to the runtime environment to support test scripts. This is the same idea as the `$TEST262` global variable added by the TEST262 test harness. The following sections introduce the runtime features of testmc available for tests to use.
+## テスト作成のための参考資料
+testmcアプリケーションは、テストスクリプトをサポートするためにランタイム環境に機能を追加します。これは、TEST262テストハーネスによって追加された`$TEST262`グローバル変数と同じアイデアです。以下のセクションでは、テストで使用できるtestmcのランタイム機能を紹介します。
 
-### `$TESTMC` Global
+### `$TESTMC` グローバル
 
-The `$TESTMC` global is an object with properties for many different purposes.
+`$TESTMC` グローバルは、さまざまな目的のためのプロパティを持つオブジェクトです。
 
 #### `timeout(ms [, message])`
-The `timeout` function is used to cause a test to fail if it does not complete within the specified period of time. The `timeout` function only works with asynchronous tests (those marked with `async` in their front-matter).
+`timeout` 関数は、指定された時間内にテストが完了しない場合にテストを失敗させるために使用されます。`timeout` 関数は非同期テスト（frontmatterで `async` とマークされているもの）でのみ機能します。
 
 ```js
 $TESTMC.timeout(5000, "dns lookup timeout");
 ```
 
 #### `HostObject`, `HostObjectChunk`, `HostBuffer`
-These constructors are used to create host objects to pass as arguments to functions being tested.
+これらのコンストラクタは、テスト中の関数に引数として渡すためのホストオブジェクトを作成するために使用されます。
 
 ```js
-new $TESTMC.HostObject // host object with pointer (-1) for storage
-new $TESTMC.HostObjectChunk // host object with 16 byte chunk for storage
-new $TESTMC.HostBuffer(count) // host buffer of count bytes
+new $TESTMC.HostObject // ストレージ用のポインター(-1)を持つホストオブジェクト
+new $TESTMC.HostObjectChunk // ストレージ用の16バイトチャンクを持つホストオブジェクト
+new $TESTMC.HostBuffer(count) // countバイトのホストバッファー
 ```
-See the [XS in C](../xs/XS%20in%20C.md) document for additional information on host objects.
+ホストオブジェクトに関する追加情報については、[XS in C](../xs/XS%20in%20C.md)のドキュメントを参照してください。
 
 #### `config`
-The `config` property is a shortcut to the `mc/config` module's default export. It contains configuration properties for some kinds of tests (details below). This is also convenient for test scripts running as a program rather than a module.
+`config` プロパティは `mc/config` モジュールのデフォルトエクスポートへのショートカットです。これにはいくつかのテストのための設定プロパティが含まれています（詳細は以下）。これは、モジュールとしてではなくプログラムとして実行されるテストスクリプトにとっても便利です。
 
 ```js
 let ssid = $TESTMC.config.ssid;
 ```
 
 #### `wifiInvalidConnectionTimeout`, `wifiConnectionTimeout`, `wifiScanTimeout`
-These constants are used to set timeouts for Wi-Fi tests. They are provided as values on `$TESTMC` because the optimal value varies by target device and network conditions such as signal strength.
+これらの定数はWi-Fiテストのタイムアウトを設定するために使用されます。ターゲットデバイスやネットワーク条件（信号強度など）によって最適な値が異なるため、`$TESTMC` に値として提供されています。
 
 ```js
 $TESTMC.timeout($TESTMC.wifiScanTimeout, "wi-fi scan timeout");
 ```
 
 #### `Behavior`
-The `$TESTMC.Behavior` constructor extends the Piu `Behavior` class for testing. It wraps each handler in a `try`/`catch` block. If the wrapper catches an exception, it terminates the test as failed. This is convenient for writing tests for Piu events.
+`$TESTMC.Behavior` コンストラクタは、テスト用のPiu `Behavior` クラスを拡張します。各ハンドラーを `try`/`catch` ブロックでラップします。ラッパーが例外をキャッチした場合、テストは失敗として終了します。これはPiuイベントのテストを書く際に便利です。
 
 ```js
 class SampleBehavior extends $TESTMC.Behavior {
@@ -571,36 +571,36 @@ class SampleBehavior extends $TESTMC.Behavior {
 }
 ```
 
-### `$NETWORK` Global
-The `$NETWORK` global provides functions and values useful for testing operations that use the network.
+### `$NETWORK` グローバル
+`$NETWORK` グローバルは、ネットワークを使用する操作のテストに役立つ関数や値を提供します。
 
 #### `connected`
-The `connected` property returns a Promise that resolves when a network connection is available. If the network is already connected (such as when running tests in the simulator), the promise resolves immediately.
+`connected` プロパティは、ネットワーク接続が利用可能になったときに解決されるPromiseを返します。ネットワークがすでに接続されている場合（シミュレーターでテストを実行している場合など）、Promiseはすぐに解決されます。
 
-Because the resolution of the promise is asynchronous, the `connected` property should only be used in tests marked `async`.
+Promiseの解決は非同期であるため、`connected` プロパティは `async` とマークされたテストでのみ使用するべきです。
 
 ```js
 await $NETWORK.connected;
 ```
 
 #### `invalidDomain`
-The `invalidDomain` property is a string containing a DNS hostname guaranteed to fail to resolve. This is useful for testing error handling of network code.
+`invalidDomain` プロパティは、解決に失敗することが保証されているDNSホスト名を含む文字列です。これはネットワークコードのエラーハンドリングをテストするのに役立ちます。
 
 #### `wifi()`
-The `wifi` function returns a promise which resolves to an object with the options object to establish a Wi-Fi connection for testing.
+`wifi` 関数は、テスト用のWi-Fi接続を確立するオプションオブジェクトを解決するPromiseを返します。
 
 ```js
 let options = await $NETWORK.wifi();
 new WiFi(options);
 ```
 
-Note that most network tests can use `$NETWORK.connected` to establish a connection. The `$NETWORK.wifi` function is provided to test the APIs used to establish a Wi-Fi connection.
+ほとんどのネットワークテストでは `$NETWORK.connected` を使用して接続を確立できます。`$NETWORK.wifi` 関数はWi-Fi接続を確立するために使用されるAPIをテストするために提供されています。
 
-### `screen` Global
-The `screen` global is a standard part of the Moddable SDK runtime environment on devices with a display. It is used by both Poco and Piu to access the display driver. The `testmc` test app adds wraps the device's `screen` global to provide additional capabilities.
+### `screen` グローバル
+`screen` グローバルは、ディスプレイを持つデバイスのModdable SDKランタイム環境の標準的な部分です。これはPocoとPiuによってディスプレイドライバにアクセスするために使用されます。`testmc` テストアプリは、デバイスの `screen` グローバルをラップして追加の機能を提供します。
 
 ##### `checksum`
-The `checksum` property is a hash of the last update drawn to the screen. The value is a 32 character hexadecimal string.
+`checksum` プロパティは、画面に描画された最後の更新のハッシュです。値は32文字の16進数文字列です。
 
 ```js
 render.begin();
@@ -611,10 +611,10 @@ render.end();
 assert.sameValue("e5386bfa56b0ab7128c75199547c2178", screen.checksum, "mismatch");
 ```
 
-The checksum is for the pixels sent to the display driver by the last update. It is only a checksum of the entire screen if all pixels were drawn in a single update. The checksum changes if the pixel format or software rotation changes.
+チェックサムは、最後の更新によってディスプレイドライバに送信されたピクセルのものです。すべてのピクセルが単一の更新で描画された場合にのみ、画面全体のチェックサムになります。ピクセルフォーマットやソフトウェアの回転が変更されると、チェックサムも変更されます。
 
-#### `checkImage(checksum)`
-The `checkImage` method uses `screen.checksum` to verify the correctness of rendering with Piu. If the checksum does not match, the test is terminated as failed.
+#### `checkImage(checksum)` {/*examples*/}
+`checkImage` メソッドは `screen.checksum` を使用して、Piuによるレンダリングの正確性を検証します。チェックサムが一致しない場合、テストは失敗として終了します。
 
 ```js
 one.height = 50;
@@ -626,36 +626,36 @@ one.width = 150;
 screen.checkImage("4e008cd76aa8c80e480d966a8aa91228");
 ```
 
-#### `doTouchBegan()`, `doTouchMoved()`, `doTouchEnded()`
-These functions send touch input events as if they were generated by the touch screen driver. The arguments to each function are `id, x, y, ticks`. These `async` functions resolve once the touch event has been delivered.
+#### `doTouchBegan()`, `doTouchMoved()`, `doTouchEnded()` {/*examples*/}
+これらの関数は、タッチスクリーンドライバーによって生成されたかのようにタッチ入力イベントを送信します。各関数への引数は `id, x, y, ticks` です。これらの `async` 関数は、タッチイベントが配信された後に解決されます。
 
 ```js
 await screen.doTouchBegan(0, 100, 100, Time.ticks);
 ```
 
-#### Test Configuration in `mc/config`
-The testmc manifest contains configuration values for on-device testing, such as hardware pin numbers and I/O ports. These values are used by tests, so that they may written to be independent of the device being tested. When running testmc on a new device, the configuration values for the device must be added to the manifest.
+#### `mc/config` でのテスト設定
+testmcマニフェストには、ハードウェアピン番号やI/Oポートなど、デバイス上でのテストに使用される設定値が含まれています。これらの値はテストに使用され、テストがテスト対象のデバイスに依存しないように記述されます。新しいデバイスでtestmcを実行する場合、デバイスの設定値をマニフェストに追加する必要があります。
 
 - `config.digital[]`
 
-An array of ECMA-419 digital pin specifiers.
+ECMA-419デジタルピン指定子の配列です。
 
 - `config.i2c`
 
-An object with properties for the `hz` and `address` of a device connected to the default I²C  bus to use for tests. Also has `unusedAddress` for an address that is guaranteed not to have a device connected.
+デフォルトのI²Cバスに接続されたデバイスの`hz`と`address`のプロパティを持つオブジェクトです。また、デバイスが接続されていないことが保証されている`unusedAddress`も含まれています。
 
 - `config.pwm`
 
-An object with properties for a PWM testing. `from` is `true` if the host implementation supports the `from` property in the constructor options object. `pins` is an array of ECMA-419 pin specifiers that may be used with PWM. `ports` is an array of ECMA-419 port specifiers that may be used with the PWM pins. `invalidPorts` is an array of invalid ECMA-419 port specifiers. `resolutions` is an array of supported PWM resolutions. `hzs` is an array of supported PWM frequencies.
+PWMテストのためのプロパティを持つオブジェクトです。`from`は、コンストラクターオプションオブジェクトの`from`プロパティをホスト実装がサポートしている場合に`true`です。`pins`はPWMに使用可能なECMA-419ピン指定の配列です。`ports`はPWMピンに使用可能なECMA-419ポート指定の配列です。`invalidPorts`は無効なECMA-419ポート指定の配列です。`resolutions`はサポートされているPWM解像度の配列です。`hzs`はサポートされているPWM周波数の配列です。
 
 - `config.spi`
 
-An object with properties for SPI testing. `select` is the ECMA-419 pin specifier for the select pin. `ports` is an array of ECMA-419 port specifiers for SPI. `invalidPorts` is an array of invalid SPI port specifiers. `hzs` is an array of support SPI frequencies.
+SPIテストのためのプロパティを持つオブジェクトです。`select`は選択ピンのECMA-419ピン指定です。`ports`はSPIのためのECMA-419ポート指定の配列です。`invalidPorts`は無効なSPIポート指定の配列です。`hzs`はサポートされているSPI周波数の配列です。
 
 - `config.invalidPins`
 
-An array of ECMA-419 pin specifiers that are invalid for the target device.
+ECMA-419ピン指定の配列で、ターゲットデバイスに対して無効です。
 
 - `config.flashPartition`
 
-The name of the flash partition to use for tests. The content of this partition will be destroyed by the tests.
+テストに使用するフラッシュパーティションの名前です。このパーティションの内容はテストによって破壊されます。
