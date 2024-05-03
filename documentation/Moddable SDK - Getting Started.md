@@ -206,7 +206,7 @@ Moddable SDKは、Windows 8.1以降およびMicrosoft Visual Studio Community 20
 	```
 
 5. [リンク先の手順](https://www.architectryan.com/2018/08/31/how-to-change-environment-variables-on-windows-10/)に従ってコントロールパネルアプリの「環境変数」ダイアログを開きます。そのダイアログから：
- - ユーザー変数として`MODDABLE`を作成し、ローカルのModdable SDKリポジトリディレクトリを指すように設定します。システムに合わせてパスを更新し、「ディレクトリを参照。..」ボタンを使用してModdable SDKフォルダに移動します。
+ - ユーザー変数として`MODDABLE`を作成し、ローカルのModdable SDKリポジトリディレクトリを指すように設定します。システムに合わせてパスを更新し、「ディレクトリを参照」ボタンを使用してModdable SDKフォルダに移動します。
 	- 変数名：`MODDABLE`
 	- 変数値：`%USERPROFILE%\Projects\moddable`
 
