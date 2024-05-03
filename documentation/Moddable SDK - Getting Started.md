@@ -210,7 +210,7 @@ Moddable SDKは、Windows 8.1以降およびMicrosoft Visual Studio Community 20
 	- 変数名：`MODDABLE`
 	- 変数値：`%USERPROFILE%\Projects\moddable`
 
- - ユーザー変数`Path`を編集して、Moddable SDKツールディレクトリを含むようにします。システムに合わせてパスを更新し、「参照。..」ボタンを使用して正しいフォルダに移動します。
+ - ユーザー変数`Path`を編集して、Moddable SDKツールディレクトリを含むようにします。システムに合わせてパスを更新し、「参照」ボタンを使用して正しいフォルダに移動します。
 	- 変数名：`Path`
 	- 変数値（既存のリストに追加）：`%USERPROFILE%\Projects\moddable\build\bin\win\release`
 
