@@ -59,6 +59,7 @@ void fx_lockdown(txMachine* the)
 	mxRunCount(1); \
 	mxPop()
 
+	txSlot* constructor;
 	txSlot* instance;
 	txSlot* property;
 	txSlot* item;
@@ -69,30 +70,36 @@ void fx_lockdown(txMachine* the)
 		mxTypeError("lockdown already called");
 	mxProgram.value.reference->flag |= XS_DONT_MARSHALL_FLAG;
 
+	fxDuplicateInstance(the, mxThrowTypeErrorFunction.value.reference);
+	constructor = the->stack;
+	constructor->value.reference->flag |= XS_CAN_CONSTRUCT_FLAG;
+	mxFunctionInstanceCode(constructor->value.reference)->ID = XS_NO_ID; 
+	mxFunctionInstanceHome(constructor->value.reference)->value.home.object = NULL;
+	
 	property = mxBehaviorSetProperty(the, mxAsyncFunctionPrototype.value.reference, mxID(_constructor), 0, XS_OWN);
 	if (property) {
-		property->kind = mxThrowTypeErrorFunction.kind;
-		property->value = mxThrowTypeErrorFunction.value;
+		property->kind = constructor->kind;
+		property->value = constructor->value;
 	}
 	property = mxBehaviorSetProperty(the, mxAsyncGeneratorFunctionPrototype.value.reference, mxID(_constructor), 0, XS_OWN);
 	if (property) {
-		property->kind = mxThrowTypeErrorFunction.kind;
-		property->value = mxThrowTypeErrorFunction.value;
+		property->kind = constructor->kind;
+		property->value = constructor->value;
 	}
 	property = mxBehaviorSetProperty(the, mxFunctionPrototype.value.reference, mxID(_constructor), 0, XS_OWN);
 	if (property) {
-		property->kind = mxThrowTypeErrorFunction.kind;
-		property->value = mxThrowTypeErrorFunction.value;
+		property->kind = constructor->kind;
+		property->value = constructor->value;
 	}
 	property = mxBehaviorSetProperty(the, mxGeneratorFunctionPrototype.value.reference, mxID(_constructor), 0, XS_OWN);
 	if (property) {
-		property->kind = mxThrowTypeErrorFunction.kind;
-		property->value = mxThrowTypeErrorFunction.value;
+		property->kind = constructor->kind;
+		property->value = constructor->value;
 	}
 	property = mxBehaviorSetProperty(the, mxCompartmentPrototype.value.reference, mxID(_constructor), 0, XS_OWN);
 	if (property) {
-		property->kind = mxThrowTypeErrorFunction.kind;
-		property->value = mxThrowTypeErrorFunction.value;
+		property->kind = constructor->kind;
+		property->value = constructor->value;
 	}
 
 	instance = fxNewArray(the, _Compartment);
@@ -118,8 +125,8 @@ void fx_lockdown(txMachine* the)
 	fxSetHostFunctionProperty(the, property, mxCallback(fx_Date_now_secure), 0, mxID(_now));
 	property = mxBehaviorSetProperty(the, mxDatePrototype.value.reference, mxID(_constructor), 0, XS_OWN);
 	if (property) {
-		property->kind = mxThrowTypeErrorFunction.kind;
-		property->value = mxThrowTypeErrorFunction.value;
+		property->kind = constructor->kind;
+		property->value = constructor->value;
 	}
 	mxPull(instance->next->value.array.address[_Date]);
 	
@@ -195,6 +202,7 @@ void fx_lockdown(txMachine* the)
 	mxFunctionInstanceCode(mxThrowTypeErrorFunction.value.reference)->ID = XS_NO_ID; 
 	mxFunctionInstanceHome(mxThrowTypeErrorFunction.value.reference)->value.home.object = NULL;
 
+	mxPop();
 	mxPop();
 }
 
