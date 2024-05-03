@@ -250,7 +250,7 @@ Moddable SDKは、Windows 8.1以降およびMicrosoft Visual Studio Community 20
 - Moddable SDKのビルドが"`'nmake' is not recognized as an internal or external command, operable program or batch file.`"のエラーで失敗した場合、3つの潜在的な問題と修正方法があります：
 	1. Visual Studioがインストールされていない可能性があります。[Microsoft Visual Studio 2022 Community Edition installer](https://www.visualstudio.com/downloads/)の使用をお勧めします。
 	2. Visual Studioをインストールした際に、「Desktop development for C++」ワークロードオプションを選択していない可能性があります。[インストーラー](https://www.visualstudio.com/downloads/)を再実行し、そのワークロードをインストールするオプションを選択してください。
-	3. デフォルトのコマンドプロンプトではなく、「VS 2022用x86ネイティブツールコマンドプロンプト」でビルドを試みた可能性があります。このコマンドプロンプトはビルドに重要な環境変数を設定し、スタートメニューで「x86 Native Tools」と検索することで見つけることができます。
+	3. 「VS 2022用x86ネイティブツールコマンドプロンプト」を使わずにデフォルトのコマンドプロンプトでビルドを試みた可能性があります。「VS 2022用x86ネイティブツールコマンドプロンプト」はビルドに重要な環境変数を設定します。これはスタートメニューで「x86 Native Tools」と検索することで見つけることができます。
 
 - Moddable SDKのビルドが"`fatal error LNK1112: module machine type 'x64' conflicts with target machine type 'x86'`"のようなエラーで失敗した場合、おそらく「VS 2022用x64ネイティブツールコマンドプロンプト」ではなく、正しい「VS 2022用x86ネイティブツールコマンドプロンプト」でビルドを試みたことが原因です。このコマンドプロンプトはビルドに重要な環境変数を設定し、スタートメニューで「x86 Native Tools」と検索することで見つけることができます。
 
