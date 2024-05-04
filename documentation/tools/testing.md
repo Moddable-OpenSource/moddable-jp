@@ -351,8 +351,8 @@ assert(Array.isArray(5), "expected Array");	// throws
 `assert.sameValue`と`assert.notSameValue`は、通常、期待される値と実際の値を比較するために使用されます。`assert`と同様に、テストを説明するメッセージのためのオプショナルな引数があります。
 
 ```js
-assert.sameValue(result, 12, "期待される結果は12");
-assert.notSameValue(result, 12, "期待される結果は12と異なる");
+assert.sameValue(result, 12, "expected result of 12");
+assert.notSameValue(result, 12, "expected result different from 12");
 ```
 
 慣例により、`assert.sameValue`と`assert.notSameValue`への最初の引数はテストによって生成された値です。2番目の値はテストの期待される結果です。
@@ -539,9 +539,9 @@ $TESTMC.timeout(5000, "dns lookup timeout");
 これらのコンストラクタは、テスト中の関数に引数として渡すためのホストオブジェクトを作成するために使用されます。
 
 ```js
-new $TESTMC.HostObject // ストレージ用のポインター(-1)を持つホストオブジェクト
-new $TESTMC.HostObjectChunk // ストレージ用の16バイトチャンクを持つホストオブジェクト
-new $TESTMC.HostBuffer(count) // countバイトのホストバッファー
+new $TESTMC.HostObject // host object with pointer (-1) for storage
+new $TESTMC.HostObjectChunk // host object with 16 byte chunk for storage
+new $TESTMC.HostBuffer(count) // host buffer of count bytes
 ```
 ホストオブジェクトに関する追加情報については、[XS in C](../xs/XS%20in%20C.md)のドキュメントを参照してください。
 
