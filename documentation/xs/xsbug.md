@@ -1,139 +1,138 @@
 # xsbug
-Updated October 2, 2023
+2023年10月2日更新
 
-The `xsbug` JavaScript source level debugger is a full featured debugger that supports debugging modules and applications for [XS platforms](../xs/XS%20Platforms.md). The `xsbug` debugger is automatically launched when deploying debug builds and connects to devices via USB or over Wi-Fi. Similar to other debuggers, `xsbug` supports setting breakpoints and browsing source code, the call stack, local variables, and global variables. The `xsbug` debugger additionally provides real-time instrumentation to track memory usage and profile application and resource consumption. There is also an integrated [performance profiler](#profiler) for identifying performance hot-spots.
+`xsbug` JavaScriptソースレベルデバッガーは、[XSプラットフォーム](../xs/XS%20Platforms.md)のモジュールやアプリケーションのデバッグをサポートするフル機能デバッガーです。`xsbug` デバッガーはデバッグビルドをデプロイする際に自動的に起動し、USBまたはWi-Fi経由でデバイスに接続します。他のデバッガーと同様に、`xsbug` はブレークポイントの設定やソースコード、コールスタック、ローカル変数、グローバル変数の閲覧をサポートします。さらに、`xsbug` デバッガーはリアルタイムの計測機能を提供し、メモリ使用量の追跡やアプリケーションおよびリソース消費のプロファイリングが可能です。パフォーマンスのホットスポットを特定するための統合された[パフォーマンスプロファイラー](#profiler)もあります。
 
-A video demonstration of xsbug is available [here](https://youtu.be/vqu8gDV7AOo).
+xsbugのビデオデモは[こちら](https://youtu.be/vqu8gDV7AOo)でご覧いただけます。
 
-> Note: For developers who prefer to use a console log for debugging, xsbug-log maybe used instead of xsbug. See [below](#xsbug-log) for details.
+> 注意: コンソールログを使用してデバッグを好む開発者のために、xsbugの代わりにxsbug-logを使用することもできます。詳細は[以下](#xsbug-log)を参照してください。
 
-## Machine Tabs
+## マシンタブ
 
-Figure 1 shows the machine tab view. At the top of the window, there are tabs for all XS virtual machines connected to **xsbug** (highlighted in red in the image below). The orange bullet signifies a "broken" virtual machine. Select the tab to see where and why the virtual machine is broken.
+図1はマシンタブビューを示しています。ウィンドウの上部には、**xsbug**に接続されているすべてのXS仮想マシンのタブがあります（下の画像で赤で強調表示されています）。オレンジ色の丸は「停止した」仮想マシンを示しています。タブを選択して、仮想マシンがどこで、なぜ停止したのかを確認してください。
 
-> **Note:** A virtual machine is "broken" when stopped at a breakpoint, `debugger` statement or exception.
+> **注意:** バーチャルマシンはブレークポイント、`debugger` ステートメント、または例外で停止したときに「停止した」とされます。
 
-**Figure 1.** Machine tab view
+**図 1.** マシンタブビュー
 
 ![](../assets/xsbug/machines.png)
 
-The left pane displays:
+左ペインには以下が表示されます：
 
-* The **Kill** ![](../assets/xsbug/kill.png), **Break** ![](../assets/xsbug/break.png), **Run** ![](../assets/xsbug/run.png), **Step** ![](../assets/xsbug/step.png), **Step In**  ![](../assets/xsbug/step-in.png) and **Step Out**  ![](../assets/xsbug/step-out.png) buttons. Corresponding menu items and shortcuts are also available in the **Debug** menu to control the virtual machine.
-* The **Profile** panel. Use this to activate the [performance profiler](#profiler) to locate performance hotspots in scripts.
-* The **Instrumentation** panel. Use this to track memory usage and monitor resource consumption in real-time.
-* The **Calls** stack panel. Select a row in this panel to see the source code line where the call was made and to inspect the local variables of that stack frame.
-* The **Locals**, **Modules**, and **Globals** panels. Use these to inspect values of local and global variables and see which modules are loaded. Dictionaries and arrays have the ![](../assets/xsbug/arrow.png) icon next to their name. You can inspect the values of an object's properties or an array's items by tapping the name to expand the row.
+* **Kill** ![](../assets/xsbug/kill.png)、**Break** ![](../assets/xsbug/break.png)、**Run** ![](../assets/xsbug/run.png)、**Step** ![](../assets/xsbug/step.png)、**Step In**  ![](../assets/xsbug/step-in.png)、**Step Out**  ![](../assets/xsbug/step-out.png) ボタン。対応するメニューアイテムとショートカットも **Debug** メニューにあり、バーチャルマシンを制御するために使用します。
+* **Profile** パネル。これを使用して [パフォーマンスプロファイラ](#profiler) をアクティブにし、スクリプト内のパフォーマンスのホットスポットを特定します。
+* **Instrumentation** パネル。これを使用してメモリ使用量を追跡し、リアルタイムでリソース消費を監視します。
+* **Calls** スタックパネル。このパネルの行を選択して、そのコールが行われたソースコードの行を表示し、そのスタックフレームのローカル変数を調べます。
+* **Locals**、**Modules**、および **Globals** パネル。これらを使用してローカル変数とグローバル変数の値を調べ、どのモジュールがロードされているかを確認します。辞書と配列は名前の隣に ![](../assets/xsbug/arrow.png) アイコンがあります。オブジェクトのプロパティや配列のアイテムの値を調べるには、行を展開するために名前をタップします。
 
-The right panes display:
+右側のペインには以下が表示されます：
 
-* The selected file.
-* The console. Each virtual machine has its own console.
-* A field to enter JavaScript expressions to be evaluated. This field is labeled "EVAL" and is only available when stopped at a breakpoint. See [Interactive Console](repl) for more information.
+* 選択されたファイル。
+* コンソール。各仮想マシンには独自のコンソールがあります。
+* JavaScriptの式を評価するためのフィールド。このフィールドは「EVAL」とラベル付けされており、ブレークポイントで停止している場合にのみ利用可能です。詳細は[インタラクティブコンソール](repl)を参照してください。
 
-## Breakpoints Tab
+## Breakpointsタブ
 
-Figure 2 shows the Breakpoints tab view. Select the first tab (highlighted in red in the image below) to browse and search files and folders to set and clear breakpoints. Breakpoints can be edited even when no virtual machines are connected to **xsbug**.
+図2はBreakpointsタブのビューを示しています。最初のタブ（画像の赤で強調表示されています）を選択して、ファイルやフォルダを閲覧および検索し、ブレークポイントを設定または解除します。仮想マシンが**xsbug**に接続されていない場合でも、ブレークポイントを編集できます。
 
-To disable/enable a breakpoint, click on the breakpoint in the breakpoint tab then select the **Disable Breakpoint** or **Enable Breakpoint** option in the **Debug** menu.
+ブレークポイントを無効/有効にするには、Breakpointsタブでブレークポイントをクリックし、**デバッグ**メニューで**ブレークポイントを無効にする**または**ブレークポイントを有効にする**オプションを選択します。
 
-To add files and folders to **xsbug**, select the **Open File...** and **Open Folder...** items in the **File** menu, or drag and drop files and folders into the **xsbug** window.
+**xsbug**にファイルやフォルダを追加するには、**File**メニューの**Open File...**および**Open Folder...**項目を選択するか、ファイルやフォルダを**xsbug**ウィンドウにドラッグアンドドロップします。
 
-To remove files and folders from **xsbug**, use the **Close** ![](../assets/xsbug/close.png) button in the header of a files and folders panel.
+**xsbug**からファイルやフォルダを削除するには、ファイルやフォルダのパネルのヘッダーにある**閉じる** ![](../assets/xsbug/close.png) ボタンを使用します。
 
-**Figure 2.** Breakpoints tab view
+**図 2.** Breakpointsタブのビュー
 
 ![](../assets/xsbug/breakpoints.png)
 
-The left pane displays:
+左ペインには以下が表示されます：
 
-* The **Breakpoints** themselves. Tap a row in this panel to see where the breakpoint is. Each breakpoint row shows icons corresponding to features used by the breakpoint - a question mark for Conditional breakpoints, a tally for Hit Count breakpoints, and a "$" prompt for Trace Expressions. In the header of this panel, there are two icons. The first is an "f" button for setting Function Name breakpoints. The second is a **Trash** ![](../assets/xsbug/trash.png) button to clear all breakpoints. 
+* **ブレークポイント**自体。このパネルの行をタップしてブレークポイントの位置を確認します。各ブレークポイント行には、ブレークポイントに使用される機能に対応するアイコンが表示されます - 条件付きブレークポイントのための疑問符、ヒットカウントブレークポイントのためのタリー、トレース式のための "$" プロンプト。このパネルのヘッダーには2つのアイコンがあります。最初の「f」ボタンは関数名ブレークポイントを設定するためのものです。2つ目は全てのブレークポイントをクリアする **ゴミ箱** ![](../assets/xsbug/trash.png) ボタンです。
 
-* The **Search** panel. Use this to recursively search all the files in all the folders added to **xsbug**.
-* Zero or more files and folders panels. Tap folder rows to browse, select a file row to display the file.
+* **検索**パネル。これを使用して、**xsbug**に追加されたすべてのフォルダ内のすべてのファイルを再帰的に検索します。
+* 空またはそれ以上のファイルおよびフォルダパネル。フォルダ行をタップして閲覧し、ファイル行を選択してファイルを表示します。
 
-The right pane displays:
+右ペインには以下が表示されます：
 
-* The selected file.
-* The **xsbug** log, which merges the output of the consoles of all connected virtual machines. The log survives the disconnection of virtual machines.
+* 選択されたファイル。
+* **xsbug**ログ。これは、接続されたすべての仮想マシンのコンソールの出力を統合します。ログは仮想マシンの切断後も残ります。
 
-## File Pane
+## ファイルペイン
 
-Figure 3. shows the File pane (highlighted in red). Selecting a row in the **Breakpoints** or **Calls** panels, or selecting a file in a folder panel opens a right pane with source code.
+図3. はファイルペイン（赤で強調表示）を示しています。**Breakpoints**や**Calls**パネルの行を選択するか、フォルダーパネルでファイルを選択すると、ソースコードが右ペインに開きます。
 
-**Figure 3.** File pane
+**図3.** ファイルペイン
 
 ![](../assets/xsbug/file.png)
 
-In the header of the pane:
+ペインのヘッダーでは：
 
-* Tapping the parts of the path open folders in the Finder or Explorer.
-* The **Edit** ![](../assets/xsbug/edit.png) button opens the file in its default editor.
-* The **Find** ![](../assets/xsbug/find.png) button extends the header with a field to search the file.
-* The **Close** ![](../assets/xsbug/close.png) button closes the file pane.
+* パスの部分をタップすると、FinderやExplorerでフォルダが開きます。
+* **編集** ![](../assets/xsbug/edit.png) ボタンはファイルをデフォルトのエディタで開きます。
+* **検索** ![](../assets/xsbug/find.png) ボタンはヘッダーを拡張してファイルを検索するフィールドを表示します。
+* **閉じる** ![](../assets/xsbug/close.png) ボタンはファイルペインを閉じます。
 
-To edit a breakpoint, tap the breakpoint's arrow in the File Pane to display the editor.
+ブレークポイントを編集するには、ファイルペインでブレークポイントの矢印をタップしてエディタを表示します。
 
 ![](../assets/xsbug/breakpoint-editor.png)
 
-Breakpoints may be moved by dragging the breakpoint's arrow up and down.
+ブレークポイントは、ブレークポイントの矢印を上下にドラッグすることで移動できます。
 
-Breakpoints may be deleted by dragging the breakpoint's arrow to the left.
+ブレークポイントは、ブレークポイントの矢印を左にドラッグすることで削除できます。
 
-## Preferences Pane
+## Preferencesペイン
 
-Figure 4. shows the Preferences pane. Selecting the **Preferences** item from the **xsbug** menu opens a right pane with preferences panels.
+図4. はPreferencesペインを示しています。**xsbug** メニューから **Settings** 項目を選択すると、Preferencesパネルが右ペインに開きます。
 
-**Figure 4.** Preferences pane
+**図 4.** Preferencesパネル
 
 ![](../assets/xsbug/preferences.png)
 
-The **Break** preferences panel toggles the **Break On Start** and **Break On Exceptions** flags for all virtual machines.
+**Break** Preferencesパネルは、すべての仮想マシンに対して **開始時に中断** と **例外時に中断** のフラグを切り替えます。
 
-The **Instruments** preferences panel allows you to select whether you want the instrumentation panel to automatically show while all virtual machines are running and hide when a virtual machine breaks.
+**Instruments** Preferencesパネルでは、すべての仮想マシンが実行中の間に自動的にINSTRUMENTSパネルを表示し、仮想マシンが中断したときに隠すかどうかを選択できます。
 
-The **Network** preferences panel displays the interfaces **xsbug** is listening on, and provides an edit field to change the port number **xsbug** is listening with. The default port number is **5002**. Changing the port number kills any connected virtual machines.
+**Network** Preferencesパネルは、**xsbug** がリスニングしているインターフェースを表示し、**xsbug** が使用しているポート番号を変更するための編集フィールドを提供します。デフォルトのポート番号は **5002** です。ポート番号を変更すると、接続されている仮想マシンは停止します。
 
 <a id="repl"></a>
-## Interactive Console (EVAL)
+## 対話型コンソール (EVAL)
 
-The interactive console is shown at the bottom of the File Pane when stopped at a breakpoint. Eval expressions may be used in many different ways:
+対話型コンソールは、ブレークポイントで停止したときにファイルパネルの下部に表示されます。Eval式は多様な方法で使用できます：
 
-- Display a value: `this`, `this.prototype`, `x`, `this.#ref`
-- Perform a calculation: `x + y`, `this.bounds.width * this.bounds.height`
-- Call functions: `this.update()`, `Math.round(x)`
-- Set values: `this.x = 12`, `globalThis.keep = this`, `this.#ref = null`
+- 値を表示する：`this`, `this.prototype`, `x`, `this.#ref`
+- 計算を行う：`x + y`, `this.bounds.width * this.bounds.height`
+- 関数を呼び出す：`this.update()`, `Math.round(x)`
+- 値を設定する：`this.x = 12`, `globalThis.keep = this`, `this.#ref = null`
 
-JavaScript expressions entered into the Eval field are evaluated in the context of the current breakpoint. The evaluation context is also defined by the currently selected stack frame in the Calls panel, which changes the local variables that are visible and the value of `this`.
+Evalフィールドに入力されたJavaScript式は、現在のブレークポイントのコンテキストで評価されます。評価コンテキストは、Callsパネルで選択されているスタックフレームによっても定義され、表示されるローカル変数と `this` の値が変わります。
 
-If an expression uses a feature of JavaScript that has been optimized out (using the strip feature of XS to minimize the size of the engine), the console displays `"dead strip"`.
+式がJavaScriptの機能を使用していて、XSのstrip機能を使用してエンジンのサイズを最小限に抑えることで最適化されている場合、コンソールには `"dead strip"` が表示されます。
 
-Expressions may access private fields of objects with some restrictions. First, access to private fields is based on the scope. If the current scope cannot access a private field, then the Eval expression cannot either. In addition, only the private fields that are referenced by the current function may be accessed by an expressions.
+式は、いくつかの制限付きでオブジェクトのプライベートフィールドにアクセスできます。まず、プライベートフィールドへのアクセスはスコープに基づいています。現在のスコープがプライベートフィールドにアクセスできない場合、Eval式もアクセスできません。さらに、現在の関数によって参照されているプライベートフィールドのみが式によってアクセスされる可能性があります。
 
 <a id="profiler"></a>
-## Performance Profiler
+## パフォーマンスプロファイラー
 
-xsbug has an integrated performance profiler that is invaluable for identifying performance hotspots in JavaScript code. The profiler works on JavaScript running on embedded device targets and the simulator.
+xsbugにはJavaScriptコードのパフォーマンスのホットスポットを特定するのに非常に価値のある統合パフォーマンスプロファイラーがあります。このプロファイラーは、組み込みデバイスターゲットとシミュレーターで実行されるJavaScriptに対応しています。
 
-These resources will help you get started:
+これらのリソースを使って始めましょう：
 
-- [High level introduction](https://blog.moddable.com/blog/profiler/) to the profiler on the Moddable blog
-- [Step-by-step walkthrough](https://blog.moddable.com/blog/optimizing-life/) showing how the XS profiler was used to identify performance hotspots, guide optimizations, and verify performance improvements
-- [Technical details](./XS%20Profiler.md) on the XS performance profiler including implementation notes and how the displayed time values are calculated
-
+- Moddableブログにおけるプロファイラーに関する[上級レベルの紹介](https://blog.moddable.com/blog/profiler/)
+- XSプロファイラーがパフォーマンスのホットスポットを特定し、最適化をガイドし、パフォーマンス改善を検証するのにどのように使用されたかを示す[ステップバイステップのウォークスルー](https://blog.moddable.com/blog/optimizing-life/)
+- XSパフォーマンスプロファイラーに関する[技術的詳細](./XS%20Profiler.md)、実装注釈、表示される時間値の計算方法を含む
 
 <a id="colorize"></a>
-## Colorizing console/log with trace
+## コンソール/ログのカラー化とトレース
 
-You can colorize your output in the console/log pane when using `trace` on a per-line basis by using a tag at the start a line.  Available tags are:
+`trace`を使用する際に、コンソール/ログペインで出力を行ごとにカラー化することができます。行の始めにタグを使用します。利用可能なタグは以下の通りです：
 
 * `<info>`
 * `<warn>`
 * `<error>`
 
-The color used is dependent upon the dark/light theme that is selected.
+使用される色は、選択されたDark/Lightテーマに依存します。
 
-For example,
+例えば、
 
 ```js
 trace('This is a standard text line\n');
@@ -147,24 +146,23 @@ trace('starts with the tag\n');
 
 ![](../assets/xsbug/colorize.png)
 
-## Unit Test Runner
+## ユニットテストランナー
 
-xsbug may be used to run tests262 and unit tests, such as [those included](../../tests) in the Moddable SDK,  See the [Testing the Moddable SDK](../tools/testing.md) document for instructions on using xsbug for testing.
-
+xsbugは、Moddable SDKに含まれる[テスト](../../tests)やtests262などのユニットテストを実行するために使用することができます。xsbugを使用してテストする方法については、[Moddable SDKのテスト](../tools/testing.md)ドキュメントを参照してください。
 
 <a id="xsbug-log"></a>
 ## xsbug-log
 
-xsbug-log is an alternative to xsbug. Instead of a graphical user interface, it is a simple console log of the project's output. xsbug-log useful when running on devices without a display (so-called "headless" devices) and for developers who prefer debugging with only console output.
+xsbug-logはxsbugの代替品です。グラフィカルユーザーインターフェースの代わりに、プロジェクトの出力のシンプルなコンソールログです。xsbug-logは、ディスプレイを持たないデバイス（いわゆる「ヘッドレス」デバイス）で実行する場合や、コンソール出力のみでデバッグを好む開発者に便利です。
 
-xsbug-log is implemented in Node.js. To use it, you must first install the dependencies:
+xsbug-logはNode.jsで実装されています。使用するには、まず依存関係をインストールする必要があります：
 
 ```
 cd $MODDABLE/tools/xsbug-log
 npm install
 ```
 
-To use xsbug-log with `mcconfig` use `-dl` (for debug log) in place of`-d` on the command line.
+`mcconfig`でxsbug-logを使用するには、コマンドラインで`-d`の代わりに`-dl`（デバッグログ用）を使用します。
 
 ```
 mcconfig -dl -m -p esp32/moddable_two
