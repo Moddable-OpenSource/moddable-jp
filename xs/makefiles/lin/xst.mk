@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2016-2022  Moddable Tech, Inc.
+# Copyright (c) 2016-2024  Moddable Tech, Inc.
 #
 #   This file is part of the Moddable SDK Tools.
 # 
@@ -80,7 +80,7 @@ ifeq ($(GOAL),debug)
 		C_OPTIONS += -DFUZZING=1
 	endif
 	ifneq ($(OSSFUZZ),0)
-		C_OPTIONS += -DOSSFUZZ=1 -DmxMetering=1 -DmxXSMemoryLimit=0x80000000
+		C_OPTIONS += -DOSSFUZZ=1 -DmxMetering=1 -DmxXSMemoryLimit=0x40000000
 		ifneq ($(FUZZ_METER),0)
 			C_OPTIONS += -DmxFuzzMeter=$(FUZZ_METER)
 		endif
