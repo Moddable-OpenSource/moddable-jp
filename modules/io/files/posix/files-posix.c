@@ -221,10 +221,10 @@ void xs_direectoryposix_destructor(void *data)
 
 void xs_direectoryposix(xsMachine *the)
 {
-	xsTrace("Directory constructor is temporary for bootstrapping. Will throw in the future.");
+	xsTrace("Directory constructor is temporary for bootstrapping. Will throw in the future.\n");
 
 	xsmcGet(xsResult, xsArg(0), xsID_path);
-	char *path = xsmcToString(xsResult);		//@@ not checked with getPat.... for bootstrap
+	char *path = xsmcToString(xsResult);		//@@ not checked with getPath.... for bootstrap
 	xsDirectoryRecord d;
 	
 	struct stat buf;
@@ -464,10 +464,16 @@ void xs_scanposix_close(xsMachine *the)
 void xs_scanposix_read(xsMachine *the)
 {
 	DIR *dir = getScan(xsThis);
-	struct dirent *de = readdir(dir);
-	if (!de) {
-		xs_scanposix_close(the);
-		return;
+	struct dirent *de;
+
+	while (true) {
+		de = readdir(dir);
+		if (!de) {
+			xs_scanposix_close(the);
+			return;
+		}
+		if (c_strcmp(".", de->d_name) && c_strcmp("..", de->d_name))
+			break;
 	}
 	xsmcSetString(xsResult, de->d_name);
 }
