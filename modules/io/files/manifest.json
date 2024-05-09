@@ -4,6 +4,11 @@
 			"modules": {
 				"embedded:x-files": "./posix/files-posix"
 			}
+		},
+		"lin": {
+			"modules": {
+				"embedded:x-files": "./posix/files-posix"
+			}
 		}
 	},
 	"preload": [

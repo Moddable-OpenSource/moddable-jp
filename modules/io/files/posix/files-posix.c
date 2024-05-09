@@ -28,12 +28,7 @@
 #include <unistd.h>
 
 #define kCreatePermissions (0755)
-
-#if mxLinux
-	#define kOpenDirFlags (O_RDONLY | O_RESOLVE_BENEATH)
-#else
-	#define kOpenDirFlags (O_RDONLY)
-#endif
+#define kOpenDirFlags (O_RDONLY)
 
 /*
 	helpers
@@ -93,6 +88,24 @@ static char *_getPath(xsMachine *the, xsSlot *slot)
 	return NULL;		// can never reach here
 }
 
+#if mxLinux
+#include <linux/openat2.h>
+#include <sys/syscall.h>
+
+static int do_openat2(int dirfd, const char *pathname, int flags)
+{
+	struct open_how how = {0};
+	how.flags = flags;
+	how.mode = 0;
+	how.resolve = RESOLVE_BENEATH;
+	return syscall(SYS_openat2, dirfd, pathname, &how, sizeof(how));
+}
+#else /* !mxLinux */
+static int do_openat2(int dirfd, const char *pathname, int flags)
+{
+	return openat(fd, pathname, flags, mode);
+}
+#endif
 
 /*
 	File
@@ -288,11 +301,7 @@ void xs_direectoryposix_openFile(xsMachine *the)
 	}
 
 	xsFileRecord f;
-#if mxLinux
-	f.fd = openat(fd, path, mode | O_RESOLVE_BENEATH, kCreatePermissions);
-#else
 	f.fd = openat(fd, path, mode, kCreatePermissions);
-#endif
 	throwIf(f.fd);
 
 	xsmcSetHostChunk(xsResult, &f, sizeof(f));
@@ -315,8 +324,7 @@ void xs_direectoryposix_openDirectory(xsMachine *the)
 		xsUnknownError("not directory");
 
 	xsDirectoryRecord d;
-
-	d.fd = openat(fd, path, kOpenDirFlags);
+	d.fd = do_openat2(fd, path, kOpenDirFlags);
 	throwIf(d.fd); 
 
 	xsmcSetHostChunk(xsResult, &d, sizeof(d));
