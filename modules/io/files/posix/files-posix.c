@@ -161,8 +161,7 @@ void xs_fileposix_read(xsMachine *the)
 		returnLength = 1;
 	}
 
-	throwIf(lseek(fd, position, SEEK_SET));
-	int result = read(fd, buffer, length);
+	int result = pread(fd, buffer, length, position);
 	throwIf(result);
 
 	if (returnLength)
@@ -179,8 +178,7 @@ void xs_fileposix_write(xsMachine *the)
 	xsUnsignedValue length;
 	xsmcGetBufferWritable(xsArg(0), &buffer, &length);
 
-	throwIf(lseek(fd, position, SEEK_SET));
-	throwIf(write(fd, buffer, length));
+	throwIf(pwrite(fd, buffer, length, position));
 }
 
 void xs_fileposix_status(xsMachine *the)

@@ -586,7 +586,6 @@ void xs_stat_isDirectory(xsMachine *the)
 
 void xs_stat_isSymbolicLink(xsMachine *the)
 {
-	xsmcGet(xsResult, xsThis, xsID_mode);
 	xsmcSetFalse(xsResult);
 }
 
