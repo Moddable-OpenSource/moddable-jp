@@ -4149,7 +4149,7 @@ XS_CODE_JUMP:
 		mxCase(XS_CODE_EVAL)
 			offset = mxStack->value.integer;
 			slot = mxStack + 1 + offset + 4;
-			if (mxIsFunction(slot->value.reference) && (mxFunctionInstanceCode(slot->value.reference)->value.callback.address == mxFunctionInstanceCode(mxEvalFunction.value.reference)->value.callback.address)) {
+			if (mxIsReference(slot) && mxIsFunction(slot->value.reference) && (mxFunctionInstanceCode(slot->value.reference)->value.callback.address == mxFunctionInstanceCode(mxEvalFunction.value.reference)->value.callback.address)) {
 				mxSaveState;
 				gxDefaults.runEval(the);
 				mxRestoreState;
@@ -4162,7 +4162,7 @@ XS_CODE_JUMP:
 		mxCase(XS_CODE_EVAL_TAIL)
 			offset = mxStack->value.integer;
 			slot = mxStack + 1 + offset + 4;
-			if (mxIsFunction(slot->value.reference) && (mxFunctionInstanceCode(slot->value.reference)->value.callback.address == mxFunctionInstanceCode(mxEvalFunction.value.reference)->value.callback.address)) {
+			if (mxIsReference(slot) && mxIsFunction(slot->value.reference) && (mxFunctionInstanceCode(slot->value.reference)->value.callback.address == mxFunctionInstanceCode(mxEvalFunction.value.reference)->value.callback.address)) {
 				mxSaveState;
 				gxDefaults.runEval(the);
 				mxRestoreState;
