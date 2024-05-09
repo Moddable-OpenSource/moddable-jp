@@ -103,7 +103,7 @@ static int do_openat2(int dirfd, const char *pathname, int flags)
 #else /* !mxLinux */
 static int do_openat2(int dirfd, const char *pathname, int flags)
 {
-	return openat(fd, pathname, flags, mode);
+	return openat(dirfd, pathname, flags);
 }
 #endif
 
@@ -174,11 +174,10 @@ void xs_fileposix_read(xsMachine *the)
 void xs_fileposix_write(xsMachine *the)
 {
 	int fd = getFile(xsThis);
+	int position = xsmcToInteger(xsArg(1));
 	void *buffer;
 	xsUnsignedValue length;
 	xsmcGetBufferWritable(xsArg(0), &buffer, &length);
-
-	int position = xsmcToInteger(xsArg(1));
 
 	throwIf(lseek(fd, position, SEEK_SET));
 	throwIf(write(fd, buffer, length));
