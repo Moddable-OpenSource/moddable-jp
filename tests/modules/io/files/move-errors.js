@@ -12,9 +12,12 @@ assert.throws(Error, () => files.move(pathFrom, pathTo));
 assert.throws(SyntaxError, () => files.move(pathFrom));
 assert.throws(SyntaxError, () => files.move());
 
+files.delete(pathFrom);
+files.delete(pathTo);
+
 files.create(pathFrom);
 assert.throws(SyntaxError, () => files.move.call(new $TESTMC.HostObject, pathFrom, pathTo));
 assert.throws(Error, () => files.move(pathFrom, "../" + pathTo));
 assert.throws(Error, () => files.move("../" + pathFrom, pathTo));
 files.move(pathFrom, pathTo);
-files.delete(pathTo);
+assert(files.delete(pathTo));
