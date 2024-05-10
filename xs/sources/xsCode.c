@@ -1709,6 +1709,10 @@ txInteger fxScopeCodeSpecifierNodes(txScope* self, txCoder* coder)
 					fxCoderAddSymbol(coder, 1, XS_CODE_SYMBOL, specifier->symbol);
 					index++;
 				}
+				else {
+					fxCoderAddByte(coder, 1, XS_CODE_NULL);
+					index++;
+				}
 				specifier = specifier->nextSpecifier;
 			}
 			fxCoderAddInteger(coder, 1, XS_CODE_INTEGER_1, index);
