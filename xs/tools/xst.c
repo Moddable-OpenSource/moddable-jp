@@ -24,7 +24,6 @@
 
 extern int fuzz(int argc, char* argv[]);
 extern void fx_print(xsMachine* the);
-extern void fxAbortFuzz(xsMachine* the);
 extern void fxBuildAgent(xsMachine* the);
 extern void fxBuildFuzz(xsMachine* the);
 extern txScript* fxLoadScript(txMachine* the, txString path, txUnsigned flags);
@@ -934,7 +933,6 @@ void fxAbort(txMachine* the, int status)
 	if (the->abortStatus) // xsEndHost calls fxAbort!
 		return;
 	the->abortStatus = status;
-	fxAbortFuzz(the);
 	fxExitToHost(the);
 }
 

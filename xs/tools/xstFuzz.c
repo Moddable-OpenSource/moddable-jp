@@ -24,7 +24,6 @@
 
 extern int fuzz(int argc, char* argv[]);
 extern void fx_print(xsMachine* the);
-extern void fxAbortFuzz(xsMachine* the);
 extern void fxBuildAgent(xsMachine* the);
 extern void fxBuildFuzz(xsMachine* the);
 extern void fxRunLoop(txMachine* the);
@@ -49,10 +48,6 @@ extern int gxStress;
 int gxMemoryFail;		// not thread safe
 #endif
 /* native memory stress */
-
-void fxAbortFuzz(xsMachine* the) 
-{
-}
 
 void fxBuildFuzz(xsMachine* the) 
 {
