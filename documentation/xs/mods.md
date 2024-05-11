@@ -1,46 +1,46 @@
-# Mods - User Installed Extensions
+# msods - ユーザーがインストールする拡張機能
 Copyright 2020-2023 Moddable Tech, Inc.<BR>
-Revised: October 11, 2023
+改訂： 2023年10月11日
 
-Mods are scripts that users can install on their IoT products to add new features and change existing behaviors. A mod is one or more JavaScript modules together with assets like images, audio, and certificates. A mod augments the software of a product without changing the factory installed firmware. To minimize safety, security, and privacy risks, products may sandbox mods using Secure ECMAScript (aka Hardened JavaScript). Mods are a new core feature of the Moddable SDK supported by the XS JavaScript engine.
+modsは、新しい機能を追加したり既存の挙動を変更したりするために、ユーザーがIoT製品にインストールできるスクリプトです。modは、画像、オーディオ、証明書などのアセットとともに、1つ以上のJavaScriptモジュールで構成されます。modは、工場でインストールされたファームウェアを変更することなく、製品のソフトウェアを拡張します。安全性、セキュリティ、およびプライバシーのリスクを最小限に抑えるために、製品はSecure ECMAScript（別名Hardened JavaScript）を使用してmodsをサンドボックス化することがあります。modsは、XS JavaScriptエンジンによってサポートされるModdable SDKの新しいコア機能です。
 
-Mods are simple to create but the technology behind them is complex. This article introduces the fundamentals of mods, how to create mods, and how to implement support for running mods in projects. Mods run on microcontrollers with constrained resources which in turn puts constraints on mods. This article describes some of these limitations to help authors of mods and mod hosts make the best tradeoffs for their projects.
+modsの作成は簡単ですが、その背後にある技術は複雑です。この記事では、modsの基本、modsの作成方法、およびプロジェクトでmodsを実行するためのサポートを実装する方法について紹介します。modsはリソースが制約されたマイクロコントローラーで実行されるため、modsにも制約があります。この記事では、これらの制限について説明し、modsの作者とmodホストがプロジェクトに最適なトレードオフを行うのに役立ちます。
 
-## Key Characteristics of Mods
+## modsの主な特徴
 
-Mods are a tool to extend the capabilities of IoT products. It is rare today for an IoT product to support extensions, and when they do it is through native code. Using JavaScript as the foundation for mods not only makes it feasible to support extensibility in many more products, it empowers many more users to do so.
+modsは、IoT製品の機能を拡張するためのツールです。現在、IoT製品が拡張をサポートしていることは稀であり、サポートしている場合でもネイティブコードを通じて行われます。modsの基盤としてJavaScriptを使用することは、多くの製品で拡張性をサポートすることを実現可能にし、より多くのユーザーがそれを行うことを可能にします。
 
-- **Mods are portable** - The JavaScript language was designed from the start to be independent of both the host operating system and the host hardware. The Moddable SDK follows that by providing APIs that are consistent across devices.  This portability is critical so that developers can use their knowledge and experience across devices from many different manufacturers, rather than needing to learn new development tools, a new language, and new APIs for each IoT product.
-- **Mods are standard** - IoT products are built using standards -- from standard electrical connectors to standard Wi-Fi -- to ensure they are reliable, safe, and can interoperate with products from different manufacturers. Mods follow this proven pattern by using modern industry-standard JavaScript (ECMAScript 2020) as their programming language. Moddable is helping to standardize APIs for IoT products through the Ecma TC53 committee, ECMAScript Modules for Embedded Systems.
-- **Mods are secure** - IoT products control physical devices in the real world. It is essential that they are safe and secure when running mods. The Moddable SDK achieves this using Compartments, a sandboxing method from Secure ECMAScript. Compartments allow a mod host to control when a mod runs and the capabilities a mod has access to. This allows a mod host to set a security policy, for example, that allows a mod to control a light bulb at only certain times of day and to only communicate with certain trusted cloud services. Secure ECMAScript guarantees the mod cannot break out of the security rules.
-- **Mods are lightweight** - Because memory and storage are often limited on IoT products, mods must be able to do useful work with a minimum of resources. Because mods are installed as precompiled byte code, they are ready to run immediately and their byte-code executes in place from flash storage without having to be loaded into memory. Many useful mods require just a few KB of code to do useful work.
-- **Mods add value** - Users of IoT products inevitably demand more features than the product manufacturer is willing or able to implement. Mods solve this problem by allowing users and third party software developers to extend the built-in software of the product to add new features, to support additional cloud connectivity, to add new device integrations, to provide a custom user interface, and more.
-- **Mods simplify products** - IoT products continue to support more features to meet the needs of various customer segments. This proliferation of features makes products more difficult to use, more difficult to implement, and much more difficult to test and validate before shipping. Mods simplify products by allowing a manufacturer to build-in only the core features and allowing users to install mods for the features they use.
+- **modsはポータブルです** - JavaScript言語は、最初からホストのオペレーティングシステムやホストハードウェアに依存しないように設計されています。Moddable SDKは、デバイス間で一貫したAPIを提供することでこれを実現しています。このポータビリティは、開発者が新しい開発ツールや新しい言語、新しいAPIを学ぶ必要なく、多くの異なるメーカーのデバイスで知識と経験を活用できるようにするために重要です。
+- **modsは標準です** - IoT製品は、信頼性が高く、安全であり、異なるメーカーの製品と相互運用できるようにするために、標準的な電気コネクタから標準的なWi-Fiまで、標準を使用して構築されます。modsは、プログラミング言語として現代の業界標準であるJavaScript（ECMAScript 2020）を使用することで、この実証済みのパターンに従います。Moddableは、Ecma TC53委員会を通じて、組み込みシステム用のECMAScriptモジュールの標準化を支援しています。
+- **modsは安全です** - IoT製品は現実世界の物理デバイスを制御します。modsを実行する際には、それらが安全・安心であることが不可欠です。Moddable SDKは、Secure ECMAScriptからのサンドボックス化方法であるCompartmentsを使用してこれを実現します。Compartmentsは、modホストがmodが実行されるタイミングとmodがアクセスできる機能を制御することを可能にします。これにより、modホストはセキュリティポリシーを設定できます。たとえば、modが特定の時間帯にのみ電球を制御し、特定の信頼できるクラウドサービスとのみ通信することを許可します。Secure ECMAScriptは、modがセキュリティルールから抜け出すことができないことを保証します。
+- **modsは軽量です** - IoT製品のメモリとストレージはしばしば限られているため、modsは最小限のリソースで有用な作業を行うことができなければなりません。modsは事前にコンパイルされたバイトコードとしてインストールされるため、すぐに実行可能であり、そのバイトコードはメモリにロードされることなくフラッシュストレージからその場で実行されます。多くの有用なmodsは、有用な作業を行うためにわずか数KBのコードを必要とします。
+- **modsは価値を加えます** - IoT製品のユーザーは、製品メーカーが実装する意志がない、または実装できない機能を必然的に要求します。modsは、ユーザーやサードパーティのソフトウェア開発者が製品の組み込みソフトウェアを拡張して新機能を追加し、追加のクラウド接続をサポートし、新しいデバイス統合を追加し、カスタムユーザーインターフェースを提供することを可能にすることで、この問題を解決します。
+- **modsは製品を簡素化します** - IoT製品はさまざまな顧客セグメントのニーズに応えるために、より多くの機能をサポートし続けています。この機能の増加は、製品の使用を難しくし、実装を困難にし、出荷前にテストおよび検証をはるかに困難にします。modsは、メーカーがコア機能のみを組み込むことを可能にし、ユーザーが使用する機能のmodsをインストールすることで製品を簡素化します。
 
-## Anatomy of a Mod
-A mod is made up of three parts: the JavaScript source code, any data assets it needs, and a manifest to describe how to build it. Each of these three parts works in about the same way as they do when building full projects in the Moddable SDK.
+## modの構造
+modは、JavaScriptソースコード、必要なデータアセット、そしてそれを構築する方法を記述するマニフェストの3つの部分で構成されています。これらの3つの部分は、Moddable SDKで完全なプロジェクトを構築するときとほぼ同じ方法で機能します。
 
-### JavaScript Source Code
-A mod can contain several JavaScript source code files. Each source code file is a standard JavaScript module. The modules may be imported by the mod host and by the mod itself.
+### JavaScriptソースコード
+modには複数のJavaScriptソースコードファイルを含むことができます。各ソースコードファイルは標準的なJavaScriptモジュールです。これらのモジュールは、modホストやmod自体によってインポートされることがあります。
 
-Mods are not automatically run when the system starts. There may not even be a `main.js` file. Instead, the mod host decides which modules to run and when. For example, a mod host that uses mods to render a screen saver might load and run the mod's `screensaver.js` module only when the system is idle.
+modはシステムが起動すると自動的に実行されるわけではありません。`main.js`ファイルが存在しないこともあります。代わりに、modホストがどのモジュールをいつ実行するかを決定します。例えば、スクリーンセーバーを表示するためにmodを使用するmodホストは、システムがアイドル状態のときにのみmodの`screensaver.js`モジュールをロードして実行するかもしれません。
 
-A mod may use any features of the JavaScript language that are available. Because of storage constraints, the mod host may choose to omit certain JavaScript language features that it determines are not essential for its operation. If a mod attempts to use a language feature that is unavailable, XS throws a "dead strip" error. Mod hosts should be able to support full JavaScript on many common low-cost microcontrollers (such as the ESP32). The limitations are necessary on microcontrollers with constrained flash storage (such as the Silicon Labs Gecko parts) or limited flash address space (such as the ESP8266 which typically has a 4 MB flash chip but only a 1 MB address space to access it).
+modは、利用可能なJavaScript言語の任意の機能を使用することができます。ストレージの制約のため、modホストは操作に不可欠でないと判断したJavaScript言語の特定の機能を省略することを選択するかもしれません。もしmodが利用できない言語機能を使用しようとすると、XSは「dead strip」エラーを投げます。modホストは、多くの一般的な低コストマイクロコントローラ（ESP32など）で完全なJavaScriptをサポートできるはずです。制約が必要なのは、フラッシュストレージが限られているマイクロコントローラ（Silicon LabsのGeckoパーツなど）やフラッシュアドレス空間が限られているマイクロコントローラ（通常は4 MBのフラッシュチップを持つが、アクセス可能なアドレス空間は1 MBのみのESP8266など）です。
 
-### Data and Assets
-Mods can contain data in addition to code. A mod that displays a user interface can contain the images, fonts, and sounds it needs. A mod that connects to a network service can include TLS certificates as data. Mods can also contain text or binary data, such as calibration data, that it needs.
+### データとアセット
+modにはコードだけでなくデータも含まれることがあります。ユーザーインターフェースを表示するmodには、必要な画像、フォント、音声が含まれている場合があります。ネットワークサービスに接続するmodには、データとしてTLS証明書を含むことができます。また、modには、キャリブレーションデータなどのテキストまたはバイナリデータも含まれることがあります。
 
-The mod's data is accessed using the `Resource` constructor, which allows the data to be used directly from flash storage without having to be loaded into memory.
+modのデータは、`Resource` コンストラクタを使用してアクセスされ、メモリにロードすることなく直接フラッシュストレージから使用できます。
 
-### Manifest
-A mod's manifest is a JSON file that describes the files used in the mod. The manifest is a subset of the full [manifest format](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md) used by the Moddable SDK, with only the `include`, `module`, `data`, `resource`, and `config` sections. The `build` and `platform` sections are also supported but rarely used.
+### マニフェスト
+modのマニフェストは、modで使用されるファイルを記述するJSONファイルです。マニフェストは、Moddable SDKで使用される[マニフェスト形式](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md)の完全なサブセットであり、`include`、`module`、`data`、`resource`、`config` セクションのみを含みます。`build` および `platform` セクションもサポートされていますが、あまり使用されません。
 
-A mod's manifest usually includes the manifest at [`$MODDABLE/examples/manifest_mod.json`](../../examples/manifest_mod.json) which contains settings required for building and deploying the mod, such as the connection speed to use to transfer the mod to the device.
+modのマニフェストには通常、ビルドおよびデプロイに必要な設定を含む [`$MODDABLE/examples/manifest_mod.json`](../../examples/manifest_mod.json) が含まれており、デバイスへのmodの転送に使用する接続速度などが含まれています。
 
-### Example Mod
-This section shows modules, data, and manifest of a simple mod.
+### modの例
+このセクションでは、シンプルなmodのモジュール、データ、マニフェストを示します。
 
-There is just one module, which imports data from a resource and traces its content to the console together with the version number of the mod.
+モジュールは1つだけで、リソースからデータをインポートし、その内容とmodのバージョン番号をコンソールに出力します。
 
 ```js
 import Resource from "Resource";
@@ -51,13 +51,13 @@ trace(String.fromArrayBuffer(message), "\n");
 trace(`Software version ${config.version}\n`);
 ```
 
-The mod contains a single data file, a text file with a short message.
+このmodには、短いメッセージが書かれたテキストファイルのデータファイルが1つ含まれています。
 
 ```
 Hello, mod.
 ```
 
-The manifest tells the build system to include these two files.
+マニフェストは、これら2つのファイルをビルドシステムに含めるように指示します。
 
 ```json
 {
@@ -78,18 +78,18 @@ The manifest tells the build system to include these two files.
 }
 ```
 
-> **Note**: If there are no `"config"` values, either in the manifest or on the command line, then the "mod/config" module is not created.
+> **注**: マニフェストまたはコマンドラインに `"config"` 値がない場合、"mod/config" モジュールは作成されません。
 
-## Building, Running, and Debugging a Mod
-A mod is built and run using the `mcrun` command line tool from the Moddable SDK. The `mcrun` tool is very similar to `mcconfig` which builds full hosts that include native code.
+## modのビルド、実行、デバッグ
+modは、Moddable SDKの `mcrun` コマンドラインツールを使用してビルドおよび実行されます。`mcrun` ツールは、ネイティブコードを含む完全なホストをビルドする `mcconfig` と非常に似ています。
 
-To build and run the example mod above, set the current working directory to the mod and then execute `mcrun`:
+上記の例のmodをビルドして実行するには、modのディレクトリを現在の作業ディレクトリに設定し、次のように `mcrun` を実行します：
 
 ```
 mcrun -d -m
 ```
 
-The output from a successful build looks as follows:
+成功したビルドの出力は次のようになります：
 
 ```
 > mcrun -d -m
@@ -100,26 +100,26 @@ The output from a successful build looks as follows:
 # xsl mc.xsa
 ```
 
-When building for the desktop, the mod is automatically opened in the simulator. However, the mod cannot run by itself because it requires a mod host. The mod host is launched first using `mcconfig` and then the mod is launched using `mcrun`. A simple mod host is introduced below.
+デスクトップ用にビルドする場合、modは自動的にシミュレータで開かれます。しかし、modは単独では実行できません。これはmodホストが必要だからです。modホストは最初に `mcconfig` を使用して起動され、その後 `mcrun` を使用してmodが起動されます。以下に簡単なmodホストを紹介します。
 
-You can use `mcrun` to build and install the mod on a microcontroller by specifying the target platform with the `-p` option in the same way as `mcconfig`.
+`mcrun` を使用して、`-p` オプションでターゲットプラットフォームを指定することにより、マイクロコントローラにmodをビルドしてインストールすることができます。
 
 ```
 mcrun -d -m -p esp32/moddable_two
 ```
 
-For `mcrun` to install the mod, a debug build of a mod host must first be installed on the device. The mod host must be a debug build because `mcrun` installs the mod using the xsbug debugger protocol. Mods can also run on a release build of a mod host but must be installed in some other way ([this discussion](https://github.com/Moddable-OpenSource/moddable/discussions/1105) shows one way to do this on the ESP32 silicon family).
+`mcrun` がmodをインストールするためには、まずデバイスにmodホストのデバッグビルドがインストールされている必要があります。`mcrun` はxsbugデバッガープロトコルを使用してmodをインストールするため、modホストはデバッグビルドでなければなりません。modはmodホストのリリースビルドでも実行できますが、別の方法でインストールする必要があります（この方法は[この議論](https://github.com/Moddable-OpenSource/moddable/discussions/1105)でESP32シリコンファミリーについて説明されています）。
 
-Once the mod is installed, `mcrun` automatically restarts the microcontroller and connects to xsbug to debug the mod.
+modがインストールされると、`mcrun` は自動的にマイクロコントローラを再起動し、xsbugに接続してmodのデバッグを行います。
 
-## Hosting a Mod
-Adding support for mods to a project is straightforward. It requires some additional configuration and adding code to invoke the mod. Beyond that, it may be necessary to adjust some of the default settings. This section describes the fundamental steps to hosting a mod and advanced configuration options.
+## mod のホスティング
+プロジェクトにmodのサポートを追加することは簡単です。追加の設定とmodを呼び出すコードの追加が必要です。それ以外に、デフォルト設定の調整が必要な場合もあります。このセクションでは、modのホスティングの基本的な手順と高度な設定オプションについて説明します。
 
-### A Simple Mod Host
-This section shows the essential steps for creating a mod host.
+### シンプルな mod ホスト
+このセクションでは、modホストを作成するための基本的な手順を示します。
 
-#### Manifest
-The commonly used manifests in the Moddable SDK, such as [`manifest_base.json`](https://github.com/Moddable-OpenSource/moddable/blob/public/examples/manifest_base.json), do not enable support for mods because supporting mods requires some additional code. Only projects that actually use mods should include that code. To enable mods, add `XS_MODS` to the `defines` section of the project's manifest.
+#### マニフェスト
+Moddable SDKで一般的に使用されるマニフェスト、例えば [`manifest_base.json`](https://github.com/Moddable-OpenSource/moddable/blob/public/examples/manifest_base.json) は、modのサポートには追加のコードが必要なため、modのサポートを有効にしていません。実際にmodを使用するプロジェクトのみがそのコードを含めるべきです。modを有効にするには、プロジェクトのマニフェストの `defines` セクションに `XS_MODS` を追加します。
 
 ```
 "defines": {
@@ -127,14 +127,14 @@ The commonly used manifests in the Moddable SDK, such as [`manifest_base.json`](
 },
 ```
 
-#### Checking For Installed Mods
-A mod host may want to check if a mod is installed before attempting to load it. To do that use the `Modules` module, a utility module for working with mods. First, import the `Modules` module:
+#### インストールされた mod の確認
+modホストは、modをロードする前にmodがインストールされているかどうかを確認することが望ましいかもしれません。それを行うには、modを扱うためのユーティリティモジュールである `Modules` モジュールを使用します。まず、`Modules` モジュールをインポートします：
 
 ```js
 import Modules from "modules";
 ```
 
-Add the manifest for the `Modules` module to your project manifest:
+プロジェクトマニフェストに `Modules` モジュールのマニフェストを追加します：
 
 ```
 "include": [
@@ -142,26 +142,26 @@ Add the manifest for the `Modules` module to your project manifest:
 ]
 ```
 
-Then use the static `has` method to check if a given module is available. The following code determines if the module "mod" from the example above is installed:
+次に、静的な `has` メソッドを使用して、特定のモジュールが利用可能かどうかを確認します。以下のコードは、上記の例のモジュール "mod" がインストールされているかどうかを判定します：
 
 ```js
 if (Modules.has("mod"))
 	trace("mod installed\n");
 ```
 
-The `has` function does not load or execute the mod. It only checks for its presence.
+`has` 関数は、modをロードまたは実行しません。その存在のみを確認します。
 
-#### Running a Mod
-The `Modules` module can load and run a module within a mod.
+#### modの実行
+`Modules` モジュールは、mod内でモジュールをロードして実行することができます。
 
 ```js
 if (Modules.has("mod"))
 	Modules.importNow("mod");
 ```
 
-The `importNow` function loads the module and executes the module's body, similar to calling dynamic `import`, though `importNow` is synchronous.
+`importNow` 関数はモジュールをロードし、モジュールの本体を実行します。これは動的な `import` を呼び出すのと似ていますが、`importNow` は同期的です。
 
-The `importNow` function returns the module's default export. Consider the following mod that exports several functions through its default export.
+`importNow` 関数はモジュールのデフォルトエクスポートを返します。以下のmodがデフォルトエクスポートを通じていくつかの関数をエクスポートすることを考えてみましょう。
 
 ```js
 export default {
@@ -173,17 +173,17 @@ export default {
 	}
 };
 ```
-The mod host loads the mod at start-up and calls `onLaunch` for the mod to initialize itself.
+modホストは起動時にmodをロードし、modが自身を初期化するために `onLaunch` を呼び出します。
 
 ```js
 const mod = Modules.importNow("mod");
 mod.onLaunch();
 ```
 
-The mod host invokes the other functions at the appropriate time, `onLightOn` when the light is turned on, `onLightOff` and when it is turned off.
+modホストは適切なタイミングで他の関数を呼び出します。`onLightOn`はライトが点灯したとき、`onLightOff`は消灯したときです。
 
-### Checking Compatibility at Runtime
-Each mod can have a module named `check` which contains a function to verify that the mod is compatible with the current host. By default the `check` module is created automatically by `mcrun` to verify that any graphics in the mod are compatible with the current host. It is a good practice to invoke the `check` module, when present, before any other. The `check` module exports a function that throws an exception if it finds an incompatibility.
+### 実行時の互換性の確認
+各modには、現在のホストとの互換性を検証する関数を含む`check`という名前のモジュールがあります。デフォルトでは、`check`モジュールは`mcrun`によって自動的に作成され、modのグラフィックスが現在のホストと互換性があるかどうかを検証します。存在する場合、他のどのモジュールよりも先に`check`モジュールを呼び出すことが良い習慣です。`check`モジュールは、非互換性を見つけた場合に例外を投げる関数をエクスポートします。
 
 ```js
 if (Modules.has("check")) {
@@ -197,14 +197,14 @@ if (Modules.has("check")) {
 }
 ```
 
-If the pixel format is set to `"x"`, the `check` module is not generated by `mcrun`. To set the pixel format, use `-f x` on the command line when invoking `mcrun` or set `"format"` in the `"config"` section of the mod's manifest.  
+ピクセルフォーマットが`"x"`に設定されている場合、`check`モジュールは`mcrun`によって生成されません。ピクセルフォーマットを設定するには、`mcrun`を呼び出す際のコマンドラインで`-f x`を使用するか、modのマニフェストの`"config"`セクションで`"format"`を設定します。
 
-### Keys
-The dynamic nature of the JavaScript language means that the JavaScript engine needs to keep track of all properties names used by the virtual machine. XS does this using a key array. The [`preload`](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/xs/preload.md) feature used for building hosts for microcontrollers stores all the host's property names into a key array in flash storage.
+### キー
+JavaScript言語の動的な性質は、JavaScriptエンジンが仮想マシンで使用されるすべてのプロパティ名を追跡する必要があります。XSはこれをキーアレイを使用して行います。マイクロコントローラー用のホストを構築するために使用される[`preload`](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/xs/preload.md)機能は、ホストのすべてのプロパティ名をフラッシュストレージのキーアレイに保存します。
 
-At launch, XS creates a second array to store keys created at runtime. This array has an initial allocation size and then grows in increments as needed. 
+起動時に、XSはランタイムで作成されたキーを格納するための第二の配列を作成します。この配列は初期割り当てサイズを持ち、必要に応じて増分で拡大します。
 
-Mods, however, may create many more symbols because they can contain code with many property names that do not appear in the host. To accommodate this, a  project can adjust the initial length of the runtime key array in the `"creation"` section of the manifest. 
+しかし、modsはホストに現れない多くのプロパティ名を含むコードを含むことができるため、より多くのシンボルを作成する可能性があります。これに対応するために、プロジェクトはマニフェストの`"creation"`セクションでランタイムキーアレイの初期長を調整することができます。
 
 ```
 "creation": {
@@ -215,22 +215,22 @@ Mods, however, may create many more symbols because they can contain code with m
 }
 ```
 
-Each entry in the key array is a pointer, which is 4 bytes on a 32-bit microcontroller. The 128 key table above uses 512 bytes of memory.
+キーアレイの各エントリはポインタであり、32ビットマイクロコントローラ上では4バイトです。上記の128キーテーブルはメモリの512バイトを使用します。
 
-The instruments pane in xsbug displays the number of keys allocated in the runtime key array in the "Keys Used" section. Monitoring this value can help select an optimal initial length for the runtime key array.
+xsbugのインストゥルメントペインは、"Keys Used"セクションでランタイムキーアレイに割り当てられたキーの数を表示します。この値を監視することで、ランタイムキーアレイの最適な初期長を選択するのに役立ちます。
 
-### JavaScript Language Features
-The default behavior of the Moddable SDK build tools is to remove any JavaScript language features that are not used by the host modules. This process reduces the size of the engine, saving flash storage space and speeding installation time.
+### JavaScript言語機能
+Moddable SDKビルドツールのデフォルトの動作は、ホストモジュールによって使用されていないJavaScript言語機能を削除することです。このプロセスはエンジンのサイズを削減し、フラッシュストレージのスペースを節約し、インストール時間を速めます。
 
-The XS linker is able to safely strip unused language features by analyzing the byte code of the project's modules. The linker cannot, however, analyze the byte code of mods, which are only installed after the host is running.
+XSリンカーは、プロジェクトのモジュールのバイトコードを分析することによって、使用されていない言語機能を安全に削除することができます。ただし、リンカーはホストが実行された後にのみインストールされるmodsのバイトコードを分析することはできません。
 
-A mod host can use the manifest to control which language features are available instead of allowing the XS linker to perform automatic stripping. The simplest approach is to keep all language features. For projects with no flash storage pressure, this is a viable option. Add a `strip` object with an empty strip array to the project manifest:
+modホストは、XSリンカーに自動削除を行わせる代わりに、マニフェストを使用して利用可能な言語機能を制御することができます。最も簡単なアプローチは、すべての言語機能を保持することです。フラッシュストレージの逼迫がないプロジェクトにとっては、これは実行可能なオプションです。プロジェクトマニフェストに空のstrip配列を持つ`strip`オブジェクトを追加します：
 
 ```
 "strip": []
 ```
 
-A mod host may reduce its flash storage size by explicitly stripping selected features. This is done by naming the constructors and functions to strip.  The following strip array removes features seldom used on constrained microcontrollers, such as `eval`, maps and sets, atomics, shared array buffers, regular expressions, and proxies.
+modホストは、選択した機能を明示的に削除することによって、フラッシュストレージのサイズを減らすことができます。これは、削除するコンストラクタと関数を命名することによって行われます。次のstrip配列は、`eval`、MapとSet、Atomics、SharedArrayBuffer、RegExp、およびProxyなど、制約のあるマイクロコントローラでめったに使用されない機能を削除します。
 
 ```
 "strip": [
@@ -249,21 +249,21 @@ A mod host may reduce its flash storage size by explicitly stripping selected fe
 ]
 ```
 
-For additional details on stripping language features, see the [Strip](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md#strip) section of the manifest documentation.
+言語機能の削除の詳細については、マニフェストドキュメントの[Strip](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md#strip)セクションを参照してください。
 
-When a mod uses a JavaScript language feature that has been stripped, a "dead strip" exception is generated and the virtual machine terminates execution.
+modが削除されたJavaScript言語機能を使用すると、「dead strip」例外が生成され、仮想マシンは実行を終了します。
 
-### Securing a Mod
-Mods are powerful because they have access to the same modules and global variables as the host. This means that a mod is likely able to perform all of the same operations as the host. For a simple host that only prepares an environment for the mod to run in, this is not a problem.  However, some hosts want to limit what a mod can do to ensure the integrity of operation of the host. These IoT product hosts want to ensure that the mod can only perform those operations the host chooses to allow.
+### modの保護
+modは、ホストと同じモジュールやグローバル変数にアクセスできるため、強力です。これは、modがホストと同じ操作を行う可能性が高いことを意味します。modを実行するための環境を準備するだけのシンプルなホストの場合、これは問題ではありません。しかし、一部のホストは、ホストの操作の完全性を確保するために、modができることを制限したいと考えています。これらのIoT製品のホストは、ホストが許可する操作のみをmodが実行できるようにしたいと考えています。
 
-Restricting a script from access to certain capabilities is common. Every web browser ensures the integrity of the user's computer by restricting scripts in many ways. For example, scripts cannot normally access the user's file system.
+スクリプトが特定の機能へのアクセスを制限することは一般的です。すべてのWebブラウザは、多くの方法でスクリプトを制限することにより、ユーザーのコンピュータの完全性を保証します。たとえば、スクリプトは通常、ユーザーのファイルシステムにアクセスすることはできません。
 
-Using Secure ECMAScript, a mod host can restrict the capabilities available to a mod, just as a browser does for the scripts it hosts. This restriction is accomplished using Secure ECMAScript (SES), a proposed enhancement to the JavaScript language that is already implemented in XS. SES restricts the modules of a mod by loading them into a `Compartment`, a lightweight sandbox inside the current JavaScript virtual machine.
+Secure ECMAScriptを使用すると、modホストはブラウザがホストするスクリプトに対して行うのと同じように、modが利用できる機能を制限できます。この制限は、Secure ECMAScript（SES）を使用して行われます。SESは、提案されているJavaScript言語の拡張であり、すでにXSで実装されています。SESは、現在のJavaScript仮想マシン内の軽量サンドボックスである`Compartment`にmodのモジュールをロードすることにより、制限を行います。
 
-The following sections show simple examples of how SES gives mod hosts the ability to restrict the capabilities a mod may access and how SES eliminates certain attacks.
+以下のセクションでは、SESがmodホストにmodがアクセスできる機能を制限する能力をどのように与えるか、またSESが特定の攻撃を排除する方法についての簡単な例を示しています。
 
-#### Restricting Module Access
-The following code creates a compartment and loads the mod's "mod' module into the compartment.
+#### モジュールアクセスの制限
+次のコードはCompartmentを作成し、そのCompartmentにmodの "mod" モジュールをロードします。
 
 ```js
 let c = new Compartment(
@@ -275,13 +275,13 @@ let c = new Compartment(
 let exports = c.importNow("mod");
 ```
 
-The first argument to the `Compartment` constructor relates to global variables inside the compartment and is described in the following section. The second argument is the compartment's module map. It performs two functions. First, it determines which modules are available to be imported by scripts running inside the compartment. Second, it allows remapping module specifiers to change how a module is accessed inside the compartment.
+`Compartment` コンストラクターへの最初の引数はCompartment内のグローバル変数に関連しており、次のセクションで説明されます。2番目の引数はCompartmentのモジュールマップです。これは2つの機能を果たします。まず、Compartment内で実行されるスクリプトによってインポート可能なモジュールを決定します。次に、Compartment内でモジュールがアクセスされる方法を変更するためにモジュール指定子をリマッピングします。
 
-The module map above allows only the module named "mod" to be imported inside the compartment. There is no remapping of module specifiers. The property name on the left ("mod") is the module specifier inside the compartment and the value on the right (also "mod") is the module specified in the host.
+上記のモジュールマップは、Compartment内で "mod" という名前のモジュールのみをインポートすることを許可します。モジュール指定子のリマッピングはありません。左側のプロパティ名（"mod"）はCompartment内のモジュール指定子であり、右側の値（同じく "mod"）はホストで指定されたモジュールです。
 
-The call to the `importNow` method loads the module "mod" inside of compartment `c`. Because of the module map, the mod cannot import any of the modules from the host. If it tries to do so, the import fails as if the module is not present.
+`importNow` メソッドの呼び出しは、Compartment `c` 内でモジュール "mod" をロードします。モジュールマップのため、modはホストのモジュールをインポートすることができません。もし試みた場合、モジュールが存在しないかのようにインポートは失敗します。
 
-The compartment map below is changed to use remapping.
+以下のCompartmentマップは、リマッピングを使用するように変更されています。
 
 ```js
 let c = new Compartment(
@@ -293,12 +293,12 @@ let c = new Compartment(
 let exports = c.importNow("modExample");
 ```
 
-Remapping is useful for giving the mod access to a limited version of an existing module. For example, a host may wish to give a mod access to the HTTP client module but wants to restrict the domains to which the HTTP client can connect. The host contains the unrestricted HTTP module ("http") and a restricted version ("httpRestricted"). The host would use the unrestricted version for its requests. It would provide the mod the restricted version, remapping its module specifier to "http" inside the compartment so that the mod can use the HTTP client module by importing "http".
+リマッピングは、既存のモジュールの限定版をmodにアクセスさせるために役立ちます。例えば、ホストはmodにHTTPクライアントモジュールへのアクセスを許可したいが、HTTPクライアントが接続できるドメインを制限したい場合があります。ホストは制限のないHTTPモジュール ("http") と制限されたバージョン ("httpRestricted") を持っています。ホストは自身のリクエストに制限のないバージョンを使用します。そして、Compartment内でモジュール指定子を "http" にリマッピングすることにより、modがHTTPクライアントモジュールを "http" をインポートすることによって使用できるように制限版を提供します。
 
-#### Separate Globals
-Projects often store important data and objects in global variables for convenient access. These globals may provide access to capabilities or private information that the mod host wishes to keep from the mod. Without SES, the global variables are available to mods. When SES creates a new compartment, the compartment receives its own set of global variables that are separate from the globals of the mod host. The compartment's global variables contain only the globals defined by the JavaScript language.
+#### 別々のグローバル変数 {/*examples*/}
+プロジェクトはしばしば重要なデータやオブジェクトを便利なアクセスのためにグローバル変数に保存します。これらのグローバル変数は、能力やプライベート情報へのアクセスを提供するかもしれませんが、modホストはmodからこれらを隠したいと考えています。SESがなければ、グローバル変数はmodに利用可能です。SESが新しいCompartmentを作成すると、そのCompartmentはmodホストのグローバル変数とは別の自身のグローバル変数セットを受け取ります。Compartmentのグローバル変数には、JavaScript言語によって定義されたグローバル変数のみが含まれます。
 
-In the following code, the global variable "secret" is unavailable to the mod.
+次のコードでは、グローバル変数「secret」はmodに利用できません。
 
 ```js
 globalThis.secret = new Secret;
@@ -311,7 +311,7 @@ let c = new Compartment(
 let exports = c.importNow("modExample");
 ```
 
-The first argument to the compartment constructor is a map of additional globals to add to the compartment when it is created. In the following code, the `secret` global is made available to the mod as a global variable with the name `sharedSecret`:
+Compartmentコンストラクターへの最初の引数は、作成時にCompartmentに追加する追加のグローバルのマップです。次のコードでは、`secret` グローバルが `sharedSecret` という名前のグローバル変数としてmodに利用可能になります：
 
 ```js
 globalThis.secret = new Secret;
@@ -326,7 +326,7 @@ let c = new Compartment(
 let exports = c.importNow("modExample");
 ```
 
-The compartment instance `c` has a `globalThis` property which the mod host can use to access the globals of the compartment. The previous example may be rewritten using the compartment's `globalThis` property.
+Compartmentインスタンス `c` は `globalThis` プロパティを持っており、modホストはCompartmentのグローバルにアクセスするために使用できます。前の例は、Compartmentの `globalThis` プロパティを使用して書き直すことができます。
 
 ```js
 globalThis.secret = new Secret;
@@ -339,10 +339,10 @@ c.globalThis.sharedSecret = globalThis.secret;
 let exports = c.importNow("modExample");
 ```
 
-The mod host can access and update the globals of the compartment at any time. This is a powerful capability that should be used with care to avoid creating an unpredictable execution environment for the mod.
+modホストは、いつでもCompartmentのグローバルにアクセスして更新することができます。これは強力な機能であり、modの実行環境を予測不可能にしないように注意して使用する必要があります。
 
-#### Mod Cannot Intercept Mod Host Calls
-Those with JavaScript experience might expect that a mod could interfere with the operation of the mod host through clever patching of the built-in primordial objects like `Object`, `Function`, and `Array`. For example, the following intercepts every call to push on `Array` instances.
+#### modはmodホストの呼び出しを傍受できません
+JavaScriptの経験がある人なら、`Object`、`Function`、`Array` などの組み込み原始オブジェクトの巧妙なパッチを通じてmodがmodホストの操作に干渉できると期待するかもしれません。例えば、次の例は `Array` インスタンスへのすべてのpush呼び出しを傍受します。
 
 ```js
 const originalPush = Array.prototype.push;
@@ -355,51 +355,51 @@ Array.prototype.push = function(...elements) {
 }
 ```
 
-This kind of global patch of built-in objects is called a [monkey patch](https://en.wikipedia.org/wiki/Monkey_patch). It is a technique that allows one script to attack another. In SES, this kind of attack is not possible through the primordial objects because they are frozen, making it impossible to change existing properties. If a script running in a compartment attempts to replace the `push` function, an exception is thrown.
+この種の組み込みオブジェクトへのグローバルパッチは[モンキーパッチ](https://en.wikipedia.org/wiki/Monkey_patch)と呼ばれています。これは、あるスクリプトが別のスクリプトを攻撃することを可能にする技術です。SESでは、原始的なオブジェクトがフリーズされているため、既存のプロパティを変更することは不可能で、この種の攻撃は不可能です。Compartment内で実行されているスクリプトが`push`関数を置き換えようとすると、例外が投げられます。
 
-## Behind the Scenes
-Mods are easy to use, which makes it easy to overlook the many complex details involved in making them work. This section describes implementation details that may be important when working with mods.
+## 舞台裏
+modsは使いやすいため、それらを動作させるために関与する多くの複雑な詳細を見落としやすくなります。このセクションでは、modsを扱う際に重要になるかもしれない実装の詳細について説明します。
 
-### Building Mods
-`mcrun` converts the mod's JavaScript source code and data into a single binary file, an XS Archive (.xsa extension). The archive format is designed so JavaScript byte code executes directly from flash storage without having to be copied into memory.
+### modsのビルド
+`mcrun`は、modのJavaScriptソースコードとデータを単一のバイナリファイル、XSアーカイブ（.xsa拡張子）に変換します。アーカイブ形式は、フラッシュストレージから直接JavaScriptバイトコードが実行されるように設計されており、メモリにコピーする必要がありません。
 
-The JavaScript modules are precompiled to XS byte code, so no source code is deployed to the target device. This allows the device to begin executing the mod without needing to parse the JavaScript source code first.
+JavaScriptモジュールはXSバイトコードに事前コンパイルされるため、ソースコードはターゲットデバイスにデプロイされません。これにより、デバイスはJavaScriptソースコードを解析する必要なく、modの実行を開始できます。
 
-The image, font, and audio resources in the manifest are transformed to a format compatible with the target device following the manifest [resource rules](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md#resources).
+マニフェスト内の画像、フォント、およびオーディオリソースは、マニフェストの[リソースルール](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md#resources)に従って、対象デバイスと互換性のある形式に変換されます。
 
-While the source code to the mod is platform independent, the binary format of the mod is not. The pixel format and rotation of the images is optimized for a specific host, the XS byte code generated is for a specific version of the XS engine, etc. The archive is not a general purpose distribution format for mods.
+modのソースコードはプラットフォームに依存しないものの、modのバイナリ形式はプラットフォームに依存します。画像のピクセル形式や回転は特定のホストに最適化されており、生成されるXSバイトコードは特定のXSエンジンのバージョン用です等。アーカイブはmodの一般的な配布形式ではありません。
 
-The `mcrun` tool builds the mod without knowledge of the symbol table of the mod host. XS byte code references symbols by a 16-bit ID. When the mod is run by a mod host, XS automatically updates the symbol ID values in the mod's byte code so they match the host IDs. This process is very fast. The symbol IDs of the mod are only updated when the host changes, not on every run.
+`mcrun` ツールは、modホストのシンボルテーブルを知らずにmodをビルドします。XSバイトコードは16ビットIDでシンボルを参照します。modがmodホストによって実行されると、XSは自動的にmodのバイトコード内のシンボルID値を更新して、ホストのIDと一致させます。このプロセスは非常に高速です。modのシンボルIDはホストが変更されたときのみ更新され、毎回の実行時に更新されるわけではありません。
 
-### Interaction with Preload
-When a mod host loads a module, the mod is searched for the module before the host. This allows a mod to override modules of the host.
+### Preloadとの相互作用
+modホストがモジュールをロードするとき、ホストの前にmodがモジュールを検索します。これにより、modはホストのモジュールをオーバーライドすることができます。
 
-However, modules in the host that are preloaded have already completed their imports at build time. Therefore, the module imported by a preloaded module cannot be overridden by the modules of a mod.
+ただし、ホスト内のプリロードされたモジュールは、ビルド時にすでにそのインポートが完了しています。したがって、プリロードされたモジュールによってインポートされたモジュールは、modのモジュールによって上書きされることはできません。
 
-This does not generally cause any issues with the use of mods as extensions to a mod host. It does preclude the use of mods to deliver patches to modules in the host.
+これは一般的に、modホストへの拡張としてmodを使用する際に問題を引き起こすことはありません。ただし、ホスト内のモジュールにパッチを配布するためにmodを使用することはできません。
 
-### Where Mods are Stored
-Mods are stored in flash memory, but the location and size of the mod storage area depends on the host.
+### modの保存場所
+modはフラッシュメモリに保存されますが、modの保存領域の場所とサイズはホストによって異なります。
 
-Attempts to install a mod larger than the available space fail, so it is not possible to accidentally write outside the space reserved.
+利用可能なスペースよりも大きなmodをインストールしようとすると失敗するため、予約されたスペースの外に誤って書き込むことはありません。
 
 #### ESP32
-The ESP-IDF on the ESP32 supports a partition map, and the Moddable SDK uses it to reserve a partition for mods. In the default [`partitions.csv`](https://github.com/Moddable-OpenSource/moddable/blob/6729c9482b9186f3654d8b158f095451edb74e62/build/devices/esp32/xsProj/partitions.csv#L25) the mod partition is defined here:
+ESP32のESP-IDFはパーティションマップをサポートしており、Moddable SDKはmod用にパーティションを予約するためにそれを使用します。デフォルトの[`partitions.csv`](https://github.com/Moddable-OpenSource/moddable/blob/6729c9482b9186f3654d8b158f095451edb74e62/build/devices/esp32/xsProj/partitions.csv#L25)では、modパーティションはここで定義されています：
 
 ```
 xs,       0x40, 1,       0x3A0000, 0x040000,
 ```
 
-This reserves 256 KB of space for storing the mod. Moddable SDK projects for the ESP32 can use their own manifest to increase or decrease mod storage, or remove it if they do not support mods.
+この設定は、modを保存するために256 KBのスペースを予約します。ESP32用のModdable SDKプロジェクトは、独自のマニフェストを使用してmodの保存領域を増減させたり、modをサポートしていない場合はその領域を削除したりすることができます。
 
-#### ESP8266 and nRF52
-Storing mods on ESP8266 and nRF52 is more complex than ESP32 for two reasons. First, there are no formally defined partitions so the Moddable SDK must manage flash layout entirely. Second, the mod archive must be memory mapped to allow in-place execution, but the ESP8266 can only memory map the first 1 MB of flash and the nRF52 only has 1 MB of flash. This requires the mod archive be stored in the same 1 MB of space as the mod host.
+#### ESP8266とnRF52
+ESP8266とnRF52でのmodの保存は、ESP32よりも複雑です。その理由は2つあります。まず、正式に定義されたパーティションがないため、Moddable SDKはフラッシュレイアウトを完全に管理する必要があります。次に、modアーカイブはその場で実行を可能にするためにメモリマップされる必要がありますが、ESP8266はフラッシュの最初の1 MBのみをメモリマップでき、nRF52はフラッシュが1 MBしかありません。これにより、modアーカイブはmodホストと同じ1 MBのスペースに保存される必要があります。
 
-The Moddable SDK solves this problem by storing the mod starting at the first flash sector following the mod host image. This gives the largest possible space for mods on each host. However, it also means that address of the mod and the space available for the mod depends on the host.
+Moddable SDKは、この問題を解決するために、modホストイメージに続く最初のフラッシュセクターからmodの保存を開始します。これにより、各ホストで可能な限り大きなスペースをmodに提供します。しかし、これはまた、modのアドレスとmodに利用可能なスペースがホストに依存することを意味します。
 
-### XS Archive Format
+### XSアーカイブ形式
 
-The XS archive file format uses the Box (aka Atom) structuring mechanism of the [ISO Base Media File Format](https://www.loc.gov/preservation/digital/formats/fdd/fdd000079.shtml) to structure data. The atom structure of the XS archive file is shown in the following table:
+XSアーカイブファイル形式は、[ISO Base Media File Format](https://www.loc.gov/preservation/digital/formats/fdd/fdd000079.shtml)のBox（別名Atom）構造メカニズムを使用してデータを構造化します。XSアーカイブファイルのアトム構造は、次の表に示されています：
 
 ```
 XS_A - signature of the XS archive file
@@ -419,16 +419,16 @@ XS_A - signature of the XS archive file
         (Additional PATH / DATA pairs follow - one per piece of data]
 ```
 
-The order of the atoms that precedes the `MODS` atom must be as shown because the microcontroller implementation expects this layout.
+`MODS` アトムの前にあるアトムの順序は、マイクロコントローラの実装がこのレイアウトを期待しているため、示された通りでなければなりません。
 
-When loading the archive, XS iterates on the symbol table to build a mapped identifiers array. If the mapped identifiers array matches the `IDEN` atom, there is nothing else to do. Otherwise, the mapped identifiers table is written into the `IDEN` atom and XS traverses the `MAPS` and `CODE` atoms to map identifiers in the byte code, updating the CODE atoms accordingly.
+アーカイブをロードする際、XSはシンボルテーブルを反復処理して、マップされた識別子の配列を構築します。マップされた識別子の配列が `IDEN` アトムと一致する場合、それ以上の操作は必要ありません。そうでない場合、マップされた識別子テーブルは `IDEN` アトムに書き込まれ、XSは `MAPS` および `CODE` アトムをトラバースして、バイトコード内の識別子をマップし、CODEアトムをそれに応じて更新します。
 
-#### About the Box / Atom structuring mechanism
+#### ボックス / アトム構造化メカニズムについて
 
-The atom structuring mechanism is a lightweight way of structuring binary data.
+アトム構造化メカニズムは、バイナリデータを構造化する軽量な方法です。
 
-Each atom begins with an 8 byte header consisting of two 32-bit big-endian values. The first value is an unsigned integer that indicates the size of the atom, including the header, in bytes.  The second value is a [four-character code](https://en.wikipedia.org/wiki/FourCC), typically consisting of human-readable ASCII values, that indentifies the content of the atom. For example, for the sole atom at the root of an XS archive file, the first value is the length of the file in bytes and the second value is `XS_A` indicating an atom containing an XS archive.
+各アトムは、2つの32ビットのビッグエンディアン値からなる8バイトのヘッダーで始まります。最初の値は、ヘッダーを含むアトムのサイズをバイト単位で示す符号なし整数です。2番目の値は、アトムの内容を識別する[four-character code](https://en.wikipedia.org/wiki/FourCC)で、通常は人間が読めるASCII値で構成されます。例えば、XSアーカイブファイルのルートにある唯一のアトムの場合、最初の値はファイルのバイト単位の長さであり、2番目の値は `XS_A` で、XSアーカイブを含むアトムを示します。
 
-Each atom may contain atoms and/or other data. The content of an atom is defined by its four-character code. For example, the `RSRC` atom above is defined to contain zero or more pairs of `PATH` and `DATA` atoms, whereas the `NAME` atom is defined to contain a null terminated string.
+各アトムは、他のデータおよび/または他のアトムを含むことができます。アトムの内容は、その4文字のコードによって定義されます。例えば、上記の`RSRC`アトムは、`PATH`と`DATA`のアトムのペアを0個以上含むように定義されていますが、`NAME`アトムはヌル終端文字列を含むように定義されています。
 
-File readers that do not recognize the four-character code of the atom can skip over the atom using the first value in the atom header. This approach allows new atoms to be introduced without breaking existing readers.
+アトムの4文字のコードを認識しないファイルリーダーは、アトムヘッダーの最初の値を使用してアトムをスキップすることができます。このアプローチにより、新しいアトムを導入しても既存のリーダーが壊れることはありません。
