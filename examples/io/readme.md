@@ -1,10 +1,10 @@
-# Moddable SDK - IO Examples
+# Moddable SDK - IO の例
 
-Copyright 2021 Moddable Tech, Inc.<BR>
-Revised: November 3, 2021
+著作権2021 Moddable Tech, Inc.<BR>
+改訂： 2021年11月3日
 
-These examples demonstrate how to use our experimental implementation of Ecma TC53, [ECMAScript Modules for Embedded Systems](https://ecmatc53.github.io/spec/web/spec.html).
+これらの例は、[組み込みシステム用のECMAScriptモジュール](https://ecmatc53.github.io/spec/web/spec.html)であるEcma TC53の実験的実装の使用方法を示しています。
 
-It is only implemented for the ESP8266 and ESP32 microcontrollers at this time.
+現時点では、ESP8266およびESP32マイクロコントローラーでのみ実装されています。
 
-For details about the implementation, see the [IO documentation](../../documentation/io/io.md).
+実装の詳細については、[IOのドキュメント](../../documentation/io/io.md)を参照してください。
