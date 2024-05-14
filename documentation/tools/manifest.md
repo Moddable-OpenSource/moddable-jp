@@ -1,17 +1,16 @@
-# Manifest
-Copyright 2017-2023 Moddable Tech, Inc.<BR>
-Revised: August 3, 2023
+# マニフェスト
+著作権2017-2023 Moddable Tech, Inc.<BR>
+改訂： 2023年8月3日
 
-A manifest is a JSON file that describes the modules and resources necessary to build a Moddable app. This document explains the properties of the JSON object and how manifests are processed by the Moddable SDK build tools.
+マニフェストは、Moddableアプリを構築するために必要なモジュールとリソースを記述するJSONファイルです。このドキュメントでは、JSONオブジェクトのプロパティと、マニフェストがModdable SDKビルドツールによってどのように処理されるかについて説明します。
 
+## 目次
 
-## Table of Contents
-
-* [Example](#example)
-* [Properties](#properties)
+* [サンプル](#example)
+* [プロパティ](#properties)
 	* [`build`](#build)
 	* [`include`](#include)
-		* [Including git repositories](#include-git)
+		* [gitリポジトリの含め方](#include-git)
 	* [`creation`](#creation)
 	* [`defines`](#defines)
 	* [`config`](#config)
@@ -21,14 +20,14 @@ A manifest is a JSON file that describes the modules and resources necessary to 
 	* [`resources`](#resources)
 	* [`data`](#data)
 	* [`platforms`](#platforms)
-		* [`subplatforms`](#subplatforms)
+		* [`サブプラットフォーム`](#subplatforms)
 	* [`bundle`](#bundle)
-* [How manifests are processed](#process)
+* [マニフェストの処理方法](#process)
 
 <a id="example"></a>
-## Example
+## 例
 
-As a simple example, consider the manifest of the [balls example app](../../examples/piu/balls). It is quite short:
+簡単な例として、[balls example app](../../examples/piu/balls)のマニフェストを考えてみましょう。これは非常に短いものです：
 
 ```json
 {
@@ -47,17 +46,17 @@ As a simple example, consider the manifest of the [balls example app](../../exam
 }
 ```
 
-The `include` array lists other manifests to include. This is a convenient way to use the same properties and modules across many applications because it eliminates the need for you to specify each individual property and module in every application's manifest.  For example, `manifest_base.json` is included in all of our example applications. It is used so that resource, instrumentation, time, and timer modules are included in the build for each application.
+`include` 配列は、含めるべき他のマニフェストをリストアップします。これは、各アプリケーションのマニフェストで個々のプロパティやモジュールを指定する必要をなくすため、多くのアプリケーションで同じプロパティやモジュールを使用する便利な方法です。例えば、`manifest_base.json`はすべてのサンプルアプリケーションに含まれています。これにより、resource、instrumentation、time、timerモジュールが各アプリケーションのビルドに含まれるようになります。
 
-The `modules` and `resources` objects list modules and resources that are specific to the balls app that should be included in the build. Here the `modules` object specifies that the `main.js` file located in the balls app directory should be included, and the `resources` object specifies that the `balls.png` image located in the balls app directory should be included.
+`modules` と `resources` オブジェクトは、ビルドに含めるべきballsアプリ固有のモジュールとリソースをリストアップします。ここで `modules` オブジェクトは、ballsアプリディレクトリにある `main.js` ファイルを含めるべきであると指定し、`resources` オブジェクトは、ballsアプリディレクトリにある `balls.png` 画像を含めるべきであると指定します。
 
 <a id="properties"></a>
-## Properties
+## プロパティ
 
 <a id="build"></a>
 ### `build`
 
-The `build` object defines the environment variables used to build paths in other paths in the manifest. Notice that the manifest can access shell environment variables like `MODDABLE`.
+`build` オブジェクトは、マニフェストの他のパスで使用される環境変数を定義します。マニフェストは `MODDABLE` のようなシェル環境変数にアクセスできることに注意してください。
 
 ```json
 "build": {
@@ -68,7 +67,7 @@ The `build` object defines the environment variables used to build paths in othe
 }
 ```
 
-When you build an application, the default output directory name is taken from the directory name containing the manifest. You can specify a different output directory name by specifying a `NAME` environment variable in the `build` object.
+アプリケーションをビルドするとき、デフォルトの出力ディレクトリ名はマニフェストを含むディレクトリの名前から取られます。`build` オブジェクトで `NAME` 環境変数を指定することにより、異なる出力ディレクトリ名を指定することができます。
 
 ```json
 "build": {
@@ -76,26 +75,26 @@ When you build an application, the default output directory name is taken from t
 }
 ```
 
-#### ESP32-specific environment variables
+#### ESP32固有の環境変数
 
-The `esp32` platform object supports a number of optional environment variables applications can use to customize the Moddable SDK build for ESP32 devices:
+`esp32` プラットフォームオブジェクトは、ESP32デバイスのModdable SDKビルドをカスタマイズするためにアプリケーションが使用できるいくつかのオプショナルな環境変数をサポートしています：
 
-| Variable | Description |
+| 変数 | 説明 |
 | --- | :--- |
-| `ESP32_SUBCLASS` | If a device other than the `esp32`, set `esp32s2`, `esp32s3`, `esp32c3`, `esp32c6`, or `esp32h2`
-| `SDKCONFIGPATH` | Pathname to a directory containing custom [sdkconfig defaults](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html#custom-sdkconfig-defaults) entries.
-| `PARTITIONS_FILE` | Pathname to a [partition table](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/partition-tables.html) in CSV format.
-| `BOOTLOADERPATH` | Pathname to a directory containing a custom [ESP-IDF bootloader component](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/bootloader.html#custom-bootloader).
-| `C_FLAGS_SUBPLATFORM` | C compiler flags to use when compiling Moddable SDK sources.
-| `USE_USB` | Configure the device to use the USB port for programming and debugging.
+| `ESP32_SUBCLASS` | `esp32`以外のデバイスの場合、`esp32s2`、`esp32s3`、`esp32c3`、`esp32c6`、または`esp32h2`を設定
+| `SDKCONFIGPATH` | カスタム [sdkconfig defaults](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html#custom-sdkconfig-defaults) エントリを含むディレクトリへのパス名。
+| `PARTITIONS_FILE` | CSV形式の[パーティションテーブル](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/partition-tables.html)へのパス名。
+| `BOOTLOADERPATH` | カスタム [ESP-IDF ブートローダーコンポーネント](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/bootloader.html#custom-bootloader) を含むディレクトリへのパス名。
+| `C_FLAGS_SUBPLATFORM` | Moddable SDKソースをコンパイルする際に使用するCコンパイラフラグ。
+| `USE_USB` | プログラミングおよびデバッグ用にUSBポートを使用するようにデバイスを設定。
 
-> Note: This document does not cover native code ESP32 and ESP-IDF build details. Refer to the [ESP-IDF documentation](https://docs.espressif.com/projects/esp-idf/en/v4.2/esp32/get-started/index.html) for additional information.
+> 注意: このドキュメントはネイティブコードESP32およびESP-IDFのビルドの詳細をカバーしていません。追加情報については、[ESP-IDFドキュメント](https://docs.espressif.com/projects/esp-idf/en/v4.2/esp32/get-started/index.html)を参照してください。
 
 #### `ESP32_SUBCLASS`
 
-The target ESP32 subclass for a build is specified using the `ESP32_SUBCLASS` property.
+ビルドの対象となるESP32サブクラスは、`ESP32_SUBCLASS` プロパティを使用して指定されます。
 
-Valid `ESP32_SUBCLASS`:
+有効な `ESP32_SUBCLASS`:
 |   |
 | :--- |
 | `esp32s2` |
@@ -104,7 +103,7 @@ Valid `ESP32_SUBCLASS`:
 | `esp32c6` |
 | `esp32h2` |
 
-The [modClock](https://github.com/Moddable-OpenSource/moddable/tree/public/contributed/modClock) example app leverages the `SDKCONFIGPATH` and `PARTITIONS_FILE` environment variables:
+[modClock](https://github.com/Moddable-OpenSource/moddable/tree/public/contributed/modClock) サンプルアプリは、`SDKCONFIGPATH` および `PARTITIONS_FILE` 環境変数を活用しています：
 
 ```json
 "build": {
@@ -113,9 +112,9 @@ The [modClock](https://github.com/Moddable-OpenSource/moddable/tree/public/contr
 },
 ```
 
-In this example, the modClock [partitions.csv](https://github.com/Moddable-OpenSource/moddable/blob/public/contributed/modClock/sdkconfig/partitions.csv) file completely replaces the base Moddable SDK [partitions.csv](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/partitions.csv) file at build time to provide additional partitions for OTA updates. The `sdkconfig` directory contains sdkconfig files that override and supplement the base Moddable SDK [sdkconfig.defaults](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/sdkconfig.defaults) entries. The following section describes how the Moddable ESP32 build processes sdkconfig files.
+この例では、modClockの [partitions.csv](https://github.com/Moddable-OpenSource/moddable/blob/public/contributed/modClock/sdkconfig/partitions.csv) ファイルがビルド時に基本のModdable SDK [partitions.csv](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/partitions.csv) ファイルを完全に置き換え、OTAアップデート用の追加パーティションを提供します。`sdkconfig` ディレクトリには、基本のModdable SDK [sdkconfig.defaults](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/sdkconfig.defaults) エントリを上書きおよび補完するsdkconfigファイルが含まれています。次のセクションでは、Moddable ESP32ビルドがsdkconfigファイルをどのように処理するかを説明します。
 
-The `C_FLAGS_SUBPLATFORM` environment variable is for use in manifests of subplatforms (and should not be used elsewhere). It allows compiler specific settings unique to a subplatform. For example, a subplatform using first generation ESP32 silicon with external PSRAM would enable the following settings to cause the compiler to generate code to work around the silicon bugs:
+`C_FLAGS_SUBPLATFORM` 環境変数は、サブプラットフォームのマニフェストで使用するためのものです（他の場所では使用しないでください）。これにより、サブプラットフォーム固有のコンパイラ設定を可能にします。例えば、初代ESP32シリコンを使用し、外部PSRAMが搭載されているサブプラットフォームでは、以下の設定を有効にして、シリコンのバグを回避するコードをコンパイラが生成するようにします：
 
 ```json
 "build": {
@@ -123,27 +122,27 @@ The `C_FLAGS_SUBPLATFORM` environment variable is for use in manifests of subpla
 },
 ```
 
-#### How partitions.csv is processed
-The [ESP-IDF partition table](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/partition-tables.html) must contain certain partitions to support certain features:
+#### partitions.csv の処理方法 {/*examples*/}
+[ESP-IDF パーティションテーブル](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/partition-tables.html)には、特定の機能をサポートするために特定のパーティションが含まれている必要があります：
 
-- [Mods](../xs/mods.md) requires a partition to store the mod's archive
-- Files requires a partition to store the file system
-- Over-the-Air (OTA) updates require two OTA app partitions plus an OTA Data partition
+- [Mods](../xs/mods.md) はmodのアーカイブを保存するパーティションが必要です
+- ファイルはファイルシステムを保存するパーティションが必要です
+- オーバー・ザ・エア（OTA）アップデートは、2つのOTAアプリパーティションとOTAデータパーティションが必要です
 
-The `mcconfig` tool can automatically modify the partition map to support these features. This simplifies development by eliminating the need to manually create a targeted partition table for projects. It makes optimal use of flash space, by only creating partitions for features that are used by the project.
+`mcconfig` ツールは、これらの機能をサポートするためにパーティションマップを自動的に変更することができます。これにより、プロジェクト用にターゲットパーティションテーブルを手動で作成する必要がなくなり、開発が簡素化されます。プロジェクトで使用される機能のみに対してパーティションを作成することで、フラッシュスペースを最適に利用します。
 
-The `mcconfig` tool creates new partitions by dividing the factory app partition based on the features used by the project. The default partition tables for Moddable SDK devices all have a single factory app partition and so support this feature of `mcconfig`.
+`mcconfig` ツールは、プロジェクトで使用される機能に基づいて、ファクトリーアプリパーティションを分割して新しいパーティションを作成します。Moddable SDKデバイスのデフォルトのパーティションテーブルはすべて、単一のファクトリーアプリパーティションを持っているため、この `mcconfig` の機能をサポートしています。
 
-To determine the features in-use, `mcconfig` checks the following manifest [defines](#defines). These defines are set in the manifests that require them, so it is usually unnecessary to set them in project manifests.
+使用する機能を決定するために、`mcconfig` は以下のマニフェスト [define](#defines) をチェックします。これらの定義はそれが必要なマニフェストで設定されるため、通常はプロジェクトマニフェストで設定する必要はありません。
 
-- Mods – if `XS_MODS` is set to a non-zero value, mods are considered to be in use
+- Mods – `XS_MODS` がゼロ以外の値に設定されている場合、modsが使用中と見なされます
 
 ```json
 "defines": {
 	"XS_MODS": 1
 }
 ```
-- Files - if `file partition` is set to the name of a partition, files are considered to be in use
+- Files - `file partition` がパーティションの名前に設定されている場合、ファイルが使用中と見なされます
 
 ```json
 "defines": {
@@ -152,7 +151,7 @@ To determine the features in-use, `mcconfig` checks the following manifest [defi
 	}
 }
 ```
-- OTA – if `ota autospilt` is set, OTA is considered to be in-use.
+- OTA – `ota autospilt` が設定されている場合、OTAが使用中と見なされます。
 
 ```json
 "defines": {
@@ -161,44 +160,42 @@ To determine the features in-use, `mcconfig` checks the following manifest [defi
 	}
 }
 ```
-If the partitions.csv file for the project includes a partition for these features, `mcconfig` does not automatically create the corresponding partition. For example, if a mods partition is defined in the partitions.csv file, `mcconfig` does not create one from the factory app partition.
+プロジェクトのpartitions.csvファイルにこれらの機能のパーティションが含まれている場合、`mcconfig` は対応するパーティションを自動的に作成しません。例えば、modsパーティションがpartitions.csvファイルで定義されている場合、`mcconfig` はファクトリーアプリパーティションからそれを作成しません。
 
-The partitions created have the following sizes. Options could be implemented in the future to configure these sizes.
+作成されたパーティションは以下のサイズを持っています。将来的にこれらのサイズを設定するオプションが実装される可能性があります。
 
 - Mods - 256 KB
 - Storage - 64 KB
-- OTA - 8 KB is reserved for the OTA Data partition required by the ESP-IDF. The space in the factory app partition not used for other partitions is divided into two OTA app partitions.
+- OTA - 8 KBはESP-IDFに必要なOTAデータパーティション用に予約されています。ファクトリーアプリパーティションの他のパーティションに使用されていないスペースは、2つのOTAアプリパーティションに分割されます。
 
-#### How sdkconfig files are processed
+#### sdkconfigファイルの処理方法 {#how-sdkconfig-files-are-processed}
 
-The Moddable SDK sdkconfig defaults files are located in the `$MODDABLE/build/devices/esp32/xsProj-esp32` and `$MODDABLE/build/devices/esp32/xsProj-esp32s2` directories for ESP32 and ESP32-S2, respectively. The `sdkconfig.defaults` ([ESP32](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/sdkconfig.defaults)/[ESP32-S2](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32s2/sdkconfig.defaults)) file is the base configuration file used by all ESP32/ESP32-S2 builds. Release and instrumented release builds merge additional configuration options, on top of the base `sdkconfig.defaults` file, from the `sdkconfig.defaults.release` ([ESP32](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/sdkconfig.defaults.release)/[ESP32-S2](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32s2/sdkconfig.defaults.release)) and `sdkconfig.inst` ([ESP32](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/sdkconfig.inst)/[ESP32-S2](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32s2/sdkconfig.inst)) files respectively. When merging, configuration options that exist in the base `sdkconfig.defaults` file are replaced and options that don't exist in the base `sdkconfig.defaults` file are added. The merge processing order is as follows:
+Moddable SDKのsdkconfigデフォルトファイルは、それぞれESP32とESP32-S2用に`$MODDABLE/build/devices/esp32/xsProj-esp32`および`$MODDABLE/build/devices/esp32/xsProj-esp32s2`ディレクトリに位置しています。`sdkconfig.defaults` ([ESP32](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/sdkconfig.defaults)/[ESP32-S2](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32s2/sdkconfig.defaults)) ファイルは、すべてのESP32/ESP32-S2ビルドに使用される基本設定ファイルです。リリースおよびリリースinstrumentedビルドは、基本の`sdkconfig.defaults`ファイルの上に追加の設定オプションをマージします。これは`sdkconfig.defaults.release` ([ESP32](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/sdkconfig.defaults.release)/[ESP32-S2](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32s2/sdkconfig.defaults.release)) および`sdkconfig.inst` ([ESP32](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/sdkconfig.inst)/[ESP32-S2](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32s2/sdkconfig.inst)) ファイルから行われます。マージ時に、基本の`sdkconfig.defaults`ファイルに存在する設定オプションは置き換えられ、基本の`sdkconfig.defaults`ファイルに存在しないオプションは追加されます。マージ処理の順序は以下の通りです：
 
-1. All base `sdkconfig.defaults` options are applied to the build.
-2. On release builds, the `sdkconfig.defaults.release` options are merged.
-3. On release instrumented builds, the `sdkconfig.inst` options are merged.
+1. すべての基本的な `sdkconfig.defaults` オプションがビルドに適用されます。
+2. リリースビルドでは、`sdkconfig.defaults.release` オプションがマージされます。
+3. リリースinstrumentedビルドでは、`sdkconfig.inst` オプションがマージされます。
 
-	When applications specify optional sdkconfig files using the `SDKCONFIGPATH` manifest environment variable, the merge processing additionally includes the following:
+	アプリケーションが `SDKCONFIGPATH` マニフェスト環境変数を使用してオプショナルなsdkconfigファイルを指定する場合、マージ処理には以下が含まれます：
 
-4. The application `$(SDKCONFIGPATH)/sdkconfig.defaults` options, when provided, are merged.
-5. On release builds, the application `$(SDKCONFIGPATH)/sdkconfig.defaults.release` options, when provided,  are merged.
-6. On release instrumented builds, the application `$(SDKCONFIGPATH)/sdkconfig.inst` options, when provided, are merged.
+4. 提供されている場合、アプリケーションの `$(SDKCONFIGPATH)/sdkconfig.defaults` オプションがマージされます。
+5. リリースビルドでは、提供されている場合、アプリケーションの `$(SDKCONFIGPATH)/sdkconfig.defaults.release` オプションがマージされます。
+6. リリースinstrumentedビルドでは、提供されている場合、アプリケーションの `$(SDKCONFIGPATH)/sdkconfig.inst` オプションがマージされます。
 
 ### `USE_USB`
 
-Some ESP32 devices support USB directly instead of using a USB-to-serial chip to program. For example, the `esp32-s2`, `esp32-s3` and `esp32-c3` class devices. The `esp32` does not support USB.
+一部のESP32デバイスは、USB-to-serialチップを使用する代わりに直接USBをサポートしています。例えば、`esp32-s2`、`esp32-s3`、`esp32-c3` クラスのデバイスです。`esp32` はUSBをサポートしていません。
 
-1. `esp32-s2` devices support TinyUSB. Set `"USE_USB": "1"`.
-2. `esp32-s3` devices support both TinyUSB and JTAG-CDC. Set `"USE_USB"` to either `1` for TinyUSB or `2` for JTAG-CDC.
-3. `esp32c3` devices support JTAG-CDC. Set `"USE_USB": "2"`.
-
-
+1. `esp32-s2` デバイスはTinyUSBをサポートします。`"USE_USB": "1"` を設定します。
+2. `esp32-s3` デバイスはTinyUSBとJTAG-CDCの両方をサポートします。`"USE_USB"` を `1` に設定するとTinyUSB、`2` に設定するとJTAG-CDCになります。
+3. `esp32c3` デバイスはJTAG-CDCをサポートします。`"USE_USB": "2"` を設定します。
 
 ***
 
 <a id="include"></a>
 ### `include`
 
-The `include` array lists other manifests to include. It's often convenient to include other manifests to avoid repeating common properties in every manifest. For example, the [`bmp280` example](../../examples/drivers/bmp280) includes `manifest_base.json` and the manifest for the BMP280 temperature/barometric pressure sensor:
+`include` 配列は、含めるべき他のマニフェストをリストアップします。共通のプロパティをすべてのマニフェストで繰り返さないように、他のマニフェストを含めることがよく便利です。例えば、[`bmp280` の例](../../examples/drivers/bmp280)では `manifest_base.json` とBMP280温度/気圧センサーのマニフェストが含まれています：
 
 ```json
 "include": [
@@ -207,30 +204,30 @@ The `include` array lists other manifests to include. It's often convenient to i
 ]
 ```
 
-Each example application in the Moddable SDK includes at least one of the manifests in the [examples directory](../../examples/).
+Moddable SDKの各サンプルアプリケーションは、[examples directory](../../examples/) のマニフェストの少なくとも1つを含んでいます。
 
-- `manifest_base.json` is included by each of our example applications. It includes resource, instrumentation, time, and timer modules. It also includes a `creation` object that works for many applications. The [`creation` object](#creation) is covered in more detail later in this document.
+- `manifest_base.json` は、私たちのサンプルアプリケーションのそれぞれによって含まれています。これにはresource、instrumentation、time、timerが含まれています。また、多くのアプリケーションで機能する `creation` オブジェクトも含まれています。[`creation` オブジェクト](#creation)については、このドキュメントの後ほど詳しく説明されています。
 
-- `manifest_commodetto.json` is for applications that use the [Commodetto graphics library](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/commodetto.md) directly.
+- `manifest_commodetto.json` は、[Commodettoグラフィックライブラリ](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/commodetto.md) を直接使用するアプリケーション用です。
 
-- `manifest_net.json` is for applications that use Wi-Fi. It includes Socket, Net, SNTP, and Wi-Fi modules. It does not include specific networking protocols like HTTP and MQTT.
+- `manifest_net.json` はWi-Fiを使用するアプリケーション用です。Socket、Net、SNTP、Wi-Fiモジュールが含まれています。HTTPやMQTTなどの特定のネットワークプロトコルは含まれていません。
 
-- `manifest_piu.json` is for applications that use the [Piu application framework](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md). It includes all the modules needed to use Piu. The screen and touch drivers are provided elsewhere, typically by the manifest of the target device itself, to keep the Piu manifest device independent.
+- `manifest_piu.json` は [Piu アプリケーションフレームワーク](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md) を使用するアプリケーション用です。Piuを使用するために必要なすべてのモジュールが含まれています。スクリーンとタッチドライバーは、Piuマニフェストをデバイスに依存しないようにするため、通常は対象デバイス自体のマニフェストによって提供されます。
 
-Several touch, display, and sensor [drivers](../../modules/drivers) and some [networking modules](../../modules/network) also have manifests to make it easier to incorporate them into your projects.
+いくつかのタッチ、ディスプレイ、センサー[ドライバー](../../modules/drivers)および一部の[ネットワークモジュール](../../modules/network)も、プロジェクトに簡単に組み込むためのマニフェストを持っています。
 
 <a id="include-git"></a>
-#### Including Git Repositories
-A manifest may directly include git repositories. The repositories are cloned as part of the build process and stored with the project's temporary build files.
+#### Git リポジトリの含め方
+マニフェストは直接Gitリポジトリを含めることができます。リポジトリはビルドプロセスの一部としてクローンされ、プロジェクトの一時的なビルドファイルと共に保存されます。
 
-> **Note**: This feature is experimental. While the intent is to keep the manifest JSON as-is for including git repositories, changes may be made based on feedback from experience using the feature.
+> **注**: この機能は実験的です。Git リポジトリを含めるためにマニフェスト JSON をそのまま保持する意図ですが、この機能を使用する経験からのフィードバックに基づいて変更が行われる可能性があります。
 
-Each git repository to fetch is specified by an object in the `include` array of a manifest:
+各gitリポジトリの取得は、マニフェストの`include`配列に指定されたオブジェクトによって指定されます：
 
-- The object must have a `"git"` property, which is the git URL of the repo.
-- The object can have an `"include"` property, which is the path of the manifest to include.
+- オブジェクトには、リポのgit URLを示す`"git"`プロパティが必要です。
+- オブジェクトには、含めるマニフェストのパスを示す`"include"`プロパティがあることができます。
 
-The default value of the `"include"` property is `"manifest.json"`. The `"include"` property can also be an array of paths in order to include several manifests from the same repository.
+`"include"`プロパティのデフォルト値は`"manifest.json"`です。`"include"`プロパティは、同じリポジトリから複数のマニフェストを含めるために、パスの配列も可能です。
 
 ```json
 {
@@ -256,9 +253,9 @@ The default value of the `"include"` property is `"manifest.json"`. The `"includ
 }
 ```
 
-When processing a manifest, **mcconfig** and **mcrun** clone or pull the repositories into the `repos` directory in the project's temporary build files.
+マニフェストを処理する際、**mcconfig** と **mcrun** はリポジトリをプロジェクトの一時ビルドファイル内の`repos`ディレクトリにクローンまたはプルします。
 
-Specific branches and tags are accessed using the optional `branch` and `tag` properties:
+特定のブランチやタグは、オプショナルな`branch`および`tag`プロパティを使用してアクセスされます：
 
 ```json
     {
@@ -276,16 +273,16 @@ Specific branches and tags are accessed using the optional `branch` and `tag` pr
 	},
 ```
 
-The hostname, pathname. branch, and tag are included in the path where the cloned repositories are stored to avoid conflicts.
+ホスト名、パス名、ブランチ、およびタグは、クローンされたリポジトリが保存されるパスに含まれており、競合を避けます。
 
-> **Note**: Cloned repositories are deleted when the project is cleaned (`mcconfig -d -m -t clean`). Therefore, the cloned repositories should not be edited.
+> **注記**: クローンされたリポジトリはプロジェクトがクリーンされたときに削除されます（`mcconfig -d -m -t clean`）。したがって、クローンされたリポジトリは編集すべきではありません。
 
 ***
 
 <a id="creation"></a>
 ### `creation`
 
-The `creation` object defines the creation parameters of the XS machine that will run the application. The values used in `manifest_base.json` work for many applications, including the vast majority of example applications in the Moddable SDK.
+`creation` オブジェクトは、アプリケーションを実行するXSマシンの作成パラメータを定義します。`manifest_base.json` で使用される値は、Moddable SDKのほとんどの例のアプリケーションを含む多くのアプリケーションで機能します。
 
 ```json
 "creation": {
@@ -309,50 +306,50 @@ The `creation` object defines the creation parameters of the XS machine that wil
 },
 ```
 
-These values correspond to machine allocation values [described](../xs/XS%20in%20C.md#machine-allocation) in the XS in C documentation (the sole exception is the `main` property, which is the module specifier of the module to load following the [set-up phase](../base/setup.md)). Take care when changing these values as configuring them improperly can result in an unstable or unusable system. Bigger values are not always better, especially on devices with limited resources.
+これらの値は、XS in Cのドキュメントで[説明されている](../xs/XS%20in%20C.md#machine-allocation)マシン割り当てに対応しています（唯一の例外は、[設定フェーズ](../base/setup.md)に続いてロードするモジュールのモジュール指定子である `main` プロパティです）。これらの値を変更する際は注意が必要で、不適切に設定すると不安定または使用不能なシステムになる可能性があります。特にリソースが限られているデバイスでは、大きな値が常に良いとは限りません。
 
-#### `static` memory allocations
-The `static` property is the most important for microcontrollers. It is the total number of bytes that can be used by the JavaScript language runtime, including the stack, objects, byte-code, strings, etc. It is allocated as a single block of memory to minimize bookkeeping overhead and to allow the runtime to dynamically manage areas for fixed size slots and variable sized chunks. The `static` property also imposes a strict limit on the memory allocated by the language runtime to guarantee that scripts cannot exceed their memory budget (if they could, a script could take memory required by the host OS leading to failures and instabilities).
+#### `static` メモリ割り当て
+`static` プロパティはマイクロコントローラにとって最も重要です。これは、スタック、オブジェクト、バイトコード、文字列など、JavaScript言語ランタイムが使用できるバイト数の合計です。ブックキーピングのオーバーヘッドを最小限に抑え、ランタイムが固定サイズのスロットと可変サイズのチャンクの領域を動的に管理できるように、単一のメモリブロックとして割り当てられます。`static` プロパティは、言語ランタイムによって割り当てられるメモリに厳格な制限を課し、スクリプトがメモリ予算を超過しないことを保証します（もし超過できると、スクリプトがホストOSに必要なメモリを取ってしまい、障害や不安定性を引き起こす可能性があります）。
 
-The `static` property is ignored by the simulator. The simulator falls back to on-demand memory allocation. Since computers have nearly infinite memory compared to microcontrollers, this isn't a problem.
+`static` プロパティはシミュレーターでは無視されます。シミュレーターはオンデマンドのメモリ割り当てにフォールバックします。コンピュータはマイクロコントローラに比べてほぼ無限のメモリを持っているため、これは問題ではありません。
 
-There are some situations where the `static` allocation technique of dynamically managing a single block of memory isn't the optimal choice. The first is on microcontrollers where RAM is divided across two or more discontiguous address ranges (the ESP32 is a common example). In this case, using a single block of memory for the virtual machine prevents it from using some of the available RAM. The second is when the application has been carefully tuned to work with specific sized slot and chunk pools. Done correctly, such tuning can improve performance by reducing the frequency of garbage collections, particularly at launch. For these situations, do the following:
+いくつかの状況では、動的に単一のメモリブロックを管理する `static` 割り当て技術が最適な選択ではありません。最初の例は、RAMが2つ以上の非連続なアドレス範囲に分割されているマイクロコントローラ上です（ESP32が一般的な例です）。この場合、仮想マシンのために単一のメモリブロックを使用すると、利用可能なRAMの一部を使用できなくなります。2つ目は、アプリケーションが特定のサイズのスロットとチャンクプールで動作するように慎重に調整されている場合です。正しく行われたこの調整は、特に起動時にガベージコレクションの頻度を減らすことでパフォーマンスを向上させることができます。これらの状況では、以下の手順を実行してください：
 
-- Set the `static` property to `0` to disable the static allocator. (It is not enough to delete the property as the `static` property may be defined in an included manifest)
-- Set the `chunk` `initial` property to the size of the the chunk heap in bytes
-- Set the `heap` `initial` property to the number of slots (on a 32-bit MCU, each slot is 16 bytes)
-- Set the `chunk` `incremental` and `heap` `incremental` properties to `0`. (this prevents the slot and chunk heaps from growing beyond their initial allocations)
+- `static` プロパティを `0` に設定して、静的アロケータを無効にします。（プロパティを削除するだけでは不十分です。`static` プロパティはインクルードされたマニフェストで定義されている可能性があります）
+- `chunk` の `initial` プロパティをチャンクヒープのサイズ（バイト単位）に設定します
+- `heap` の `initial` プロパティをスロットの数に設定します（32ビットMCUでは、各スロットは16バイトです）
+- `chunk` の `incremental` と `heap` の `incremental` プロパティを `0` に設定します。（これにより、スロットとチャンクヒープが初期割り当てを超えて拡大するのを防ぎます）
 
-Using this approach, the memory allocator on the microcontroller allocates the following:
+このアプローチを使用すると、マイクロコントローラのメモリアロケータは以下を割り当てます：
 
-- one memory block for the stack (the stack must be contiguous)
-- one memory block for chunks (this eliminates memory lost to chunk fragmentation and allows allocating the largest possible blocks from JavaScript)
-- one or more memory blocks for the slot heap
+- スタック用のメモリブロック（スタックは連続している必要があります）
+- チャンク用のメモリブロック（これによりチャンクの断片化によるメモリの損失がなくなり、JavaScriptから可能な限り大きなブロックを割り当てることができます）
+- スロットヒープ用の1つ以上のメモリブロック
 
-> **Note**: The microcontroller runtime could be enhanced to allocate the chunk heap across multiple memory blocks; to-date this has not been necessary. The chunk heap is allocated before the stack and slot heap, allowing it to allocate the largest possible contiguous free block.
+> **注記**: マイクロコントローラのランタイムは、チャンクヒープを複数のメモリブロックにわたって割り当てるように強化される可能性がありますが、これまでのところ必要はありませんでした。チャンクヒープはスタックとスロットヒープの前に割り当てられ、可能な限り大きな連続した空きブロックを割り当てることができます。
 
 #### `keys`
-the VM allocates space for `keys.initial` runtime keys when the VM is initialized. For embedded projects, this number should be small as most keys are allocated when building, not at runtime. To prevent more keys than this being allocated at runtime, set `keys.incremental` to `0`. To allow additional keys to be allocated, provide a non-zero value for `keys.incremental`.
+VMは初期化時に `keys.initial` ランタイムキーのスペースを割り当てます。組み込みプロジェクトの場合、この数は少なくすべきです。ほとんどのキーはビルド時に割り当てられ、ランタイムでは割り当てられません。ランタイムでこれ以上のキーが割り当てられるのを防ぐために、`keys.incremental` を `0` に設定します。追加のキーを割り当てることを許可するには、`keys.incremental` に非ゼロの値を提供します。
 
-The `keys` property previously contained an `available` property for the total number of keys that could be allocated at runtime. If `keys.initial` is not provided, the value of `keys.available` is used with `keys.incremental` of `0`.
+`keys` プロパティには以前、ランタイムで割り当て可能なキーの総数を示す `available` プロパティが含まれていました。`keys.initial` が提供されていない場合、`keys.available` の値が `keys.incremental` の `0` と共に使用されます。
 
 ***
 
 <a id="defines"></a>
 ### `defines`
 
-The `defines` object creates a set of C language #define preprocessor statements. It is designed to configure the C language implementation of hardware drivers.
+`defines` オブジェクトは、C言語の #defineプリプロセッサステートメントのセットを作成します。これは、ハードウェアドライバのC言語実装を設定するために設計されています。
 
-The `defines` object is explained more fully in the [defines document](../tools/defines.md).
+`defines` オブジェクトについては、[defines ドキュメント](../tools/defines.md)でより詳しく説明されています。
 
 ***
 
 <a id="config"></a>
 ### `config`
 
-The `config` object contains values that are accessible to the application's scripts.
+`config` オブジェクトには、アプリケーションのスクリプトからアクセス可能な値が含まれています。
 
-It is commonly used in the manifests of target platforms to specify the screen driver, touch driver, and default rotation. These properties are used by [Commodetto](../commodetto/commodetto.md) and [Piu](../piu/piu.md) setup modules.
+これは一般的に、ターゲットプラットフォームのマニフェストでスクリーンドライバー、タッチドライバー、デフォルトの回転を指定するために使用されます。これらのプロパティは [Commodetto](../commodetto/commodetto.md) および [Piu](../piu/piu.md) のセットアップモジュールによって使用されます。
 
 ```json
 "config": {
@@ -362,9 +359,9 @@ It is commonly used in the manifests of target platforms to specify the screen d
 }
 ```
 
-It is also used in the [files manifest](../../modules/files/file/manifest.json) to specify the file system root for each platform, some networking examples to specify Wi-Fi credentials, and more.
+また、[files manifest](../../modules/files/file/manifest.json)で各プラットフォームのファイルシステムのルートを指定したり 、いくつかのネットワーキングの例でWi-Fi認証情報を指定したりするためにも使用されます。
 
-To access the `config` object in an application's scripts, import it. For example:
+アプリケーションのスクリプトで `config` オブジェクトにアクセスするには、それをインポートします。例えば：
 
 ```js
 import config from "mc/config";
@@ -375,28 +372,28 @@ if (!config.ssid) {
 }
 ```
 
-The `config` object in the `mc/config` module is frozen, preventing its values from being changed at runtime.
+`mc/config` モジュールの `config` オブジェクトは凍結されており、実行時にその値を変更することはできません。
 
-The content of the `config` object may be overridden by adding key value pairs to the command line provided to `mcconfig`. See the Arguments section of the [Tools document](./tools.md#arguments) for details.
+`config` オブジェクトの内容は、`mcconfig` に提供されたコマンドラインにキーバリューペアを追加することで上書きされる場合があります。詳細は [toolドキュメント](./tools.md#arguments) の引数セクションを参照してください。
 
 ***
 
 <a id="strip"></a>
 ### `strip`
 
-Most applications do not use all built-in JavaScript language features. To save ROM, the XS linker can strip unused native code from the XS engine itself. For more information about the strip feature, see the **Strip unused features** section of the [XS Differences](../xs/XS%20Differences.md) document.
+ほとんどのアプリケーションは、すべての組み込みJavaScript言語機能を使用しません。ROMを節約するために、XSリンカーは使用されていないネイティブコードをXSエンジン自体から削除することができます。ストリップ機能の詳細については、[XS Differences](../xs/XS%20Differences.md) ドキュメントの **未使用の機能を削除する** セクションを参照してください。
 
-The `strip` object in a manifest is a string or array that specifies which built-in objects and functions of the JavaScript language can/should be removed by the XS linker.
+マニフェスト内の `strip` オブジェクトは、XSリンカーによって削除されるべきJavaScript言語の組み込みオブジェクトや関数を指定する文字列または配列です。
 
-- `"*"` means anything unused by the application can be stripped. This is the value used by `manifest_base.json`.
+- `"*"` はアプリケーションによって使用されていないものは何でも削除できることを意味します。これは `manifest_base.json` に使用される値です。
 
-	```json
-	"strip": "*",
-	```
+```json
+"strip": "*",
+```
 
-- If you only want certain objects or functions to be stripped, pass in an array of JavaScript class and function names. Items in the array will be stripped. Anything not included in the array will not be stripped.
+- 特定のオブジェクトや関数のみを削除したい場合は、JavaScriptのクラス名と関数名の配列を渡します。配列内の項目が削除されます。配列に含まれていないものは削除されません。
 
-	The following strips the `RegExp` class, `eval` function, and the two `Array` reduce functions.
+	以下の例では、`RegExp` クラス、`eval` 関数、および2つの `Array` reduce関数が削除されます。
 
 	```json
 	"strip": [
@@ -407,9 +404,9 @@ The `strip` object in a manifest is a string or array that specifies which built
 	]
 	```
 
-- You can also specify that specific items be stripped in addition to anything unused.
+- また、使用されていないものを全て削除する以外に、特定の項目を削除するよう指定することもできます。
 
-	The `"*"` means to strip everything unused. Because the two `Array` reduce functions are explicitly listed, they will also be stripped, whether or not they are used.
+	`"*"` は使用されていないものを全て削除することを意味します。2つの `Array` reduce関数は明示的にリストアップされているため、使用されているかどうかに関わらず削除されます。
 
 	```json
 	"strip": [
@@ -419,16 +416,16 @@ The `strip` object in a manifest is a string or array that specifies which built
 	]
 	```
 
-If an application attempts to use a class or function that has been stripped, it will throw a `dead strip!` error.
+アプリケーションが削除されたクラスや関数を使用しようとすると、`dead strip!` エラーが発生します。
 
 ***
 
 <a id="modules"></a>
 ### `modules`
 
-The `modules` object specifies which modules are included in the build. Every module used by an application must be listed in the `modules` object.
+`modules` オブジェクトは、ビルドに含まれるモジュールを指定します。アプリケーションによって使用されるすべてのモジュールは、`modules` オブジェクトにリストされていなければなりません。
 
-The `*` parameter of the `modules` object is an array of paths.
+`modules` オブジェクトの `*` パラメータは、パスの配列です。
 
 ```json
 "modules": {
@@ -439,13 +436,13 @@ The `*` parameter of the `modules` object is an array of paths.
 },
 ```
 
-These modules are imported into other script modules using the file name.
+これらのモジュールは、ファイル名を使用して他のスクリプトモジュールにインポートされます。
 
 ```js
 import ASSETS from "assets"
 ```
 
-If you want to use a different name with the `import` statement, you can include additional key/value pairs to the `modules` object where the key is the new name and the value is the path to the file. For example:
+`import` ステートメントで異なる名前を使用したい場合は、`modules` オブジェクトに追加のキー/値ペアを含めることができます。キーは新しい名前で、値はファイルへのパスです。例えば：
 
 ```json
 "modules": {
@@ -456,7 +453,7 @@ If you want to use a different name with the `import` statement, you can include
 },
 ```
 
-These modules are imported into other script modules using the name given by the manifest.
+これらのモジュールは、マニフェストによって与えられた名前を使用して他のスクリプトモジュールにインポートされます。
 
 ```js
 import ASSETS from "newNameForAssets"
@@ -467,9 +464,9 @@ import ASSETS from "newNameForAssets"
 <a id="preload"></a>
 ### `preload`
 
-Preloading of modules is a unique feature of the XS JavaScript engine. Preloading executes parts of a JavaScript application during the the build process, before the application is downloaded to the target device. For more information about preloading, see the [preloading document](../xs/preload.md).
+XS JavaScriptエンジンのユニークな機能であるモジュールのプリロードについて説明します。プリロードは、アプリケーションがターゲットデバイスにダウンロードされる前のビルドプロセス中に、JavaScriptアプリケーションの一部を実行します。プリロードについての詳細は、[preloadingドキュメント](../xs/preload.md)を参照してください。
 
-The `preload` array in a manifest lists the modules preloaded in the read-only XS virtual machine that will be cloned to run the app. It is an array of module names, not paths to modules.
+マニフェストの `preload` 配列は、アプリを実行するためにクローンされる読み取り専用のXS仮想マシンでプリロードされるモジュールをリストアップします。これはモジュール名の配列であり、モジュールへのパスではありません。
 
 ```json
 "preload": [
@@ -481,15 +478,15 @@ The `preload` array in a manifest lists the modules preloaded in the read-only X
 ***
 
 <a id="resources"></a>
-### `resources`
+### `リソース`
 
-The `resources` object specifies which resources (image, font, and audio files) are included in the build.
+`resources` オブジェクトは、ビルドに含まれるリソース（画像、フォント、オーディオファイル）を指定します。
 
-#### Images
+#### 画像
 
-Image assets may be in the GIF, JPEG, and PNG image file formats.
+画像アセットは、GIF、JPEG、PNG画像ファイル形式である可能性があります。
 
-GIF and JPEG files should be included in the `*` array.
+GIFおよびJPEGファイルは `*` 配列に含めるべきです。
 
 ```json
 "resources":{
@@ -499,19 +496,19 @@ GIF and JPEG files should be included in the `*` array.
 },
 ```
 
-PNG files are converted by `png2bmp`. This converts them into BMP files that Moddable apps can use directly from flash storage. `png2bmp` can convert to alpha bitmaps and color bitmaps.
+PNGファイルは `png2bmp` によって変換されます。これにより、Moddableアプリがフラッシュストレージから直接使用できるBMPファイルに変換されます。`png2bmp` はアルファビットマップとカラービットマップに変換することができます。
 
-- Files listed in the `*` array will be converted to 8-bit alpha and 16-bit color bitmaps.
+- `*` 配列にリストされたファイルは、8ビットアルファと16ビットカラービットマップに変換されます。
 
-- Files listed in the `*-color` array will only be converted to 16-bit color bitmaps.
+- `*-color` 配列にリストされたファイルは、16ビットカラービットマップにのみ変換されます。
 
-- Files listed in the `*-alpha` array will only be converted to 8-bit alpha bitmaps.
+- `*-alpha` 配列にリストされたファイルは、8ビットアルファビットマップにのみ変換されます。
 
-- Files listed in the `*-mask` array will be converted to 4-bit alpha bitmaps.
+- `*-mask` 配列にリストされたファイルは、4ビットアルファビットマップに変換されます。
 
-#### Fonts
+#### フォント
 
-The Moddable SDK uses bitmap fonts. The metrics are provided by binary FNT files, the glyphs are provided by PNG files. The glyph files are converted like all other PNGs (using `png2bmp`) so you can include fonts in the `*`, `*-alpha`, `*-color`, or `*-mask` arrays.
+Moddable SDKはビットマップフォントを使用します。メトリックはバイナリFNTファイルによって提供され、グリフはPNGファイルによって提供されます。グリフファイルは他のPNGと同様に（`png2bmp` を使用して）変換されるため、`*`, `*-alpha`, `*-color`, `*-mask` 配列にフォントを含めることができます。
 
 ```json
 "resources":{
@@ -521,13 +518,13 @@ The Moddable SDK uses bitmap fonts. The metrics are provided by binary FNT files
 },
 ```
 
-For more information about creating fonts for Moddable applications, see the [font documentation](../commodetto/Creating%20fonts%20for%20Moddable%20applications.md).
+Moddableアプリケーション用のフォントを作成する方法についての詳細は、[fontドキュメント](../commodetto/Creating%20fonts%20for%20Moddable%20applications.md)を参照してください。
 
-#### Audio
+#### オーディオ
 
-The [`AudioOut` module](../pins/audioout.md) requires that audio be provided either as a MAUD audio resource or as raw audio samples. WAV files are automatically converted to the `maud` format using the `wav2maud` tool of the Moddable SDK, and compressed using IMA ADCPM.
+[`AudioOut` モジュール](../pins/audioout.md) では、オーディオはMAUDオーディオリソースまたは生のオーディオサンプルとして提供する必要があります。WAVファイルはModdable SDKの `wav2maud` ツールを使用して自動的に `maud` 形式に変換され、IMA ADCPMで圧縮されます。
 
-Wave audio files should be included in the `*` array.
+Waveオーディオファイルは `*` 配列に含めるべきです。
 
 ```json
 "resources":{
@@ -542,13 +539,13 @@ Wave audio files should be included in the `*` array.
 <a id="data"></a>
 ### `data`
 
-The `data` object specifies resources to be included in the build. Unlike resources in the `resources` object, resources specified in the `data` object are never transformed in any way by the Moddable SDK build tools. You can use the `data` object to include resources like TLS certificates and JSON files.
+`data` オブジェクトはビルドに含めるリソースを指定します。`resources` オブジェクトのリソースとは異なり、`data` オブジェクトで指定されたリソースはModdable SDKのビルドツールによって何らかの変換は行われません。TLS証明書やJSONファイルなどのリソースを含めるために `data` オブジェクトを使用できます。
 
-#### TLS Certificates
+#### TLS 証明書
 
-`SecureSocket` objects use TLS certificates in DER (binary) format. The certificate store is located in the `$MODDABLE/modules/crypt/data` directory, or you can include your own certificates. Any valid certificate in DER format will work.
+`SecureSocket` オブジェクトはDER（バイナリ）形式のTLS証明書を使用します。証明書ストアは `$MODDABLE/modules/crypt/data` ディレクトリに位置しているか、または自身の証明書を含めることができます。DER形式の有効な証明書であればどれでも機能します。
 
-TLS certificates should be included in the `*` array.
+TLS証明書は `*` 配列に含めるべきです。
 
 ```json
 "data":{
@@ -563,9 +560,9 @@ TLS certificates should be included in the `*` array.
 <a id="platforms"></a>
 ### `platforms`
 
-The `platforms` object allows you to specify properties that should only apply to specific platforms and subplatforms. The `platforms` object has one property for each platform or subplatform. Each property can have an `include` array, a `modules` object, a `preload` array, a `resources` object, a `defines` object, and a `recipes` object that will be used only when that platform is the goal of the build.
+`platforms` オブジェクトを使用すると、特定のプラットフォームおよびサブプラットフォームにのみ適用されるべきプロパティを指定できます。`platforms` オブジェクトには、各プラットフォームまたはサブプラットフォームごとに1つのプロパティがあります。各プロパティには、そのプラットフォームがビルドのターゲットである場合にのみ使用される `include` 配列、`modules` オブジェクト、`preload` 配列、`resources` オブジェクト、`defines` オブジェクト、および `recipes` オブジェクトを含めることができます。
 
-This is useful when the implementation of a module varies from platform to platform. For example, the `platforms` object below comes from the digital manifest. The implementation of GPIO requires the use of native code, and is different on each platform. This ensures that the correct modules are used for each target device.
+これは、モジュールの実装がプラットフォームごとに異なる場合に便利です。たとえば、以下の `platforms` オブジェクトはdigitalのマニフェストから来ています。GPIOの実装にはネイティブコードの使用が必要であり、プラットフォームごとに異なります。これにより、各ターゲットデバイスに対して正しいモジュールが使用されることを保証します。
 
 ```json
 "platforms": {
@@ -595,9 +592,9 @@ This is useful when the implementation of a module varies from platform to platf
 }
 ```
 
-The "`...`" platform identifier is a fallback for when no matching platform is found. This is useful for errors and warnings.
+"`...`" プラットフォーム識別子は、一致するプラットフォームが見つからない場合のフォールバックとして使用されます。これはエラーや警告に便利です。
 
-For example, if the `platforms` object of a manifest is as follows, building for the `esp` platform will not generate a warning/error, building for the `esp32` platform will generate a warning, and building for any other platform will generate an error.
+たとえば、マニフェストの `platforms` オブジェクトが以下のようである場合、`esp` プラットフォームでのビルドは警告/エラーを生成せず、`esp32` プラットフォームでのビルドは警告を生成し、他のプラットフォームでのビルドはエラーを生成します。
 
 ```json
 "platforms":{
@@ -615,11 +612,11 @@ For example, if the `platforms` object of a manifest is as follows, building for
 ```
 
 <a id="subplatforms"></a>
-#### Subplatforms
+#### サブプラットフォーム
 
-A subplatform is used to configure an application for the variations in a product family. They are useful when devices are similar and share much of the same configuration, but have slight differences.
+サブプラットフォームは、製品ファミリーのバリエーションに対してアプリケーションを設定するために使用されます。デバイスが似ていて多くの同じ設定を共有しているが、わずかな違いがある場合に便利です。
 
-For example, there are subplatforms for each Gecko device supported by the Moddable SDK. In the segment below, the `timer` module is specified for all `gecko` platforms. The `wakeup` pin is defined differently for the `gecko/giant` and `gecko/mighty` subplatforms.
+たとえば、Moddable SDKによってサポートされている各Geckoデバイスにはサブプラットフォームがあります。以下のセグメントでは、すべての `gecko` プラットフォームに対して `timer` モジュールが指定されています。`wakeup` ピンは `gecko/giant` および `gecko/mighty` サブプラットフォームで異なって定義されています。
 
 ```json
 "platforms": {
@@ -651,7 +648,7 @@ For example, there are subplatforms for each Gecko device supported by the Modda
 }
 ```
 
-The `SUBPLATFORM` variable is automatically defined by `mcconfig`. A wildcard is a available to match on subplatforms. The `SUBPLATFORM` variable and wildcard match used together simplify inclusion of subplatform manifests:
+`SUBPLATFORM` 変数は `mcconfig` によって自動的に定義されます。サブプラットフォームに一致するためのワイルドカードが利用可能です。`SUBPLATFORM` 変数とワイルドカードのマッチングを一緒に使用することで、サブプラットフォームのマニフェストの含め方が簡単になります：
 
 ```json
 	"platforms": {
@@ -665,14 +662,14 @@ The `SUBPLATFORM` variable is automatically defined by `mcconfig`. A wildcard is
 <a id="bundle"></a>
 ### `bundle`
 
-The `bundle` object is used by the [`mcbundle` command line tool](./tools.md#mcbundle) to build and package app archives for the Moddable Store. It has the following properties:
+`bundle` オブジェクトは、Moddable Storeのアプリアーカイブを構築およびパッケージするために [`mcbundle` コマンドラインツール](./tools.md#mcbundle) によって使用されます。以下のプロパティを持っています：
 
-| Property | Required | Description |
+| プロパティ | 必須 | 説明 |
 | :---: | :---: | :--- |
-| `id` | ✓ | The app signature. We typically use the app signature `tech.moddable.` + the name of the app, for example `tech.moddable.balls` for an app called `balls`.
-| `devices` | ✓ | An array of platform identifiers or device signatures that support the app.<BR><BR>You can also use wildcards (e.g. `esp/*` or `esp32/*`).
-| `custom` | | The path to the `custom` directory for the app's configurable preferences, if any.
-| `icon` | | The path to the custom app icon, if any. The app icon is the image that shows up next to the app name in the Moddable Store. The Moddable Store supplies a default icon based on the Moddable logo.
+| `id` | ✓ | アプリの署名です。通常、アプリの名前に `tech.moddable.` を加えたものを使用します。例えば、`balls` というアプリの場合は `tech.moddable.balls` となります。
+| `devices` | ✓ | アプリをサポートするプラットフォーム識別子またはデバイス署名の配列。<BR><BR>ワイルドカード（例：`esp/*` や `esp32/*`）も使用できます。
+| `custom` | | アプリの設定可能な設定のための `custom` ディレクトリへのパス（ある場合）。
+| `icon` | | カスタムアプリアイコンへのパス（ある場合）。アプリアイコンはModdable Storeでアプリ名の隣に表示される画像です。Moddable StoreはModdableロゴに基づいたデフォルトのアイコンを提供します。
 
 ```json
 "bundle": {
@@ -688,17 +685,17 @@ The `bundle` object is used by the [`mcbundle` command line tool](./tools.md#mcb
 
 ***
 <a id="process"></a>
-## How manifests are processed
+## マニフェストの処理方法
 
-`mcconfig` is a command line tool that generates a make file based on a manifest, then runs `make` to build and launch Moddable apps on microcontrollers or in the simulator. `mcconfig` processes a manifest in three passes: combine, match, and generate.
+`mcconfig`は、マニフェストに基づいてmakefileを生成し、`make`を実行してマイクロコントローラーやシミュレーター上でModdableアプリをビルドして起動するコマンドラインツールです。`mcconfig`はマニフェストを3つのパスで処理します：結合、マッチ、生成。
 
-### Combine
+### 結合
 
-The first pass combines the properties of the included manifests (in depth-first order) with the properties of the processed manifest. For each manifest, the common properties are combined with the properties of the platform that is the goal of the build. Subplatform properties are combined with platform properties.
+最初のパスは、処理されたマニフェストのプロパティと組み込まれたマニフェストのプロパティを結合します（深さ優先順）。各マニフェストについて、共通のプロパティはビルドの目標であるプラットフォームのプロパティと結合されます。サブプラットフォームのプロパティはプラットフォームのプロパティと結合されます。
 
-In the `modules` and `resources` objects, paths can be relative to the manifest that defines them.
+`modules`および`resources`オブジェクト内のパスは、それを定義するマニフェストに対して相対的になります。
 
-When combining properties with the same name, the combined value is the concatenation of the two values. For example, consider the following snippet of a manifest for an application. The `include`  object specifies that the properties from `manifest_base.json` should be included. The `modules` object specifies just one module called `main`.
+同じ名前のプロパティを結合する際には、結合された値は2つの値の連結になります。例えば、アプリケーションのマニフェストの以下のスニペットを考えてみましょう。`include`オブジェクトは`manifest_base.json`からのプロパティを含めることを指定しています。`modules`オブジェクトは`main`と呼ばれるモジュールをただ一つ指定しています。
 
 ```json
 {
@@ -712,7 +709,7 @@ When combining properties with the same name, the combined value is the concaten
 }
 ```
 
-The `modules` object from `manifest_base.json` includes additional modules from the `$MODDABLE/modules` directory.
+`manifest_base.json`の`modules`オブジェクトには、`$MODDABLE/modules`ディレクトリからの追加モジュールが含まれています。
 
 ```json
 	"modules": {
@@ -723,7 +720,7 @@ The `modules` object from `manifest_base.json` includes additional modules from 
 	},
 ```
 
-The concatenation of the two `modules` objects includes the `main` module from the application, and the resource and instrumentation modules specified in `manifest_base.json`.
+2つの`modules`オブジェクトの連結には、アプリケーションの`main`モジュールと、`manifest_base.json`で指定されたresourceおよびinstrumentationモジュールが含まれます。
 
 ```json
 "modules": {
@@ -735,34 +732,34 @@ The concatenation of the two `modules` objects includes the `main` module from t
 }
 ```
 
-### Match
+### マッチ
 
-The second pass matches files with the properties of the combined `modules` and `resources` objects:
+2回目のパスでは、組み合わせた`modules`および`resources`オブジェクトのプロパティと一致するファイルをマッチングします：
 
-- The `~` property contains files to exclude from the build.
-- The name of each property is the target file, the value of the property is the source file or an array of source files.
-- Targets and sources can use the `*` wildcard to represent all files that match.
+- `~`プロパティにはビルドから除外するファイルが含まれます。
+- 各プロパティの名前はターゲットファイルで、その値はソースファイルまたはソースファイルの配列です。
+- ターゲットとソースは、マッチするすべてのファイルを表すために`*`ワイルドカードを使用できます。
 
-These are the supported extensions:
+これらはサポートされている拡張子です：
 
-- In the `modules` object, `mcconfig` matches `.c`, `.cc`, `.cpp`, `.h`, `.js` and `.m` files.
-- In the `resources` object, `mcconfig` matches `.act`, `.bmp`, `.cct`, `.dat`, `.der`, `.fnt`, `.jpg`, `.json`, `.nfnt`, `.pk8`, `.png`, `.rle`, `.ski` and `.ttf`  files.
+- `modules`オブジェクトでは、`mcconfig`は`.c`、`.cc`、`.cpp`、`.h`、`.js`、`.m`ファイルにマッチします。
+- `resources`オブジェクトでは、`mcconfig`は`.act`、`.bmp`、`.cct`、`.dat`、`.der`、`.fnt`、`.jpg`、`.json`、`.nfnt`、`.pk8`、`.png`、`.rle`、`.ski`、`.ttf`ファイルにマッチします。
 
-### Generate
+### 生成
 
-The third pass generates make variables and rules for matched files:
+3回目のパスでは、一致したファイルのためのmake変数とルールが生成されます：
 
-- The .js files are compiled with `xsc` and linked with `xsl`.
-- The modules listed in the `preload` properties are preloaded by `xsl` in the read-only XS virtual machine that will be cloned to run the app.
-- The .png files are converted by `png2bmp`. Use the `*-color` and `*-alpha` pseudo target to get only color or only alpha bitmaps.
-- The .h files define header dependencies and include directories.
-- The .c files are compiled and linked with $(CC) unless they match the value of a property of the combined `recipes` object, then they use the make recipe corresponding to the name of the property.
+- `.js` ファイルは `xsc` でコンパイルされ、`xsl` でリンクされます。
+- `preload` プロパティにリストされているモジュールは、アプリを実行するためにクローンされる読み取り専用のXS仮想マシンで `xsl` によってプリロードされます。
+- `.png` ファイルは `png2bmp` によって変換されます。色またはアルファビットマップのみを取得するには、`*-color` および `*-alpha` 疑似ターゲットを使用します。
+- `.h` ファイルはヘッダ依存関係とインクルードディレクトリを定義します。
+- `.c` ファイルは $(CC) でコンパイルされリンクされますが、組み合わせた `recipes` オブジェクトのプロパティの値と一致する場合は、そのプロパティの名前に対応するmakeレシピを使用します。
 
-The generated make file contains the generated variables, then the make fragment corresponding to the goal of the build, then the generated rules.
+生成されたmakefileには生成された変数、ビルドの目標に対応するmakeフラグメント、そして生成されたルールが含まれます。
 
-You will find the default make fragments and the make recipes in `$(MODDABLE)/tools/mcconfig`. It is the make fragments that define the compiler options, the linker options, the libraries, etc.
+デフォルトのmakeフラグメントとmakeレシピは `$(MODDABLE)/tools/mcconfig` にあります。これらのmakeフラグメントがコンパイラオプション、リンカーオプション、ライブラリなどを定義します。
 
-The make fragment can be specified in a platform's `build` section.
+makeフラグメントは、プラットフォームの`build`セクションで指定できます。
 
 ```json
 "platforms": {
