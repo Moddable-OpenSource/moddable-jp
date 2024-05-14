@@ -1194,6 +1194,7 @@ struct xsMachineRecord {
 	void* archive;
 	xsSlot scratch;
 	xsSlot* stackPrototypes;
+	int exitStatus;
 #ifndef __XSALL__
 	xsMachinePlatform
 #endif
@@ -1304,30 +1305,31 @@ struct xsCreationRecord {
 
 #define xsBeginHostExit(_THE) \
 	do { \
+		xsMachine* __HOST_THE__ = _THE; \
 		xsJump __HOST_JUMP__; \
-		__HOST_JUMP__.nextJump = (_THE)->firstJump; \
-		__HOST_JUMP__.stack = (_THE)->stack; \
-		__HOST_JUMP__.scope = (_THE)->scope; \
-		__HOST_JUMP__.frame = (_THE)->frame; \
+		__HOST_JUMP__.nextJump = (__HOST_THE__)->firstJump; \
+		__HOST_JUMP__.stack = (__HOST_THE__)->stack; \
+		__HOST_JUMP__.scope = (__HOST_THE__)->scope; \
+		__HOST_JUMP__.frame = (__HOST_THE__)->frame; \
 		__HOST_JUMP__.environment = NULL; \
-		__HOST_JUMP__.code = (_THE)->code; \
+		__HOST_JUMP__.code = (__HOST_THE__)->code; \
 		__HOST_JUMP__.flag = 0; \
-		(_THE)->firstJump = &__HOST_JUMP__; \
-		(_THE)->exitStatus = xsNormalExit; \
+		(__HOST_THE__)->firstJump = &__HOST_JUMP__; \
+		(__HOST_THE__)->exitStatus = xsNormalExit; \
 		if (setjmp(__HOST_JUMP__.buffer) == 0) { \
-			xsMachine* the = fxBeginHost(_THE)
+			xsMachine* the = fxBeginHost(__HOST_THE__)
 
 #define xsEndHostExit(_THE) \
 			fxEndHost(the); \
 			the = NULL; \
 		} \
-		else if ((_THE)->exitStatus == xsNormalExit) \
-			(_THE)->exitStatus = xsUnhandledExceptionExit; \
-		(_THE)->stack = __HOST_JUMP__.stack, \
-		(_THE)->scope = __HOST_JUMP__.scope, \
-		(_THE)->frame = __HOST_JUMP__.frame, \
-		(_THE)->code = __HOST_JUMP__.code, \
-		(_THE)->firstJump = __HOST_JUMP__.nextJump; \
+		else if ((__HOST_THE__)->exitStatus == xsNormalExit) \
+			(__HOST_THE__)->exitStatus = xsUnhandledExceptionExit; \
+		(__HOST_THE__)->stack = __HOST_JUMP__.stack, \
+		(__HOST_THE__)->scope = __HOST_JUMP__.scope, \
+		(__HOST_THE__)->frame = __HOST_JUMP__.frame, \
+		(__HOST_THE__)->code = __HOST_JUMP__.code, \
+		(__HOST_THE__)->firstJump = __HOST_JUMP__.nextJump; \
 		break; \
 	} while(1)
 

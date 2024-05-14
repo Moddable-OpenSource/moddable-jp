@@ -401,6 +401,7 @@ struct sxMachine {
 	void* archive; /* xs.h */
 	txSlot scratch; /* xs.h */
 	txSlot* stackPrototypes; /* xs.h */
+	int exitStatus; /* xs.h */
 	mxMachinePlatform /* xs.h */
 	txFlag status;
 	
