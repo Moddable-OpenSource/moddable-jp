@@ -1304,6 +1304,37 @@ struct xsCreationRecord {
 	#define xsEndMetering(_THE)
 #endif
 
+#define xsNormalExit (-1)
+
+#define xsBeginHostExit(_THE) \
+	do { \
+		xsJump __HOST_JUMP__; \
+		__HOST_JUMP__.nextJump = (_THE)->firstJump; \
+		__HOST_JUMP__.stack = (_THE)->stack; \
+		__HOST_JUMP__.scope = (_THE)->scope; \
+		__HOST_JUMP__.frame = (_THE)->frame; \
+		__HOST_JUMP__.environment = NULL; \
+		__HOST_JUMP__.code = (_THE)->code; \
+		__HOST_JUMP__.flag = 0; \
+		(_THE)->firstJump = &__HOST_JUMP__; \
+		(_THE)->exitStatus = xsNormalExit; \
+		if (setjmp(__HOST_JUMP__.buffer) == 0) { \
+			xsMachine* the = fxBeginHost(_THE)
+
+#define xsEndHostExit(_THE) \
+			fxEndHost(the); \
+			the = NULL; \
+		} \
+		else if ((_THE)->exitStatus == xsNormalExit) \
+			(_THE)->exitStatus = xsUnhandledExceptionExit; \
+		(_THE)->stack = __HOST_JUMP__.stack, \
+		(_THE)->scope = __HOST_JUMP__.scope, \
+		(_THE)->frame = __HOST_JUMP__.frame, \
+		(_THE)->code = __HOST_JUMP__.code, \
+		(_THE)->firstJump = __HOST_JUMP__.nextJump; \
+		break; \
+	} while(1)
+
 enum {	
 	xsNoID = 0,
 	xsDefault = 0,

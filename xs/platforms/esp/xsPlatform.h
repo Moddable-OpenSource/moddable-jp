@@ -40,6 +40,7 @@
 
 #include "stdint.h"
 #include "stdbool.h"
+#include "mc.defines.h"
 
 #if ESP32
 	#define ICACHE_FLASH_ATTR __attribute__((section(".rodata.mod.0")))
@@ -177,6 +178,13 @@ typedef struct DebugFragmentRecord *DebugFragment;
 	#define mxMachineInstrument
 #endif
 
+#if MODDEF_XS_ABORT_EXITTOHOST
+	#define mxExitToHost \
+		int exitStatus;
+#else
+	#define mxExitToHost
+#endif
+
 #if ESP32
 	#define mxMachinePlatform \
 		uint8_t *heap; \
@@ -186,6 +194,7 @@ typedef struct DebugFragmentRecord *DebugFragment;
 		void *dbgQueue; \
 		void *queues; \
 		void *task; \
+		mxExitToHost \
 		mxMachineDebug \
 		mxMachineInstrument
 #else
@@ -193,6 +202,7 @@ typedef struct DebugFragmentRecord *DebugFragment;
 		uint8_t *heap; \
 		uint8_t *heap_ptr; \
 		uint8_t *heap_pend; \
+		mxExitToHost \
 		mxMachineDebug \
 		mxMachineInstrument
 #endif
