@@ -157,10 +157,8 @@ static txBoolean fxToNumericNumberBinary(txMachine* the, txSlot* a, txSlot* b, t
 
 #if mxBoundsCheck
 #define mxAllocStack(_COUNT) \
-	if ((mxStack - _COUNT) < the->stackBottom) { \
-		mxSaveState; \
-		fxAbort(the, XS_STACK_OVERFLOW_EXIT); \
-	} \
+	if ((mxStack - _COUNT) < the->stackBottom) \
+		goto STACK_OVERFLOW; \
 	mxStack -= _COUNT
 #else
 #define mxAllocStack(_COUNT) \
@@ -4304,6 +4302,10 @@ XS_CODE_JUMP:
 			mxBreak;
 		}
 	}
+
+STACK_OVERFLOW:
+	mxSaveState;
+	fxAbort(the, XS_STACK_OVERFLOW_EXIT);
 }
 
 #ifdef mxMetering

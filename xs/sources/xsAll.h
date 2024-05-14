@@ -46,11 +46,7 @@ extern "C" {
 
 //#define mxFrequency 1
 #ifndef mxBoundsCheck
-	#ifdef mxDebug
-		#define mxBoundsCheck 1
-	#else
-		#define mxBoundsCheck 0
-	#endif
+	#define mxBoundsCheck 1
 #endif
 #ifndef mxKeysGarbageCollection
 	#define mxKeysGarbageCollection 0

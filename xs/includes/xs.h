@@ -151,11 +151,7 @@
 #endif /* !INCLUDE_XSPLATFORM */
 
 #ifndef mxBoundsCheck
-	#ifdef mxDebug
-		#define mxBoundsCheck 1
-	#else
-		#define mxBoundsCheck 0
-	#endif
+	#define mxBoundsCheck 1
 #endif
 #ifndef NULL
 	#define NULL 0
