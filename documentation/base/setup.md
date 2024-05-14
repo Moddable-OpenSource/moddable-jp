@@ -1,38 +1,38 @@
-# Setup
+# セットアップ
 Copyright 2017-2023 Moddable Tech, Inc.<BR>
-Revised: June 28, 2023
+改訂: 2023年6月28日
 
-## Background
-The use of JavaScript on a minimal MCU requires an extremely lightweight runtime. One obvious way to keep the runtime small is to only include functionality which is required by the application being run. For example, while a modern Linux, macOS, or Windows distribution includes drivers for a wide variety of displays to support whatever the user may connect, an efficient MCU distribution only includes a single display driver to support the built-in display of the device. Consequently, each device configuration (MCU + display + network capabilities, etc) is distinct.
+## 背景
+最小限のMCUでJavaScriptを使用するには、非常に軽量なランタイムが必要です。ランタイムを小さく保つ明確な方法の一つは、実行されるアプリケーションに必要な機能のみを含めることです。例えば、現代のLinux、macOS、またはWindowsのディストリビューションには、ユーザーが接続する可能性のあるさまざまなディスプレイをサポートするためのドライバーが含まれていますが、効率的なMCUディストリビューションには、デバイスの内蔵ディスプレイをサポートするための単一のディスプレイドライバーのみが含まれています。その結果、各デバイス構成（MCU + ディスプレイ + ネットワーク機能など）は独自のものとなります。
 
-While an infinite number of hardware configurations with supporting software frameworks is possible, in practice a handful of configurations are commonly used. For example, Moddable Zero combines an ESP8266 Wi-Fi module with the ILI9341 display controller, a QVGA display, and an XPT2046 resistive touch screen controller. The manifest defines the modules to include in the firmware. The manifest does not contain instructions for how to instantiate these modules, their configuration, or how they may appear in JavaScript global variables.
+無数のハードウェア構成とそれをサポートするソフトウェアフレームワークは可能ですが、実際にはいくつかの構成が一般的に使用されています。例えば、Moddable ZeroはESP8266 Wi-FiモジュールとILI9341ディスプレイコントローラー、QVGAディスプレイ、およびXPT2046抵抗膜式タッチスクリーンコントローラーを組み合わせています。マニフェストはファームウェアに含めるモジュールを定義します。マニフェストには、これらのモジュールをどのようにインスタンス化するか、その構成、またはJavaScriptのグローバル変数にどのように表示されるかについての指示は含まれていません。
 
-In some deployments, the configuration and instantiation is performed by the application. Often however, it is convenient to share these tasks for a given hardware configuration across applications. This is the case with example code, which should be kept as simple and focused as possible, and early versions of device applications which can accept the default configuration.
+いくつかのデプロイメントでは、設定とインスタンス化がアプリケーションによって行われます。しかし、多くの場合、特定のハードウェア構成に対するこれらのタスクをアプリケーション間で共有することは便利です。これは、サンプルコードの場合に当てはまり、できるだけシンプルで焦点を絞ったものにする必要があり、デフォルトの設定を受け入れることができるデバイスアプリケーションの初期バージョンにも当てはまります。
 
-## setup modules
-The configuration and instantiation may be implemented in one or more setup modules. Set up modules are identified by having a module specified that begins with `setup/`. All setup modules run before the main module, preparing the environment the main module requires. For example, there are two primary set-up modules for Moddable Zero. The `setup/network` module establishes a Wi-Fi connection, retrieves an IP address, and sets the real time clock. The `setup/piu` module instantiates the display and touch drivers and binds them to the global variable `screen`.
+## セットアップモジュール
+設定とインスタンス化は、1つ以上のセットアップモジュールで実装される場合があります。セットアップモジュールは、`setup/`で始まるモジュールが指定されていることで識別されます。すべてのセットアップモジュールはメインモジュールの前に実行され、メインモジュールが必要とする環境を準備します。例えば、Moddable Zeroには2つの主要なセットアップモジュールがあります。`setup/network`モジュールはWi-Fi接続を確立し、IPアドレスを取得し、リアルタイムクロックを設定します。`setup/piu`モジュールはディスプレイとタッチドライバをインスタンス化し、それらをグローバル変数`screen`にバインドします。
 
-Usually applications do not need to explicitly include the setup modules in their manifest as they are included by the manifests that require them. For example the `example/manifest_network.json` manifest includes `setup/network`, and the `example/manifest_piu.json` manifest includes `setup/piu`.
+通常、アプリケーションはセットアップモジュールを明示的にマニフェストに含める必要はありません。必要なマニフェストによって含まれるためです。例えば、`example/manifest_network.json`マニフェストには`setup/network`が含まれ、`example/manifest_piu.json`マニフェストには`setup/piu`が含まれています。
 
-The implementation of a setup is straightforward. The module exports a single function to perform. This function is called at start-up time. When there are multiple setup modules, there is no guarantee on the order in which they are called.
+セットアップの実装は簡単です。モジュールは実行するための単一の関数をエクスポートします。この関数は起動時に呼び出されます。複数のセットアップモジュールがある場合、それらが呼び出される順序は保証されません。
 
-The setup function receives a single argument, a done function to call when setup is complete. The `done` function allows setup to perform asynchronous operations, such as establishing a network connection.
+セットアップ関数は、セットアップが完了したときに呼び出す `done` 関数という単一の引数を受け取ります。`done` 関数は、ネットワーク接続の確立などの非同期操作を実行するために使用されます。
 
 	export default function (done) {
 		setupOperation();
 		done();
 	}
 
-## Preload
+## プリロード
 
-To minimize RAM use and speed start-up time, the main module and any setup modules should be [preloaded](../xs/preload.md).
+RAMの使用を最小限に抑え、起動時間を短縮するために、メインモジュールおよび任意のセットアップモジュールは[プリロード](../xs/preload.md)する必要があります。
 
-## Additional notes
+## 追加の注意事項
 
-- The idea for setup modules is loosely modeled on the setup function in the Arduino application model.
-- The simulator implicitly performs the work of setup already, initializing the screen global variable before running the main module.
-- The setup modules are only run on the first (main) virtual machine instantiated. For example, when using Workers, the setup modules are not run in the workers.
-- Sometimes it is useful to remove a setup module provided by the host, for example to replace the default `setup/network` module so that the application script can manage the Wi-Fi connection itself. This is accomplished using the `"~"` option of manifests.
+- セットアップモジュールのアイデアは、Arduinoアプリケーションモデルのセットアップ関数に緩やかに基づいています。
+- シミュレータは、メインモジュールを実行する前に画面のグローバル変数を初期化するなど、セットアップの作業を暗黙的に実行します。
+- セットアップモジュールは、最初の（メインの）仮想マシンでのみ実行されます。例えば、ワーカーを使用する場合、セットアップモジュールはワーカー内では実行されません。
+- ホストによって提供されるセットアップモジュールを削除することが有用な場合があります。例えば、デフォルトの `setup/network` モジュールを置き換えて、アプリケーションスクリプトがWi-Fi接続を自分で管理できるようにする場合です。これは、マニフェストの `"~"` オプションを使用して実現されます。
 
 ```json
 "modules": {
