@@ -539,6 +539,8 @@ void fxBigintToArrayBuffer(txMachine* the, txSlot* slot, txU4 total, txBoolean s
 		total = length;
 	}
 	if (sign) {
+		if (total >= 0x7FFFFFFF)
+			mxRangeError("out of range byteLength");
 		offset++;
 		total++;
 	}
