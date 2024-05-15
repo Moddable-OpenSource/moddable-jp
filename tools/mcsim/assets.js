@@ -38,6 +38,7 @@ const liteColors = {
 	"header": { "color": "#404040", "fill": [ "#f0f0f0", "#f0f0f0", "#e6e6e6", "#dbdbdb" ], "stroke": "#dbdbdb", },
 
 	"background": { "fill": "#cccccc" },
+	"backgroundComponent": 0xcc,
 };
 
 const darkColors = {
@@ -60,6 +61,7 @@ const darkColors = {
 	"header": { "color": "#f0f0f0", "fill": [ "#3b3b3b", "#3b3b3b", "#4b4b4b", "#5b5b5b" ], "stroke": "#4e4e4e", },
 
 	"background": { "fill": "#5d5d5d" },
+	"backgroundComponent": 0x5d,
 };
 
 const themes = [
@@ -79,6 +81,8 @@ function buildTheme($, codeFont) {
 	const colors = globalThis.colors = {};
 	const skins = globalThis.skins = {};
 	const styles = globalThis.styles = {};
+	
+	colors.backgroundComponent = $.backgroundComponent;
 
 	skins.button = new Skin({ fill:$.button.fill, stroke:$.button.stroke });
 	styles.button = new Style({ font:"semibold", color:$.button.color });
@@ -123,4 +127,9 @@ export function buildAssets(which) {
 	const theme = themes[which];
 	buildTheme(theme);
 }
+
+export function getBackgroundComponent() { 
+	return globalThis.colors.backgroundComponent;
+}
+
 
