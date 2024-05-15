@@ -91,7 +91,6 @@
 #define mxMachinePlatform \
 	txSocket connection; \
 	int promiseJobs; \
-	int abortStatus; \
 	void* rejection; \
 	void *script;		// txScript*
 

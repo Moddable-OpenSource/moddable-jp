@@ -523,7 +523,7 @@ int fuzz(int argc, char* argv[])
 		xsEndMetering(machine);
 		gxMemoryFail = 0;
 		fxDeleteScript(machine->script);
-		int status = (machine->abortStatus & 0xff) << 8;
+		int status = (machine->exitStatus & 0xff) << 8;
 		if (!status && error)
 			status = XS_UNHANDLED_EXCEPTION_EXIT << 8;
 		if (write(REPRL_CWFD, &status, 4) != 4) {
@@ -656,13 +656,13 @@ int fuzz_oss(const uint8_t *Data, size_t script_size)
 	xsEndMetering(machine);
 	fxDeleteScript(machine->script);
 #if mxXSMemoryLimit
-	int abortStatus = machine->abortStatus;
+	int exitStatus = machine->exitStatus;
 #endif
 	xsDeleteMachine(machine);
 	free(buffer);
 
 #if mxXSMemoryLimit
-	if ((XS_TOO_MUCH_COMPUTATION_EXIT == abortStatus) || (XS_NOT_ENOUGH_MEMORY_EXIT == abortStatus))
+	if ((XS_TOO_MUCH_COMPUTATION_EXIT == exitStatus) || (XS_NOT_ENOUGH_MEMORY_EXIT == exitStatus))
 		freeMemoryBlocks();		// clean-up if computation or memory limits exceeded
 #endif
 

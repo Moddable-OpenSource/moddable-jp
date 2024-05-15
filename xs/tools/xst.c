@@ -271,8 +271,8 @@ int main(int argc, char* argv[])
 			fxStopProfiling(machine, C_NULL);
 		}
 		xsEndMetering(machine);
-		if (machine->abortStatus) {
-			char *why = (machine->abortStatus <= XS_UNHANDLED_REJECTION_EXIT) ? gxAbortStrings[machine->abortStatus] : "unknown";
+		if (machine->exitStatus) {
+			char *why = (machine->exitStatus <= XS_UNHANDLED_REJECTION_EXIT) ? gxAbortStrings[machine->exitStatus] : "unknown";
 			fprintf(stderr, "Error: %s\n", why);
 			error = 1;
 		}
@@ -930,9 +930,9 @@ void fxAbort(txMachine* the, int status)
 {
 	if (XS_DEBUGGER_EXIT == status)
 		c_exit(1);
-	if (the->abortStatus) // xsEndHost calls fxAbort!
+	if (the->exitStatus) // xsEndHost calls fxAbort!
 		return;
-	the->abortStatus = status;
+	the->exitStatus = status;
 	fxExitToHost(the);
 }
 

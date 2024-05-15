@@ -845,9 +845,9 @@ int fxRunTestCase(txPool* pool, txContext* context, char* path, txUnsigned flags
 		}
 	}
 	xsEndHost(machine);
-	if (machine->abortStatus) {
+	if (machine->exitStatus) {
 		success = 0;
-		if ((machine->abortStatus == XS_NOT_ENOUGH_MEMORY_EXIT) || (machine->abortStatus == XS_STACK_OVERFLOW_EXIT)) {
+		if ((machine->exitStatus == XS_NOT_ENOUGH_MEMORY_EXIT) || (machine->exitStatus == XS_STACK_OVERFLOW_EXIT)) {
 			if (context->negative) {
 				if (!strcmp("RangeError", (char*)context->negative->data.scalar.value)) {
 					snprintf(message, 1024, "OK");
@@ -856,7 +856,7 @@ int fxRunTestCase(txPool* pool, txContext* context, char* path, txUnsigned flags
 			}
 		}
 		if (!success) {
-			char *why = (machine->abortStatus <= XS_UNHANDLED_REJECTION_EXIT) ? gxAbortStrings[machine->abortStatus] : "unknown";
+			char *why = (machine->exitStatus <= XS_UNHANDLED_REJECTION_EXIT) ? gxAbortStrings[machine->exitStatus] : "unknown";
 			snprintf(message, 1024, "# %s", why);
 			success = 0;
 		}
