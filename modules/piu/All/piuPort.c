@@ -279,9 +279,9 @@ void PiuPort_drawTexture(xsMachine* the)
 	sy = xsToPiuCoordinate(xsArg(5));
 	sw = xsToPiuDimension(xsArg(6));
 	sh = xsToPiuDimension(xsArg(7));
-	PiuViewPushColor(view, &color);
+	PiuViewPushColorFilter(view, &color);
 	PiuViewDrawTexture(view, texture, x, y, sx, sy, sw, sh);
-	PiuViewPopColor(view);
+	PiuViewPopColorFilter(view);
 }
 
 void PiuPort_fillColor(xsMachine* the)
@@ -321,9 +321,9 @@ void PiuPort_fillTexture(xsMachine* the)
 	sy = xsToPiuCoordinate(xsArg(7));
 	sw = xsToPiuDimension(xsArg(8));
 	sh = xsToPiuDimension(xsArg(9));
-	PiuViewPushColor(view, &color);
+	PiuViewPushColorFilter(view, &color);
 	PiuViewFillTexture(view, texture, x, y, w, h, sx, sy, sw, sh);
-	PiuViewPopColor(view);
+	PiuViewPopColorFilter(view);
 }
 
 void PiuPort_invalidate(xsMachine* the)
