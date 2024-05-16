@@ -7,7 +7,7 @@ import files from "./files-fixture.js";
 
 const path = "testdir";
 files.delete(path);
-files.create(path);
+files.createDirectory(path);
 
 assert(files.status(path).isDirectory());
 

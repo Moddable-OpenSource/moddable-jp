@@ -10,8 +10,8 @@ import {deleteTree} from "./files-fixture.js";
 {
 	deleteTree(files, "test");
 
-	files.create("test");
-	files.create("test/subdir");
+	files.createDirectory("test");
+	files.createDirectory("test/subdir");
 	const testRoot = files.openDirectory({path: "test"});
 	const subdir = testRoot.openDirectory({path: "subdir"});
 
@@ -27,8 +27,8 @@ import {deleteTree} from "./files-fixture.js";
 {
 	deleteTree(files, "test");
 
-	files.create("test");
-	files.create("test/subdir");
+	files.createDirectory("test");
+	files.createDirectory("test/subdir");
 	const testRoot = files.openDirectory({path: "test"});
 
 	testRoot.openFile({path: "subdir/test.bin", mode: "w+"}).close();

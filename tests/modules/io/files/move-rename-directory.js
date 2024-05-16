@@ -11,7 +11,7 @@ const pathTo = "dirtest";
 files.delete(pathFrom);
 files.delete(pathTo);
 
-files.create(pathFrom);
+files.createDirectory(pathFrom);
 assert(files.status(pathFrom).isDirectory());
 files.move(pathFrom, pathTo);
 

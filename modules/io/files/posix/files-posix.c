@@ -27,7 +27,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define kCreatePermissions (0755)
+#define kCreateFilePermissions (0666)
+#define kCreateDirectoryPermissions (0777)
 #define kOpenDirFlags (O_RDONLY)
 
 /*
@@ -298,7 +299,7 @@ void xs_direectoryposix_openFile(xsMachine *the)
 	}
 
 	xsFileRecord f;
-	f.fd = openat(fd, path, mode, kCreatePermissions);
+	f.fd = openat(fd, path, mode, kCreateFilePermissions);
 	throwIf(f.fd);
 
 	xsmcSetHostChunk(xsResult, &f, sizeof(f));
@@ -366,10 +367,17 @@ void xs_direectoryposix_status(xsMachine *the)
 	int fd = getDirectory(xsThis);
 	struct stat statbuf;
 	char *path = getPath(xsArg(0));
+	int flags = 0;
+	
+	if (xsmcTest(xsArg(1))) {
+		xsmcGet(xsResult, xsArg(1), xsID_resolveTarget);
+		if (xsmcTest(xsResult))
+			flags = AT_SYMLINK_NOFOLLOW;
+	}
 
-	throwIf(fstatat(fd, path, &statbuf, 0));
+	throwIf(fstatat(fd, path, &statbuf, flags));
 
-	xsResult = xsArg(1);
+	xsResult = xsArg(2);
 
 	xsmcVars(1);
 	xsmcSetInteger(xsVar(0), statbuf.st_size);
@@ -379,12 +387,12 @@ void xs_direectoryposix_status(xsMachine *the)
 	xsmcSet(xsResult, xsID_mode, xsVar(0));
 }
 
-void xs_direectoryposix_create(xsMachine *the)
+void xs_direectoryposix_createDirectory(xsMachine *the)
 {
 	int fd = getDirectory(xsThis);
 	char *path = getPath(xsArg(0));
 
-	int result = mkdirat(fd, path, kCreatePermissions);
+	int result = mkdirat(fd, path, kCreateDirectoryPermissions);
 	if (result < 0) {
 		if (EEXIST == errno) {
 			xsmcSetFalse(xsResult);
@@ -395,17 +403,26 @@ void xs_direectoryposix_create(xsMachine *the)
 	xsmcSetTrue(xsResult);
 }
 
+void xs_direectoryposix_createLink(xsMachine *the)
+{
+	int fd = getDirectory(xsThis);
+	char *path = getPath(xsArg(0));
+	char *target = getPath(xsArg(1));
+
+	throwIf(symlinkat(target, fd, path));
+}
+
 void xs_direectoryposix_readLink(xsMachine *the)
 {
 	int fd = getDirectory(xsThis);
 	char *path = getPath(xsArg(0));
-	char buf[1024];
+	char *s;
 
-	ssize_t length = readlinkat(fd, path, buf, sizeof(buf) - 1);
+	xsmcSetStringBuffer(xsResult, NULL, 1024);
+	s = xsmcToString(xsResult);
+	ssize_t length = readlinkat(fd, path, s, 1024 - 1);
 	throwIf(length);
-	buf[length] = 0;
-
-	xsmcSetString(xsResult, buf);
+	s[length] = 0;
 }
 
 /*

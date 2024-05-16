@@ -70,11 +70,12 @@ class Directory @ "xs_direectoryposix_destructor" {
 
 	move(from, to) @ "xs_direectoryposix_move"
 
-	status(path) {
-		return status.call(this, path, new Status);
+	status(path, options) {
+		return status.call(this, path, options, new Status);
 	}
 
-	create(options) @ "xs_direectoryposix_create"
+	createDirectory(options) @ "xs_direectoryposix_createDirectory"
+	createLink(path, target) @ "xs_direectoryposix_createLink"
 
 	readLink(path) @ "xs_direectoryposix_readLink"
 

@@ -74,9 +74,10 @@ class Directory @ "xs_direectorylittlefs_destructor" {
 		return status.call(this, path, new Status);
 	}
 
-	create(options) @ "xs_direectorylittlefs_create"
+	createDirectory(options) @ "xs_direectorylittlefs_createDirectory"
+	createLink(path, target) @ "xs_direectorylittlefs_link"
 
-	readLink(path) @ "xs_direectorylittlefs_readLink"
+	readLink(path) @ "xs_direectorylittlefs_link"
 
 	scan(path) {
 		return scan.call(this, path, Scan.prototype);

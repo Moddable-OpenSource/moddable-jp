@@ -24,7 +24,7 @@ paths.forEach(path => {
 	if (path.includes(".")) 
 		files.openFile({path, mode: "w+"}).close();
 	else
-		files.create(path);
+		files.createDirectory(path);
 });
 
 assert.compareArray(scan(files, "scantest/foo/bar"), ["test", "test1.bin", "test2.bin", "test3.bin"]);

@@ -469,7 +469,7 @@ void xs_direectorylittlefs_status(xsMachine *the)
 	xsmcSet(xsResult, xsID_mode, xsVar(0));
 }
 
-void xs_direectorylittlefs_create(xsMachine *the)
+void xs_direectorylittlefs_createDirectory(xsMachine *the)
 {
 	char *dirPath = getDirectory(xsThis);
 	char *path = appendPath(dirPath, xsArg(0));
@@ -485,7 +485,7 @@ void xs_direectorylittlefs_create(xsMachine *the)
 	xsmcSetTrue(xsResult);
 }
 
-void xs_direectorylittlefs_readLink(xsMachine *the)
+void xs_direectorylittlefs_link(xsMachine *the)
 {
 	getDirectory(xsThis);	// reject instance with invalid "this" first, as exepected by tests
 	xsUnknownError("unsupported");

@@ -41,5 +41,5 @@ assert.throws(TypeError, () => f.openFile());
 assert.throws(TypeError, () => f.openFile.call(new $TESTMC.HostObject, {path}));
 
 deleteTree(files, dirPath);
-files.create(dirPath);
+files.createDirectory(dirPath);
 assert.throws(Error, () => files.openFile({path: dirPath}));

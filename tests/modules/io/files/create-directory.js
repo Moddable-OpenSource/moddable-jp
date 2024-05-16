@@ -15,7 +15,7 @@ const paths = [
 ];
 
 deleteTree(files, paths[0]);
-paths.forEach(path => files.create(path));
+paths.forEach(path => files.createDirectory(path));
 paths.reverse();
 paths.forEach(path => assert(files.delete(path)));
 paths.forEach(path => assert.throws(Error, () => files.status(path)));

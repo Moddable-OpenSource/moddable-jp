@@ -15,7 +15,7 @@ assert.throws(SyntaxError, () => files.move());
 files.delete(pathFrom);
 files.delete(pathTo);
 
-files.create(pathFrom);
+files.createDirectory(pathFrom);
 assert.throws(SyntaxError, () => files.move.call(new $TESTMC.HostObject, pathFrom, pathTo));
 assert.throws(Error, () => files.move(pathFrom, "../" + pathTo));
 assert.throws(Error, () => files.move("../" + pathFrom, pathTo));
