@@ -76,7 +76,7 @@ IO Streamsモジュールは、ストリームを使用したECMA-419センサ�
 
 ### button
 
-この例は、Moddableの [IOボタンの例](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/io/digital/button) を再訪します。ボタンの状態に基づいてLEDをオンおよびオフにします。
+この例は、Moddableの [IOボタンの例](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/io/digital/button) を再検討します。ボタンの状態に基づいてLEDをオンおよびオフにします。
 
 `iostreams.js` によってエクスポートされたミックスインを使用すると、`Digital` クラスはボタン用の `ReadableStream` サブクラスとLED用の `WritableStream` サブクラスの両方になります。
 
@@ -89,7 +89,7 @@ cd /path/to/streams/examples/button
 mcconfig -d -m -p esp32/moddable_two_io
 ```
 
-LEDの状態が変わるときにコンソール出力はありません。状態の変化を見るためには、LED自体を観察する必要があります。
+LEDの状態が変わるときにコンソール出力はありません。状態の変化を見るためには、LED自体を監視する必要があります。
 
 ### touch {#examples}
 
