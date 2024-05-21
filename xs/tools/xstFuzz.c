@@ -111,8 +111,15 @@ static uint8_t hashAddress(void *addr)
 	return (uint8_t)sum;
 }
 
+static txMutex gLinkMemoryMutex;
+
 static void linkMemoryBlock(void *address, size_t size)
 {
+	static uint8_t first = 1;
+	if (first) {
+		first = 0;
+		fxCreateMutex(&gLinkMemoryMutex);
+	}
 	uint8_t index = hashAddress(address);
 	txMemoryBlock *block = malloc(sizeof(txMemoryBlock));		// assuming this will never fail (nearly true)
 
@@ -120,18 +127,23 @@ static void linkMemoryBlock(void *address, size_t size)
 	block->prev = C_NULL;
 	block->size = size;
 
+    fxLockMutex(&gLinkMemoryMutex);
+
 	block->next = gBlocks[index];
 	if (gBlocks[index])
 		gBlocks[index]->prev = block;
 	gBlocks[index] = block;
 	
 	gBlocksSize += size;
+
+    fxUnlockMutex(&gLinkMemoryMutex);
 }
 
 static void unlinkMemoryBlock(void *address)
 {
 	uint8_t index = hashAddress(address);
 
+    fxLockMutex(&gLinkMemoryMutex);
 	txMemoryBlock *block = gBlocks[index];
 	while (block && (block->address != address))
 		block = block->next;
@@ -146,16 +158,21 @@ static void unlinkMemoryBlock(void *address)
 
 	gBlocksSize -= block->size;
 
+    fxUnlockMutex(&gLinkMemoryMutex);
+
 	free(block);
 }
 
 static size_t getMemoryBlockSize(void *address)
 {
 	uint8_t index = hashAddress(address);
+    fxLockMutex(&gLinkMemoryMutex);
 	txMemoryBlock *block = gBlocks[index];
 	while (block && (block->address != address))
 		block = block->next;
-	return block->size;
+	int size = block->size;
+    fxUnlockMutex(&gLinkMemoryMutex);
+    return size;
 }
 
 void freeMemoryBlocks(void)
