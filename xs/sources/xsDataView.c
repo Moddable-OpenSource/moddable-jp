@@ -1544,7 +1544,6 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 	txSlot* view;
 	txSlot* buffer;
 	txSlot* data;
-	txU2 shift;
 	txNumber length;
 	mxTemporary(iterator);
 	mxTemporary(next);
@@ -1568,7 +1567,6 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 		dispatch = instance->next;
 		view = dispatch->next;
 		buffer = view->next;
-		shift = dispatch->value.typedArray.dispatch->shift;
 		mxPush(mxArrayBufferConstructor);
 		mxNew();
 		mxPushNumber(length * dispatch->value.typedArray.dispatch->size);
@@ -1590,9 +1588,6 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 			view = dispatch->next;
 			buffer = view->next;
 			data = fxCheckArrayBufferDetached(the, buffer, XS_MUTABLE);
-			shift = dispatch->value.typedArray.dispatch->shift;
-			if (view->value.dataView.size < (length * dispatch->value.typedArray.dispatch->size))
-				mxTypeError("too small TypedArray");
 		}
 		else
 			mxTypeError("no TypedArray");
@@ -1619,7 +1614,8 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 			else
 				mxPushSlot(slot);
 			(*dispatch->value.typedArray.dispatch->coerce)(the, the->stack);
-			(*dispatch->value.typedArray.dispatch->setter)(the, data, (index << shift), the->stack, EndianNative);
+			mxPushSlot(mxResult);
+			mxSetIndex(index);
 			mxPop();
 			index++;
 			slot = slot->next;
@@ -1649,7 +1645,8 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 				mxGetIndex(index);
 			}
 			(*dispatch->value.typedArray.dispatch->coerce)(the, the->stack);
-			(*dispatch->value.typedArray.dispatch->setter)(the, data, (index << shift), the->stack, EndianNative);
+			mxPushSlot(mxResult);
+			mxSetIndex(index);
 			mxPop();
 			index++;
 		}	
