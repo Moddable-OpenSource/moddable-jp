@@ -1613,7 +1613,6 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 			}
 			else
 				mxPushSlot(slot);
-			(*dispatch->value.typedArray.dispatch->coerce)(the, the->stack);
 			mxPushSlot(mxResult);
 			mxSetIndex(index);
 			mxPop();
@@ -1644,7 +1643,6 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 				mxPushSlot(mxArgv(0));
 				mxGetIndex(index);
 			}
-			(*dispatch->value.typedArray.dispatch->coerce)(the, the->stack);
 			mxPushSlot(mxResult);
 			mxSetIndex(index);
 			mxPop();
