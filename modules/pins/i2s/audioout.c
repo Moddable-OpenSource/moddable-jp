@@ -1626,7 +1626,7 @@ void audioOutLoop(void *pvParameter)
 			modGPIOWrite(&out->amplifierPower, 1);
 			i2s_channel_disable(out->tx_handle);
 			i2s_channel_enable(out->tx_handle);
-			out->bytesInFlight = sizeof(out->buffer) * 2;
+			out->bytesInFlight = out->sampleRate >> 3;		// 1/8th of a second
 #elif MODDEF_AUDIOOUT_I2S_DAC
 			dac_continuous_enable(out->dacHandle);
 #else
