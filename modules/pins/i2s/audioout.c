@@ -1622,10 +1622,12 @@ void audioOutLoop(void *pvParameter)
 
 		if (stopped) {
 #ifdef MODDEF_AUDIOOUT_AMPLIFIER_POWER
-			out->bytesInFlight = sizeof(out->buffer) * 1000;		// don't turn off amplifier during disable/enable
-			modGPIOWrite(&out->amplifierPower, 1);
-			i2s_channel_disable(out->tx_handle);
-			i2s_channel_enable(out->tx_handle);
+			if (out->bytesInFlight <= 0) {
+				out->bytesInFlight = sizeof(out->buffer) * 1000;		// don't turn off amplifier during disable/enable
+				modGPIOWrite(&out->amplifierPower, 1);
+				i2s_channel_disable(out->tx_handle);
+				i2s_channel_enable(out->tx_handle);
+			}
 			out->bytesInFlight = out->sampleRate >> 3;		// 1/8th of a second
 #elif MODDEF_AUDIOOUT_I2S_DAC
 			dac_continuous_enable(out->dacHandle);
