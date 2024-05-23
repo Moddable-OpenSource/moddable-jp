@@ -129,11 +129,25 @@ int main(int argc, char* argv[])
 	for (argi = 1; argi < argc; argi++) {
 		if (argv[argi][0] != '-')
 			continue;
-		if (!strcmp(argv[argi], "-l"))
-			continue;
-		if (!strcmp(argv[argi], "-lc"))
-			continue;
-		if (!strcmp(argv[argi], "-h"))
+	
+		if (!strcmp(argv[argi], "-c"))
+			option = 4;
+		else if (!strcmp(argv[argi], "-i")) {
+			argi++;
+			option = 4;
+		}
+		else if (!strcmp(argv[argi], "-l"))
+			option = 4;
+		else if (!strcmp(argv[argi], "-lc"))
+			option = 4;
+		else if (!strcmp(argv[argi], "-o")) {
+			argi++;
+			option = 4;
+		}
+		else if (!strcmp(argv[argi], "-t"))
+			option = 4;
+
+		else if (!strcmp(argv[argi], "-h"))
 			fxPrintUsage();
 		else if (!strcmp(argv[argi], "-b"))
 			option = 7;
@@ -149,8 +163,6 @@ int main(int argc, char* argv[])
 			profiling = 1;
 		else if (!strcmp(argv[argi], "-s"))
 			option = 3;
-		else if (!strcmp(argv[argi], "-t"))
-			option = 4;
 		else if (!strcmp(argv[argi], "-v"))
 			printf("XS %d.%d.%d, slot %zu bytes, ID %zu bytes\n", XS_MAJOR_VERSION, XS_MINOR_VERSION, XS_PATCH_VERSION, sizeof(txSlot), sizeof(txID));
 		else {
