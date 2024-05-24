@@ -1655,7 +1655,9 @@ void audioOutLoop(void *pvParameter)
 
 		dac_continuous_write(out->dacHandle, out->buffer8, count, NULL, -1);		// -1 for portMAX_DELAY
 #elif (16 == MODDEF_AUDIOOUT_I2S_BITSPERSAMPLE) || (32 == MODDEF_AUDIOOUT_I2S_BITSPERSAMPLE)
+	#ifdef MODDEF_AUDIOOUT_AMPLIFIER_POWER
 		__atomic_add_fetch(&out->bytesInFlight, sizeof(out->buffer), __ATOMIC_SEQ_CST);
+	#endif
 		i2s_channel_write(out->tx_handle, (const char *)out->buffer, sizeof(out->buffer), &bytes_written, portMAX_DELAY);
 #else
 	#error invalid MODDEF_AUDIOOUT_I2S_BITSPERSAMPLE
