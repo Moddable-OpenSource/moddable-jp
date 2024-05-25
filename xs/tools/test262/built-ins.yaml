@@ -65,3 +65,8 @@ fail:
                             - cross-realm.js: "Test262Error: Expected SameValue(«function [\"for\"] (){[native code]}», «function [\"for\"] (){[native code]}») to be false"
                     - keyFor:
                             - cross-realm.js: "Test262Error: Expected SameValue(«function [\"keyFor\"] (){[native code]}», «function [\"keyFor\"] (){[native code]}») to be false"
+            - TypedArrayConstructors:
+                    - from:
+                            - BigInt:
+                                    - custom-ctor-returns-smaller-instance-throws.js: "Test262Error: source is using iterator Expected a TypeError to be thrown but no exception was thrown at all (Testing with BigInt64Array.)"
+                            - custom-ctor-returns-smaller-instance-throws.js: "Test262Error: source is using iterator Expected a TypeError to be thrown but no exception was thrown at all (Testing with Float64Array.)"

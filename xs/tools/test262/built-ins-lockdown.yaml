@@ -3394,6 +3394,10 @@ fail:
                                     - other-ctor-buffer-ctor-species-undefined.js: "TypeError: (anonymous-608): set constructor: not writable (Testing with BigInt64Array.)"
                                     - same-ctor-buffer-ctor-species-null.js: "TypeError: (anonymous-608): set constructor: not writable (Testing with BigInt64Array.)"
                                     - same-ctor-buffer-ctor-species-undefined.js: "TypeError: (anonymous-608): set constructor: not writable (Testing with BigInt64Array.)"
+                    - from:
+                            - BigInt:
+                                    - custom-ctor-returns-smaller-instance-throws.js: "Test262Error: source is using iterator Expected a TypeError to be thrown but no exception was thrown at all (Testing with BigInt64Array.)"
+                            - custom-ctor-returns-smaller-instance-throws.js: "Test262Error: source is using iterator Expected a TypeError to be thrown but no exception was thrown at all (Testing with Float64Array.)"
                     - internals:
                             - Delete:
                                     - BigInt:
@@ -3452,32 +3456,6 @@ fail:
                                     - BigInt:
                                             - indexed-value.js: "TypeError: Object.defineProperty: invalid descriptor"
                                     - indexed-value.js: "TypeError: Object.defineProperty: invalid descriptor"
-            - Uint8Array:
-                    - fromBase64:
-                            - descriptor.js: "Test262Error: descriptor should be writable; descriptor should be configurable"
-                            - length.js: "Test262Error: descriptor should be configurable"
-                            - name.js: "Test262Error: descriptor should be configurable"
-                    - fromHex:
-                            - descriptor.js: "Test262Error: descriptor should be writable; descriptor should be configurable"
-                            - length.js: "Test262Error: descriptor should be configurable"
-                            - name.js: "Test262Error: descriptor should be configurable"
-                    - prototype:
-                            - setFromBase64:
-                                    - descriptor.js: "Test262Error: descriptor should be writable; descriptor should be configurable"
-                                    - length.js: "Test262Error: descriptor should be configurable"
-                                    - name.js: "Test262Error: descriptor should be configurable"
-                            - setFromHex:
-                                    - descriptor.js: "Test262Error: descriptor should be writable; descriptor should be configurable"
-                                    - length.js: "Test262Error: descriptor should be configurable"
-                                    - name.js: "Test262Error: descriptor should be configurable"
-                            - toBase64:
-                                    - descriptor.js: "Test262Error: descriptor should be writable; descriptor should be configurable"
-                                    - length.js: "Test262Error: descriptor should be configurable"
-                                    - name.js: "Test262Error: descriptor should be configurable"
-                            - toHex:
-                                    - descriptor.js: "Test262Error: descriptor should be writable; descriptor should be configurable"
-                                    - length.js: "Test262Error: descriptor should be configurable"
-                                    - name.js: "Test262Error: descriptor should be configurable"
             - WeakMap:
                     - empty-iterable.js: "TypeError: (anonymous-607): set set: not writable"
                     - get-set-method-failure.js: "TypeError: Object.defineProperty: invalid descriptor"
