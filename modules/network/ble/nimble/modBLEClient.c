@@ -793,6 +793,7 @@ static const char_name_table *uuidToCharName(ble_uuid_any_t *uuid)
 				uint16_t descriptor_index = 0;
 				const struct ble_gatt_dsc_def *descriptor = &characteristic->descriptors[descriptor_index];
 				while (NULL != descriptor->uuid) {
+					++att_index;
 					if (0 == ble_uuid_cmp((const ble_uuid_t*)uuid, (const ble_uuid_t*)descriptor->uuid)) {
 						for (int k = 0; k < char_name_count; ++k) {
 							const char_name_table *char_name = &char_names[k];
@@ -801,7 +802,6 @@ static const char_name_table *uuidToCharName(ble_uuid_any_t *uuid)
 							}
 						}
 					}
-					++att_index;
 					descriptor = &characteristic->descriptors[++descriptor_index];
 				}
 			}
