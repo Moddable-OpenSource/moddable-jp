@@ -41,7 +41,7 @@ class Client extends BLEClient {
             descriptors[i].readValue();
     }
     onDescriptorValue(descriptor, value) {
-        const view = new Uint8Array(value);
+        const view = ArrayBuffer.isView(value) ? value : new Uint8Array(value);
         const index = CONFIG.EXPECTED_DESCRIPTORS.findIndex(element => element.equals(descriptor.uuid));
         
         try {
