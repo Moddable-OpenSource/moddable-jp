@@ -71,6 +71,11 @@ static void fxScreenPost(txScreen* screen, char* message, int size);
 static void fxScreenStart(txScreen* screen, double interval);
 static void fxScreenStop(txScreen* screen);
 
+enum {
+	piuRecordingTouches = 1 << 29,
+	piuPlayingTouches = 1 << 30,
+};
+
 LRESULT CALLBACK PiuScreenControlProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static BOOL dragging = FALSE;
@@ -458,6 +463,36 @@ void PiuScreen_get_pixelFormat(xsMachine* the)
 	xsResult = xsInteger((*self)->screen->pixelFormat);
 }
 
+void PiuScreen_get_playingTouches(xsMachine* the)
+{
+	PiuScreen* self = PIU(Screen, xsThis);
+	xsResult = ((*self)->flags & piuPlayingTouches) ? xsTrue : xsFalse;
+}
+
+void PiuScreen_set_playingTouches(xsMachine* the)
+{
+	PiuScreen* self = PIU(Screen, xsThis);
+	if (xsTest(xsArg(0)))
+		(*self)->flags |= piuPlayingTouches;
+	else
+		(*self)->flags &= ~piuPlayingTouches;
+}
+
+void PiuScreen_get_recordingTouches(xsMachine* the)
+{
+	PiuScreen* self = PIU(Screen, xsThis);
+	xsResult = ((*self)->flags & piuRecordingTouches) ? xsTrue : xsFalse;
+}
+
+void PiuScreen_set_recordingTouches(xsMachine* the)
+{
+	PiuScreen* self = PIU(Screen, xsThis);
+	if (xsTest(xsArg(0)))
+		(*self)->flags |= piuRecordingTouches;
+	else
+		(*self)->flags &= ~piuRecordingTouches;
+}
+
 void PiuScreen_get_running(xsMachine* the)
 {
 	PiuScreen* self = PIU(Screen, xsThis);
@@ -552,6 +587,10 @@ void PiuScreen_quit(xsMachine* the)
 {
 	PiuScreen* self = PIU(Screen, xsThis);
 	PiuScreenQuit(self);
+}
+
+void PiuScreen_touch(xsMachine* the)
+{
 }
 
 static int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
