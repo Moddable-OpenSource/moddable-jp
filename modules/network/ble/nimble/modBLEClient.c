@@ -61,6 +61,7 @@ typedef struct {
 	uint8_t mitm;
 	uint8_t iocap;
 
+	uint8_t scanning;
 	uint8_t closing;
 	uint16_t useCount;
 	
@@ -163,7 +164,7 @@ static void logGAPEvent(struct ble_gap_event *event);
 
 static modBLE gBLE = NULL;
 
-// Posting message bumps useCount go gBLE cannot be freed while message is in transit.
+// Posting message bumps useCount so gBLE cannot be freed while message is in transit.
 // Message receivers can safely access gBLE, since it cannot have gone to null
 // Message receivers decrement useCount on exit, after their last access to modBLE
 static int postBLEClientMessage(char *name, modBLE ble, uint8_t *message, uint16_t messageLength, modMessageDeliver callback, void *refcon)
@@ -218,6 +219,9 @@ static void bleClientCloseEvent(void *the, void *refcon, uint8_t *message, uint1
 {
 	modBLE ble = refcon;
 
+	if (ble->scanning)
+		ble_gap_disc_cancel();
+	
 	xsBeginHost(ble->the);
 	xsmcSetHostData(ble->obj, NULL);
 	xsForget(ble->obj);
@@ -255,6 +259,9 @@ void xs_ble_client_close(xsMachine *the)
 	modBLE ble = xsmcGetHostData(xsThis);
 	if (!ble || ble->closing)
 		return;
+
+	if (ble->scanning)
+		xs_ble_client_stop_scanning(the);
 
 	ble->closing = true;
 	xsmcSetHostData(xsThis, NULL);
@@ -312,6 +319,11 @@ void xs_ble_client_start_scanning(xsMachine *the)
 	uint8_t own_addr_type;
 	struct ble_gap_disc_params disc_params;
 
+	if (ble->scanning)
+		xsUnknownError("already scanning");
+		
+	ble->scanning = 1;
+
 	switch(filterPolicy) {
 		case kBLEScanFilterPolicyWhitelist:
 			filterPolicy = BLE_HCI_SCAN_FILT_USE_WL;
@@ -343,8 +355,11 @@ void xs_ble_client_start_scanning(xsMachine *the)
 void xs_ble_client_stop_scanning(xsMachine *the)
 {
 	modBLE ble = validateInstance(the);
-	ble_gap_disc_cancel();
-	downBLEClientUseCount(ble);
+	if (ble->scanning) {
+		ble->scanning = 0;
+		ble_gap_disc_cancel();
+		downBLEClientUseCount(ble);
+	}
 }
 
 void xs_ble_client_connect(xsMachine *the)
@@ -359,8 +374,11 @@ void xs_ble_client_connect(xsMachine *the)
 	modBLE ble = getBLEClient();
 	if (!ble)
 		return;
-	
-	ble_gap_disc_cancel();
+
+	if (gBLE->scanning) {
+		ble_gap_disc_cancel();
+		downBLEClientUseCount(ble);
+	}
 
 	// Check if there has already been a connection established with this peer.
 	// This can happen if a BLEServer instance connects prior to the BLEClient instance.
@@ -849,19 +867,21 @@ static void scanResultEvent(void *the, void *refcon, uint8_t *message, uint16_t 
 
 	while (NULL != (entry = (deviceDiscoveryRecord*)modBLEMessageQueueDequeue(&ble->discoveryQueue))) {
 		struct ble_gap_disc_desc *disc = &entry->disc;
-		xsBeginHost(ble->the);
-		xsmcVars(2);
-		xsmcSetNewObject(xsVar(0));
-		xsmcSetArrayBuffer(xsVar(1), entry->data, disc->length_data);
-		xsmcSet(xsVar(0), xsID_scanResponse, xsVar(1));
-		xsmcSetArrayBuffer(xsVar(1), disc->addr.val, 6);
-		xsmcSet(xsVar(0), xsID_address, xsVar(1));
-		xsmcSetInteger(xsVar(1), disc->addr.type);
-		xsmcSet(xsVar(0), xsID_addressType, xsVar(1));
-		xsmcSetInteger(xsVar(1), disc->rssi);
-		xsmcSet(xsVar(0), xsID_rssi, xsVar(1));
-		xsCall2(ble->obj, xsID_callback, xsStringX("onDiscovered"), xsVar(0));
-		xsEndHost(ble->the);
+		if (ble->scanning && !ble->closing) {
+			xsBeginHost(ble->the);
+			xsmcVars(2);
+			xsmcSetNewObject(xsVar(0));
+			xsmcSetArrayBuffer(xsVar(1), entry->data, disc->length_data);
+			xsmcSet(xsVar(0), xsID_scanResponse, xsVar(1));
+			xsmcSetArrayBuffer(xsVar(1), disc->addr.val, 6);
+			xsmcSet(xsVar(0), xsID_address, xsVar(1));
+			xsmcSetInteger(xsVar(1), disc->addr.type);
+			xsmcSet(xsVar(0), xsID_addressType, xsVar(1));
+			xsmcSetInteger(xsVar(1), disc->rssi);
+			xsmcSet(xsVar(0), xsID_rssi, xsVar(1));
+			xsCall2(ble->obj, xsID_callback, xsStringX("onDiscovered"), xsVar(0));
+			xsEndHost(ble->the);
+		}
 		
 		c_free(entry);
 	}
