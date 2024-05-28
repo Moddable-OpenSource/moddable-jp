@@ -512,6 +512,9 @@ txFlag fxStringToIndex(void* the, txString theString, txIndex* theIndex);
 mxExport char* fxCStackLimit();
 mxExport txID fxGenerateProfileID(void* console);
 mxExport void fxGenerateTag(void* console, txString buffer, txInteger bufferSize, txString path);
+#ifdef mxMetering
+mxExport void fxMeterSome(void* console, txU4 count);
+#endif
 mxExport void fxVReport(void* console, txString theFormat, c_va_list theArguments);
 mxExport void fxVReportError(void* console, txString thePath, txInteger theLine, txString theFormat, c_va_list theArguments);
 mxExport void fxVReportWarning(void* console, txString thePath, txInteger theLine, txString theFormat, c_va_list theArguments);

@@ -5041,8 +5041,13 @@ void fxRunUsingAsync(txMachine* the)
 #endif
 }
 
-
-
+#ifdef mxMetering
+void fxMeterSome(void* console, txU4 count)
+{
+	txMachine* the = console;
+	the->meterIndex += count;
+}
+#endif
 
 
 

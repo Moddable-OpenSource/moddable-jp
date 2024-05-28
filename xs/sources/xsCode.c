@@ -193,6 +193,9 @@ txScript* fxParserCode(txParser* parser)
 	txSize total;
 	txByte* p;
 	txHostNode* node;
+#ifdef mxMetering
+	txUnsigned meterIndex = 0;
+#endif
 
     c_memset(&coder, 0, sizeof(txCoder));
 	coder.parser = parser;
@@ -381,8 +384,14 @@ txScript* fxParserCode(txParser* parser)
 			break;
 		}
 		code = code->nextCode;
+#ifdef mxMetering
+		meterIndex++;
+#endif
 	}	
-	
+#ifdef mxMetering
+	fxMeterSome(parser->console, meterIndex);
+#endif
+
 	code = coder.firstCode;
 	size = 0;
 	while (code) {
