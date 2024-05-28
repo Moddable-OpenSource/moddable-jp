@@ -118,6 +118,7 @@ class DeviceScreenBehavior extends Behavior {
 	}
 	onCreate(screen, device) {
 		model.SCREEN = screen;
+		screen.skin = skins.fingerprint;
 		this.device = device;
 		this.workers = [];
 	}

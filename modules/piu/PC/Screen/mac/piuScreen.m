@@ -50,10 +50,6 @@ typedef struct PiuScreenMessageStruct  PiuScreenMessageRecord, *PiuScreenMessage
 	txScreen* screen;
     NSTimeInterval time;
 	NSTimer *timer;
-    NSImage *touchImage;
-	int touchX;
-	int touchY;
-	BOOL touching;
 }
 @property (assign) PiuScreen* piuScreen;
 @property (assign) void* library;
@@ -62,10 +58,6 @@ typedef struct PiuScreenMessageStruct  PiuScreenMessageRecord, *PiuScreenMessage
 @property (assign) txScreen *screen;
 @property (assign) NSTimeInterval time;
 @property (assign) NSTimer *timer;
-@property (retain) NSImage *touchImage;
-@property (assign) int touchX;
-@property (assign) int touchY;
-@property (assign) BOOL touching;
 - (void)abortMachine:(NSObject *)object;
 - (void)launchMachine:(NSString*)libraryPath with:(NSString*)archivePath;
 - (void)quitMachine;
@@ -91,6 +83,7 @@ struct PiuScreenStruct {
 	xsIntegerValue rotation;
 	xsNumberValue transparency;
 	xsBooleanValue circular;
+	PiuPointRecord fingerprint;
 };
 
 struct PiuScreenMessageStruct {
@@ -99,8 +92,9 @@ struct PiuScreenMessageStruct {
 };
 
 enum {
-	piuRecordingTouches = 1 << 29,
-	piuPlayingTouches = 1 << 30,
+	piuRecordingTouches = 1 << 24,
+	piuPlayingTouches = 1 << 25,
+	piuDisplayFingerprint = 1 << 26,
 };
 
 @implementation NSPiuScreenView
@@ -111,14 +105,9 @@ enum {
 @synthesize screen;
 @synthesize time;
 @synthesize timer;
-@synthesize touchImage;
-@synthesize touchX;
-@synthesize touchY;
-@synthesize touching;
 - (void)dealloc {
 	if (library)
     	dlclose(library);
-    [touchImage release];
     [super dealloc];
 }
 - (void)abortMachine:(NSObject *)object {
@@ -163,11 +152,20 @@ enum {
 	CGImageRelease(image);
 	CGDataProviderRelease(provider);
 	CGColorSpaceRelease(colorSpace);
-	if (touching) {
-		NSSize size = [touchImage size];
-		NSRect source = NSMakeRect(0, 0, size.width, size.height);
-		NSRect destination = NSMakeRect(touchX - (size.width / 2), srcRect.size.height - touchY - (size.height / 2), size.width, size.height);
-		[touchImage drawInRect:destination fromRect:source operation:NSCompositingOperationSourceOver fraction:1 respectFlipped:YES hints:nil];
+	if ((*piuScreen)->flags & piuDisplayFingerprint) {
+		PiuSkin* skin = (*piuScreen)->skin;
+		if (skin) {
+			PiuTexture* texture = (*skin)->data.pattern.texture;
+			if (skin) {
+				NSImage* image = (*texture)->image;
+				if (image) {
+					NSSize size = [image size];
+					NSRect source = NSMakeRect(0, 0, size.width, size.height);
+					NSRect destination = NSMakeRect((*piuScreen)->fingerprint.x - (size.width / 2), srcRect.size.height - (*piuScreen)->fingerprint.y - (size.height / 2), size.width, size.height);
+					[image drawInRect:destination fromRect:source operation:NSCompositingOperationSourceOver fraction:1 respectFlipped:YES hints:nil];
+				}
+			}
+		}
 	}
 }
 - (void)launchMachine:(NSString*)libraryPath with:(NSString*)archivePath {
@@ -254,39 +252,40 @@ bail:
 	free(message->buffer);
 }
 - (void)mouseDown:(NSEvent *)event {
-	if (touching)
+	if ((*piuScreen)->flags & piuPlayingTouches) 
 		return;
-	NSTimeInterval when = 1000 * (time + [event timestamp]);
-	NSPoint point = [event locationInWindow];
-	point = [self convertPoint:point fromView:nil];
-	point = [self rotatePoint:point];
-	if ((*piuScreen)->flags & piuRecordingTouches) 
-		fxScreenRecordTouch(self.screen, touchEventBeganKind, 0, point.x, point.y);
-	if (self.screen->touch) 
-		(*self.screen->touch)(self.screen, touchEventBeganKind, 0, point.x, point.y, when);
+	if (self.screen->touch) {
+		NSPoint point = [event locationInWindow];
+		point = [self convertPoint:point fromView:nil];
+		point = [self rotatePoint:point];
+		if ((*piuScreen)->flags & piuRecordingTouches) 
+			fxScreenRecordTouch(self.screen, touchEventBeganKind, 0, point.x, point.y);
+		(*self.screen->touch)(self.screen, touchEventBeganKind, 0, point.x, point.y, 0);
+	}
 }
 - (void)mouseDragged:(NSEvent *)event {
-	if (touching)
+	if ((*piuScreen)->flags & piuPlayingTouches) 
 		return;
-	NSTimeInterval when = 1000 * (time + [event timestamp]);
-	NSPoint point = [event locationInWindow];
-	point = [self convertPoint:point fromView:nil];
-	point = [self rotatePoint:point];
-	if ((*piuScreen)->flags & piuRecordingTouches) 
-		fxScreenRecordTouch(self.screen, touchEventMovedKind, 0, point.x, point.y);
-		(*self.screen->touch)(self.screen, touchEventMovedKind, 0, point.x, point.y, when);
+	if (self.screen->touch)  {
+		NSPoint point = [event locationInWindow];
+		point = [self convertPoint:point fromView:nil];
+		point = [self rotatePoint:point];
+		if ((*piuScreen)->flags & piuRecordingTouches) 
+			fxScreenRecordTouch(self.screen, touchEventMovedKind, 0, point.x, point.y);
+		(*self.screen->touch)(self.screen, touchEventMovedKind, 0, point.x, point.y, 0);
+	}
 }
 - (void)mouseUp:(NSEvent *)event {
-	if (touching)
+	if ((*piuScreen)->flags & piuPlayingTouches) 
 		return;
-	NSTimeInterval when = 1000 * (time + [event timestamp]);
-	NSPoint point = [event locationInWindow];
-	point = [self convertPoint:point fromView:nil];
-	point = [self rotatePoint:point];
-	if ((*piuScreen)->flags & piuRecordingTouches) 
-		fxScreenRecordTouch(self.screen, touchEventEndedKind, 0, point.x, point.y);
-	if (self.screen->touch) 
-		(*self.screen->touch)(self.screen, touchEventEndedKind, 0, point.x, point.y, when);
+	if (self.screen->touch) {
+		NSPoint point = [event locationInWindow];
+		point = [self convertPoint:point fromView:nil];
+		point = [self rotatePoint:point];
+		if ((*piuScreen)->flags & piuRecordingTouches) 
+			fxScreenRecordTouch(self.screen, touchEventEndedKind, 0, point.x, point.y);
+		(*self.screen->touch)(self.screen, touchEventEndedKind, 0, point.x, point.y, 0);
+	}
 }
 - (void)quitMachine {
 	if (self.screen->quit) 
@@ -413,14 +412,6 @@ void PiuScreenBind(void* it, PiuApplication* application, PiuView* view)
     NSDate* date = [NSDate dateWithTimeIntervalSinceNow:-time];
     screenView.time = [date timeIntervalSince1970];
     screenView.timer = nil;
-  
-	NSURL* base = [[NSBundle mainBundle] resourceURL];
-	NSURL* url = [NSURL URLWithString:@"assets/fingerprint.png" relativeToURL:base];
-	screenView.touchImage = [[NSImage alloc] initByReferencingURL:url];
-	screenView.touchX = 0;
-	screenView.touchY = 0;
-	screenView.touching = NO;
-	 
     [(*view)->nsView addSubview:clipView];
 }
 
@@ -614,20 +605,20 @@ void PiuScreen_touch(xsMachine* the)
 {
 	PiuScreen* self = PIU(Screen, xsThis);
 	txScreen* screen = (*self)->screen;
-	NSPiuScreenView *screenView = screen->view;
-	xsIntegerValue kind = xsToInteger(xsArg(0));
-	xsIntegerValue index = xsToInteger(xsArg(1));
-	xsIntegerValue x = xsToInteger(xsArg(2));
-	xsIntegerValue y = xsToInteger(xsArg(3));
-	if (kind == 0)
-		screenView.touching = YES;
-	else if ((kind == 1) || (kind == 2))
-		screenView.touching = NO;
-	screenView.touchX = x;
-	screenView.touchY = y;
-	[screenView display];
-	if (screen->touch) 
+	if (screen->touch) {
+		xsIntegerValue kind = xsToInteger(xsArg(0));
+		xsIntegerValue index = xsToInteger(xsArg(1));
+		xsIntegerValue x = xsToInteger(xsArg(2));
+		xsIntegerValue y = xsToInteger(xsArg(3));
+		if (kind == 0)
+			(*self)->flags |= piuDisplayFingerprint;
+		else if ((kind == 1) || (kind == 2))
+			(*self)->flags &= ~piuDisplayFingerprint;
+		(*self)->fingerprint.x = x;
+		(*self)->fingerprint.y = y;
+		fxScreenBufferChanged(screen);
 		(*screen->touch)(screen, kind, index, x, y, 0);
+	}
 }
 
 void PiuScreen_writePNG(xsMachine* the)

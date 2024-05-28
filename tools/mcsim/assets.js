@@ -71,6 +71,7 @@ const themes = [
 Object.freeze(themes, true)
 
 const textures = {
+	fingerprint: { path:"assets/fingerprint.png", scale:1 },
 	icons: { path:"assets/icons.png", scale:2 },
 	popup: { path:"assets/popup.png", scale:2 },
 	shadow: { path:"assets/shadow.png", scale:1 },
@@ -121,6 +122,7 @@ function buildTheme($, codeFont) {
 	styles.controlValue = new Style({ font:"light", color:$.pane.color, horizontal:"left", left:10 });
 	
 	skins.background = new Skin({ fill:$.background.fill });
+	skins.fingerprint = new Skin({ texture:textures.fingerprint,  });
 }
 
 export function buildAssets(which) { 
