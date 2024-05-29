@@ -30,7 +30,7 @@
 						"type": "Uint8Array",
 						"permissions": "read",
 						"properties": "read",
-						"value": 3
+						"value": [3]
 					}
 				}
 			}
