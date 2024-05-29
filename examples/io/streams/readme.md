@@ -1,28 +1,28 @@
 # Streams
-Revised: January 24, 2024
+改訂日： 2024年1月24日
 
-This directory contains an experimental implementation of [web streams](https://streams.spec.whatwg.org). It is based on the [reference implementation](https://github.com/whatwg/streams). 
+このディレクトリには、[web streams](https://streams.spec.whatwg.org) の実験的な実装が含まれています。これは [リファレンス実装](https://github.com/whatwg/streams) に基づいています。
 
-The purpose of this work is to evaluate the feasibility and usefulness of web streams on resource-constrained embedded devices.
+この作業の目的は、リソースが制約された組み込みデバイスでのweb streamsの実現可能性と有用性を評価することです。
 
-Starting with the reference implementation helps to ensure that the behaviors are conformant with the web streams specification. To verify conformance, the implementation has been tested using the Web Platform Tests for web streams ([more below](#tests)). 
+リファレンス実装から始めることで、動作がweb streams仕様に準拠していることを確認できます。準拠性を確認するために、この実装はweb streamsのWeb Platform Testsを使用してテストされています（[詳細はこちら](#tests)）。
 
-The reference implementation has many opportunities for optimization of both memory use and performance. This is an area for future work.
+リファレンス実装には、メモリ使用量とパフォーマンスの両方を最適化する多くの機会があります。これは将来の作業領域です。
 
 <a id="modules"></a>
-## `modules` directory
-The `modules` directory contains the JavaScript implementation of web streams.
+## `modules` ディレクトリ
+`modules` ディレクトリには、web streamsのJavaScript実装が含まれています。
 
 ### streams.js
 
-This is the web streams implementation itself, derived from the [reference implementation](https://github.com/whatwg/streams) These are some of the differences from the original reference implementation:
+これは [リファレンス実装](https://github.com/whatwg/streams) から派生したweb streamsの実装です。以下はオリジナルのリファレンス実装との違いです：
 
-- Source code is in a single file rather than spread across multiple files
-- Modified to eliminate dependencies on the web platform
-- Changes made to improve efficiency when running under XS
-- Packaged as a standard JavaScript module (ESM)
+- ソースコードが複数のファイルに分散されず、単一のファイルにまとめられている
+- webプラットフォームへの依存を排除するように変更
+- XSでの実行時の効率を向上させるための変更
+- 標準のJavaScriptモジュール (ESM) としてパッケージ化
 
-The streams module exports the following:
+streamsモジュールは以下をエクスポートします：
 
 - AbortController
 - AbortSignal
@@ -43,7 +43,7 @@ The streams module exports the following:
 - TextDecoderStream
 - TextEncoderStream
 
-On the web, these exported classes are global variables. To run web examples in a Moddable application, please provide the globals:
+Webでは、これらのエクスポートされたクラスはグローバル変数です。Moddableアプリケーションでwebの例を実行するには、グローバル変数を提供してください：
 
 ```js
 import * as streams from "streams";
@@ -51,10 +51,10 @@ for (let key in streams)
 	globalThis[key] = streams[key];
 ```
 
-For compatibility with web platform tests, the `TextDecoderStream` and `TextEncoderStream` classes currently access the `TextDecoder` and `TextEncoder` classes as globals. 
+Webプラットフォームテストとの互換性のために、現在 `TextDecoderStream` と `TextEncoderStream` クラスはグローバルとして `TextDecoder` と `TextEncoder` クラスにアクセスします。
 
-If you want to use the `TextDecoderStream` and `TextEncoderStream` classes in a Moddable application, please provide the `TextDecoder` and `TextEncoder` classes as globals:
-	
+Moddableアプリケーションで `TextDecoderStream` と `TextEncoderStream` クラスを使用したい場合は、グローバルとして `TextDecoder` と `TextEncoder` クラスを提供してください：
+
 ```js
 import TextDecoder from "text/decoder";
 globalThis.TextDecoder = TextDecoder;
@@ -64,73 +64,73 @@ globalThis.TextEncoder = TextEncoder;
 
 ### iostreams.js
 
-The IO Streams module supports ECMA-419 IO using streams. The module exports two mixins, which create `ReadableStream` and `WritableStream` subclasses based on a class that conforms to the [ECMA-419 IO class pattern](https://419.ecma-international.org/#-9-io-class-pattern). The `button` example shows how to use these mixins.
+IO Streamsモジュールは、ストリームを使用したECMA-419 IOをサポートします。このモジュールは、[ECMA-419 IOクラスパターン](https://419.ecma-international.org/#-9-io-class-pattern)に準拠したクラスに基づいて `ReadableStream` と `WritableStream` のサブクラスを作成する2つのミックスインをエクスポートします。`button` の例は、これらのミックスインの使用方法を示しています。
 
 ### sensorstreams.js
 
-The IO Streams module supports ECMA-419 sensors using streams. The module exports a mixin which creates a `ReadableStream` subclass based on an a class that conforms to the [ECMA-419 Sensor class pattern](https://419.ecma-international.org/#-13-sensor-class-pattern). The `touch` example shows how to use this mixin.
+IO Streamsモジュールは、ストリームを使用したECMA-419センサーをサポートします。このモジュールは、[ECMA-419センサークラスパターン](https://419.ecma-international.org/#-13-sensor-class-pattern)に準拠したクラスに基づいて `ReadableStream` のサブクラスを作成するミックスインをエクスポートします。`touch` の例は、このミックスインの使用方法を示しています。
 
 <a id="examples"></a>
-## `examples` directory
-This directory contains several Moddable SDK example applications that use streams. The examples have all been successfully run on [Moddable Two](https://www.moddable.com/moddable-two), a development board built around the ESP32 microcontroller. They should run on other ESP32-based devices, though configuration changes may be necessary. Because of code size and RAM requirements, the examples may not fit into less capable microcontrollers.
+## `examples` ディレクトリ
+このディレクトリには、ストリームを使用するいくつかのModdable SDKの例のアプリケーションが含まれています。これらの例は、ESP32マイクロコントローラを中心に構築された開発ボードである [Moddable Two](https://www.moddable.com/moddable-two) で正常に実行されました。他のESP32ベースのデバイスでも動作するはずですが、設定の変更が必要な場合があります。コードサイズとRAMの要件のため、これらの例は能力の低いマイクロコントローラには収まらない場合があります。
 
 ### button
 
-This example revisits Moddable [IO button example](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/io/digital/button). It turns an LED on and off based on the state of a button.
+この例は、Moddableの [IOボタンの例](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/io/digital/button) を再検討します。ボタンの状態に基づいてLEDをオンおよびオフにします。
 
-Using to the mixins exported by `iostreams.js`, the `Digital` class becomes both a `ReadableStream` subclass for the button and a `WritableStream` subclass for the LED.
+`iostreams.js` によってエクスポートされたミックスインを使用すると、`Digital` クラスはボタン用の `ReadableStream` サブクラスとLED用の `WritableStream` サブクラスの両方になります。
 
-There is also a `TransformStream` to invert the value.
+値を反転するための `TransformStream` もあります。
 
-To build:
+ビルドするには：
 
 ```
 cd /path/to/streams/examples/button
 mcconfig -d -m -p esp32/moddable_two_io
 ```
-	
-Note that there is no console output when the LED changes state; you must watch the LED itself to see the state changes.
-	
-### touch
 
-Thanks to the mixin exported by `sensorstream.js`, the `Touch` class from `embedded:sensor/Touch/FT6x06` becomes a `ReadableStream` subclass. 
+LEDの状態が変わるときにコンソール出力はありません。状態の変化を見るためには、LED自体を監視する必要があります。
 
-Since `ReadableStream` provides an async iterator, the stream of points is read with a `for await` loop
+### touch {#examples}
 
-To build:
+`sensorstream.js`によってエクスポートされるミックスインのおかげで、`embedded:sensor/Touch/FT6x06`の`Touch`クラスは`ReadableStream`のサブクラスになります。
+
+`ReadableStream`は非同期イテレータを提供するため、ポイントのストリームは`for await`ループで読み取られます。
+
+ビルドするには：
 
 ```
 cd /path/to/streams/examples/touch
 mcconfig -d -m -p esp32/moddable_two_io
-```	
+```
 
-### fetch
+### fetch {#examples}
 
-This example implements the web standard[ `fetch()` function](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) to make an HTTP request, using Moddable SDK's implementation of the [ECMA-419 HTTP Client class pattern](https://419.ecma-international.org/#-20-http-client-class-pattern) and the `ReadableStream` class. 
+この例では、Moddable SDKの[ECMA-419 HTTPクライアントクラスパターン](https://419.ecma-international.org/#-20-http-client-class-pattern)と`ReadableStream`クラスを使用して、HTTPリクエストを行うためのWeb標準[`fetch()`関数](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)を実装しています。
 
-To build:
+ビルドするには：
 
 ```
 cd /path/to/streams/examples/fetch
 mcconfig -d -m -p esp32/moddable_two_io ssid=<SSID> password=<PASSWORD>
 ```
 
-The fetch example also runs on the simulator:
+fetchの例はシミュレータでも実行できます：
 
 ```
 mcconfig -d -m
 ```
 
 <a id="tests"></a>
-## `wpt` tests directory
+## `wpt` テストディレクトリ {#tests}
 
-This directory contains web stream unit tests extracted from the [Web Platform Tests Project](https://github.com/web-platform-tests/wpt).
+このディレクトリには、[Web Platform Tests Project](https://github.com/web-platform-tests/wpt)から抽出されたWebストリームの単体テストが含まれています。
 
-To run the tests, you need to build [xst](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/xs/xst.md), the XS test tool. Then:
+テストを実行するには、XSテストツールである[xst](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/xs/xst.md)をビルドする必要があります。その後：
 
 ```
 cd /path/to/streams/wpt
 ./iterate.sh
 ```
 
-The vast majority of tests pass - 1168 of 1203 (97.1%). Of the 35 failures, 25 are are because they use  text formats unsupported by `TextDecoder` on embedded, not because of the streams implementation itself. Setting those aside, 99.2% of the tests pass.
+テストの大部分は合格します - 1203のうち1168（97.1%）。35の失敗のうち、25は`TextDecoder`が組み込みでサポートしていないテキストフォーマットを使用しているためであり、ストリームの実装自体が原因ではありません。それを除けば、99.2%のテストが合格します。

@@ -1,36 +1,36 @@
-# TC53 IO: A New Take on JavaScript Input/Output on Microcontrollers
-Author: Peter Hoddie<BR>
-Updated: April 7, 2021<BR>
-Copyright 2019-2021 Moddable Tech, Inc.
+# TC53 IO: マイクロコントローラ上のJavaScript入出力の新しいアプローチ
+著者： Peter Hoddie<BR>
+更新日： 2021年4月7日<BR>
+著作権2019-2021 Moddable Tech, Inc.
 
-This document introduces work on Input/Output (IO) under development by Ecma TC53 in the IO Class Pattern proposal and describes an implementation of the proposal that uses the XS JavaScript engine on the ESP8266 microcontroller. (The implementation also supports ESP32, but this document is focused on ESP8266.)
+このドキュメントは、Ecma TC53によって開発中のIOクラスパターン提案に基づく入出力（IO）に関する作業を紹介し、ESP8266マイクロコントローラ上でXS JavaScriptエンジンを使用した提案の実装について説明します。（実装はESP32もサポートしていますが、このドキュメントはESP8266に焦点を当てています）
 
-Ecma TC53 is a standards committee with a charter to define ECMAScript Modules for embedded systems. Its goal is to define standard JavaScript APIs for developing software for resource-constrained embedded hardware. This is analogous to the work of W3C and WHATWG to define JavaScript APIs for developing software for the web. The APIs defined by TC53 are intended to be vendor-neutral and, consequently, independent of the host operating system, CPU architecture, and JavaScript engine. IO was selected as the first area of work by TC53 because it is fundamental to nearly all uses of embedded systems. For example, IO is a precondition to implementing support for both sensors and communication.
+Ecma TC53は、組み込みシステム向けのECMAScriptモジュールの標準化を推進するための委員会です。その目標は、リソースが制約された組み込みハードウェア向けのソフトウェアを開発するための標準的なJavaScript APIを定義することです。これは、W3CやWHATWGがウェブ向けのソフトウェアを開発するためのJavaScript APIを定義する作業に類似しています。TC53によって定義されたAPIは、ベンダーに依存せず、したがってホストオペレーティングシステム、CPUアーキテクチャ、およびJavaScriptエンジンに依存しないことを意図しています。IOは、組み込みシステムのほぼすべての用途にとって基本的であるため、TC53によって最初の作業領域として選ばれました。例えば、IOはセンサーと通信の両方をサポートするための前提条件です。
 
-A key characteristic of the initial TC53 work, including the work on IO, is that they are low-level APIs. They can be considered the minimal host for a JavaScript runtime. They will be used to build higher-level APIs, including frameworks for specific types of products, markets, and programming styles. The APIs are similar to drivers, where a small, simple API is important to achieving reliability. The APIs are designed to be straightforward to use in JavaScript. They have an additional design goal which is less common: they are intended to be straightforward to implement in native code. As these APIs make up a porting layer, they need to be clear to the implementors of the porting layer. They need to be small enough that the porting task is not an overwhelming amount of work. They need to be simple enough in their use of JavaScript that an embedded C developer can create an efficient port without first becoming an expert in the JavaScript language.
+初期のTC53の作業、特にIOに関する作業の重要な特徴は、それらが低レベルのAPIであることです。これらはJavaScriptランタイムの最小ホストと見なすことができます。これらは、特定の種類の製品、市場、およびプログラミングスタイルのためのフレームワークを含む高レベルのAPIを構築するために使用されます。これらのAPIはドライバに似ており、小さくシンプルなAPIが信頼性を達成するために重要です。これらのAPIはJavaScriptで使用するのが簡単であるように設計されています。さらに、これらのAPIはネイティブコードで実装するのが簡単であることを目指しています。これらのAPIはポーティングレイヤーを構成するため、ポーティングレイヤーの実装者にとって明確である必要があります。ポーティング作業が圧倒的な量の作業にならないように、十分に小さくする必要があります。JavaScriptの使用がシンプルで、組み込みC開発者がJavaScript言語の専門家になることなく効率的なポートを作成できるようにする必要があります。
 
-The IO Class Pattern proposal appears to balance these requirements well. The design takes inspiration from a range of JavaScript projects including [Johnny Five](http://johnny-five.io/), [Firmata](http://firmata.org/wiki/Main_Page), [Node.js](https://nodejs.org/en/), and the [Moddable SDK](https://github.com/Moddable-OpenSource/moddable), among others. These have provided ideas grounded in real-world experience about how to interact with various kinds of IO in JavaScript. The effort to implement the APIs proved to be very manageable, with a result that operates efficiently in terms of both CPU utilization, latency, and memory use.
+IOクラスパターンの提案は、これらの要件をうまくバランスさせているように見えます。この設計は、[Johnny Five](http://johnny-five.io/)、[Firmata](http://firmata.org/wiki/Main_Page)、[Node.js](https://nodejs.org/en/)、および[Moddable SDK](https://github.com/Moddable-OpenSource/moddable)など、さまざまなJavaScriptプロジェクトからインスピレーションを得ています。これらのプロジェクトは、JavaScriptでさまざまな種類のIOと対話する方法について、実際の経験に基づいたアイデアを提供してきました。APIの実装の取り組みは非常に管理しやすく、CPU利用率、レイテンシ、およびメモリ使用量の両方の観点から効率的に動作する結果となりました。
 
-The basic definition of the IO Class Pattern has been in place since mid-2019, with refinements to the design settling into place. The [current draft](https://ecmatc53.github.io/spec/web/spec.html) of the proposed specification is now available. To better understand the design, an implementation effort was undertaken. The ESP8266 microcontroller was selected as a testbed because it is supported by the XS JavaScript engine and its hardware resources are on the low end of the devices that currently support modern JavaScript. Further, its low cost and wide availability make it feasible for many developers to experiment with and contribute to the effort.
+IOクラスパターンの基本定義は2019年中頃から存在しており、設計の改良が進んでいます。提案された仕様の[現在のドラフト](https://ecmatc53.github.io/spec/web/spec.html)が利用可能です。設計をよりよく理解するために、実装の取り組みが行われました。ESP8266マイクロコントローラーがテストベッドとして選ばれたのは、XS JavaScriptエンジンによってサポートされており、そのハードウェアリソースが現在のモダンなJavaScriptをサポートするデバイスの中で低い方に位置しているためです。さらに、その低コストと広い入手可能性により、多くの開発者が実験し、この取り組みに貢献することが可能です。
 
-The implementation itself tries to be "bare metal" as much as feasible. The digital and serial IO is implemented by directly manipulating hardware registers, for example. This approach was taken to explore what a truly focused port of the IO Class looks like. To ease porting, future work may include a native porting layer.
+実装自体は可能な限り「ベアメタル」にしようとしています。例えば、デジタルおよびシリアルIOはハードウェアレジスタを直接操作することによって実装されています。このアプローチは、IOクラスの真に焦点を絞ったポートがどのようなものかを探るために採用されました。将来的な作業には、ネイティブのポーティングレイヤーを含めることが考えられます。
 
-The remainder of this document describes the IO Class Pattern and how it is applied to each IO type in the ESP8266 implementation.
+このドキュメントの残りの部分では、IOクラスパターンと、それがESP8266実装の各IOタイプにどのように適用されるかについて説明します。
 
-## The Basic IO Pattern
-The IO Class Pattern design starts with the idea that the majority of IO operations on a microcontroller are described by four basic operations:
+## 基本的なIOパターン
+IOクラスパターンの設計は、マイクロコントローラー上の大多数のIO操作が次の4つの基本操作によって記述されるという考えから始まります：
 
-1. **Create** -- Establish and configure a connection to an IO resource.
-1. **Read** -- Get data from the IO resource.
-1. **Write** -- Send data to the IO resource.
-1. **Close** -- Release the IO resource.
+1. **Create** -- IOリソースへの接続を確立し、構成する。
+1. **Read** -- IOリソースからデータを取得する。
+1. **Write** -- IOリソースにデータを送信する。
+1. **Close** -- IOリソースを解放する。
 
-Of course, not every kind of IO uses all four operations. An analog input does not use write. A digital output does not use read. These differences are why this is called a "Class Pattern" and not simply a "Class". Each IO type defines how it uses the pattern. The analog input, for example, defines that the write operation is not supported.
+もちろん、すべての種類のIOが4つの操作すべてを使用するわけではありません。アナログ入力は書き込みを使用しません。デジタル出力は読み取りを使用しません。これらの違いが、このパターンが単なる「クラス」ではなく「クラスパターン」と呼ばれる理由です。各IOタイプは、このパターンをどのように使用するかを定義します。例えば、アナログ入力は書き込み操作がサポートされていないことを定義します。
 
-The IO Class Pattern adopts the long-standing JavaScript convention that all operations are non-blocking. This behavior is particularly important on resource-constrained devices as there may be insufficient resources available to create even a single parallel execution context for a blocking operation. This is not to say that all operations complete instantaneously, but that they complete quickly enough that they do not inhibit the ability of the system to respond to incoming events in a timely manner.
+IOクラスパターンは、すべての操作が非ブロッキングであるという長年のJavaScriptの慣例を採用しています。この動作は、リソースが制約されたデバイスでは特に重要です。なぜなら、ブロッキング操作のための並行実行コンテキストを作成するためのリソースが不足している可能性があるからです。これは、すべての操作が瞬時に完了するという意味ではありませんが、システムがタイムリーに受信イベントに応答する能力を妨げない程度に迅速に完了することを意味します。
 
-### Create Operation
-The create operation is performed by the constructor of an IO class. The constructor takes a single argument, an object that contains properties to configure the IO. This is sometimes called an *options object*. For example, the following creates an instance of an analog input bound to pin 16.
+### 作成操作
+作成操作は、IOクラスのコンストラクタによって実行されます。コンストラクタは、IOを構成するプロパティを含むオブジェクトを1つの引数として受け取ります。これは時々*オプションオブジェクト*と呼ばれます。例えば、次のサンプルでは、ピン16にバインドされたアナログ入力のインスタンスを作成します。
 
 ```js
 let analogIn = new Analog({
@@ -38,7 +38,7 @@ let analogIn = new Analog({
 });
 ```
 
-The IO configuration depends on the host hardware. The API must accommodate the significant variation present in hardware capabilities. For example, some hardware supports configuring the number of bits of resolution an analog input provides. Such a host might add a `resolution` property to the IO configuration for this purpose.
+IOの構成はホストハードウェアに依存します。APIは、ハードウェアの能力に大きな違いがあることを考慮しなければなりません。例えば、いくつかのハードウェアは、アナログ入力が提供する解像度のビット数を構成することをサポートしています。そのようなホストは、この目的のためにIO構成に`resolution`プロパティを追加するかもしれません。
 
 ```js
 let analogIn = new Analog({
@@ -47,7 +47,7 @@ let analogIn = new Analog({
 });
 ```
 
-The IO class may provide notification of certain events, for example when new data is available to read. When a notification is available, it invokes a callback function. This example creates a Serial IO instance with an `onReadable` callback function that is invoked when the serial instance has new data available to read.
+IOクラスは、例えば新しいデータが読み取り可能になったときなど、特定のイベントの通知を提供する場合があります。通知が利用可能な場合、コールバック関数を呼び出します。この例では、シリアルIOインスタンスを作成し、シリアルインスタンスに新しいデータが読み取り可能になったときに呼び出される`onReadable`コールバック関数を設定します。
 
 ```js
 let serial = new Serial({
@@ -58,27 +58,28 @@ let serial = new Serial({
 })
 ```
 
-This way of providing the callback as a property of the configuration is often convenient. The same approach is used by streams in Node.js as described in [Simplified Construction](https://nodejs.org/api/stream.html#stream_simplified_construction).
+このように、コールバックを構成のプロパティとして提供する方法は便利なことが多いです。同じアプローチは、[Simplified Construction](https://nodejs.org/api/stream.html#stream_simplified_construction)で説明されているように、Node.jsのストリームでも使用されます。
 
-Each IO implementation defines the notifications it supports. The IO Class Pattern proposal defines four notifications:
+各IO実装はサポートする通知を定義します。IOクラスパターンの提案では、次の4つの通知が定義されています：
 
-- `onReadable` -- New data is available to read.
-- `onWritable`-- The output buffer is able to accept more data.
-- `onError` -- A problem occurred.
-- `onReady` -- The instance is initialized and ready for use.
+- `onReadable` -- 読み取るための新しいデータが利用可能です。
+- `onWritable` -- 出力バッファがより多くのデータを受け入れることができます。
+- `onError` -- 問題が発生しました。
+- `onReady` -- インスタンスが初期化され、使用可能です。
 
-The callbacks are usually optional. There is often a runtime cost associated with each callback. Therefore, it is recommended that scripts only install the callbacks they require. That said, the use of callbacks is generally preferred to polling.
+コールバックは通常オプションです。各コールバックにはランタイムコストが伴うことが多いため、スクリプトは必要なコールバックのみをインストールすることをお勧めします。とはいえ、ポーリングよりもコールバックの使用が一般的に推奨されます。
 
-Once the create operation completes, the configuration of the IO instance is locked. This helps simplify the API and its implementation. It also simplifies the work to secure IO with [Secure ECMAScript](https://blog.moddable.com/blog/secureprivate/) (a topic detailed elsewhere). In the rare situation where it needs to be changed, the instance is closed and re-created with the desired changes.
+作成操作が完了すると、IOインスタンスの構成がロックされます。これにより、APIとその実装が簡素化されます。また、[Secure ECMAScript](https://blog.moddable.com/blog/secureprivate/)（別の場所で詳述されているトピック）でIOを保護する作業も簡素化されます。変更が必要な稀な状況では、インスタンスを閉じて、希望する変更を加えて再作成します。
 
-In the case of hardware resources, the create operation usually establishes exclusive access to the hardware. This prevents two instances from interfering with one another. In some cases shared access is desirable, for example two different parts of a project may want to check the status of the same digital input. Rather than requiring the porting layer to manage the complexity of multiple clients of a single hardware resource, this is deferred to the JavaScript layer where mechanisms can be implemented to support this in a way that is tailored to the specific project need.
+ハードウェアリソースの場合、作成操作は通常ハードウェアへの排他的アクセスを確立します。これにより、2つのインスタンスが互いに干渉するのを防ぎます。プロジェクトの異なる部分が同じデジタル入力のステータスを確認したい場合など、共有アクセスが望ましい場合もあります。単一のハードウェアリソースの複数のクライアントの複雑さをポーティングレイヤーで管理するのではなく、JavaScriptレイヤーに委ね、特定のプロジェクトのニーズに合わせたメカニズムを実装することができます。
 
-The create operation is often the largest part of the implementation of an IO class. This is because it must validate the configuration, initialize the IO resource, and bind the IO resource to the JavaScript object. Fortunately, create operations are usually infrequent compared to read and write operations. Create can take the time to set up data structures so that the read and write operations can execute relatively quickly.
+作成操作はIOクラスの実装の中で最も大きな部分を占めることが多いです。これは、構成を検証し、IOリソースを初期化し、IOリソースをJavaScriptオブジェクトにバインドする必要があるためです。幸いなことに、作成操作は読み取りおよび書き込み操作に比べて頻度が少ないことが多いです。作成はデータ構造を設定する時間をかけることができるため、読み取りおよび書き込み操作が比較的迅速に実行できます。
 
-### Read Operation
-The read operation returns data from an IO resource.
+### 読み取り操作
+読み取り操作はIOリソースからデータを返します。
 
-The data returned by the read operation depends on the IO class definition. For example, a digital input returns a number with the value of 0 or 1.
+
+読み取り操作によって返されるデータは、IOクラスの定義によって異なります。例えば、デジタル入力は0または1の数値を返します。
 
 ```js
 let input = new Digital({
@@ -88,25 +89,25 @@ let input = new Digital({
 console.log(input.read());
 ```
 
-The kind of data returned by the read operation is determined by the `format` property of the IO instance, which is explained below in the Data Format section. Each IO class defines a default format that is suitable for many situations.
+読み取り操作によって返されるデータの種類は、以下のデータフォーマットセクションで説明されているように、IOインスタンスの`format`プロパティによって決定されます。各IOクラスは、多くの状況に適したデフォルトフォーマットを定義しています。
 
-If no data is available, the result of the read operation is `undefined`. No exception is thrown in this situation.
+データが利用できない場合、読み取り操作の結果は`undefined`です。この状況では例外はスローされません。
 
-Scripts that perform read operations may call read at any time. To avoid polling, the IO class for a given input may support the `onReadable` callback. The `onReadable` callback is a notification that new data is available to be read, but it does not provide the data. The read operation is the only way to read data.
+読み取り操作を行うスクリプトは、いつでも読み取りを呼び出すことができます。ポーリングを避けるために、特定の入力に対するIOクラスは`onReadable`コールバックをサポートする場合があります。`onReadable`コールバックは、新しいデータが読み取り可能であることを通知しますが、データ自体は提供しません。データを読み取る唯一の方法は読み取り操作です。
 
-Most kinds of IO have one of the following behaviors for their read operation:
+ほとんどの種類のIOは、読み取り操作に対して以下のいずれかの動作を持ちます：
 
-- Return the current value of the IO resource.
+- IOリソースの現在の値を返す。
 
-	Examples of this include digital inputs and analog inputs. Performing a read operation does not change what will be returned by the next read operation. Only changes to the IO resource itself change the value. The `onReadable` callback is invoked when the value of the IO resource changes.
-- Return data from the input buffer.
+	これにはデジタル入力やアナログ入力が含まれます。読み取り操作を行っても、次の読み取り操作で返される内容は変わりません。IOリソース自体の変更のみが値を変更します。IOリソースの値が変わると`onReadable`コールバックが呼び出されます。
+- 入力バッファからデータを返す。
 
-	Examples of this include serial and TCP network connections. Once data is read from a serial connection, that data is removed from the input buffer. A subsequent read will receive the next data in the buffer. The `onReadable` callback is invoked when new data is received.
+	これにはシリアルおよびTCPネットワーク接続が含まれます。シリアル接続からデータを読み取ると、そのデータは入力バッファから削除されます。次の読み取りではバッファ内の次のデータが受信されます。新しいデータが受信されると`onReadable`コールバックが呼び出されます。
 
-### Write Operation
-The write operation sends data to an IO resource.
+### 書き込み操作
+書き込み操作はデータをIOリソースに送信します。
 
-The data accepted by the write operation depends on the IO class definition. For example, a digital output expects a number with the value of 0 or 1.
+書き込み操作で受け入れられるデータは、IOクラスの定義によって異なります。例えば、デジタル出力は0または1の数値を期待します。
 
 ```js
 let output = new Digital({
@@ -116,9 +117,9 @@ let output = new Digital({
 output.write(1);
 ```
 
-The kind of data accepted by the write operation is determined by the `format` property of the IO instance, which is explained below in the Data Format section. Each IO class defines a default format that is suitable for many situations.
+書き込み操作で受け入れられるデータの種類は、以下のデータフォーマットセクションで説明されているように、IOインスタンスの`format`プロパティによって決定されます。各IOクラスは、多くの状況に適したデフォルトフォーマットを定義しています。
 
-Scripts that perform write operations may call write at any time. The IO instance may not always be able to accept new data, such as when its output buffer is full. If write is called in this situation, an exception is thrown. Such IO instances generally support the `onWritable` callback which indicates when space is available in the output buffer. The following example uses the `onWritable` callback to transmit a continuous stream of asterisk (ASCII 42) characters.
+書き込み操作を行うスクリプトは、いつでもwriteを呼び出すことができます。IOインスタンスは、出力バッファが満杯のときなど、常に新しいデータを受け入れることができるわけではありません。このような状況でwriteが呼び出されると、例外がスローされます。このようなIOインスタンスは一般的に、出力バッファに空きができたときに通知する`onWritable`コールバックをサポートしています。以下のサンプルでは、`onWritable`コールバックを使用して、アスタリスク（ASCII 42）文字の連続ストリームを送信します。
 
 ```js
 new Serial({
@@ -130,34 +131,34 @@ new Serial({
 });
 ```
 
-Most kinds of IO have one of the following behaviors for their write operation:
+ほとんどの種類のIOは、書き込み操作に対して次のいずれかの動作を持ちます：
 
-- Change the current value output by the IO resource.
+- IOリソースによって出力される現在の値を変更する。
 
-	A digital output is an example of this behavior. Performing a write operation immediately changes what is output by the IO resource. The `onWritable` callback is not useful for this case, as the value may be changed at any time.
-- Add data to the output buffer.
+	デジタル出力はこの動作の例です。書き込み操作を行うと、IOリソースによって出力されるものが即座に変更されます。この場合、値はいつでも変更できるため、`onWritable`コールバックは役に立ちません。
+- データを出力バッファに追加する。
 
-	Examples of this include serial and TCP network connections. Once data is written from a serial connection, that data is transmitted over a period of time. The `onWritable` callback is invoked when space has been freed in the output buffer.
+	これにはシリアルおよびTCPネットワーク接続が含まれます。シリアル接続からデータが書き込まれると、そのデータは一定期間にわたって送信されます。出力バッファに空きができると、`onWritable`コールバックが呼び出されます。
 
-### Close Operation
-The close operation releases all hardware resources associated with the IO instance.
+### クローズ操作
+クローズ操作は、IOインスタンスに関連付けられたすべてのハードウェアリソースを解放します。
 
 ```js
 serial.close();
 ```
 
-The specific IO class defines additional details of its close behavior. For example, a digital output may become a digital input when not in use to reduce power or a serial port may terminate any pending output.
+特定のIOクラスは、そのクローズ動作の詳細を定義します。例えば、デジタル出力は使用されていないときにデジタル入力になることで電力を節約する場合がありますし、シリアルポートは保留中の出力を終了する場合があります。
 
-No callbacks are invoked once the close operation begins. Any pending callbacks are canceled.
+クローズ操作が開始されると、コールバックは一切呼び出されません。保留中のコールバックはキャンセルされます。
 
-### Data Formats
-The read and write operations operate on some kind of data. Because JavaScript is an untyped language, the kind of data may be anything supported by the language. Each kind of IO defines the data format or data formats that it supports. If the IO kind supports more than one data format, it also defines the default data format.
+### データフォーマット
+読み取りおよび書き込み操作は、何らかのデータに対して行われます。JavaScriptは型のない言語であるため、データの種類は言語がサポートするものであれば何でもかまいません。各種類のIOは、サポートするデータフォーマットまたはデータフォーマットを定義します。IOの種類が複数のデータフォーマットをサポートする場合、デフォルトのデータフォーマットも定義します。
 
-The IO Class Pattern defines that the format used is managed through the `format` property, present on all IO instances. The value of the `format` property is a string.  The `format` may be changed at runtime.
+IOクラスパターンは、使用されるフォーマットがすべてのIOインスタンスに存在する`format`プロパティを通じて管理されることを定義しています。`format`プロパティの値は文字列です。`format`は実行時に変更することができます。
 
-The serial IO type supports two data formats. The first is `number`, which is used to read and write a single byte at a time. The second is `buffer`, which is used to read and write buffers of bytes. Depending on the situation, one or the other is more convenient or efficient.
+シリアルIOタイプは2つのデータフォーマットをサポートしています。最初のフォーマットは`number`で、これは1バイトずつ読み書きするために使用されます。2つ目のフォーマットは`buffer`で、バイトのバッファを読み書きするために使用されます。状況に応じて、どちらか一方がより便利または効率的です。
 
-For example, consider the following example which reads one byte from serial as a byte and then uses that value to read the following bytes into a buffer:
+例えば、次のサンプルでは、シリアルから1バイトをバイトとして読み取り、その値を使用して次のバイトをバッファに読み取ります。
 
 ```js
 serial.format = "number";
@@ -166,46 +167,46 @@ serial.format = "buffer";
 let data = serial.read(count);
 ```
 
-A "string" data format, while not yet implemented, seems necessary in some cases. The data format specifier would need to include the text encoding, for example "string;ascii" or "string;utf8".
+「文字列」データフォーマットはまだ実装されていませんが、いくつかのケースでは必要とされるようです。データフォーマット指定子には、例えば「string;ascii」や「string;utf8」のようにテキストエンコーディングを含める必要があります。
 
-This approach to data formats has similarities with [streams in Node.js](https://nodejs.org/api/stream.html), which may return strings of various encodings, buffers, and objects.
+このデータフォーマットへのアプローチは、[Node.jsのストリーム](https://nodejs.org/api/stream.html)と類似しており、さまざまなエンコーディングの文字列、バッファ、およびオブジェクトを返すことがあります。
 
-### Beyond Callback Functions
-The IO Class Pattern uses callback functions to deliver notifications. One motivation for this choice is that it closely reflects the common native implementations of IO, which helps to simplify porting. Another reason is that callbacks may be used to implement other common forms of notifications including events and promises. The original [IO Class Pattern proposal](https://gist.github.com/phoddie/166c9c17b2f31d0beda9f2410a219268) explores this area in depth, giving examples of how to apply mixins to IO Classes to provide an async- and event-based API. The simplicity and consistency of the IO Class makes the implementation of general purpose mixins small and straightforward.
+### コールバック関数を超えて
+IOクラスパターンは通知を提供するためにコールバック関数を使用します。この選択の動機の1つは、IOの一般的なネイティブ実装を反映しており、ポーティングを簡素化するのに役立つためです。もう1つの理由は、コールバックを使用してイベントやプロミスなどの他の一般的な通知形式を実装できるためです。元の[IOクラスパターン提案](https://gist.github.com/phoddie/166c9c17b2f31d0beda9f2410a219268)はこの領域を深く探求しており、非同期およびイベントベースのAPIを提供するためにIOクラスにミックスインを適用する方法の例を示しています。IOクラスのシンプルさと一貫性により、汎用のミックスインの実装が小さく簡単になります。
 
-## IO Kinds
-The IO Class Pattern, as described above, defines the fundamental behavior of an IO Class. Each particular kind of IO applies that definition to its specific characteristics and needs to create a class definition for that particular kind of IO. This section describes the different kinds of IO Classes implemented for ESP8266 and the specific adaptations.
+## IOの種類
+上記のように、IOクラスパターンはIOクラスの基本的な動作を定義します。各特定の種類のIOは、その特定の特性とニーズに応じてこの定義を適用し、その特定の種類のIOのためのクラス定義を作成します。このセクションでは、ESP8266用に実装されたさまざまな種類のIOクラスとその特定の適応について説明します。
 
-### Digital
-The built-in `Digital` IO class is used for digital inputs and outputs.
+### デジタル
+組み込みの`Digital` IOクラスは、デジタル入力および出力に使用されます。
 
 ```js
 import Digital from "embedded:io/digital";
 ```
 
-#### Constructor Properties
+#### コンストラクタプロパティ
 
-| Property | Description |
+| プロパティ | 説明 |
 | :---: | :--- |
-| `pin` | A number from 0 to 16 indicating the GPIO number to control. This property is required.
-| `mode` |A value indicating the mode of the IO. May be `Digital.Input`, `Digital.InputPullUp`, `Digital.InputPullDown`, `Digital.InputPullUpDown`, `Digital.Output`, or `Digital.OutputOpenDrain`. This property is required.
-|`edge` | A value indicating the conditions for invoking the `onReadable` callback. Values are `Digital.Rising`, `Digital.Falling`, and `Digital.Rising | Digital.Falling`. This value is required if `onReadable` is used and ignored otherwise.
+| `pin` | 制御するGPIO番号を示す0から16の数値。このプロパティは必須です。
+| `mode` | IOのモードを示す値。`Digital.Input`、`Digital.InputPullUp`、`Digital.InputPullDown`、`Digital.InputPullUpDown`、`Digital.Output`、または `Digital.OutputOpenDrain` のいずれか。このプロパティは必須です。
+| `edge` | `onReadable`コールバックを呼び出す条件を示す値。値は `Digital.Rising`、`Digital.Falling`、および `Digital.Rising | Digital.Falling` です。この値は `onReadable` が使用される場合に必須で、それ以外の場合は無視されます。
 
-#### Callbacks
+#### コールバック
 
 **`onReadable()`**
 
-Invoked when the input value changes depending on the value of the `mode` property.
+`mode`プロパティの値に応じて入力値が変化したときに呼び出されます。
 
-#### Data Format
-The `Digital` class always uses a data format of `number` with values of 0 and 1.
+#### データフォーマット
+`Digital`クラスは常に0と1の値を持つ`number`のデータフォーマットを使用します。
 
-#### Use Notes
-A digital IO instance configured as an input does not implement write; one configured as an output does not implement read.
+#### 使用ノート
+入力として構成されたデジタルIOインスタンスは書き込みを実装せず、出力として構成されたものは読み取りを実装しません。
 
-#### Examples
+#### サンプル
 
-The following example creates a digital output to control the built-in LED on the ESP8266 board, and turns it off by writing a 1 to it.
+次のサンプルは、ESP8266ボードの内蔵LEDを制御するデジタル出力を作成し、1を書き込むことでそれをオフにします。
 
 ```js
 const led = new Digital({
@@ -215,7 +216,7 @@ const led = new Digital({
 led.write(1);		// off
 ```
 
-The following example uses the built-in flash button on the ESP8266 to control the `led` created in the preceding example.
+次のサンプルは、ESP8266の内蔵フラッシュボタンを使用して、前のサンプルで作成した`led`を制御します。
 
 ```js
 let button = new Digital({
@@ -228,45 +229,45 @@ let button = new Digital({
 });
 ```
 
-> Note: The `Digital` class is implemented in JavaScript using the more general `DigitalBank` IO class described in the following section.
+> 注: `Digital`クラスは、次のセクションで説明するより一般的な`DigitalBank` IOクラスを使用してJavaScriptで実装されています。
 
 ### Digital Bank
-The built-in `DigitalBank` class provides simultaneous access to a group of digital pins.
+組み込みの`DigitalBank`クラスは、デジタルピンのグループに同時にアクセスするためのものです。
 
 ```js
 import DigitalBank from "embedded:io/digitalbank";
 ```
 
-Many microcontrollers, including the ESP8266, provide access to their digital pins through unified memory mapped hardware ports that make it possible to read and write several pins as a single operation. The `DigitalBank` IO provides direct access to this capability.
+ESP8266を含む多くのマイクロコントローラは、統一されたメモリマップドハードウェアポートを通じてデジタルピンにアクセスでき、複数のピンを単一の操作として読み書きすることが可能です。`DigitalBank` IOはこの機能に直接アクセスを提供します。
 
-#### Constructor Properties
+#### コンストラクタプロパティ
 
-| Property | Description |
+| プロパティ | 説明 |
 | :---: | :--- |
-| `pins` |A bit mask with pins to include in the bank set to 1. For example, the bit mask for a bank to access pins 2 and 3 is 0x0C (0b1100). This property is required.
-| `mode` | A value indicating the mode of the IO, May be `Digital.Input`, `Digital.InputPullUp`, `Digital.InputPullDown`, `Digital.InputPullUpDown`, `Digital.Output`, or `Digital.OutputOpenDrain`. All pins in the bank use the same mode. This property is required.
-| `rises` | A bit mask indicating the pins in the bank that should trigger an  `onReadable` callback when transitioning from 0 to 1. When an `onReadable` callback is provided, at least one pin must be set in `rises` and `falls`.
-| `falls` | A bit mask indicating the pins in the bank that should trigger an  `onReadable` callback when transitioning from 1 to 0. When an `onReadable` callback is provided, at least one pin must be set in `rises` and `falls`.
+| `pins` | バンクに含めるピンを1に設定したビットマスク。例えば、ピン2と3にアクセスするバンクのビットマスクは0x0C（0b1100）です。このプロパティは必須です。
+| `mode` | IOのモードを示す値。`Digital.Input`、`Digital.InputPullUp`、`Digital.InputPullDown`、`Digital.InputPullUpDown`、`Digital.Output`、または `Digital.OutputOpenDrain` のいずれか。バンク内のすべてのピンは同じモードを使用します。このプロパティは必須です。
+| `rises` | 0から1に遷移する際に`onReadable`コールバックをトリガーするバンク内のピンを示すビットマスク。`onReadable`コールバックが提供される場合、少なくとも1つのピンが`rises`および`falls`に設定されている必要があります。
+| `falls` | 1から0に遷移する際に`onReadable`コールバックをトリガーするバンク内のピンを示すビットマスク。`onReadable`コールバックが提供される場合、少なくとも1つのピンが`rises`および`falls`に設定されている必要があります。
 
-#### Callbacks
+#### コールバック
 
 **`onReadable(triggers)`**
 
-Invoked when the input value changes depending on the value of the `mode`, `rises`, and `falls` properties. The `onReadable` callback receives a single argument, `triggers`, which is a bit mask indicating each pin that triggered the callback with a 1.
+`mode`、`rises`、`falls`プロパティの値に応じて入力値が変化したときに呼び出されます。`onReadable`コールバックは、`triggers`という単一の引数を受け取ります。これは、コールバックをトリガーした各ピンを1で示すビットマスクです。
 
-#### Data Format
-The `DigitalBank` class always uses a data format of `number`. The value is a bit mask. On a read operation, any bit positions that are not included in the `pins` bit mask are set to 0. This requirement is important as otherwise the state of reserved pins or pins used by another bank may be leaked.
+#### データフォーマット
+`DigitalBank`クラスは常に`number`のデータフォーマットを使用します。値はビットマスクです。読み取り操作では、`pins`ビットマスクに含まれないビット位置はすべて0に設定されます。この要件は、予約されたピンや他のバンクで使用されているピンの状態が漏れないようにするために重要です。
 
-#### Use Notes
-A digital IO bank instance configured as an input does not implement write; one configured as an output does not implement read.
+#### 使用上の注意
+入力として構成されたデジタルIOバンクインスタンスは書き込みを実装せず、出力として構成されたものは読み取りを実装しません。
 
-Multiple `DigitalBank` instances may be created, however none of them may use the same pins.
+複数の`DigitalBank`インスタンスを作成できますが、それらは同じピンを使用することはできません。
 
-#### Implementation Notes
-Because the ESP8266 provides access to (all but one) of its digital pins through a single hardware port, `DigitalBank` is the foundation for Digital IO and the single-pin `Digital` IO class builds on that. On a microcontroller that only provides access to each pin independently, not as a group, it would make sense to implement `DigitalBank` using `Digital`. The API for both `Digital` and `DigitalBank` remain consistent regardless of the implementation choice.
+#### 実装上の注意
+ESP8266は単一のハードウェアポートを通じて（1つを除く）すべてのデジタルピンにアクセスできるため、`DigitalBank`はデジタルIOの基盤であり、単一ピンの`Digital` IOクラスはそれに基づいて構築されています。マイクロコントローラが各ピンに独立してアクセスできる場合、`DigitalBank`を`Digital`を使用して実装するのが理にかなっています。`Digital`と`DigitalBank`のAPIは、実装の選択に関係なく一貫しています。
 
-#### Examples
-The following example creates a `DigitalBank` to output to pins 12 through 15.
+#### サンプル
+次のサンプルでは、ピン12から15に出力する`DigitalBank`を作成します。
 
 ```js
 let leds = new DigitalBank({
@@ -276,7 +277,7 @@ let leds = new DigitalBank({
 leds.write(0xF000);
 ```
 
-The following example is functionally equivalent to the LED example in the Digital section, but uses `DigitalBank`.
+次のサンプルは、DigitalセクションのLEDのサンプルと機能的に同等ですが、`DigitalBank`を使用しています。
 
 ```js
 let button = new DigitalBank({
@@ -290,7 +291,7 @@ let button = new DigitalBank({
 });
 ```
 
-The following examples uses a `DigitalBank` to monitor pins 1 and 15 as inputs. It reports when pin 1 rises or pin 15 falls.
+次のサンプルでは、ピン1と15を入力として監視する`DigitalBank`を使用します。ピン1が上昇したり、ピン15が下降したときに報告します。
 
 ```js
 let buttons = new DigitalBank({
@@ -307,33 +308,33 @@ let buttons = new DigitalBank({
 });
 ```
 
-### Analog Input
-The built-in `Analog` IO class represents an analog input source.
+### アナログ入力
+組み込みの`Analog` IOクラスはアナログ入力ソースを表します。
 
 ```js
 import Analog from "embedded:io/analog";
 ```
 
-#### Constructor Properties
+#### コンストラクタプロパティ
 
-| Property | Description |
+| プロパティ | 説明 |
 | :---: | :--- |
-|  `pin` | The number of the analog input. The ESP8266 has only a single analog input so this property is unused.
+|  `pin` | アナログ入力の番号。ESP8266には単一のアナログ入力しかないため、このプロパティは使用されません。
 
-#### Callbacks
-There are no callbacks supported. Analog inputs are generally continuously fluctuating so the value is always changing which would cause onReadable to be invoked continuously.
+#### コールバック
+コールバックはサポートされていません。アナログ入力は一般的に常に変動しているため、値は常に変化しており、これにより `onReadable` が継続的に呼び出されることになります。
 
-#### Data Format
-The data format is always a number. The value returned is an integer from 0 to a maximum value based on the resolution of the analog input.
+#### データ形式
+データ形式は常に数値です。返される値は、アナログ入力の解像度に基づく最大値までの整数です。
 
-#### Usage Notes
-The analog input on the ESP8266 always provides 10-bit values. The analog input devices have a read-only `resolution` property which indicates the number of bits of resolution provided by values returned by the instance.
+#### 使用上の注意
+ESP8266のアナログ入力は常に10ビットの値を提供します。アナログ入力デバイスには、インスタンスが返す値の解像度のビット数を示す読み取り専用の `resolution` プロパティがあります。
 
-#### Implementation Notes
-An `onReadable` callback may be useful. It could trigger based on various conditions, such as changing by more than a certain amount or entering a certain range of values. This is similar to triggers used in energy management work with very-low-power co-processors. This is an area for future work.
+#### 実装上の注意
+`onReadable` コールバックは有用かもしれません。これは、特定の範囲の値に入るか、あるいは特定の量以上に変化するなどの条件に基づいてトリガーされる可能性があります。これは、非常に低消費電力のコプロセッサを使用したエネルギー管理作業で使用されるトリガーに似ています。これは将来の作業のための領域です。
 
-#### Example
-The following example displays the value of an analog input as a floating point number from 0 to 1. The `resolution` property is used to scale the result of the `read` call.
+#### サンプル
+次のサンプルは、アナログ入力の値を0から1までの浮動小数点数として表示します。`resolution` プロパティは `read` 呼び出しの結果をスケーリングするために使用されます。
 
 ```js
 let analog = new Analog({});
@@ -341,34 +342,34 @@ trace(analog.read() / (1 << analog.resolution), "\n");
 ```
 
 ### PWM
-The built-in `PWM` IO class provides access to the pulse-width modulation capability of pins.
+組み込みの `PWM` IOクラスは、ピンのパルス幅変調機能へのアクセスを提供します。
 
 ```js
 import PWM from "embedded:io/pwm";
 ```
 
-#### Constructor Properties
+#### コンストラクタのプロパティ
 
-| Property | Description |
+| プロパティ | 説明 |
 | :---: | :--- |
-|  `pin` | A number from 0 to 16 indicating the GPIO number to operate as a PWM output. This property is required.
-|  `hz` | A number specifying the frequency of the PWM output in Hz. This property is optional.
+|  `pin` | PWM出力として動作するGPIO番号を示す0から16までの数値。このプロパティは必須です。
+|  `hz` | Hz単位でPWM出力の周波数を指定する数値。このプロパティはオプションです。
 
-#### Callbacks
-There are no callbacks supported.
+#### コールバック
+コールバックはサポートされていません。
 
-#### Data Format
-The data format is always a number. The `write` call accepts integers between 0 and a maximum value based on the resolution of the PWM output.
+#### データ形式
+データ形式は常に数値です。`write` 呼び出しは、PWM出力の解像度に基づく最大値までの整数を受け入れます。
 
-#### Use Notes
-PWM instances have a read-only `resolution` property which indicates the number of bits of resolution accepted on writes. PWM outputs on the ESP8266 always use 10-bit values.
+#### 使用上の注意
+PWMインスタンスには、書き込み時に受け入れられる解像度のビット数を示す読み取り専用の `resolution` プロパティがあります。ESP8266のPWM出力は常に10ビットの値を使用します。
 
-The ESP8266 supports only a single PWM output frequency across all PWM output pins. Attempts to construct a PWM with `hz` specified when an existing PWM has already specified a different frequency will fail. A new frequency may be specified if all PWM instances that requested the original frequency have been closed.
+ESP8266は、すべてのPWM出力ピンに対して単一のPWM出力周波数のみをサポートします。既存のPWMが異なる周波数を指定している場合に `hz` を指定してPWMを構築しようとすると失敗します。元の周波数を要求したすべてのPWMインスタンスが閉じられた場合、新しい周波数を指定することができます。
 
-When a PWM instance is created, it defaults to a duty cycle of 0% until a `write` is performed.
+PWMインスタンスが作成されると、`write`が実行されるまでデューティサイクルは0%に設定されます。
 
-#### Example
-The following example creates a PWM output on pin 5 with a 10 kHz output frequency and sets it to a 50% duty cycle. The `resolution` property is used to scale the argument to `write`.
+#### サンプル
+次のサンプルでは、ピン5に10 kHzの出力周波数でPWM出力を作成し、デューティサイクルを50%に設定します。`resolution`プロパティは、`write`の引数をスケーリングするために使用されます。
 
 ```js
 let pwm = new PWM({ pin: 5, hz: 10000 });
@@ -376,33 +377,33 @@ pwm.write(0.5 * ((1 << pwm.resolution) - 1));
 ```
 
 ### I<sup>2</sup>C
-The built-in `I2C` class implements an I<sup>2</sup>C Master to communicate with one address on an I<sup>2</sup>C bus.
+組み込みの`I2C`クラスは、I<sup>2</sup>Cバス上の1つのアドレスと通信するためのI<sup>2</sup>Cマスターを実装しています。
 
 ```js
 import I2C from "embedded:io/i2c";
 ```
 
-#### Constructor Properties
-| Property | Description |
+#### コンストラクタプロパティ
+| プロパティ | 説明 |
 | :---: | :--- |
-| `data` | A number from 0  to 16 indicating the GPIO number of the I<sup>2</sup>C data pin. This property is required.
-| `clock` | A number from 0 to 16 indicating the GPIO number of the I<sup>2</sup>C clock pin. This property is required.
-| `hz` | The speed of communication on the I<sup>2</sup>C bus. This property is required.
-| `address` | The 7-bit address of the I<sup>2</sup>C slave device to communicate with.
+| `data` | I<sup>2</sup>CデータピンのGPIO番号を0から16の範囲で指定します。このプロパティは必須です。
+| `clock` | I<sup>2</sup>CクロックピンのGPIO番号を0から16の範囲で指定します。このプロパティは必須です。
+| `hz` | I<sup>2</sup>Cバス上の通信速度。このプロパティは必須です。
+| `address` | 通信するI<sup>2</sup>Cスレーブデバイスの7ビットアドレス。
 
-#### Callbacks
-There are no callbacks for the built-in `I2C`. All operations are performed synchronously.
+#### コールバック
+組み込みの`I2C`にはコールバックはありません。すべての操作は同期的に実行されます。
 
-#### Data Format
-The data format is always a buffer. The `write` call accepts an `ArrayBuffer` or a `TypedArray`. The `read` call always returns an `ArrayBuffer`.
+#### データフォーマット
+データフォーマットは常にバッファです。`write`呼び出しは`ArrayBuffer`または`TypedArray`を受け入れます。`read`呼び出しは常に`ArrayBuffer`を返します。
 
-#### Use Notes
-Many I<sup>2</sup>C buses use the higher-level SMB protocol, an extension to the I<sup>2</sup>C protocol that simplifies its use.  The `SMBus` class is a subclass of the `I2C` class that provides support for working with SMBus devices.
+#### 使用上の注意
+多くのI<sup>2</sup>Cバスは、I<sup>2</sup>Cプロトコルの拡張である高レベルのSMBプロトコルを使用します。`SMBus`クラスは、SMBusデバイスを操作するためのサポートを提供する`I2C`クラスのサブクラスです。
 
-The I<sup>2</sup>C protocol is transaction-based. At the end of each read and write operation, a stop bit is sent. If the stop bit is 1, it indicates the end of the transaction; if 0, it indicates that there are additional operations on the transaction. The `read` and `write` calls set the stop bit to 1 by default. An optional second parameter to the `read` and `write` allows the stop bit to be specified. Pass `false` to set the stop bit to 0, and `true` to set the stop bit to 1.
+I<sup>2</sup>Cプロトコルはトランザクションベースです。各読み取りおよび書き込み操作の終了時にストップビットが送信されます。ストップビットが1の場合はトランザクションの終了を示し、0の場合はトランザクションに追加の操作があることを示します。`read`および`write`呼び出しはデフォルトでストップビットを1に設定します。`read`および`write`のオプションの第2引数でストップビットを指定できます。ストップビットを0に設定するには`false`を、1に設定するには`true`を渡します。
 
-#### Example
-The following example reads the number of touch points from an FT6206 touch sensor, and then retrieves the X and Y coordinates for the active touch points.
+#### サンプル
+次のサンプルでは、FT6206タッチセンサーからタッチポイントの数を読み取り、アクティブなタッチポイントのX座標とY座標を取得します。
 
 ```js
 let touch = new I2C({
@@ -425,51 +426,51 @@ if (count)
 }
 ```
 
-### Serial
-The built-in `Serial` class implements bi-directional communication over serial port at a specified baud rate.
+### シリアル
+組み込みの `Serial` クラスは、指定されたボーレートでシリアルポートを介した双方向通信を実装します。
 
 ```js
 import Serial from "embedded:io/serial";
 ```
 
-#### Constructor Properties
-| Property | Description |
+#### コンストラクタのプロパティ
+| プロパティ | 説明 |
 | :---: | :--- |
-| `baud` | A number specifying the baud rate of the connection. This property is required.
+| `baud` | 接続のボーレートを指定する数値。このプロパティは必須です。
 
-> **Note**: No pins are specified because there is only a single full-duplex hardware serial port on the ESP8266, which is always connected to GPIO pins 1 and 3.
+> **注**: ピンは指定されていません。なぜなら、ESP8266にはフルデュプレックスのハードウェアシリアルポートが1つしかなく、それが常にGPIOピン1と3に接続されているからです。
 
-#### Callbacks
+#### コールバック
 
 **`onReadable(bytes)`**
 
-The `onReadable` callback is invoked when new data is available to read. The callback receives a single argument that indicates the number of bytes available.
+新しいデータが読み取り可能になると `onReadable` コールバックが呼び出されます。コールバックは、利用可能なバイト数を示す単一の引数を受け取ります。
 
 **`onWritable(bytes)`**
 
-The `onWritable` callback is invoked when space has been freed in the output buffer. The callback receives a single argument that indicates the number of bytes that may be written to the output buffer without overflowing.
+出力バッファに空きができると `onWritable` コールバックが呼び出されます。コールバックは、オーバーフローせずに出力バッファに書き込めるバイト数を示す単一の引数を受け取ります。
 
-#### Data Format
-The data format is either `number` for individual bytes, or `buffer` for groups of bytes. The default data format is `number`. When using the `buffer` format, the `write` call accepts an `ArrayBuffer` or a `TypedArray`. The `read` call always returns an `ArrayBuffer`.
+#### データ形式
+データ形式は、個々のバイトの場合は `number`、バイトのグループの場合は `buffer` です。デフォルトのデータ形式は `number` です。`buffer` 形式を使用する場合、`write` 呼び出しは `ArrayBuffer` または `TypedArray` を受け入れます。`read` 呼び出しは常に `ArrayBuffer` を返します。
 
-#### Use Notes
-If the `onWritable` callback is provided, it is invoked immediately following instantiation.
+#### 使用上の注意
+`onWritable` コールバックが提供されている場合、インスタンス化直後に呼び出されます。
 
-When a `write` is attempted, it will fail with an exception if there is insufficient space in the output buffer to hold all the data to be written. Partial data is never written.
+`write` を試みると、書き込むデータを保持するのに十分なスペースが出力バッファにない場合、例外が発生して失敗します。部分的なデータは決して書き込まれません。
 
-When using the `buffer` data format, calling read with no arguments returns all bytes available in the FIFO. The number of bytes to read may be passed. If fewer bytes are available in the FIFO than requested, only the bytes available are returned -- no exception is thrown and the `read` call will not wait for additional data to arrive.
+`buffer` データ形式を使用する場合、引数なしで `read` を呼び出すとFIFO内のすべてのバイトが返されます。読み取るバイト数を指定することもできます。要求されたバイト数よりもFIFO内のバイト数が少ない場合、利用可能なバイトのみが返されます -- 例外はスローされず、`read` 呼び出しは追加データの到着を待ちません。
 
-#### Implementation Notes
-The ESP8266 has a 128-byte FIFO on both the serial input and output. The implementation does not add any additional buffers.
+#### 実装メモ
+ESP8266には、シリアル入力および出力の両方に128バイトのFIFOがあります。実装には追加のバッファは追加されません。
 
-An `onError` callback could be supported to report receive buffer overflows and other errors detected by the hardware.
+受信バッファのオーバーフローやハードウェアによって検出されたその他のエラーを報告するために、`onError`コールバックをサポートすることができます。
 
-If no callbacks are specified, the implementation reduces its memory allocation by eliminating the storage used to maintain references to the callbacks.
+コールバックが指定されていない場合、実装はコールバックへの参照を維持するために使用されるストレージを排除することでメモリ割り当てを削減します。
 
-The API should include the ability to flush the input and output FIFOs.
+APIには、入力および出力FIFOをフラッシュする機能を含めるべきです。
 
-#### Examples
-The following example implements a simple serial echo. It uses the default data format of `number` to read and write individual bytes.
+#### サンプル
+次のサンプルは、シンプルなシリアルエコーを実装しています。個々のバイトを読み書きするために、デフォルトのデータ形式である`number`を使用します。
 
 ```js
 let serial = new Serial({
@@ -481,7 +482,7 @@ let serial = new Serial({
 });
 ```
 
-The following example continuously outputs text to the serial output. It uses the `onWritable` callback to write data as quickly as possible without overflowing the output FIFO. The example uses the `buffer` data format to maximize throughput.
+次のサンプルは、シリアル出力にテキストを連続的に出力します。`onWritable`コールバックを使用して、出力FIFOをオーバーフローさせることなくできるだけ早くデータを書き込みます。このサンプルでは、スループットを最大化するために`buffer`データ形式を使用します。
 
 ```js
 const message = ArrayBuffer.fromString("Since publication of the first edition in 1997, ECMAScript has grown to be one of the world's most widely used general-purpose programming languages. It is best known as the language embedded in web browsers but has also been widely adopted for server and embedded applications.\r\n");
@@ -504,61 +505,60 @@ const serial = new Serial({
 serial.format = "buffer";
 ```
 
-### TCP Socket
-The built-in `TCP` network socket class implements a general purpose, bi-directional TCP connection.
+### TCPソケット
+組み込みの`TCP`ネットワークソケットクラスは、汎用の双方向TCP接続を実装します。
 
 ```js
 import TCP from "embedded:io/socket/tcp";
 ```
 
-The TCP socket is only a TCP connection. It is not a TCP listener, as in some networking libraries. The TCP listener is a separate class.
+TCPソケットはTCP接続のみです。一部のネットワーキングライブラリのようにTCPリスナーではありません。TCPリスナーは別のクラスです。
 
-#### Constructor Properties
-| Property | Description |
+#### コンストラクタプロパティ
+| プロパティ | 説明 |
 | :---: | :--- |
-| `address` | A string with the IP (v4) address of the remote endpoint to connect to. This property is required.
-| `port` | A number specifying the remote port to connect to. This property is required.
-| `nodelay` | A boolean indicating whether to disable Nagle's algorithm on the socket. This property is equivalent to the `TCP_NODELAY` option in the BSD sockets API. This property is optional and defaults to false.
-| `from` | An existing TCP socket instance from which the native socket instance is taken to use with the newly created socket instance. This property is optional and designed for use with a TCP listener. An example is given in the TCP listener section. When using the `from` property, the `address` and `port` properties are not required, and are ignored if specified.
+| `address` | 接続先のリモートエンドポイントのIP（v4）アドレスを含む文字列。このプロパティは必須です。
+| `port` | 接続先のリモートポートを指定する数値。このプロパティは必須です。
+| `nodelay` | ソケットでNagleのアルゴリズムを無効にするかどうかを示すブール値。このプロパティはBSDソケットAPIの`TCP_NODELAY`オプションに相当します。このプロパティはオプションで、デフォルトはfalseです。
+| `from` | ネイティブソケットインスタンスを新しく作成されたソケットインスタンスで使用するために取得する既存のTCPソケットインスタンス。このプロパティはオプションであり、TCPリスナーと一緒に使用するために設計されています。サンプルはTCPリスナーセクションに記載されています。`from`プロパティを使用する場合、`address`および`port`プロパティは必須ではなく、指定されていても無視されます。
 
-#### Callbacks
+#### コールバック
 
 **`onReadable(bytes)`**
 
-Invoked when new data is available to be read. The callback receives a single argument that indicates the number of bytes available to read.
-
+新しいデータが読み取れるようになったときに呼び出されます。コールバックは、読み取れるバイト数を示す単一の引数を受け取ります。
 
 **`onWritable(bytes)`**
 
-Invoked when space has been made available to output additional data. The callback receives a single argument that indicates the number of bytes that may be written to the TCP socket without overflowing the output buffers.
+追加のデータを出力するためのスペースが確保されたときに呼び出されます。コールバックは、出力バッファをオーバーフローさせずにTCPソケットに書き込めるバイト数を示す単一の引数を受け取ります。
 
 **`onError`**
 
-Invoked when an error occurs. Once `onError` is invoked, the connection is no longer usable. Reporting the error type is an area for future work.
+エラーが発生したときに呼び出されます。`onError`が呼び出されると、接続はもはや使用できません。エラーの種類を報告することは今後の課題です。
 
-#### Data Format
-The data format is either `number` for individual bytes, or `buffer` for groups of bytes. The default data format is `buffer`. When using the `buffer` format, the `write` call accepts an `ArrayBuffer` or a `TypedArray`. The `read` call always returns an `ArrayBuffer`.
+#### データフォーマット
+データフォーマットは、個々のバイトに対しては`number`、バイトのグループに対しては`buffer`です。デフォルトのデータフォーマットは`buffer`です。`buffer`フォーマットを使用する場合、`write`呼び出しは`ArrayBuffer`または`TypedArray`を受け入れます。`read`呼び出しは常に`ArrayBuffer`を返します。
 
-#### Use Notes
-When the socket successfully connects to the remote host, the `onWritable` callback is invoked as it is now possible to write data.
+#### 使用上の注意
+ソケットがリモートホストへの接続に成功すると、データの書き込みが可能になるため、`onWritable`コールバックが呼び出されます。
 
-The `onError` callback is invoked when the remote socket disconnects for any reason, including a clean TCP disconnect.
+リモートソケットが何らかの理由で切断されると、`onError`コールバックが呼び出されます。これにはクリーンなTCP切断も含まれます。
 
-If there is insufficient buffer space available for a `write` request, no data is written and an exception is thrown.
+`write`リクエストに対して十分なバッファスペースがない場合、データは書き込まれず、例外がスローされます。
 
-There is usually no need for scripts using TCP socket to combine multiple write operations into a single `write` call. When possible, the TCP socket implementation combines writes that occur within a single turn of the JavaScript event loop.
+通常、TCPソケットを使用するスクリプトが複数の書き込み操作を単一の`write`呼び出しにまとめる必要はありません。可能な場合、TCPソケット実装はJavaScriptイベントループの単一ターン内で発生する書き込みを結合します。
 
-#### Implementation Notes
-The TCP socket is implemented using the [lwip](https://savannah.nongnu.org/projects/lwip/) networking library. It uses the lowest-level public API, the callback API.
+#### 実装上の注意
+TCPソケットは[lwip](https://savannah.nongnu.org/projects/lwip/)ネットワーキングライブラリを使用して実装されています。最も低レベルの公開APIであるコールバックAPIを使用します。
 
-Support for the `number` data format used to read/write bytes instead of buffers has proven convenient when implementing protocols that use TCP in place of serial. It is not an essential feature. On the other hand, direct support for strings is important and an area for future work.
+バッファの代わりにバイトを読み書きするために使用される`number`データフォーマットのサポートは、シリアルの代わりにTCPを使用するプロトコルを実装する際に便利であることが証明されていますが、必須の機能ではありません。一方、文字列の直接サポートは重要であり、今後の課題です。
 
-The TCP socket accepts an `address` property to specify the remote host. That is necessary for some situations, but often the host name is known. Currently the host name is resolved externally to the socket. It would be convenient to pass the host name as an alternative to the address. For security reasons, it may be necessary to use the host name to allow a white or black list to be applied to limit access to hosts.
+TCPソケットはリモートホストを指定するために`address`プロパティを受け入れます。これはいくつかの状況で必要ですが、ホスト名が既知であることが多いです。現在、ホスト名はソケットの外部で解決されます。アドレスの代わりにホスト名を渡すことができると便利です。セキュリティ上の理由から、ホスト名を使用してホワイトリストまたはブラックリストを適用し、ホストへのアクセスを制限する必要があるかもしれません。
 
-Defining optional keep-alive properties for the constructor is a topic for future work.
+オプションのキープアライブプロパティをコンストラクタに定義することは、将来の課題です。
 
-#### Example
-The following examples connects to an HTTP server, sends a GET request for the root, and traces the response to the debug console.
+#### サンプル
+次のサンプルは、HTTPサーバーに接続し、ルートに対してGETリクエストを送信し、応答をデバッグコンソールにトレースします。
 
 ```js
 new TCP({
@@ -583,35 +583,35 @@ new TCP({
 });
 ```
 
-### TCP Listener
-The built-in TCP `Listener` class provides a way to listen for and accept incoming TCP connection requests.
+### TCP リスナー
+組み込みのTCP `Listener` クラスは、着信TCP接続要求をリッスンして受け入れる方法を提供します。
 
 ```js
 import Listener from "embedded:io/socket/listener";
 ```
 
-#### Constructor Properties
-| Property | Description |
+#### コンストラクタプロパティ
+| プロパティ | 説明 |
 | :---: | :--- |
-| `port` | A number specifying the port to listen on. This property is optional.
+| `port` | リッスンするポートを指定する数値。このプロパティはオプションです。
 
-#### Callback
+#### コールバック
 
 **`onReadable(requests)`**
 
-Invoked when one or more new connection requests are received. The callback receives a single argument that indicates the total number of pending connection requests.
+1つ以上の新しい接続要求が受信されたときに呼び出されます。コールバックは、保留中の接続要求の総数を示す単一の引数を受け取ります。
 
-#### Data Format
-The TCP `Listener` class uses `socket/tcp` as its sole data format.
+#### データ形式
+TCP `Listener` クラスは、唯一のデータ形式として `socket/tcp` を使用します。
 
-#### Use Notes
-The `read` function returns a `TCP` Socket instance. The instance is already connected to the remote host. The `read` and `write` functions operate as usual. There are no callback functions installed, so the script cannot receive `onReadable`, `onWritable`, or `onError` notifications. To configure the socket, pass it to the `TCP` Socket constructor using the optional `from` argument. An example is shown below.
+#### 使用ノート
+`read` 関数は `TCP` ソケットインスタンスを返します。このインスタンスはすでにリモートホストに接続されています。`read` および `write` 関数は通常通り動作します。コールバック関数はインストールされていないため、スクリプトは `onReadable`、`onWritable`、または `onError` の通知を受け取ることはできません。ソケットを構成するには、オプションの `from` 引数を使用して `TCP` ソケットコンストラクタに渡します。以下にサンプルを示します。
 
-#### Implementation Notes
-The constructor should support an optional `address` property to bind to a specific network interface.
+#### 実装ノート
+コンストラクタは、特定のネットワークインターフェースにバインドするためのオプションの `address` プロパティをサポートする必要があります。
 
-#### Example
-The following example implements a simple HTTP echo server. It accepts incoming requests and sends back the complete request (including the request headers) as the response body. The `TCPEcho` class reads the request and generates the response.
+#### サンプル
+次のサンプルは、シンプルなHTTPエコーサーバーを実装しています。着信要求を受け入れ、要求全体（要求ヘッダーを含む）を応答ボディとして返します。`TCPEcho` クラスは要求を読み取り、応答を生成します。
 
 ```js
 class TCPEcho {
@@ -647,44 +647,44 @@ new Listener({
 });
 ```
 
-### UDP Socket
-The built-in `UDP` network socket class implements the sending and receiving of UDP packets.
+### UDP ソケット
+組み込みの `UDP` ネットワークソケットクラスは、UDPパケットの送受信を実装します。
 
 ```js
 import UDP from "embedded:io/socket/udp";
 ```
 
-#### Constructor Properties
-| Property | Description |
+#### コンストラクタプロパティ
+| プロパティ | 説明 |
 | :---: | :--- |
-| `port` | The local port number to bind the UDP socket to. This property is optional.
+| `port` | UDPソケットをバインドするローカルポート番号。このプロパティはオプションです。
 
-#### Callback
+#### コールバック
 
 **`onReadable(packets)`**
 
-Invoked when one or more packets are received. The callback receives a single argument that indicates the total number of packets available to read.
+1つ以上のパケットが受信されたときに呼び出されます。コールバックは、読み取ることができるパケットの総数を示す1つの引数を受け取ります。
 
-#### Data Format
-The data format is always `buffer`. The `write` call accepts an `ArrayBuffer` or a `TypedArray`. The `read` call always returns an `ArrayBuffer`.
+#### データフォーマット
+データフォーマットは常に `buffer` です。`write` 呼び出しは `ArrayBuffer` または `TypedArray` を受け入れます。`read` 呼び出しは常に `ArrayBuffer` を返します。
 
-#### Use Notes
-The `read` call returns a complete UDP packet as an `ArrayBuffer`. Partial reads are not supported. The returned packet data has two properties attached to it:
+#### 使用ノート
+`read` 呼び出しは、完全なUDPパケットを `ArrayBuffer` として返します。部分的な読み取りはサポートされていません。返されたパケットデータには次の2つのプロパティが付属しています：
 
-- `address`, a string containing the packet sender's address
-- `port`, the port number used to send the packet.
+- `address`、パケット送信者のアドレスを含む文字列
+- `port`、パケット送信に使用されたポート番号
 
-The `write` call takes three arguments: remote address string, remote port number, and the packet data as an `ArrayBuffer` or `TypedArray`. If there is insufficient memory to transmit the packet, the `write` call throws an exception.
+`write` 呼び出しは3つの引数を取ります：リモートアドレス文字列、リモートポート番号、およびパケットデータとしての `ArrayBuffer` または `TypedArray`。パケットを送信するのに十分なメモリがない場合、`write` 呼び出しは例外をスローします。
 
-#### Implementation Notes
-The UDP socket is implemented using the [lwip](https://savannah.nongnu.org/projects/lwip/) networking library. It uses the lowest-level lwip public API, the callback API.
+#### 実装ノート
+UDPソケットは [lwip](https://savannah.nongnu.org/projects/lwip/) ネットワーキングライブラリを使用して実装されています。最も低レベルのlwip公開APIであるコールバックAPIを使用します。
 
-Specifying optional properties to the constructor to support multicast is an area for future work.
+マルチキャストをサポートするためにコンストラクタにオプションのプロパティを指定することは、将来の作業領域です。
 
-As with the TCP socket, it would be useful to be able to specify a host name for the remote end point.
+TCPソケットと同様に、リモートエンドポイントのホスト名を指定できると便利です。
 
-#### Example
-The following example implements a simple SNTP client to retrieve the current time from a network time server at address 208.113.157.157. The UDP socket is closed when a response is received. The example shows how to access the `address` and `port` properties that indicate the sender of a received UDP packet.
+#### サンプル
+次のサンプルは、アドレス208.113.157.157のネットワークタイムサーバーから現在の時刻を取得するシンプルなSNTPクライアントを実装しています。応答が受信されるとUDPソケットは閉じられます。このサンプルは、受信したUDPパケットの送信者を示す `address` および `port` プロパティにアクセスする方法を示しています。
 
 ```js
 let sntpClient = new UDP({
@@ -705,37 +705,28 @@ packet[0] = (4 << 3) | (3 << 0);		// version 4, mode 3 (client)
 sntpClient.write("208.113.157.157", 123, packet);
 ```
 
-<!--
-### Wakeable Digital
-The built-in `WakeableDigital` class represents a digital input source used in energy management. This IO kind applies the IO Class Pattern in a somewhat unusual way.
 
-```js
-import WakeableDigital from "embedded:io/wakeabledigital";
-```
+ESP8266をディープスリープにすることはIOの範囲外です。`System.deepSleep()` JavaScript関数は開発目的で提供されています。
 
-The ESP8266 has a deep sleep feature where the microcontroller turns off, but a small amount of memory (256 bytes) is retained. When the reset pin is pulled low, for example by a sensor configured to trigger an interrupt under a certain condition, the microcontroller reboots, still retaining the small memory area. The Wakeable Digital pin provides a way for scripts to know whether the most recent boot of the microcontroller is due to a wake from deep sleep or a conventional hard reset (e.g. power applied after being off). The script uses this information to change its behavior.
-
-Putting the ESP8266 into deep sleep is out of scope for IO. The `System.deepSleep()` JavaScript function is provided for development purposes.
-
-#### Constructor Properties
-| Property | Description |
+#### コンストラクタプロパティ
+| プロパティ | 説明 |
 | :---: | :--- |
-| `pin` | The pin to use to detect if the most recent wake was due to a cold boot or a wake from deep sleep. For the ESP8266, this must be set to the string "RST" for the reset pin.
+| `pin` | 最近のウェイクがコールドブートによるものかディープスリープからのウェイクによるものかを検出するために使用するピン。ESP8266の場合、リセットピンには文字列 "RST" を設定する必要があります。
 
-#### Callbacks
+#### コールバック
 
 **`onReadable()`**
 
-Invoked following instantiation if the device was woken from deep sleep.
+デバイスがディープスリープからウェイクされた場合、インスタンス化後に呼び出されます。
 
-#### Data Format
-The Wakeable Digital IO always uses a data format of `number`. A value of 0 indicates the device did not wake from a deep sleep and a value of 1 indicates that it did wake from a deep sleep.
+#### データフォーマット
+Wakeable Digital IOは常に`number`のデータフォーマットを使用します。値が0の場合、デバイスはディープスリープからウェイクされていないことを示し、値が1の場合、ディープスリープからウェイクされたことを示します。
 
-#### Use Notes
-The `read` call is available immediately following instantiation. Consequently, the `onReadable` callback is not strictly required as the state of the pin cannot change after the microcontroller boots. The `onReadable` callback is useful with light sleep, which does not terminate program execution as does deep sleep.
+#### 使用ノート
+`read`呼び出しはインスタンス化直後に利用可能です。したがって、マイクロコントローラがブートした後にピンの状態が変わることはないため、`onReadable`コールバックは厳密には必要ありません。`onReadable`コールバックは、プログラムの実行を終了しないライトスリープで有用です。
 
-#### Example
-The following example uses the Wakeable Digital pin to check whether the device was hard reset or woken from deep sleep.
+#### サンプル
+次のサンプルでは、Wakeable Digitalピンを使用してデバイスがハードリセットされたかディープスリープからウェイクされたかを確認します。
 
 ```js
 let wakeable = new WakeableDigital({
@@ -743,26 +734,25 @@ let wakeable = new WakeableDigital({
 });
 trace(wakeable.read() ? "Woke from deep sleep\n" : "Hard reset\n");
 ```
--->
 
-## IO Providers
-IO providers access IO resources that are external to the built-in IO resources. IO providers often use the built-in IO resources to access their external IO resources. The definition of "external" encompasses a wide range of possibilities.
+## IOプロバイダー
+IOプロバイダーは、組み込みのIOリソース外部のIOリソースにアクセスします。IOプロバイダーは、外部のIOリソースにアクセスするために組み込みのIOリソースを使用することがよくあります。「外部」の定義は広範囲にわたります。
 
-- A separate component on the same board as the microcontroller.
+- マイクロコントローラと同じボード上の別のコンポーネント。
 
-	Examples of this include GPIO and Analog expanders. These operate over shared-bus protocols like I<sup>2</sup>C and SPI to provide additional IO pins.
-- A separate board physically connected to the board holding the microcontroller.
+	これにはGPIOやアナログエクスパンダーが含まれます。これらはI<sup>2</sup>CやSPIのような共有バスプロトコルを介して動作し、追加のIOピンを提供します。
+- マイクロコントローラを保持するボードに物理的に接続された別のボード。
 
-	An example of this is an Arduino connected to a microcontroller over a serial connection as used by the Firmata protocol.
-- A separate physical device in close proximity.
+	これの例として、Firmataプロトコルで使用されるシリアル接続を介してマイクロコントローラに接続されたArduinoがあります。
+- 近接する別の物理デバイス。
 
-	Examples of this include peripherals connected by Bluetooth LE and Decentralized Ambient Synchronization ([DAS](https://blog.moddable.com/blog/das/)) using mDNS over a UDP network connection.
-- A separate physical device at a physically remote location.
+	これには、Bluetooth LEで接続された周辺機器や、UDPネットワーク接続を介してmDNSを使用する分散型アンビエント同期（[DAS](https://blog.moddable.com/blog/das/)）が含まれます。
+- 物理的に遠隔地にある別の物理デバイス。
 
-	Examples of this include the Firmata protocol running over a TCP connection and many IoT cloud services operating over protocols including HTTP/REST, MQTT, and WebSocket.
+	これには、TCP接続上で動作するFirmataプロトコルや、HTTP/REST、MQTT、WebSocketなどのプロトコルを使用して動作する多くのIoTクラウドサービスが含まれます。
 
-### Instantiating a Provider
-The provider constructor has the same API as an IO kind, a single object containing properties to configure the provider. The following example instantiates the [MCP23017](https://www.microchip.com/wwwproducts/en/MCP23017) GPIO expander, a component that provides 16 GPIO pins through an I<sup>2</sup>C interface.
+### プロバイダのインスタンス化
+プロバイダのコンストラクタは、プロバイダを構成するプロパティを含む単一のオブジェクトとして、IOの種類と同じAPIを持ちます。次のサンプルでは、I<sup>2</sup>Cインターフェースを介して16のGPIOピンを提供するコンポーネントである[MCP23017](https://www.microchip.com/wwwproducts/en/MCP23017) GPIOエクスパンダをインスタンス化します。
 
 ```js
 import Expander from "expander";
@@ -775,16 +765,16 @@ const expander = new Expander({
 });
 ```
 
-The constructor receives all properties necessary to establish a connection to the external IO resource. As with an IO resource, these properties are fixed at the time of construction. In this example, the properties passed to the constructor are identical to those required to initialize an I<sup>2</sup>C  connection, as the component communicates over I<sup>2</sup>C . Additional properties may be defined as needed to configure the connection to the external IO resources.
+コンストラクタは、外部IOリソースへの接続を確立するために必要なすべてのプロパティを受け取ります。IOリソースと同様に、これらのプロパティは構築時に固定されます。このサンプルでは、コンストラクタに渡されるプロパティは、コンポーネントがI<sup>2</sup>Cを介して通信するため、I<sup>2</sup>C接続を初期化するために必要なものと同じです。必要に応じて、外部IOリソースへの接続を構成するための追加のプロパティを定義することができます。
 
-When a script no longer needs to use the provider, it should close the instance to tear down the connection and free any resources it has reserved. In the case of the MCP23017 Expander, the close operation frees the `I2C` instance used to communicate with the component.
+スクリプトがプロバイダを使用する必要がなくなった場合、インスタンスを閉じて接続を解除し、予約されたリソースを解放する必要があります。MCP23017エクスパンダの場合、クローズ操作はコンポーネントと通信するために使用される`I2C`インスタンスを解放します。
 
 ```js
 expander.close();
 ```
 
-### IO Operations with Providers
-The IO resources available from the provider follow the IO Class Pattern with their constructors located on the provider instance. The following example performs a write operation to pin 13 of the expander.
+### プロバイダを使用したIO操作
+プロバイダから利用可能なIOリソースは、コンストラクタがプロバイダインスタンス上に配置されているIOクラスパターンに従います。次のサンプルでは、エクスパンダのピン13に書き込み操作を行います。
 
 ```js
 let led = new expander.Digital({
@@ -794,7 +784,7 @@ let led = new expander.Digital({
 led.write(1);
 ```
 
-Similarly, several digital pins may be accessed together through a `DigitalBank`. The following example reads the values of pins 8 through 15 (inclusive).
+同様に、いくつかのデジタルピンは`DigitalBank`を介して一緒にアクセスすることができます。次のサンプルでは、ピン8から15（含む）の値を読み取ります。
 
 ```js
 let buttons = new expander.DigitalBank({
@@ -804,14 +794,14 @@ let buttons = new expander.DigitalBank({
 let result = buttons.read();
 ```
 
-This method of accessing IO constructors from an instance is similar to that used by the Johnny-Five robotics framework. Here is a fragment from the [hello world](http://johnny-five.io/#hello-world) example in the Johnny-Five documentation.
+インスタンスからIOコンストラクタにアクセスするこの方法は、Johnny-Fiveロボティクスフレームワークで使用される方法と似ています。以下は、Johnny-Fiveドキュメントの[hello world](http://johnny-five.io/#hello-world)サンプルの一部です。
 
 ```js
 var led = new five.Led(13);
 led.blink(500);
 ```
 
-The MCP23017 expander has an option to trigger an interrupt when the value of one or more inputs changes. To use this capability, the constructor must be configured with the `interrupt` property, which indicates the built-in GPIO pin the interrupt is connected to. In the following example, the `interrupt` property is set to 0, indicating the interrupt is connected to digital pin 0.
+MCP23017エクスパンダーには、1つ以上の入力の値が変化したときに割り込みをトリガーするオプションがあります。この機能を使用するには、コンストラクタを`interrupt`プロパティで構成する必要があります。このプロパティは、割り込みが接続されている組み込みGPIOピンを示します。次のサンプルでは、`interrupt`プロパティが0に設定されており、割り込みがデジタルピン0に接続されていることを示しています。
 
 ```js
 const expander = new Expander({
@@ -823,7 +813,7 @@ const expander = new Expander({
 });
 ```
 
-With the interrupt configured, the `onReadable` callback may be used.
+割り込みが構成されると、`onReadable`コールバックを使用できます。
 
 ```js
 let buttons = new expander.DigitalBank({
@@ -838,15 +828,15 @@ let buttons = new expander.DigitalBank({
 });
 ```
 
-**Note**:  By convention, implementations of the IO Class Pattern directly represent the hardware they are associated with, both the features and limitations. For example, it is possible to support the `onReadable` callback without using the interrupt pin by polling. However, this is discouraged to accurately reflect the hardware capabilities to higher layers. This helps to keep low level implementations small, maintainable, and efficient. Higher layers, of course, may add such functionality as needed, consistent with the programming model they support.
+**注**: 慣例として、IOクラスパターンの実装は、それが関連付けられているハードウェアを直接表現し、その機能と制限の両方を反映します。例えば、ポーリングを使用して割り込みピンを使用せずに`onReadable`コールバックをサポートすることは可能ですが、これは高レイヤーにハードウェアの機能を正確に反映するために推奨されません。これにより、低レベルの実装を小さく、保守可能で効率的に保つことができます。もちろん、高レイヤーは、サポートするプログラミングモデルに一致するように、そのような機能を必要に応じて追加することができます。
 
-### Synchronous and Asynchronous IO with Providers
-IO resources accessed through a provider may support synchronous and/or asynchronous operation, as long as the general rule about non-blocking IO is respected. The IO Class Pattern defines callbacks to invoke when asynchronous operations complete. Providers are not required to implement these, but are encouraged to do so when the IO resources they represent may take some time to complete.
+### プロバイダーを使用した同期および非同期IO
+プロバイダーを介してアクセスされるIOリソースは、非ブロッキングIOに関する一般的なルールが尊重される限り、同期および/または非同期操作をサポートすることができます。IOクラスパターンは、非同期操作が完了したときに呼び出すコールバックを定義します。プロバイダーはこれらを実装する必要はありませんが、表現するIOリソースが完了するまでに時間がかかる場合には、これを実装することが奨励されます。
 
-#### Asynchronous Constructors
-Some IO resources are not available for use immediately after the constructor returns. The TCP client constructor is an example of one such constructor, as it is necessary to wait for the TCP connection to be established before any IO operations may occur.
+#### 非同期コンストラクタ
+一部のIOリソースは、コンストラクタが返された直後には使用できません。TCPクライアントコンストラクタはその一例であり、TCP接続が確立されるのを待ってからIO操作を行う必要があります。
 
-The IO provider may not know what IO resources are available until it has successfully established a connection to the remote resource. For this reason, a provider may not have any IO constructors on its instance until some time after its constructor completes. Such providers should support the `onReady` callback to notify scripts when the provider is ready for use.
+IOプロバイダーは、リモートリソースへの接続が確立されるまで、どのIOリソースが利用可能かを知ることができません。このため、プロバイダーはコンストラクタが完了してからしばらくの間、そのインスタンスにIOコンストラクタを持たない場合があります。そのようなプロバイダーは、プロバイダーが使用可能になったときにスクリプトに通知するために`onReady`コールバックをサポートする必要があります。
 
 ```js
 let provider = new CloudProvider({
@@ -861,20 +851,20 @@ let provider = new CloudProvider({
 });
 ```
 
-Note that the MCP23017 expander does not implement the `onReady` callback as it supports a separate component on the same board as the microcontroller accessing it, so there are no significant latencies.
+MCP23017エクスパンダーは、マイクロコントローラーと同じボード上の別のコンポーネントがアクセスするため、`onReady`コールバックを実装していないことに注意してください。そのため、重大な遅延はありません。
 
-#### Asynchronous I<sup>2</sup>C
-All of the IO kinds defined earlier in this document implement asynchronous IO by following the IO Class Pattern directly. It is less obvious how to implement an I<sup>2</sup>C  Master. An implementation of the Firmata Client through the IO Provider API provided a motivation to explore the problem and to find a solution.
+#### 非同期I<sup>2</sup>C
+このドキュメントで以前に定義されたすべてのIO種類は、IOクラスパターンに直接従うことで非同期IOを実装しています。I<sup>2</sup>Cマスターを実装する方法はそれほど明白ではありません。IOプロバイダーAPIを通じたFirmataクライアントの実装は、この問題を探求し、解決策を見つける動機を提供しました。
 
-I<sup>2</sup>C  performs read and write operations with buffers of bytes, much like serial and TCP IO. Serial and TCP (once the connection is established) are essentially peer protocols -- either side of the connection may initiate a write operation at any time. I<sup>2</sup>C , by contrast, is a master/slave protocol. The slave may only send bytes for the master to read when requested to do so. That requires the master to issue a read request to the slave device to receive data.
+I<sup>2</sup>Cは、シリアルおよびTCP IOと同様に、バイトのバッファを使用して読み書き操作を行います。シリアルおよびTCP（接続が確立された後）は本質的にピアプロトコルであり、接続のどちら側もいつでも書き込み操作を開始できます。対照的に、I<sup>2</sup>Cはマスター/スレーブプロトコルです。スレーブは、マスターが読み取りを要求したときにのみバイトを送信できます。そのため、マスターはデータを受け取るためにスレーブデバイスに読み取り要求を発行する必要があります。
 
-To support the master/slave protocol of I<sup>2</sup>C  asynchronously, the read operation is broken into two steps. The first step is issuing the read request. With I<sup>2</sup>C , the master specifies the number of bytes it will read. The call to the `read` function therefore must include the number of bytes to read. In the following example, the number of bytes to read is 4.
+I<sup>2</sup>Cのマスター/スレーブプロトコルを非同期にサポートするために、読み取り操作は2つのステップに分けられます。最初のステップは読み取り要求の発行です。I<sup>2</sup>Cでは、マスターは読み取るバイト数を指定します。したがって、`read`関数の呼び出しには読み取るバイト数を含める必要があります。次の例では、読み取るバイト数は4です。
 
 ```js
 i2c.read(4);
 ```
 
-This enqueues a read operation but does not return the data (it returns `undefined`, the result when no data is available). When the data is available, the provider invokes the `onReadable` callback. The script using the `I2C` instance retrieves the result of the read operation by calling the `read` function with no arguments.
+これは読み取り操作をキューに入れますが、データは返しません（データが利用できない場合の結果である`undefined`を返します）。データが利用可能になると、プロバイダーは`onReadable`コールバックを呼び出します。`I2C`インスタンスを使用するスクリプトは、引数なしで`read`関数を呼び出すことで読み取り操作の結果を取得します。
 
 ```js
 let i2c = new provider.I2C({
@@ -887,17 +877,17 @@ i2c.write(Uint8Array.of(4));
 i2c.read(2);
 ```
 
-A `read` call with no arguments returns the result of the earliest pending read operation requested. If no result is available, it returns `undefined`. This first-in, first-out rule ensures a predictable behavior when multiple asynchronous read operations are outstanding.
+引数なしの`read`呼び出しは、最も早く保留中の読み取り操作の結果を返します。結果が利用できない場合は`undefined`を返します。この先入れ先出しのルールは、複数の非同期読み取り操作が保留中の場合に予測可能な動作を保証します。
 
-## Conclusion
-The IO Class Pattern is a small API designed to address a wide range of IO uses in JavaScript. The core API contains only four functions — the `constructor`, `close`, `read`, and `write` — together with a handful of supporting callback functions — `onReady`, `onReadable`, `onWriteable`, and `onError`. From this foundation, implementations have been created for individual digital inputs & output, digital banks of inputs & outputs, analog input, serial, I<sup>2</sup>C  master, TCP socket, TCP listener, UDP socket, and a wake pin. The Provider Class Pattern extends the IO Class Pattern to work with remote IO resources of all kinds.
+## 結論
+IOクラスパターンは、JavaScriptでの幅広いIO用途に対応するために設計された小さなAPIです。コアAPIは、`constructor`、`close`、`read`、`write`の4つの関数と、`onReady`、`onReadable`、`onWriteable`、`onError`のいくつかのサポートコールバック関数のみで構成されています。この基盤から、個々のデジタル入力＆出力、デジタルバンクの入力＆出力、アナログ入力、シリアル、I<sup>2</sup>Cマスター、TCPソケット、TCPリスナー、UDPソケット、ウェイクピンの実装が作成されています。プロバイダークラスパターンは、あらゆる種類のリモートIOリソースで動作するようにIOクラスパターンを拡張します。
 
-Implementing broad support for the IO Class Pattern for the ESP8266 microcontroller using the XS engine in the Moddable SDK provides experience using the API from several perspectives. The implementation itself is straightforward, focused on connecting the raw hardware I/O resources to the JavaScript language using the [XS in C API](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/xs/XS%20in%20C.md). In no case is a translation layer required to adapt the native behavior of the IO to the JavaScript APIs. This is desirable as such translation can be difficult to implement reliably.
+Moddable SDKのXSエンジンを使用してESP8266マイクロコントローラー向けにIOクラスパターンの広範なサポートを実装することで、さまざまな視点からAPIを使用する経験が得られます。実装自体はシンプルで、生のハードウェアI/OリソースをJavaScript言語に接続することに焦点を当てています。[XS in C API](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/xs/XS%20in%20C.md)を使用して、ネイティブのIOの動作をJavaScript APIに適応させるための翻訳レイヤーは一切必要ありません。これは、そのような翻訳が信頼性を持って実装するのが難しいため、望ましいことです。
 
-From the API perspective, the IO Class Pattern provides clear guidance to the designer adding support for a new IO type. The design starts from consideration of how the IO capabilities can fit into the pattern rather than defining an API from scratch for each IO type. The pattern has proven itself adaptable to a range of different IO kinds. Future implementation work will explore and, no doubt, extend this.
+APIの視点から見ると、IOクラスパターンは新しいIOタイプのサポートを追加する設計者に明確なガイダンスを提供します。設計は、各IOタイプのAPIをゼロから定義するのではなく、IOの機能がどのようにパターンに適合するかを考慮することから始まります。このパターンは、さまざまなIO種類に適応できることが証明されています。将来の実装作業では、これを探求し、間違いなく拡張していくでしょう。
 
-Perhaps the most interesting perspective is as a script writer using IO classes that follow the pattern. The small API size is easy to remember. This makes it quick and comfortable to work with a range of IO. There are, of course, details that differ from one IO type to another. A digital input is quite different from a UDP socket. Still, these differences are consistent with needs of the IO, not arbitrary differences because their APIs happened to be designed by different individuals at different times with different priorities or different programming style preferences. Overall, this makes it relatively easy to both read and write code that applies the IO Class Pattern.
+おそらく最も興味深い視点は、パターンに従うIOクラスを使用するスクリプトライターとしての視点です。小さなAPIサイズは覚えやすいです。これにより、さまざまなIOを迅速かつ快適に操作できます。もちろん、IOタイプごとに異なる詳細があります。デジタル入力はUDPソケットとは大きく異なります。それでも、これらの違いはIOのニーズに一致しており、異なる個人が異なる時期に異なる優先順位やプログラミングスタイルの好みで設計したために生じる任意の違いではありません。全体として、IOクラスパターンを適用するコードを読み書きするのは比較的簡単です。
 
-Based on this exercise of building an implementation of the IO Class Pattern for a microcontroller, the design achieves its goals well. The API meets the needs of low-level script developers to access IO, it is possible to implement efficiently on resource-constrained embedded hardware, and the implementation/porting effort is focused and manageable.
+このマイクロコントローラ用のIOクラスパターンの実装演習に基づいて、設計はその目標をうまく達成しています。APIは低レベルのスクリプト開発者がIOにアクセスするためのニーズを満たしており、リソースが制約された組み込みハードウェア上で効率的に実装することが可能であり、実装/移植の努力は集中して管理可能です。
 
-There is a great deal of work remaining to fully explore the IO Class Pattern. More will be learned from future work, and those lessons will lead to refinements in the design. Areas for future work include ports to other microcontrollers, support for other runtime environments beyond the Moddable SDK, and implementations of other kinds of IO and providers.
+IOクラスパターンを完全に探求するためには、まだ多くの作業が残っています。将来の作業からさらに多くのことが学ばれ、その教訓は設計の改良につながるでしょう。将来の作業の分野には、他のマイクロコントローラへの移植、Moddable SDK以外の他のランタイム環境のサポート、他の種類のIOおよびプロバイダの実装が含まれます。
