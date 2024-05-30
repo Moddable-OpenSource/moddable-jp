@@ -103,8 +103,10 @@ typedef struct {
 	uint8_t nothingSent;
 
 	uint8_t						firstFrame;
+#ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
 	uint8_t						firstBuffer;
 	uint8_t						isContinue;
+#endif
 	uint8_t						memoryAccessControl;	// register 36h initialization value
 
 	SemaphoreHandle_t			colorsInFlight;
@@ -280,11 +282,10 @@ void xs_ILI9341p8(xsMachine *the)
 	gpio_set_direction(MODDEF_ILI9341P8_TEARINGEFFECT_PIN, GPIO_MODE_INPUT);
 	gpio_set_pull_mode(MODDEF_ILI9341P8_TEARINGEFFECT_PIN, GPIO_FLOATING);
 	gpio_install_isr_service(0);
-	gpio_set_intr_type(MODDEF_ILI9341P8_TEARINGEFFECT_PIN, GPIO_INTR_NEGEDGE);
+	gpio_set_intr_type(MODDEF_ILI9341P8_TEARINGEFFECT_PIN, GPIO_INTR_POSEDGE);
 	gpio_isr_handler_add(MODDEF_ILI9341P8_TEARINGEFFECT_PIN, tearingEffectISR, sd);
 
 	sd->startSend = xSemaphoreCreateBinary();
-	xSemaphoreGive(sd->startSend);
 #endif
 
 	sd->ops = xQueueCreate(MODDEF_ILI9341P8_OPQUEUE, sizeof(int));
@@ -405,16 +406,9 @@ void ili9341Send(PocoPixel *pixels, int byteLength, void *refcon)
 #ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
 	if (sd->firstBuffer) {
 		sd->firstBuffer = 0;
-		if (0 == gpio_get_level(MODDEF_ILI9341P8_TEARINGEFFECT_PIN)) {
-#if 0
-			while (0 == gpio_get_level(MODDEF_ILI9341P8_TEARINGEFFECT_PIN))
-				;
-#else
-			xSemaphoreTake(sd->startSend, portMAX_DELAY);
-#endif
-		}
+		xSemaphoreTake(sd->startSend, portMAX_DELAY);
 	}
- #endif
+#endif
 	{
 		int one = 1;
 		xQueueSend(sd->ops, &one, portMAX_DELAY);
@@ -476,32 +470,32 @@ void ili9341Send(PocoPixel *pixels, int byteLength, void *refcon)
 #else
 	// ST7789V
 	static const uint8_t gInit[] ICACHE_RODATA_ATTR = {
-		// Rongstar: ---- display and color format setting ----
+		// ---- display and color format setting ----
 		0x11, 0,		// Output sleep
 		kDelayMS, 200,
 		0x28, 0,		// Display OFF
+		0x26, 1, 0x04,	// Gamma Curve 4 (G1.0)
 		0x36, 1, 0,		// MY,MV,MX,RGB
 		0x3a, 1, 0x05,	// Pixel Format
 		0x21, 1, 1,		// pixel invert
 		0x35, 1, 0x00,	// tearing effect pin on (v-blanking only)
 
-		// Rongstar: ---- ST7789V Frame rate setting ----
+		// ---- Frame rate setting ----
 		0xb2, 5, 0x0c, 0x0c, 0x00, 0x33, 0x33,
 		0xb7, 1, 0x35, 
 
-		// Rongstar: ---- ST7789V Power setting ----
+		// ---- Power setting ----
 		0xbb, 1, 0x35,
 		0xc0, 1, 0x2c,
 		0xc2, 1, 0x01,
-		0xc3, 1, 0x0b,
-		0xc4, 1, 0x20,
-		0xc6, 1, 0x0f,
-		0xc6, 1, 0x15,	// frame rate (50 FPS)
+		0xc3, 1, 0x08,	// VRH Set: 3.95+ (vcom+vcom offset+0.5vdv)
+		0xc4, 1, 0x18,	// VDV Set: -0.2
+		0xc6, 1, 0x0F,	// frame rate ( 50 FPS?)
 		0xd0, 2, 0xa4, 0xa1,
 
-		// Rongstar: ---- ST7789V Gamma setting ----
-		0xe0, 14, 0xd0, 0x00, 0x02, 0x07,  0x0b, 0x1a, 0x31, 0x54,  0x40, 0x29, 0x12, 0x12,  0x12, 0x17,
-		0xe1, 14, 0xd0, 0x00, 0x02, 0x07,  0x05, 0x25, 0x2d, 0x44,  0x45, 0x1c, 0x18, 0x16,  0x1c, 0x1d,
+		// ---- Gamma setting ----
+		0xe0, 14, 0xD0, 0x08, 0x11, 0x08, 0x0C, 0x15, 0x39, 0x33, 0x50, 0x36, 0x13, 0x14, 0x29, 0x2d,
+		0xe1, 14, 0xD0, 0x08, 0x11, 0x08, 0x06, 0x06, 0x39, 0x44, 0x51, 0x0b, 0x16, 0x14, 0x2f, 0x31,
 		kDelayMS, 80,
 
 		kDelayMS, 0
@@ -558,7 +552,9 @@ void ili9341Begin(void *refcon, CommodettoCoordinate x, CommodettoCoordinate y, 
 	sd->updateLinesRemaining = h;
 	sd->yMin = yMin;
 	sd->yMax = yMax;
+#ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
 	sd->firstBuffer = !sd->firstFrame && !sd->isContinue;
+#endif
 
 	uint8_t *data = sd->data + (4 * (sd->ping++ & 7)); 
 	data[0] = xMin & 0xff;
@@ -580,14 +576,18 @@ void ili9341Begin(void *refcon, CommodettoCoordinate x, CommodettoCoordinate y, 
 void ili9341Continue(void *refcon)
 {
 	spiDisplay sd = refcon;
+#ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
 	sd->isContinue = true;
+#endif
 }
 
 void ili9341End(void *refcon)
 {
 	spiDisplay sd = refcon;
 
+#ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
 	sd->isContinue = false;
+#endif
 	if (sd->firstFrame) {
 		sd->firstFrame = false;
 

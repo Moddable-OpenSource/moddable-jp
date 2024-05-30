@@ -59,7 +59,7 @@ export default class ILI9341 @ "xs_ILI9341p8_destructor" {
 	close() @ "xs_ILI9341p8_close";
 	
 	pixels(value = 0) {
-		const pixels = this.width << 4;		// 16 scan lines
+		const pixels = this.width << 5;		// 32 scan lines
 		return (value > pixels) ? value : pixels;
 	}
 }
