@@ -5042,6 +5042,13 @@ void fxRunUsingAsync(txMachine* the)
 }
 
 #ifdef mxMetering
+void fxCheckMeter(void* console)
+{
+	txMachine* the = console;
+	if (the->meterInterval && (the->meterIndex > the->meterCount)) {
+		fxCheckMetering(the);
+	}
+}
 void fxMeterSome(void* console, txU4 count)
 {
 	txMachine* the = console;
