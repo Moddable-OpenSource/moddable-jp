@@ -1951,6 +1951,7 @@ void fx_TypedArray_prototype_includes(txMachine* the)
 				break;
 			}
 			index++;
+			mxCheckMetering();
 		}
 		mxPop();
 	}
@@ -1979,6 +1980,7 @@ void fx_TypedArray_prototype_indexOf(txMachine* the)
 				}
 			}
 			index++;
+			mxCheckMetering();
 		}
 		mxPop();
 	}
@@ -2076,6 +2078,7 @@ void fx_TypedArray_prototype_lastIndexOf(txMachine* the)
 					break;
 				}
 			}
+			mxCheckMetering();
 		}
 		mxPop();
 	}
@@ -2253,6 +2256,7 @@ void fx_TypedArray_prototype_set(txMachine* the)
 			mxPop();
 			offset += delta;
 			index++;
+			mxCheckMetering();
 		}	
 	}
 }
@@ -2547,6 +2551,7 @@ void fx_TypedArray_prototype_with(txMachine* the)
 			mxSetAt();
 			mxPop();
 			i++;
+			mxCheckMetering();
 		}
 		mxPushSlot(value);
 		mxPushSlot(mxResult);
@@ -2563,6 +2568,7 @@ void fx_TypedArray_prototype_with(txMachine* the)
 			mxSetAt();
 			mxPop();
 			i++;
+			mxCheckMetering();
 		}
 	}
 	mxPop();

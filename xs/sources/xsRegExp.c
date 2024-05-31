@@ -685,6 +685,7 @@ void fx_RegExp_prototype_match(txMachine* the)
 			}
 			mxPop();
 			count++;
+            mxCheckMetering();
 		}
 	}
 	else {
@@ -947,6 +948,7 @@ void fx_RegExp_prototype_replace(txMachine* the)
 			mxPop();
 		}
 		mxPop();
+         mxCheckMetering();
 	}
 	if (former < size) {
 		item = item->next = fxNewSlot(the);
@@ -1128,6 +1130,7 @@ void fx_RegExp_prototype_split(txMachine* the)
 			}
 		}
 		mxPop();
+		mxCheckMetering();
 	}
 	//if (p < 0)
 	//	p = 0;

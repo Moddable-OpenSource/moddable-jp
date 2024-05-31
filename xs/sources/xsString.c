@@ -1024,6 +1024,7 @@ txString fx_String_prototype_includes_aux(txMachine* the, txString string, txSiz
 				result++;
 			else
 				return result;
+			mxCheckMetering();
 		}
 	}
 	return C_NULL;
@@ -1073,6 +1074,7 @@ void fx_String_prototype_indexOf(txMachine* the)
 				anOffset++;
 			else
 				break;
+			mxCheckMetering();
 		}
 		if (anOffset <= aLimit)
 			anOffset = fxCacheUTF8ToUnicodeOffset(the, aString, anOffset);
@@ -1170,6 +1172,7 @@ void fx_String_prototype_lastIndexOf(txMachine* the)
 				anOffset--;
 			else
 				break;
+			mxCheckMetering();
 		}		
 		anOffset = fxCacheUTF8ToUnicodeOffset(the, aString, anOffset);
 	}
