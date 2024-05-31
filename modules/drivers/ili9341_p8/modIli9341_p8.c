@@ -490,7 +490,7 @@ void ili9341Send(PocoPixel *pixels, int byteLength, void *refcon)
 		0xc2, 1, 0x01,
 		0xc3, 1, 0x08,	// VRH Set: 3.95+ (vcom+vcom offset+0.5vdv)
 		0xc4, 1, 0x18,	// VDV Set: -0.2
-		0xc6, 1, 0x0F,	// frame rate ( 50 FPS?)
+		0xc6, 1, 0x15,	// frame rate ( 50 FPS - measured )
 		0xd0, 2, 0xa4, 0xa1,
 
 		// ---- Gamma setting ----
