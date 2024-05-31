@@ -156,7 +156,7 @@ Object.freeze(Colors, true);
 
 この拡張はJavaScript言語の一部ではないため、XSエンジン専用のコードでのみ使用するよう注意が必要です。同等の機能が[`harden`](https://github.com/Agoric/Harden)のような標準的な方法で利用可能になった場合、XSはそのメカニズムをだけを使用するように移行します。
 
-harden化されたJavaScriptは、`harden()`グローバル関数として再帰的フリーズを形式化します。XSはharden化されたJavaScript（以前のセキュアECMAScript）サポートの一部として`harden()`を実装していますが、現時点ではModdable SDKのビルドには含まれていません。
+Hardened JavaScriptでは、`harden()`グローバル関数として再帰的フリーズが正式に提供されています。XSはHardened JavaScript（以前のセキュアECMAScript）サポートの一部として`harden()`を実装していますが、現時点ではModdable SDKのビルドには含まれていません。
 
 ### 組み込みの自動フリーズ
 プリロードビルドフェーズの後、XSリンカーは以下をフリーズします：
