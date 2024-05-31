@@ -11,7 +11,7 @@ Copyright 2019-2023 Moddable Tech, Inc.<BR>
 すべてのモジュールをプリロードすることはできません。なぜなら、ビルドマシンで実行できる操作には限りがあるからです。例えば、デジタルピンの初期化やWi-Fiネットワークへの接続などです。Moddable SDKのほとんどのモジュールは、プリロードをサポートするように設計および実装されています。このドキュメントでは、XSのプリロード機能について詳しく説明し、プロジェクトでの使用方法と独自のモジュールへの適用方法について説明します。
 
 ## モジュールのプリロードを指定する
-プロジェクトのビルドマニフェスト（通常は `manifest.json` という名前のファイル）は、[多くの他のオプション](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md)と共に含めるモジュールをリストアップします。マニフェストの任意の部分には、プリロードモジュールのリストがあります。
+プロジェクトのビルドマニフェスト（通常は `manifest.json` という名前のファイル）は、[多くの他のオプション](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md)と共にインクルードするモジュールをリストアップします。マニフェストの任意の部分には、プリロードモジュールのリストがあります。
 
 	"modules": {
 		"*": [
