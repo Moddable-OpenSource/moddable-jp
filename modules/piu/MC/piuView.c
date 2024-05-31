@@ -913,11 +913,19 @@ void PiuViewReschedule(PiuView* self)
 	}
 }
 
+#ifndef mxPiuSloMo
+	#define mxPiuSloMo 0
+#endif
+
 PiuTick PiuViewTicks(PiuView* self)
 {
 	if ((*self)->idleTicks)
 		return (*self)->idleTicks;
+#if mxPiuSloMo
+	return modMilliseconds() / 60;
+#else
 	return modMilliseconds();
+#endif
 }
 
 void PiuViewUpdate(PiuView* self, PiuApplication* application)
@@ -936,9 +944,18 @@ void PiuViewUpdate(PiuView* self, PiuApplication* application)
 	PiuRectangleSet(&area, data[1], data[2], data[3], data[4]);
 	if (!PiuRectangleIsEmpty(&area)) {
 #endif
-		PiuViewBegin(self);
-		(*(*application)->dispatch->update)(application, self, &area);
-		PiuViewEnd(self);
+	#if mxPiuSloMo
+		static PiuTick former = 0;
+		PiuTick current = modMilliseconds();
+		if (current - former >= 1000) {
+			former = current;
+	#endif
+			PiuViewBegin(self);
+			(*(*application)->dispatch->update)(application, self, &area);
+			PiuViewEnd(self);
+	#if mxPiuSloMo
+		}
+	#endif
 	}
 }
 
