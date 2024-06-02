@@ -1,5 +1,5 @@
-This IO work is an experimental implementation of Ecma TC53, [ECMAScript Modules for Embedded Systems](https://ecmatc53.github.io/spec/web/spec.html).
+このIO作業は、Ecma TC53の実験的な実装であり、[組み込みシステム用のECMAScriptモジュール](https://ecmatc53.github.io/spec/web/spec.html)に関するものです。
 
-It is only implemented for the ESP8266 microcontroller at this time.
+現在、この実装はESP8266マイクロコントローラーにのみ実装されています。
 
-For details about the implementation, see the [IO documentation](../../documentation/io/io.md).
+実装の詳細については、[IOドキュメント](../../documentation/io/io.md)を参照してください。
