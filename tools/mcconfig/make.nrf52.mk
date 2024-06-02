@@ -409,10 +409,16 @@ SDK_GLUE_OBJ = \
 	$(TMP_DIR)/xsmain.c.o \
 	$(TMP_DIR)/systemclock.c.o \
 	$(TMP_DIR)/main.c.o \
+	$(TMP_DIR)/ftdi_trace.c.o
+
+ifeq ($(USE_USB),1)
+SDK_GLUE_OBJ += \
 	$(TMP_DIR)/debugger_usbd.c.o \
-	$(TMP_DIR)/ftdi_trace.c.o \
-	$(TMP_DIR)/app_usbd_vendor.c.o \
+	$(TMP_DIR)/app_usbd_vendor.c.o
+else
+SDK_GLUE_OBJ += \
 	$(TMP_DIR)/debugger.c.o
+endif
 
 #	$(TMP_DIR)/nrf52_serial.c.o 
 
@@ -601,8 +607,13 @@ OBJECTS += \
 	$(NRF_HW_CRYPTO_BACKEND_OBJECTS) \
 	$(NRF_DRIVERS) \
 	$(NRF_LIBRARIES) \
-	$(NRF_SOFTDEVICE) \
+	$(NRF_SOFTDEVICE)
+
+ifeq ($(USE_USB),1)
+OBJECTS += \
 	$(NRF_USBD)
+endif
+
 
 #	$(NRF_LOG_OBJECTS)
 
@@ -722,6 +733,10 @@ else
 endif
 ifeq ($(INSTRUMENT),1)
 	C_DEFINES += -DMODINSTRUMENTATION=1 -DmxInstrument=1
+endif
+
+ifeq ($(NRF52_CUSTOM_PWM_FREQ),1)
+	C_DEFINES += -DNRF52_CUSTOM_PWM_FREQ=1
 endif
 
 ifeq ($(USE_WDT),1)

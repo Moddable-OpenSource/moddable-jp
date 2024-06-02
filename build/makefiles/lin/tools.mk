@@ -250,6 +250,7 @@ C_DEFINES = \
 	-DmxNoFunctionName=1 \
 	-DmxHostFunctionPrimitive=1 \
 	-DmxFewGlobalsTable=1 \
+	-DmxStringInfoCacheLength=4 \
 	-DkModdableToolsVersion=\"$(TOOLS_VERSION)\"
 C_DEFINES += \
 	-Wno-misleading-indentation \

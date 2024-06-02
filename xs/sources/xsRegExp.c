@@ -37,7 +37,7 @@
 
 #include "xsAll.h"
 #if mxRegExp
-static txNumber fxAdvanceStringIndex(txString string, txNumber index, txBoolean unicodeFlag);
+static txNumber fxAdvanceStringIndex(txMachine* the, txString string, txNumber index, txBoolean unicodeFlag);
 static txSlot* fxCheckRegExpInstance(txMachine* the, txSlot* slot);
 static void fxExecuteRegExp(txMachine* the, txSlot* regexp, txSlot* argument);
 #endif
@@ -92,19 +92,19 @@ void fxBuildRegExp(txMachine* the)
 }
 
 #if mxRegExp
-txNumber fxAdvanceStringIndex(txString string, txNumber index, txBoolean unicodeFlag)
+txNumber fxAdvanceStringIndex(txMachine* the, txString string, txNumber index, txBoolean unicodeFlag)
 {
 #if mxCESU8
 	if (unicodeFlag) {
 		txInteger character;
-		txSize offset = fxUnicodeLength(string);
+		txSize offset = fxCacheUnicodeLength(the, string);
 		if (index >= offset)
 			return index + 1;
-		string += fxUnicodeToUTF8Offset(string, (txInteger)index);
-		offset = mxPtrDiff(mxStringByteDecode(string, &character) - string);
+		offset = fxCacheUnicodeToUTF8Offset(the, string, (txInteger)index);
+		offset = mxPtrDiff(mxStringByteDecode(string + offset, &character) - string);
 		if (character == C_EOF)
 			return index + 1;
-		return index + fxUTF8ToUnicodeOffset(string, offset);
+		return fxCacheUTF8ToUnicodeOffset(the, string, offset);
 	}
 #endif
 	return index + 1;
@@ -510,7 +510,7 @@ void fx_RegExp_prototype_exec(txMachine* the)
 	namedFlag = (flags & XS_REGEXP_N) ? 1 : 0;
 	stickyFlag = (flags & XS_REGEXP_Y) ? 1 : 0;
 	hasIndicesFlag = (flags & XS_REGEXP_D) ? 1 : 0;
-	offset = (globalFlag || stickyFlag) ? fxUnicodeToUTF8Offset(argument->value.string, (txInteger)lastIndex) : 0;
+	offset = (globalFlag || stickyFlag) ? fxCacheUnicodeToUTF8Offset(the, argument->value.string, (txInteger)lastIndex) : 0;
 	if ((offset >= 0) && fxMatchRegExp(the, regexp->value.regexp.code, temporary->value.regexp.data, argument->value.string, offset)) {
 		txSlot* resultArray;
 		txSlot* resultItem;
@@ -524,7 +524,7 @@ void fx_RegExp_prototype_exec(txMachine* the)
 		txInteger index;
 		txInteger length;
 		if (globalFlag || stickyFlag) {
-			index = fxUTF8ToUnicodeOffset(argument->value.string, temporary->value.regexp.data[1]);
+			index = fxCacheUTF8ToUnicodeOffset(the, argument->value.string, temporary->value.regexp.data[1]);
 			mxPushInteger(index);
 			mxPushSlot(mxThis);
 			mxSetID(mxID(_lastIndex));
@@ -560,7 +560,7 @@ void fx_RegExp_prototype_exec(txMachine* the)
 				resultItem->value.string[length] = 0;
 				resultItem->kind = XS_STRING_KIND;
 				if (hasIndicesFlag) {
-					start = fxUTF8ToUnicodeOffset(argument->value.string, start);
+					start = fxCacheUTF8ToUnicodeOffset(the, argument->value.string, start);
 					end = start + fxUTF8ToUnicodeOffset(argument->value.string + start, length);
 					mxPushInteger(start);
 					mxPushInteger(end);
@@ -603,7 +603,7 @@ void fx_RegExp_prototype_exec(txMachine* the)
 		resultItem = resultItem->next = fxNewSlot(the);
 		resultItem->ID = mxID(_index);
 		resultItem->kind = XS_INTEGER_KIND;
-		resultItem->value.integer = fxUTF8ToUnicodeOffset(argument->value.string, temporary->value.regexp.data[0]);
+		resultItem->value.integer = fxCacheUTF8ToUnicodeOffset(the, argument->value.string, temporary->value.regexp.data[0]);
 		resultItem = resultItem->next = fxNewSlot(the);
 		resultItem->ID = mxID(_input);
 		resultItem->value.string = argument->value.string;
@@ -678,7 +678,7 @@ void fx_RegExp_prototype_match(txMachine* the)
 				mxPushSlot(mxThis);
 				mxGetID(mxID(_lastIndex));
 				fxToLength(the, the->stack);
-				the->stack->value.number = fxAdvanceStringIndex(argument->value.string, the->stack->value.number, unicodeFlag);
+				the->stack->value.number = fxAdvanceStringIndex(the, argument->value.string, the->stack->value.number, unicodeFlag);
 				mxPushSlot(mxThis);
 				mxSetID(mxID(_lastIndex));
 				mxPop();
@@ -780,7 +780,7 @@ void fx_RegExp_prototype_matchAll_next(txMachine* the)
 				mxPushSlot(matcher);
 				mxGetID(mxID(_lastIndex));
 				fxToLength(the, the->stack);
-				the->stack->value.number = fxAdvanceStringIndex(argument->value.string, the->stack->value.number, unicode->value.boolean);
+				the->stack->value.number = fxAdvanceStringIndex(the, argument->value.string, the->stack->value.number, unicode->value.boolean);
 				mxPushSlot(matcher);
 				mxSetID(mxID(_lastIndex));
 				mxPop();
@@ -854,8 +854,8 @@ void fx_RegExp_prototype_replace(txMachine* the)
 	}
 	list = item = fxNewInstance(the);
 	mxPushSlot(list);
-	size = fxUnicodeLength(argument->value.string);
-	utf8Size = mxStringLength(argument->value.string);
+	size = fxCacheUnicodeLength(the, argument->value.string);
+	utf8Size = fxCacheUTF8Length(the, argument->value.string);
 	former = 0;
 	for (;;) {
 		fxExecuteRegExp(the, mxThis, argument);
@@ -882,7 +882,7 @@ void fx_RegExp_prototype_replace(txMachine* the)
             mxGetIndex(0);
             fxToString(the, the->stack);
             matched = the->stack;
-            matchLength = fxUnicodeLength(matched->value.string);
+            matchLength = fxUnicodeLength(matched->value.string, C_NULL);
 
             mxPushSlot(result);
             mxGetID(mxID(_length));
@@ -922,7 +922,7 @@ void fx_RegExp_prototype_replace(txMachine* the)
 				mxGetID(mxID(_groups));
 				if (!mxIsUndefined(the->stack))
 					fxToInstance(the, the->stack);
-				fxPushSubstitutionString(the, argument, utf8Size, fxUnicodeToUTF8Offset(argument->value.string, position), matched, mxStringLength(matched->value.string), i - 1, the->stack + 1, the->stack, replacement);
+				fxPushSubstitutionString(the, argument, utf8Size, fxCacheUnicodeToUTF8Offset(the, argument->value.string, position), matched, mxStringLength(matched->value.string), i - 1, the->stack + 1, the->stack, replacement);
                 item = item->next = fxNewSlot(the);
                 mxPullSlot(item);
                 the->stack += 1 + i;			
@@ -941,7 +941,7 @@ void fx_RegExp_prototype_replace(txMachine* the)
 			mxPushSlot(mxThis);
 			mxGetID(mxID(_lastIndex));
 			fxToLength(the, the->stack);
-			the->stack->value.number = fxAdvanceStringIndex(argument->value.string, the->stack->value.number, unicodeFlag);
+			the->stack->value.number = fxAdvanceStringIndex(the, argument->value.string, the->stack->value.number, unicodeFlag);
 			mxPushSlot(mxThis);
 			mxSetID(mxID(_lastIndex));
 			mxPop();
@@ -1070,7 +1070,7 @@ void fx_RegExp_prototype_split(txMachine* the)
 	item = fxLastProperty(the, array);
 	if (!limit)
 		goto bail;
-	size = fxUnicodeLength(argument->value.string);
+	size = fxUnicodeLength(argument->value.string, C_NULL);
 	if (size == 0) {
 		fxExecuteRegExp(the, splitter, argument);
 		if (the->stack->kind == XS_NULL_KIND) {
@@ -1090,7 +1090,7 @@ void fx_RegExp_prototype_split(txMachine* the)
 		mxPop();
 		fxExecuteRegExp(the, splitter, argument);
 		if (the->stack->kind == XS_NULL_KIND) {
-			q = (txInteger)fxAdvanceStringIndex(argument->value.string, q, unicodeFlag);
+			q = (txInteger)fxAdvanceStringIndex(the, argument->value.string, q, unicodeFlag);
 		}
 		else {
 			mxPushSlot(splitter);
@@ -1098,7 +1098,7 @@ void fx_RegExp_prototype_split(txMachine* the)
 			e = fxToInteger(the, the->stack);
 			mxPop();
 			if (e == p) {
-				q = (txInteger)fxAdvanceStringIndex(argument->value.string, q, unicodeFlag);
+				q = (txInteger)fxAdvanceStringIndex(the, argument->value.string, q, unicodeFlag);
 			}
 			else {
 				txSlot* result = the->stack;
@@ -1145,7 +1145,7 @@ bail:
 void fx_RegExp_prototype_split_aux(txMachine* the, txSlot* string, txIndex start, txIndex stop, txSlot* item)
 {
 #if mxRegExp
-	txInteger offset = fxUnicodeToUTF8Offset(string->value.string, start);
+	txInteger offset = fxCacheUnicodeToUTF8Offset(the, string->value.string, start);
 	txInteger length = fxUnicodeToUTF8Offset(string->value.string + offset, stop - start);
 	if ((offset >= 0) && (length > 0)) {
 		item->value.string = (txString)fxNewChunk(the, length + 1);

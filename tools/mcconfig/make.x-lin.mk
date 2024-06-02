@@ -90,7 +90,8 @@ C_DEFINES = \
 	-DmxNoFunctionLength=1 \
 	-DmxNoFunctionName=1 \
 	-DmxHostFunctionPrimitive=1 \
-	-DmxFewGlobalsTable=1
+	-DmxFewGlobalsTable=1 \
+	-DmxStringInfoCacheLength=4
 C_DEFINES += \
 	-Wno-misleading-indentation \
 	-Wno-implicit-fallthrough

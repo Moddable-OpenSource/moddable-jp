@@ -18,7 +18,6 @@
  *
  */
 
-import config from "mc/config";
 import Button from "button";
 
 class Flash {

@@ -1,6 +1,6 @@
 # Using the Moddable SDK with ESP32
 Copyright 2016-2024 Moddable Tech, Inc.<BR>
-Revised: April 3, 2024
+Revised: April 12, 2024
 
 This document provides a guide to building apps for the ESP32 line of SoCs from Espressif. The Moddable SDK supports [ESP32](https://www.espressif.com/en/products/socs/esp32), [ESP32-S2](https://www.espressif.com/en/products/socs/esp32-s2), [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3), [ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3), [ESP32-C6](https://www.espressif.com/en/products/socs/esp32-c6), and [ESP32-H2](https://www.espressif.com/en/products/socs/esp32-h2).
 
@@ -27,6 +27,11 @@ This document provides a guide to building apps for the ESP32 line of SoCs from 
 
 * [Troubleshooting](#troubleshooting)
 * [Using USB on ESP32](#using_usb)
+	* [Multi-port devices](#usb_multiport)
+	* [Build configuration](#usb_build)
+	* [TinyUSB](#usb_tinyusb) (esp32s2, esp32s3)
+	* [Serial-JTAG](#usb_serial_jtag) (esp32s3, esp32c3, esp32c6, esp32h2)
+
 
 <a id="overview"></a>
 ## Overview
@@ -995,13 +1000,27 @@ To manually put your ESP32 into bootloader mode, follow these steps:
 <a id="using_usb"></a>
 ## Using USB on ESP32
 
-Originally, programming and debugging with the ESP32 was done over a serial connection. Some devices contain an integrated serial-to-USB chip, and some use an external programmer.
+Originally, programming and debugging with the ESP32 was done over a serial or **UART** connection. Some devices contain an integrated serial-to-USB chip (UART), and some use an external programmer.
 
 In newer devices, Espressif has added USB support. Starting with the ESP32-S2, TinyUSB support was added. TinyUSB support continued with ESP32-S3.
 
-Starting with the ESP32-S3 and ESP32-C3, support for USB was integrated into the device with a USB Serial/JTAG driver.
+Starting with the ESP32-S3 and continuing with the ESP32-C3, ESP32-C6 and ESP32-H2, support for USB is integrated into the device with a USB Serial/JTAG driver. Using the Serial/JTAG driver is preferred as it uses the built-in driver which results in a smaller binary.
+
+<a id="usb_multiport"></a>
+### Multi-port devices
+
+There are some development boards that include both the UART and USB connections.
+
+<img src="./../assets/devices/esp32-dual-port.png" width=400>
+
+On macOS, when plugged into the **UART** port, the device is enumerated as a `/dev/cu.usbserial-#####` device. When plugged into the **USB** port, the device is enumerated as a `/dev/cu.usbmodem-#####` device.
+
+The Espressif IDF will install the app to whatever is connected. However, the `xsbug` connection will only work in the method that the application was built for. For example, building an app for the `esp32/esp32s3` target will use the **UART** port to connect to the debugger. Building the app for `esp32/esp32s3_cdc` or `esp32/esp32s3_usb` will connect over the **USB** port.
+
+> Note: If you have built with **USB** configured and are connected to the **UART** port, `xsbug` will not be able to connect.
 
 
+<a id="usb_build"></a>
 #### Build configuration
 
 In a device's manifest.json file, the `USE_USB` build option specifies which USB implementation to use. The `SDKCONFIGPATH` is also specified to pick up the ESP-IDF config files specific to this device:
@@ -1014,6 +1033,7 @@ In a device's manifest.json file, the `USE_USB` build option specifies which USB
 		...
 ```
 
+<a id="usb_tinyusb"></a>
 ### `USE_USB: 1` - TinyUSB
 
 TinyUSB works with the ESP32-S2 and ESP32-S3 devices.
@@ -1058,6 +1078,13 @@ These devices use this technique:
 | `esp32/s2mini` | Lolin S2 mini |
 | `esp32/s3_tft_feather` | Adafruit ESP32-S3 TFT Feather |
 
+
+> Note: A quirk with this variant is that the device enumerates to a different `/dev/cu.usbmodem-#####` whether it is in programming mode or run mode.
+> 
+> For example, building for `esp32/esp32s3_usb` I see `/dev/cu.usbmodem123401` in programming mode. In run-mode, I see `/dev/cu.usbmodem1234561`. So I set `DEBUGGER_PORT=/dev/cu.usbmodem1234561` and `UPLOAD_PORT=/dev/cu.usbmodem123401` to ensure the proper connections are made.
+
+
+<a id="usb_serial_jtag"></a>
 ### `USE_USB: 2` - SERIAL-JTAG
 
 The built-in SERIAL-JTAG driver can be used with the ESP32-S3 and ESP32-C3 devices.

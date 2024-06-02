@@ -116,7 +116,7 @@ static xsMachine *gThe;		// the main XS virtual machine running
 #if USE_USB
 static void debug_task(void *pvParameter)
 {
-	const usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 2048, .tx_buffer_size = 64 };
+	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 2048, .tx_buffer_size = 64 };
 	usb_serial_jtag_driver_install(&cfg);
 
 	while (true) {

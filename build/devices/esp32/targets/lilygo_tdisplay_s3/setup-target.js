@@ -42,15 +42,6 @@ globalThis.Host = Object.freeze({
 }, true);
 
 export default function (done) {
-
-//	Digital.write(config.backlight, 1);		// ON (but 1 is OFF on Moddable Two)
-    if ((undefined === config.brightness) || ("none" === config.brightness))
-        Digital.write(config.backlight, 0);
-    else if ("off" === config.brightness)
-        Digital.write(config.backlight, 1);
-    else
-        globalThis.backlight = new Backlight(parseInt(config.brightness));
-
 	if (config.lcd_pin)
 		Digital.write(config.lcd_pin, 1);
 

@@ -87,7 +87,8 @@ C_DEFINES = \
 	-DmxNoFunctionLength=1 \
 	-DmxNoFunctionName=1 \
 	-DmxHostFunctionPrimitive=1 \
-	-DmxFewGlobalsTable=1
+	-DmxFewGlobalsTable=1 \
+	-DmxStringInfoCacheLength=4
 ifeq ($(INSTRUMENT),1)
 	C_DEFINES += -DMODINSTRUMENTATION=1 -DmxInstrument=1
 endif

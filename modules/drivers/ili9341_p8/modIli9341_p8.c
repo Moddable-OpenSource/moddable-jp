@@ -479,6 +479,7 @@ void ili9341Send(PocoPixel *pixels, int byteLength, void *refcon)
 		// Rongstar: ---- display and color format setting ----
 		0x11, 0,		// Output sleep
 		kDelayMS, 200,
+		0x28, 0,		// Display OFF
 		0x36, 1, 0,		// MY,MV,MX,RGB
 		0x3a, 1, 0x05,	// Pixel Format
 		0x21, 1, 1,		// pixel invert
