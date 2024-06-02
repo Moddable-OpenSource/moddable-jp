@@ -501,7 +501,7 @@ mxExport txSize fxCESU8Length(txInteger character);
 #endif
 
 mxExport txSize fxUTF8ToUnicodeOffset(txString theString, txSize theOffset);
-mxExport txSize fxUnicodeLength(txString theString);
+mxExport txSize fxUnicodeLength(txString theString, txSize* byteLength);
 mxExport txSize fxUnicodeToUTF8Offset(txString theString, txSize theOffset);
 
 txFlag fxIntegerToIndex(void* the, txInteger theInteger, txIndex* theIndex);
@@ -1215,7 +1215,7 @@ enum {
 	_fromBase64,
 	_fromHex,
 	_lastChunkHandling,
-	_read,
+	_read_,
 	_setFromBase64,
 	_setFromHex,
 	_toBase64,

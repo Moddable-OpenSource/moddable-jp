@@ -1,6 +1,5 @@
 import Digital from "pins/digital";
 import Monitor from "monitor";
-import Timer from "timer";
 
 import config from "mc/config";
 

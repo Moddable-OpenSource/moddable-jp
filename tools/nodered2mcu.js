@@ -476,6 +476,13 @@ export default class extends TOOL {
 				config.active = !!config.active;
 			} break;
 
+			case "Blockly":
+				config.type = "function";
+				delete config.workspaceXml;
+				delete config.timeout;
+				delete config.blocklyConfig;
+				delete config.backpackContents;
+				// fall through
 			case "function": {
 				const params = "node, context, flow, global, libs, env"
 

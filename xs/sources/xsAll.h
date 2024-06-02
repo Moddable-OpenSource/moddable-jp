@@ -58,6 +58,10 @@ extern "C" {
 #ifndef mxRegExp
 	#define mxRegExp 1
 #endif
+#ifndef mxStringInfoCacheLength
+	#define mxStringInfoCacheLength 0
+#endif
+
 #ifndef mxMachinePlatform
 	#define mxMachinePlatform \
 		void* host;
@@ -425,6 +429,8 @@ struct sxMachine {
 	txID keyIndex;
 	txID keyOffset;
 	txSlot** keyArrayHost;
+	
+	void* stringInfoCache;
 
 #if mxAliasInstance
 	txID aliasCount;
@@ -1369,6 +1375,24 @@ extern void fxBuildString(txMachine* the);
 extern txSlot* fxNewStringInstance(txMachine* the);
 extern txSlot* fxAccessStringProperty(txMachine* the, txSlot* instance, txInteger index);
 extern void fxPushSubstitutionString(txMachine* the, txSlot* string, txInteger size, txInteger offset, txSlot* match, txInteger length, txInteger count, txSlot* captures, txSlot* groups, txSlot* replace);
+
+#if mxStringInfoCacheLength
+extern void fxAllocateStringInfoCache(txMachine* the);
+extern void fxFreeStringInfoCache(txMachine* the);
+extern void fxInvalidateStringInfoCache(txMachine* the);
+extern txSize fxCacheUTF8Length(txMachine* the, txString string);
+extern txSize fxCacheUTF8ToUnicodeOffset(txMachine* the, txString string, txSize offset);
+extern txSize fxCacheUnicodeLength(txMachine* the, txString string);
+extern txSize fxCacheUnicodeToUTF8Offset(txMachine* the, txString string, txSize offset);
+#else
+#define fxAllocateStringInfoCache(THE)
+#define fxFreeStringInfoCache(THE)
+#define fxInvalidateStringInfoCache(THE)
+#define fxCacheUTF8Length(THE,STRING) c_strlen(STRING)
+#define fxCacheUTF8ToUnicodeOffset(THE,STRING,OFFSET) fxUTF8ToUnicodeOffset(STRING,OFFSET)
+#define fxCacheUnicodeLength(THE,STRING) fxUnicodeLength(STRING,C_NULL)
+#define fxCacheUnicodeToUTF8Offset(THE,STRING,OFFSET) fxUnicodeToUTF8Offset(STRING,OFFSET)
+#endif
 
 /* xsRegExp.c */
 mxExport void fx_RegExp(txMachine* the);

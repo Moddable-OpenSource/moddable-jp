@@ -399,24 +399,32 @@ int main(int argc, char* argv[])
 			xsBeginHost(the);
 			{
 				{
+					txSlot* constructor;
 					txCallback callback;
 					txSlot* property;
 					txID id;
+					
+					fxDuplicateInstance(the, mxThrowTypeErrorFunction.value.reference);
+					constructor = the->stack;
+					constructor->value.reference->flag |= XS_CAN_CONSTRUCT_FLAG;
+					mxFunctionInstanceCode(constructor->value.reference)->ID = XS_NO_ID; 
+					mxFunctionInstanceHome(constructor->value.reference)->value.home.object = NULL;
+
 					property = mxBehaviorGetProperty(the, mxAsyncFunctionPrototype.value.reference, mxID(_constructor), 0, XS_OWN);
-					property->kind = mxThrowTypeErrorFunction.kind;
-					property->value = mxThrowTypeErrorFunction.value;
+					property->kind = constructor->kind;
+					property->value = constructor->value;
 					property = mxBehaviorGetProperty(the, mxAsyncGeneratorFunctionPrototype.value.reference, mxID(_constructor), 0, XS_OWN);
-					property->kind = mxThrowTypeErrorFunction.kind;
-					property->value = mxThrowTypeErrorFunction.value;
+					property->kind = constructor->kind;
+					property->value = constructor->value;
 					property = mxBehaviorGetProperty(the, mxFunctionPrototype.value.reference, mxID(_constructor), 0, XS_OWN);
-					property->kind = mxThrowTypeErrorFunction.kind;
-					property->value = mxThrowTypeErrorFunction.value;
+					property->kind = constructor->kind;
+					property->value = constructor->value;
 					property = mxBehaviorGetProperty(the, mxGeneratorFunctionPrototype.value.reference, mxID(_constructor), 0, XS_OWN);
-					property->kind = mxThrowTypeErrorFunction.kind;
-					property->value = mxThrowTypeErrorFunction.value;
+					property->kind = constructor->kind;
+					property->value = constructor->value;
 					property = mxBehaviorGetProperty(the, mxCompartmentPrototype.value.reference, mxID(_constructor), 0, XS_OWN);
-					property->kind = mxThrowTypeErrorFunction.kind;
-					property->value = mxThrowTypeErrorFunction.value;
+					property->kind = constructor->kind;
+					property->value = constructor->value;
 
 					fxDuplicateInstance(the, mxDateConstructor.value.reference);
 					callback = mxCallback(fx_Date_secure);
@@ -454,6 +462,8 @@ int main(int argc, char* argv[])
 					mxPop();
 					mxPush(mxGlobal);
 					mxDeleteID(mxID(_globalThis));
+					mxPop();
+					
 					mxPop();
 				}
 				{

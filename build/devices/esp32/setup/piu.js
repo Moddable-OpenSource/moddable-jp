@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -195,8 +195,33 @@ const rotate = {
 Object.freeze(rotate, true);
 
 export default function (done) {
-	globalThis.screen = new Screen({});
-	if (config.driverRotation)
-		screen.rotation = config.driverRotation;
+	if (!global.screen) {
+		globalThis.screen = new Screen({});
+
+		if (config.driverRotation) {
+			if (config.rotation)
+				screen.rotation = (config.driverRotation + config.rotation) % 360;
+			else
+				screen.rotation = config.driverRotation;
+		}
+
+		if (globalThis.Host?.Backlight || globalThis.device?.peripheral?.Backlight) {
+			let brightness = config.brightness;
+			if ((undefined === brightness) || ("none" === brightness))
+				brightness = 100;
+			else if ("off" === brightness)
+				brightness = 0;
+			else
+				brightness = parseInt(brightness);
+			
+			if (globalThis.Host?.Backlight)
+				globalThis.backlight = new Host.Backlight(brightness);
+			else {
+				globalThis.backlight = new device.peripheral.Backlight;
+				globalThis.backlight.brightness = brightness / 100;
+			}
+		}
+	}
+
 	done();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2023  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -57,4 +57,9 @@ export default class ILI9341 @ "xs_ILI9341p8_destructor" {
 	}
 
 	close() @ "xs_ILI9341p8_close";
+	
+	pixels(value = 0) {
+		const pixels = this.width << 4;		// 16 scan lines
+		return (value > pixels) ? value : pixels;
+	}
 }

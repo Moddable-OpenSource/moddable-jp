@@ -3371,7 +3371,7 @@ void fx_Uint8Array_prototype_setFromBase64(txMachine* the)
 	fxUint8ArrayFromBase64(the, src, dst, &srcSize, &dstSize, alphabet, lastChunkHandling);
 	mxPush(mxObjectPrototype);
 	property = fxLastProperty(the, fxNewObjectInstance(the));
-	property = fxNextIntegerProperty(the, property, srcSize, mxID(_read), XS_NO_FLAG);
+	property = fxNextIntegerProperty(the, property, srcSize, mxID(_read_), XS_NO_FLAG);
 	property = fxNextIntegerProperty(the, property, dstSize, mxID(_written), XS_NO_FLAG);
 	mxPullSlot(mxResult);
 }
@@ -3400,7 +3400,7 @@ void fx_Uint8Array_prototype_setFromHex(txMachine* the)
 	fxUint8ArrayFromHex(the, src, dst, &srcSize, &dstSize);
 	mxPush(mxObjectPrototype);
 	property = fxLastProperty(the, fxNewObjectInstance(the));
-	property = fxNextIntegerProperty(the, property, srcSize, mxID(_read), XS_NO_FLAG);
+	property = fxNextIntegerProperty(the, property, srcSize, mxID(_read_), XS_NO_FLAG);
 	property = fxNextIntegerProperty(the, property, dstSize, mxID(_written), XS_NO_FLAG);
 	mxPullSlot(mxResult);
 }
