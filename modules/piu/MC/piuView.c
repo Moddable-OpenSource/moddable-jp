@@ -1375,6 +1375,15 @@ void PiuView_get_rotation(xsMachine* the)
 #endif
 }
 
+void PiuView_get_ticks(xsMachine* the) 
+{
+#if mxPiuSloMo
+	xsResult = xsInteger(modMilliseconds() / 60);
+#else
+	xsResult = xsInteger(modMilliseconds());
+#endif
+}
+
 void PiuView_onDisplayReady(xsMachine* the)
 {
 #ifdef piuGPU
