@@ -531,6 +531,7 @@ class ApplicationBehavior extends Behavior {
 	}
 	doRecordTouchesCallback(application, path) {
 		try  {
+			this.doReloadFile();
 			this.SCREEN.delegate("doStartRecordingTouches", path);
 		}
 		catch (e) {
@@ -544,6 +545,7 @@ class ApplicationBehavior extends Behavior {
 	}
 	doPlayTouchesCallback(application, path) {
 		try  {
+			this.doReloadFile();
 			this.SCREEN.delegate("doStartPlayingTouches", path);
 		}
 		catch (e) {

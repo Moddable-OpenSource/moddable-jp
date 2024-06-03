@@ -81,6 +81,7 @@ class DeviceScreenBehavior extends Behavior {
 		screen.time = 0;
 		screen.start();
 		screen.bubble("onPlayingTouches", true);
+		screen.postMessage(JSON.stringify({ touches:"startPlaying" }));
 	}
 	doStopPlayingTouches(screen) {
 		screen.stop();
@@ -90,6 +91,7 @@ class DeviceScreenBehavior extends Behavior {
 		delete this.touchArray;
 		delete this.touchBuffer;
 		screen.bubble("onPlayingTouches", false);
+		screen.postMessage(JSON.stringify({ touches:"stopPlaying" }));
 	}
 	doStartRecordingTouches(screen, path) {
 		this.touchPath = path;
@@ -100,6 +102,7 @@ class DeviceScreenBehavior extends Behavior {
 		this.touchZero = this.touchWhen = Date.now();
 		screen.recordingTouches = true;
 		screen.bubble("onRecordingTouches", true);
+		screen.postMessage(JSON.stringify({ touches:"startRecording" }));
 	}
 	doStopRecordingTouches(screen) {
 		this.touchBuffer.resize(this.touchIndex * 4);
@@ -112,6 +115,7 @@ class DeviceScreenBehavior extends Behavior {
 		delete this.touchCount;
 		delete this.touchIndex;
 		screen.bubble("onRecordingTouches", false);
+		screen.postMessage(JSON.stringify({ touches:"stopRecording"  }));
 	}
 	onAbort(screen, status) {
 		screen.container.bubble("onAbort", status);
