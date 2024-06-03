@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019-2023 Bradley Farias
+* Copyright (c) 2019-2024 Bradley Farias
 *
 *   This file is part of the Moddable SDK Tools.
 *
@@ -20,7 +20,7 @@
 
 declare module "wifi" {
   export type WiFiOptions = {
-    bssid?: string,
+    bssid?: ArrayBuffer,
     ssid: string,
     password?: string
   }
