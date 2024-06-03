@@ -106,6 +106,7 @@ typedef struct {
 #ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
 	uint8_t						firstBuffer;
 	uint8_t						isContinue;
+	uint8_t						waiting;
 #endif
 	uint8_t						memoryAccessControl;	// register 36h initialization value
 
@@ -406,6 +407,7 @@ void ili9341Send(PocoPixel *pixels, int byteLength, void *refcon)
 #ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
 	if (sd->firstBuffer) {
 		sd->firstBuffer = 0;
+		sd->waiting = 1;
 		xSemaphoreTake(sd->startSend, portMAX_DELAY);
 	}
 #endif
@@ -610,10 +612,13 @@ void ili9341End(void *refcon)
 void tearingEffectISR(void *refcon)
 {
 	spiDisplay sd = refcon;
-	BaseType_t high_task_woken = pdFALSE;
 
-	xSemaphoreGiveFromISR(sd->startSend, &high_task_woken);
-	portYIELD_FROM_ISR(high_task_woken);
+	if (sd->waiting) {
+		BaseType_t high_task_woken = pdFALSE;
+		sd->waiting = 0;
+		xSemaphoreGiveFromISR(sd->startSend, &high_task_woken);
+		portYIELD_FROM_ISR(high_task_woken);
+	}
 }
 
 #endif
