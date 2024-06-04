@@ -243,7 +243,11 @@ void xs_serial_destructor(void *data)
 	if (UART_PIN_NO_CHANGE != serial->receive)
 		builtinFreePin(serial->receive);
 
+#if defined(_NO_ATOMICS)
+	if (0 == --serial->useCount)
+#else
 	if (0 == __atomic_sub_fetch(&serial->useCount, 1, __ATOMIC_SEQ_CST))
+#endif
 		c_free(serial);
 }
 
@@ -381,7 +385,11 @@ void ICACHE_RAM_ATTR serial_isr(void * arg)
 	}
 
 	if (post) {
+#if defined(_NO_ATOMICS)
+		serial->useCount++;
+#else
 		__atomic_add_fetch(&serial->useCount, 1, __ATOMIC_SEQ_CST);
+#endif
 		modMessagePostToMachineFromISR(serial->the, serialDeliver, serial);
 	}
 }
@@ -392,7 +400,12 @@ void serialDeliver(void *theIn, void *refcon, uint8_t *message, uint16_t message
 	Serial serial = (Serial)refcon;
 	int count;
 
-	if (0 == __atomic_sub_fetch(&serial->useCount, 1, __ATOMIC_SEQ_CST)) {
+#if defined(_NO_ATOMICS)
+	if (0 == --serial->useCount)
+#else
+	if (0 == __atomic_sub_fetch(&serial->useCount, 1, __ATOMIC_SEQ_CST))
+#endif
+	{
 		c_free(serial);
 		return;
 	}

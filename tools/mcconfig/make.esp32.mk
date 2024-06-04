@@ -334,7 +334,8 @@ C_COMMON_FLAGS ?= -c -Os -g \
 
 ifeq ("$(ESP_ARCH)","riscv")
 C_COMMON_FLAGS +=	\
-	-march=rv32imc
+	-march=rv32imc	\
+	-D_NO_ATOMICS
 else
 C_COMMON_FLAGS +=	\
  	-mlongcalls \
