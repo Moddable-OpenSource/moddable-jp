@@ -52,7 +52,7 @@
 				"embedded:provider/builtin": "$(BUILD)/devices/$(PLATFORM)/targets/$(SUBPLATFORM)/host/provider"
 			}
 		},
-		"esp32/esp32c6_gc9a01": {
+		"esp32/esp32c6": {
 			"include": [
 				"$(MODDABLE)/examples/manifest_net.json"
 			],
