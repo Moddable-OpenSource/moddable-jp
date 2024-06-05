@@ -145,7 +145,7 @@
 					"ports": [4, 5],
 					"invalidPorts": [0, 1],
 					"resolutions": [10, 11, 12],
-					"hzs": [10000, 200, 1]
+					"hzs": [10000, 200, 17]
 				},
 				"spi": {
 					"select": 18,
