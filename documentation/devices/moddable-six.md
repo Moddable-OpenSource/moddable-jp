@@ -74,7 +74,7 @@ Moddable Six enables programming and JavaScript debugging over the USB port. Deb
 <a id="pinout"></a>
 ### Pinout
 
-<img src="./assets/devices/moddable-six-pinout.png">
+<img src="../assets/devices/moddable-six-pinout.png">
 
 <a id="pin-info"></a>
 ### Pin Information
@@ -125,7 +125,7 @@ Power can be supplied to Moddable Six via the following:
 <a id="dimensions"></a>
 ### Dimensions
 
-The complete dimensions of Moddable Six are provided in this [PDF document](./assets/devices/moddable-six-dimensions.pdf). These are helpful when mounting Moddable Six in a product enclosure and designing a case for Moddable Six.
+The complete dimensions of Moddable Six are provided in this [PDF document](../assets/devices/moddable-six-dimensions.pdf). These are helpful when mounting Moddable Six in a product enclosure and designing a case for Moddable Six.
 
 <a id="setup"></a>
 ## Moddable SDK and Host Environment Setup
@@ -312,7 +312,7 @@ GPIO 46 enables the PAM8302A amplifier connected to the onboard speaker. Power t
 
 Moddable Six has a JST SH 1mm connector, commonly referred to as [Qwiic](https://www.sparkfun.com/qwiic) or [STEMMA QT](https://learn.adafruit.com/introducing-adafruit-stemma-qt/what-is-stemma-qt), that is used to easily connect sensors and peripherals using the I²C protocol. It uses GPIO 4 for SDA and GPIO 5 for SCL.
 
-<img width="405" src="./assets/devices/moddable-six-qwiic.jpg">
+<img width="405" src="../assets/devices/moddable-six-qwiic.jpg">
 
 <a id="neopixel"></a>
 #### NeoPixel
@@ -333,7 +333,7 @@ Moddable Six can color cycle the NeoPixel while running by enabling the `rainbow
 
 A NeoPixel strip can be connected to pin RGB IO48 on the expansion header.
 
-<img width="405" src="./assets/devices/moddable-six-external-neopixel.jpg">
+<img width="405" src="../assets/devices/moddable-six-external-neopixel.jpg">
 
 > Note: Please provide external 5V power to your NeoPixel strip. With 3.3V power, the NeoPixel strip may not work correctly. For short NeoPixel strips, you can use the `VIN 5V` pin when Moddable Six is powered by a 5V supply.
 
