@@ -679,8 +679,8 @@ int fuzz_oss(const uint8_t *Data, size_t script_size)
 	free(buffer);
 
 #if mxXSMemoryLimit
-	if ((XS_TOO_MUCH_COMPUTATION_EXIT == exitStatus) || (XS_NOT_ENOUGH_MEMORY_EXIT == exitStatus))
-		freeMemoryBlocks();		// clean-up if computation or memory limits exceeded
+	if ((XS_TOO_MUCH_COMPUTATION_EXIT == exitStatus) || (XS_NOT_ENOUGH_MEMORY_EXIT == exitStatus) || (XS_STACK_OVERFLOW_EXIT == exitStatus))
+		freeMemoryBlocks();		// clean-up if computation or memory limits exceeded, or stack overflow
 #endif
 
 	return 0;
