@@ -107,6 +107,7 @@ typedef struct {
 	uint8_t						firstBuffer;
 	uint8_t						isContinue;
 	uint8_t						waiting;
+	uint8_t						syncFrames;
 #endif
 	uint8_t						memoryAccessControl;	// register 36h initialization value
 
@@ -287,6 +288,7 @@ void xs_ILI9341p8(xsMachine *the)
 	gpio_isr_handler_add(MODDEF_ILI9341P8_TEARINGEFFECT_PIN, tearingEffectISR, sd);
 
 	sd->startSend = xSemaphoreCreateBinary();
+	sd->syncFrames = 1;
 #endif
 
 	sd->ops = xQueueCreate(MODDEF_ILI9341P8_OPQUEUE, sizeof(int));
@@ -387,6 +389,25 @@ void xs_ILI9341p8_command(xsMachine *the)
 	ili9341Command(sd, command, data, (uint16_t)dataSize);
 }
 
+void xs_ili9341p8_get_syncFrames(xsMachine *the)
+{
+#if MODDEF_ILI9341P8_TEARINGEFFECT_PIN
+	spiDisplay sd = xsmcGetHostData(xsThis);
+	xsmcSetBoolean(xsResult, sd->syncFrames);
+#else
+	xsmcSetFalse(xsResult);
+#endif
+}
+
+void xs_ili9341p8_set_syncFrames(xsMachine *the)
+{
+#if MODDEF_ILI9341P8_TEARINGEFFECT_PIN
+	spiDisplay sd = xsmcGetHostData(xsThis);
+	sd->syncFrames = xsmcToBoolean(xsArg(0));
+#endif
+}
+
+
 void xs_ILI9341p8_close(xsMachine *the)
 {
 	spiDisplay sd = xsmcGetHostData(xsThis);
@@ -405,7 +426,7 @@ void ili9341Send(PocoPixel *pixels, int byteLength, void *refcon)
 	sd->nothingSent = 0;
 
 #ifdef MODDEF_ILI9341P8_TEARINGEFFECT_PIN
-	if (sd->firstBuffer) {
+	if (sd->firstBuffer && sd->syncFrames) {
 		sd->firstBuffer = 0;
 		sd->waiting = 1;
 		xSemaphoreTake(sd->startSend, portMAX_DELAY);

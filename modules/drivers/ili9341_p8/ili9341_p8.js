@@ -57,6 +57,8 @@ export default class ILI9341 @ "xs_ILI9341p8_destructor" {
 		}
 		return this.command(0xc6, Uint8Array.of(i))
 	}
+	set syncFrames(value) @ "xs_ili9341p8_set_syncFrames";
+	get syncFrames() @ "xs_ili9341p8_get_syncFrames";
 
 	close() @ "xs_ILI9341p8_close";
 	
