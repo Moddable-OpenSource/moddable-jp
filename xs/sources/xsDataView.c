@@ -496,12 +496,8 @@ void fx_ArrayBuffer_fromBigInt(txMachine* the)
 	int endian = EndianBig;
 	if (mxArgc < 1)
 		mxTypeError("no argument");
-	if (mxArgc > 1) {
-		txInteger m = fxToInteger(the, mxArgv(1));
-		if (m < 0)
-			mxRangeError("minBytes < 0");
-		minBytes = (txU4)m;
-	}
+	if (mxArgc > 1)
+		minBytes = (txU4)fxArgToByteLength(the, 1, 0);
 	if ((mxArgc > 2) && fxToBoolean(the, mxArgv(2)))
 		sign = 1;
 	if ((mxArgc > 3) && fxToBoolean(the, mxArgv(3)))
@@ -1548,7 +1544,6 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 	txSlot* view;
 	txSlot* buffer;
 	txSlot* data;
-	txU2 shift;
 	txNumber length;
 	mxTemporary(iterator);
 	mxTemporary(next);
@@ -1572,7 +1567,6 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 		dispatch = instance->next;
 		view = dispatch->next;
 		buffer = view->next;
-		shift = dispatch->value.typedArray.dispatch->shift;
 		mxPush(mxArrayBufferConstructor);
 		mxNew();
 		mxPushNumber(length * dispatch->value.typedArray.dispatch->size);
@@ -1594,9 +1588,6 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 			view = dispatch->next;
 			buffer = view->next;
 			data = fxCheckArrayBufferDetached(the, buffer, XS_MUTABLE);
-			shift = dispatch->value.typedArray.dispatch->shift;
-			if (view->value.dataView.size < (length * dispatch->value.typedArray.dispatch->size))
-				mxTypeError("too small TypedArray");
 		}
 		else
 			mxTypeError("no TypedArray");
@@ -1622,8 +1613,8 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 			}
 			else
 				mxPushSlot(slot);
-			(*dispatch->value.typedArray.dispatch->coerce)(the, the->stack);
-			(*dispatch->value.typedArray.dispatch->setter)(the, data, (index << shift), the->stack, EndianNative);
+			mxPushSlot(mxResult);
+			mxSetIndex(index);
 			mxPop();
 			index++;
 			slot = slot->next;
@@ -1652,8 +1643,8 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 				mxPushSlot(mxArgv(0));
 				mxGetIndex(index);
 			}
-			(*dispatch->value.typedArray.dispatch->coerce)(the, the->stack);
-			(*dispatch->value.typedArray.dispatch->setter)(the, data, (index << shift), the->stack, EndianNative);
+			mxPushSlot(mxResult);
+			mxSetIndex(index);
 			mxPop();
 			index++;
 		}	
@@ -1960,6 +1951,7 @@ void fx_TypedArray_prototype_includes(txMachine* the)
 				break;
 			}
 			index++;
+			mxCheckMetering();
 		}
 		mxPop();
 	}
@@ -1988,6 +1980,7 @@ void fx_TypedArray_prototype_indexOf(txMachine* the)
 				}
 			}
 			index++;
+			mxCheckMetering();
 		}
 		mxPop();
 	}
@@ -2085,6 +2078,7 @@ void fx_TypedArray_prototype_lastIndexOf(txMachine* the)
 					break;
 				}
 			}
+			mxCheckMetering();
 		}
 		mxPop();
 	}
@@ -2262,6 +2256,7 @@ void fx_TypedArray_prototype_set(txMachine* the)
 			mxPop();
 			offset += delta;
 			index++;
+			mxCheckMetering();
 		}	
 	}
 }
@@ -2556,6 +2551,7 @@ void fx_TypedArray_prototype_with(txMachine* the)
 			mxSetAt();
 			mxPop();
 			i++;
+			mxCheckMetering();
 		}
 		mxPushSlot(value);
 		mxPushSlot(mxResult);
@@ -2572,6 +2568,7 @@ void fx_TypedArray_prototype_with(txMachine* the)
 			mxSetAt();
 			mxPop();
 			i++;
+			mxCheckMetering();
 		}
 	}
 	mxPop();

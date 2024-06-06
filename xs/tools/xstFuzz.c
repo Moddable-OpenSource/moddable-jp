@@ -24,7 +24,6 @@
 
 extern int fuzz(int argc, char* argv[]);
 extern void fx_print(xsMachine* the);
-extern void fxAbortFuzz(xsMachine* the);
 extern void fxBuildAgent(xsMachine* the);
 extern void fxBuildFuzz(xsMachine* the);
 extern void fxRunLoop(txMachine* the);
@@ -49,10 +48,6 @@ extern int gxStress;
 int gxMemoryFail;		// not thread safe
 #endif
 /* native memory stress */
-
-void fxAbortFuzz(xsMachine* the) 
-{
-}
 
 void fxBuildFuzz(xsMachine* the) 
 {
@@ -116,8 +111,15 @@ static uint8_t hashAddress(void *addr)
 	return (uint8_t)sum;
 }
 
+static txMutex gLinkMemoryMutex;
+
 static void linkMemoryBlock(void *address, size_t size)
 {
+	static uint8_t first = 1;
+	if (first) {
+		first = 0;
+		fxCreateMutex(&gLinkMemoryMutex);
+	}
 	uint8_t index = hashAddress(address);
 	txMemoryBlock *block = malloc(sizeof(txMemoryBlock));		// assuming this will never fail (nearly true)
 
@@ -125,18 +127,23 @@ static void linkMemoryBlock(void *address, size_t size)
 	block->prev = C_NULL;
 	block->size = size;
 
+    fxLockMutex(&gLinkMemoryMutex);
+
 	block->next = gBlocks[index];
 	if (gBlocks[index])
 		gBlocks[index]->prev = block;
 	gBlocks[index] = block;
 	
 	gBlocksSize += size;
+
+    fxUnlockMutex(&gLinkMemoryMutex);
 }
 
 static void unlinkMemoryBlock(void *address)
 {
 	uint8_t index = hashAddress(address);
 
+    fxLockMutex(&gLinkMemoryMutex);
 	txMemoryBlock *block = gBlocks[index];
 	while (block && (block->address != address))
 		block = block->next;
@@ -151,16 +158,21 @@ static void unlinkMemoryBlock(void *address)
 
 	gBlocksSize -= block->size;
 
+    fxUnlockMutex(&gLinkMemoryMutex);
+
 	free(block);
 }
 
 static size_t getMemoryBlockSize(void *address)
 {
 	uint8_t index = hashAddress(address);
+    fxLockMutex(&gLinkMemoryMutex);
 	txMemoryBlock *block = gBlocks[index];
 	while (block && (block->address != address))
 		block = block->next;
-	return block->size;
+	int size = block->size;
+    fxUnlockMutex(&gLinkMemoryMutex);
+    return size;
 }
 
 void freeMemoryBlocks(void)
@@ -528,7 +540,7 @@ int fuzz(int argc, char* argv[])
 		xsEndMetering(machine);
 		gxMemoryFail = 0;
 		fxDeleteScript(machine->script);
-		int status = (machine->abortStatus & 0xff) << 8;
+		int status = (machine->exitStatus & 0xff) << 8;
 		if (!status && error)
 			status = XS_UNHANDLED_EXCEPTION_EXIT << 8;
 		if (write(REPRL_CWFD, &status, 4) != 4) {
@@ -661,13 +673,13 @@ int fuzz_oss(const uint8_t *Data, size_t script_size)
 	xsEndMetering(machine);
 	fxDeleteScript(machine->script);
 #if mxXSMemoryLimit
-	int abortStatus = machine->abortStatus;
+	int exitStatus = machine->exitStatus;
 #endif
 	xsDeleteMachine(machine);
 	free(buffer);
 
 #if mxXSMemoryLimit
-	if ((XS_TOO_MUCH_COMPUTATION_EXIT == abortStatus) || (XS_NOT_ENOUGH_MEMORY_EXIT == abortStatus))
+	if ((XS_TOO_MUCH_COMPUTATION_EXIT == exitStatus) || (XS_NOT_ENOUGH_MEMORY_EXIT == exitStatus))
 		freeMemoryBlocks();		// clean-up if computation or memory limits exceeded
 #endif
 

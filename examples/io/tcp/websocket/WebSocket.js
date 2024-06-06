@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022  Moddable Tech, Inc.
+ * Copyright (c) 2021-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -53,11 +53,11 @@ class WebSocket {
 			let port, config;
 			if (scheme == "ws:") {
 				port = url.port || 80;
-				config = device.network.ws;
+				config = {...(options?.ws ?? device.network.ws)};
 			}
 			else if (scheme == "wss:") {
 				port = url.port || 443;
-				config = device.network.wss;
+				config = {...(options?.wss ?? device.network.wss)};
 			}
 			else
 				throw new URIError("only ws or wss");

@@ -672,6 +672,7 @@ void fxExportNodeHoist(void* it, void* param)
 			node->flags |= mxDeclareNodeClosureFlag | mxDeclareNodeUseClosureFlag;
 			node->line = self->line;
 			node->importSpecifier = specifier;
+			node->firstExportSpecifier = specifier;
 			fxScopeAddDeclareNode(hoister->scope, node);
 		}
 	}
