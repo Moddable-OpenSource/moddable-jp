@@ -1378,9 +1378,9 @@ void PiuView_get_rotation(xsMachine* the)
 void PiuView_get_ticks(xsMachine* the) 
 {
 #if mxPiuSloMo
-	xsResult = xsInteger(modMilliseconds() / 60);
+	xsResult = xsNumber(modMilliseconds() / 60);
 #else
-	xsResult = xsInteger(modMilliseconds());
+	xsResult = xsNumber(modMilliseconds());
 #endif
 }
 
