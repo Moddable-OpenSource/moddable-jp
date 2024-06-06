@@ -348,6 +348,12 @@ void xs_ILI9341p8_end(xsMachine *the)
 	ili9341End(sd);
 }
 
+void xs_ILI9341p8_continue(xsMachine *the)
+{
+	spiDisplay sd = xsmcGetHostData(xsThis);
+	ili9341Continue(sd);
+}
+
 void xs_ILI9341p8_pixelsToBytes(xsMachine *the)
 {
 	int count = xsmcToInteger(xsArg(0));

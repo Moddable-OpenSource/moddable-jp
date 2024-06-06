@@ -36,7 +36,7 @@ export default class ILI9341 @ "xs_ILI9341p8_destructor" {
 	end() @ "xs_ILI9341p8_end";
 
 	adaptInvalid() {}
-	continue() {}
+	continue() @ "xs_ILI9341p8_continue";
 
 	pixelsToBytes(count) @ "xs_ILI9341p8_pixelsToBytes";
 
