@@ -27,7 +27,7 @@ BMFont形式でTrueTypeおよびOpenTypeフォントを変換するためのツ�
 
 ![](../assets/create-fonts/screen02.png)
 
-BMFontバイナリ形式で。pngグリフと。fntフォントメトリクスファイルをエクスポートします。
+BMFontバイナリ形式で.pngグリフと.fntフォントメトリクスファイルをエクスポートします。
 
 ![](../assets/create-fonts/screen03.png)
 
