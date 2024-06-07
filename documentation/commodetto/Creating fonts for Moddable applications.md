@@ -33,7 +33,7 @@ BMFontバイナリ形式で.pngグリフと.fntフォントメトリクスファ
 
 ## fontbmの使い方
 
-fontbmを使用するには、まずシステムにインストールする必要があります。Windowsユーザー向けには、[ダウンロード可能なバイナリ](https://github.com/vladimirgamalyan/fontbm/releases/latest)が用意されています。[macOS](https://github.com/vladimirgamalyan/fontbm#building-macos)および[Linux](https://github.com/vladimirgamalyan/fontbm#building-linux)ユーザー向けの使い方が提供されており、現在はソースコードからビルドする必要があります。
+fontbmを使用するには、まずシステムにインストールする必要があります。Windowsユーザー向けには、[ダウンロード可能なバイナリ](https://github.com/vladimirgamalyan/fontbm/releases/latest)が用意されています。現在[macOS](https://github.com/vladimirgamalyan/fontbm#building-macos)および[Linux](https://github.com/vladimirgamalyan/fontbm#building-linux)ユーザーは、手順に従ってソースコードからビルドする必要があります。
 
 fontbmを入手したら、コマンドラインから使用して、Moddable SDKにフォントを追加するために必要な.fntファイルと.pngファイルを生成できます。
 
