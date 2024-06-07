@@ -35,7 +35,7 @@ BMFontバイナリ形式で.pngグリフと.fntフォントメトリクスファ
 
 fontbmを使用するには、まずシステムにインストールする必要があります。Windowsユーザー向けには、[ダウンロード可能なバイナリ](https://github.com/vladimirgamalyan/fontbm/releases/latest)が用意されています。[macOS](https://github.com/vladimirgamalyan/fontbm#building-macos)および[Linux](https://github.com/vladimirgamalyan/fontbm#building-linux)ユーザー向けの使い方が提供されており、現在はソースコードからビルドする必要があります。
 
-fontbmを入手したら、コマンドラインから使用して、Moddable SDKにフォントを追加するために必要な。fntファイルと。pngファイルを生成できます。
+fontbmを入手したら、コマンドラインから使用して、Moddable SDKにフォントを追加するために必要な.fntファイルと.pngファイルを生成できます。
 
 Moddable SDKプロジェクトのmanifest.jsonファイルを使用して、プロジェクトのビルドの一部としてfontbmを自動的に呼び出すことができます。これにより、プロジェクトで異なるフォントやフォントサイズを使用するのが非常に簡単になります。`mcconfig`や`mcrun`でfontbmサポートを使用するには、まず環境変数`FONTBM`をfontbm実行ファイルへのパスに設定して、Moddable SDKビルドツールがfontbmを見つけられるようにする必要があります。
 
