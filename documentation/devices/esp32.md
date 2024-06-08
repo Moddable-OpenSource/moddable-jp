@@ -1,6 +1,6 @@
 # Moddable SDKでESP32を使用する
 Copyright 2016-2024 Moddable Tech, Inc.<BR>
-改訂： April 3, 2024
+改訂： April 12, 2024
 
 このドキュメントは、EspressifのESP32シリーズのSoC向けにアプリを構築するためのガイドを提供します。Moddable SDKは、[ESP32](https://www.espressif.com/en/products/socs/esp32)、[ESP32-S2](https://www.espressif.com/en/products/socs/esp32-s2)、[ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3)、[ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3)、[ESP32-C6](https://www.espressif.com/en/products/socs/esp32-c6)、および[ESP32-H2](https://www.espressif.com/en/products/socs/esp32-h2)をサポートしています。
 
@@ -28,6 +28,10 @@ Copyright 2016-2024 Moddable Tech, Inc.<BR>
 
 * [トラブルシューティング](#troubleshooting)
 * [ESP32でのUSBの使用](#using_usb)
+	* [マルチポートデバイス](#usb_multiport)
+	* [ビルド構成](#usb_build)
+	* [TinyUSB](#usb_tinyusb) (esp32s2, esp32s3)
+	* [シリアル-JTAG](#usb_serial_jtag) (esp32s3, esp32c3, esp32c6, esp32h2)
 
 <a id="overview"></a>
 ## 概要
@@ -990,13 +994,26 @@ ESP32を手動でブートローダーモードにするには、次の手順に
 <a id="using_usb"></a>
 ## ESP32でのUSBの使用
 
-元々、ESP32のプログラミングとデバッグはシリアル接続を介して行われていました。一部のデバイスには統合されたシリアル-to-USBチップが含まれており、一部は外部プログラマを使用しています。
+元々、ESP32のプログラミングとデバッグはシリアル接続または**UART**を介して行われていました。一部のデバイスには統合されたシリアル-to-USBチップ（UART)が含まれており、一部は外部プログラマを使用しています。
 
 新しいデバイスでは、EspressifはUSBサポートを追加しました。ESP32-S2からTinyUSBサポートが追加され、ESP32-S3でもTinyUSBサポートが続いています。
 
-ESP32-S3およびESP32-C3からは、USB Serial/JTAGドライバを使用してデバイスにUSBサポートが統合されました。
+ESP32-S3から始まり、ESP32-C3、ESP32-C6、ESP32-H2に続き、USBのサポートがUSBシリアル/JTAGドライバを使用してデバイスに統合されています。組み込みドライバを使用することでバイナリが小さくなるため、シリアル/JTAGドライバの使用が推奨されます
 
+<a id="usb_multiport"></a>
+### マルチポートデバイス
 
+UARTとUSB接続の両方ができる開発ボードはたくさんあります。
+
+<img src="./../assets/devices/esp32-dual-port.png" width=400>
+
+macOSでは、**UART**ポートに接続すると、デバイスは`/dev/cu.usbserial-#####` として認識されます。**USB**ポートに接続すると、`/dev/cu.usbmodem-#####`として認識されます。
+
+Espressif IDFはどちらに接続されていてもアプリをインストールします。しかしながら、`xsbug` 接続はアプリケーションがビルドされた方法でのみ機能します。 例えば、`esp32/esp32s3`ターゲット用にアプリをビルドすると、デバッガに接続するために**UARTポート**を使用します。`esp32/esp32s3_cdc`または`esp32/esp32s3_usb`用にアプリをビルドすると、**USB**ポート経由で接続します。
+
+> 注意： もし、**USB**としてビルドとしていて、**UART**ポートとして接続していたなら、`xsbug`は接続できないでしょう。
+
+<a id="usb_build"></a>
 #### ビルド構成
 
 デバイスのmanifest.jsonファイルでは、`USE_USB`ビルドオプションがどのUSB実装を使用するかを指定します。また、`SDKCONFIGPATH`も指定して、このデバイスに特有のESP-IDF設定ファイルを取得します：
@@ -1009,6 +1026,7 @@ ESP32-S3およびESP32-C3からは、USB Serial/JTAGドライバを使用して�
 	...
 ```
 
+<a id="usb_tinyusb"></a>
 ### `USE_USB: 1` - TinyUSB
 
 TinyUSBはESP32-S2およびESP32-S3デバイスで動作します。
@@ -1053,6 +1071,12 @@ Done
 | `esp32/s2mini` | Lolin S2 mini |
 | `esp32/s3_tft_feather` | Adafruit ESP32-S3 TFT Feather |
 
+
+> Note: 注意: この端末の特徴として、プログラミングモードと実行モードのどちらにあるかに応じて、デバイスが異なる/dev/cu.usbmodem-#####として認識される点があります。
+>
+> 例えば、`esp32/esp32s3_usb`のビルドでは、 `/dev/cu.usbmodem123401`がプログラミングモードとして確認できます。実行モードでは、 `/dev/cu.usbmodem1234561`となります。 よって `DEBUGGER_PORT=/dev/cu.usbmodem1234561` および `UPLOAD_PORT=/dev/cu.usbmodem123401` と設定することで適切な接続が保証されます。
+
+<a id="usb_serial_jtag"></a>
 ### `USE_USB: 2` - SERIAL-JTAG
 
 内蔵のSERIAL-JTAGドライバーは、ESP32-S3およびESP32-C3デバイスで使用できます。
