@@ -1,12 +1,13 @@
 {
 	"platforms": {
 		"mac": {
-			"modules": {
-				"embedded:x-files": "./posix/files-posix"
-			}
+			"include": "./posix/manifest.json"
+		},
+		"lin": {
+			"include": "./posix/manifest.json"
+		},
+		"esp32": {
+			"include": "./littlefs/manifest.json"
 		}
-	},
-	"preload": [
-		"embedded:x-files"
-	]
+	}
 }

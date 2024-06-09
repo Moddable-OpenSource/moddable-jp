@@ -175,6 +175,7 @@ class View @ "PiuViewDelete" {
 	_create(application, it, screen, poco, rectangle) @ "PiuView_create"
 	
 	get rotation() @ "PiuView_get_rotation" 
+	get ticks() @ "PiuView_get_ticks" 
 	
 	onDisplayReady() @ "PiuView_onDisplayReady"
 	onIdle() @ "PiuView_onIdle"

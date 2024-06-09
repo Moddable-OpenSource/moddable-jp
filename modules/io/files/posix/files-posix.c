@@ -27,13 +27,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define kCreatePermissions (0755)
-
-#if mxLinux
-	#define kOpenDirFlags (O_RDONLY | O_RESOLVE_BENEATH)
-#else
-	#define kOpenDirFlags (O_RDONLY)
-#endif
+#define kCreateFilePermissions (0666)
+#define kCreateDirectoryPermissions (0777)
+#define kOpenDirFlags (O_RDONLY)
 
 /*
 	helpers
@@ -93,6 +89,24 @@ static char *_getPath(xsMachine *the, xsSlot *slot)
 	return NULL;		// can never reach here
 }
 
+#if mxLinux
+#include <linux/openat2.h>
+#include <sys/syscall.h>
+
+static int do_openat2(int dirfd, const char *pathname, int flags)
+{
+	struct open_how how = {0};
+	how.flags = flags;
+	how.mode = 0;
+	how.resolve = RESOLVE_BENEATH;
+	return syscall(SYS_openat2, dirfd, pathname, &how, sizeof(how));
+}
+#else /* !mxLinux */
+static int do_openat2(int dirfd, const char *pathname, int flags)
+{
+	return openat(dirfd, pathname, flags);
+}
+#endif
 
 /*
 	File
@@ -148,8 +162,7 @@ void xs_fileposix_read(xsMachine *the)
 		returnLength = 1;
 	}
 
-	throwIf(lseek(fd, position, SEEK_SET));
-	int result = read(fd, buffer, length);
+	int result = pread(fd, buffer, length, position);
 	throwIf(result);
 
 	if (returnLength)
@@ -161,14 +174,12 @@ void xs_fileposix_read(xsMachine *the)
 void xs_fileposix_write(xsMachine *the)
 {
 	int fd = getFile(xsThis);
+	int position = xsmcToInteger(xsArg(1));
 	void *buffer;
 	xsUnsignedValue length;
 	xsmcGetBufferWritable(xsArg(0), &buffer, &length);
 
-	int position = xsmcToInteger(xsArg(1));
-
-	throwIf(lseek(fd, position, SEEK_SET));
-	throwIf(write(fd, buffer, length));
+	throwIf(pwrite(fd, buffer, length, position));
 }
 
 void xs_fileposix_status(xsMachine *the)
@@ -221,10 +232,10 @@ void xs_direectoryposix_destructor(void *data)
 
 void xs_direectoryposix(xsMachine *the)
 {
-	xsTrace("Directory constructor is temporary for bootstrapping. Will throw in the future.");
+	xsTrace("Directory constructor is temporary for bootstrapping. Will throw in the future.\n");
 
 	xsmcGet(xsResult, xsArg(0), xsID_path);
-	char *path = xsmcToString(xsResult);		//@@ not checked with getPat.... for bootstrap
+	char *path = xsmcToString(xsResult);		//@@ not checked with getPath.... for bootstrap
 	xsDirectoryRecord d;
 	
 	struct stat buf;
@@ -288,11 +299,7 @@ void xs_direectoryposix_openFile(xsMachine *the)
 	}
 
 	xsFileRecord f;
-#if mxLinux
-	f.fd = openat(fd, path, mode | O_RESOLVE_BENEATH, kCreatePermissions);
-#else
-	f.fd = openat(fd, path, mode, kCreatePermissions);
-#endif
+	f.fd = openat(fd, path, mode, kCreateFilePermissions);
 	throwIf(f.fd);
 
 	xsmcSetHostChunk(xsResult, &f, sizeof(f));
@@ -315,8 +322,7 @@ void xs_direectoryposix_openDirectory(xsMachine *the)
 		xsUnknownError("not directory");
 
 	xsDirectoryRecord d;
-
-	d.fd = openat(fd, path, kOpenDirFlags);
+	d.fd = do_openat2(fd, path, kOpenDirFlags);
 	throwIf(d.fd); 
 
 	xsmcSetHostChunk(xsResult, &d, sizeof(d));
@@ -361,10 +367,17 @@ void xs_direectoryposix_status(xsMachine *the)
 	int fd = getDirectory(xsThis);
 	struct stat statbuf;
 	char *path = getPath(xsArg(0));
+	int flags = 0;
+	
+	if (xsmcTest(xsArg(1))) {
+		xsmcGet(xsResult, xsArg(1), xsID_resolveTarget);
+		if (xsmcTest(xsResult))
+			flags = AT_SYMLINK_NOFOLLOW;
+	}
 
-	throwIf(fstatat(fd, path, &statbuf, 0));
+	throwIf(fstatat(fd, path, &statbuf, flags));
 
-	xsResult = xsArg(1);
+	xsResult = xsArg(2);
 
 	xsmcVars(1);
 	xsmcSetInteger(xsVar(0), statbuf.st_size);
@@ -374,12 +387,12 @@ void xs_direectoryposix_status(xsMachine *the)
 	xsmcSet(xsResult, xsID_mode, xsVar(0));
 }
 
-void xs_direectoryposix_create(xsMachine *the)
+void xs_direectoryposix_createDirectory(xsMachine *the)
 {
 	int fd = getDirectory(xsThis);
 	char *path = getPath(xsArg(0));
 
-	int result = mkdirat(fd, path, kCreatePermissions);
+	int result = mkdirat(fd, path, kCreateDirectoryPermissions);
 	if (result < 0) {
 		if (EEXIST == errno) {
 			xsmcSetFalse(xsResult);
@@ -390,17 +403,26 @@ void xs_direectoryposix_create(xsMachine *the)
 	xsmcSetTrue(xsResult);
 }
 
+void xs_direectoryposix_createLink(xsMachine *the)
+{
+	int fd = getDirectory(xsThis);
+	char *path = getPath(xsArg(0));
+	char *target = getPath(xsArg(1));
+
+	throwIf(symlinkat(target, fd, path));
+}
+
 void xs_direectoryposix_readLink(xsMachine *the)
 {
 	int fd = getDirectory(xsThis);
 	char *path = getPath(xsArg(0));
-	char buf[1024];
+	char *s;
 
-	ssize_t length = readlinkat(fd, path, buf, sizeof(buf) - 1);
+	xsmcSetStringBuffer(xsResult, NULL, 1024);
+	s = xsmcToString(xsResult);
+	ssize_t length = readlinkat(fd, path, s, 1024 - 1);
 	throwIf(length);
-	buf[length] = 0;
-
-	xsmcSetString(xsResult, buf);
+	s[length] = 0;
 }
 
 /*
@@ -464,10 +486,16 @@ void xs_scanposix_close(xsMachine *the)
 void xs_scanposix_read(xsMachine *the)
 {
 	DIR *dir = getScan(xsThis);
-	struct dirent *de = readdir(dir);
-	if (!de) {
-		xs_scanposix_close(the);
-		return;
+	struct dirent *de;
+
+	while (true) {
+		de = readdir(dir);
+		if (!de) {
+			xs_scanposix_close(the);
+			return;
+		}
+		if (c_strcmp(".", de->d_name) && c_strcmp("..", de->d_name))
+			break;
 	}
 	xsmcSetString(xsResult, de->d_name);
 }

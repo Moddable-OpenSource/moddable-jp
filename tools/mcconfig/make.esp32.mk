@@ -38,7 +38,7 @@ endif
 PROGRAMMING_VID ?= 303a
 PROGRAMMING_PID ?= 1001
 
-EXPECTED_ESP_IDF ?= v5.1.2
+EXPECTED_ESP_IDF ?= v5.2.1
 
 # ESP32_SUBCLASS is to find some include files in IDFv4
 # values include esp32, esp32s3 and esp32s2
@@ -175,20 +175,13 @@ INC_DIRS = \
 	$(IDF_PATH)/components/esp_wifi/include \
 	$(IDF_PATH)/components/$(ESP_ARCH)/include \
 	$(IDF_PATH)/components/$(ESP_ARCH)/$(ESP32_SUBCLASS)/include \
-	$(IDF_PATH)/components/freertos/port/$(ESP_ARCH)/include \
- 	$(IDF_PATH)/components/freertos/FreeRTOS-Kernel/portable/$(ESP_ARCH)/include \
+	$(IDF_PATH)/components/freertos/config/include \
+	$(IDF_PATH)/components/freertos/config/include/freertos \
+	$(IDF_PATH)/components/freertos/config/$(ESP_ARCH)/include \
  	$(IDF_PATH)/components/freertos/FreeRTOS-Kernel/include \
  	$(IDF_PATH)/components/freertos/FreeRTOS-Kernel/include/freertos \
-	$(IDF_PATH)/components/freertos/esp_additions/arch/$(ESP_ARCH)/include \
+ 	$(IDF_PATH)/components/freertos/FreeRTOS-Kernel/portable/$(ESP_ARCH)/include/freertos \
 	$(IDF_PATH)/components/freertos/esp_additions/include \
-	$(IDF_PATH)/components/freertos/esp_additions/include/freertos \
-	$(IDF_PATH)/components/freertos \
-	$(IDF_PATH)/components/freertos/include \
-	$(IDF_PATH)/components/freertos/include/freertos \
-	$(IDF_PATH)/components/freertos/port \
-	$(IDF_PATH)/components/freertos/include/esp_additions \
-	$(IDF_PATH)/components/freertos/include/esp_additions/freertos \
-	$(IDF_PATH)/components/freertos/port/$(ESP_ARCH)/include/freertos \
 	$(IDF_PATH)/components/hal/include \
 	$(IDF_PATH)/components/hal/$(ESP32_SUBCLASS)/include \
 	$(IDF_PATH)/components/hal/platform_port/include \
@@ -341,7 +334,8 @@ C_COMMON_FLAGS ?= -c -Os -g \
 
 ifeq ("$(ESP_ARCH)","riscv")
 C_COMMON_FLAGS +=	\
-	-march=rv32imc
+	-march=rv32imc	\
+	-D_NO_ATOMICS
 else
 C_COMMON_FLAGS +=	\
  	-mlongcalls \

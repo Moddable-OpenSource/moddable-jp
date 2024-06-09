@@ -46,11 +46,7 @@ extern "C" {
 
 //#define mxFrequency 1
 #ifndef mxBoundsCheck
-	#ifdef mxDebug
-		#define mxBoundsCheck 1
-	#else
-		#define mxBoundsCheck 0
-	#endif
+	#define mxBoundsCheck 1
 #endif
 #ifndef mxKeysGarbageCollection
 	#define mxKeysGarbageCollection 0
@@ -405,6 +401,7 @@ struct sxMachine {
 	void* archive; /* xs.h */
 	txSlot scratch; /* xs.h */
 	txSlot* stackPrototypes; /* xs.h */
+	int exitStatus; /* xs.h */
 	mxMachinePlatform /* xs.h */
 	txFlag status;
 	
@@ -2222,11 +2219,17 @@ enum {
 	(((THE_SLOT)->kind == XS_STRING_KIND) || ((THE_SLOT)->kind == XS_STRING_X_KIND))
 	
 #ifdef mxMetering
+#define mxCheckMetering() \
+	if (the->meterInterval && (the->meterIndex > the->meterCount)) { \
+		fxCheckMetering(the); \
+	}
 #define mxMeterOne() \
 	(the->meterIndex++)
 #define mxMeterSome(_COUNT) \
 	(the->meterIndex += _COUNT)
 #else
+#define mxCheckMetering() \
+	((void)0)
 #define mxMeterOne() \
 	((void)0)
 #define mxMeterSome(_COUNT) \
