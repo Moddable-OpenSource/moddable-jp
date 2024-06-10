@@ -1,7 +1,7 @@
 # Moddable SDKでnRF52を使用する
 
 Copyright 2021-2024 Moddable Tech, Inc.<BR>
-改訂： January 9, 2024
+改訂： 2024年1月19日
 
 このドキュメントは、Moddable SDKを使用してNordicのnRF52840 SoC向けにアプリを構築するためのガイドです。
 

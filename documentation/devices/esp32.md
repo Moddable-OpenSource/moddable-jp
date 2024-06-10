@@ -1,6 +1,6 @@
 # Moddable SDKでESP32を使用する
 Copyright 2016-2024 Moddable Tech, Inc.<BR>
-改訂： May 23, 2024
+改訂： 2024年5月23日
 
 このドキュメントは、EspressifのESP32シリーズのSoC向けにアプリを構築するためのガイドを提供します。Moddable SDKは、[ESP32](https://www.espressif.com/en/products/socs/esp32)、[ESP32-S2](https://www.espressif.com/en/products/socs/esp32-s2)、[ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3)、[ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3)、[ESP32-C6](https://www.espressif.com/en/products/socs/esp32-c6)、および[ESP32-H2](https://www.espressif.com/en/products/socs/esp32-h2)をサポートしています。
 
