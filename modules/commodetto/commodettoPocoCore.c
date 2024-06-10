@@ -52,7 +52,15 @@ void xs_poco_destructor(void *data)
 		Poco poco = (Poco)(((uint8_t *)data) - offsetof(PocoRecord, pixels));
 		if (poco->reservedPocoJS)
 			c_free(poco->reservedPocoJS);
+#if MODDEF_POCO_DMA
+		#if ESP32
+			heap_caps_free(poco);
+		#else
+			#error DMA deallocate
+		#endif
+#else
 		c_free(poco);
+#endif
 	}
 }
 
@@ -94,7 +102,15 @@ void xs_poco_build(xsMachine *the)
 	if (rotation != kPocoRotation)
 		xsErrorPrintf("not configured for requested rotation");
 
+#if MODDEF_POCO_DMA
+	#if ESP32
+		poco = heap_caps_aligned_alloc(4, sizeof(PocoRecord) + byteLength + 8, MALLOC_CAP_DMA);
+	#else
+		#error DMA allocator
+	#endif
+#else
 	poco = c_malloc(sizeof(PocoRecord) + byteLength + 8);		// overhang when dividing
+#endif
 	if (!poco)
 		xsErrorPrintf("no memory");
 	xsmcSetHostBuffer(xsThis, poco->pixels, pixelsLength);

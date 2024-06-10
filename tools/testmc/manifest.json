@@ -46,6 +46,7 @@
 		"$(MODULES)/files/preference/manifest.json",
 		"$(MODULES)/crypt/digest/manifest.json",
 		"$(MODDABLE)/modules/crypt/tls.json",
+		"$(MODDABLE)/modules/io/files/manifest.json",
 		"$(MODDABLE)/modules/network/http/manifest.json",
 		"$(MODDABLE)/modules/network/mqtt/manifest.json",
 		"$(MODDABLE)/modules/network/ping/manifest.json",
@@ -162,6 +163,9 @@
 			"build": {
 				"SIMULATOR": "$(BUILD)/bin/lin/debug/mcsim"
 			},
+			"include": [
+				"$(MODDABLE)/modules/pins/i2s/manifest.json"
+			],
 			"modules": {
 				"*": [
 					"$(BUILD)/simulators/modules/screen",

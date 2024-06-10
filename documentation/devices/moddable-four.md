@@ -1,7 +1,7 @@
 # Moddable Four Developer Guide
 
 Copyright 2021-2024 Moddable Tech, Inc.<BR>
-Revised: January 6, 2024
+Revised: April 20, 2024
 
 This document provides information about Moddable Four, including details about its pins and other components, how to build and deploy apps, and links to other development resources.
 
@@ -13,7 +13,7 @@ This document provides information about Moddable Four, including details about 
 	- [Pin Information](#pin-info)
 - [SDK and Host Environment Setup](#setup)
 - [Building and Deploying Apps](#building-and-deploying-apps)
-- [Using the Moddable Four](#moddable-features)
+- [Using Moddable Four](#moddable-features)
 - [Troubleshooting](#troubleshooting)
 - [Development Resources](#development-resources)
 	- [Simulator](#simulator)
@@ -66,15 +66,15 @@ It also includes an integrated LIS3DH accelerometer, jog dial, and CR2032 batter
 | GPIO27<BR>SCL | I/O<BR>I2C | Connects to nrf52 GPIO27<BR>I2C Clock<BR>Accelerometer |
 | GPIO26<BR>SDA | I/O<BR>I2C | Connects to nrf52 GPIO26<BR>I2C Data<BR>Accelerometer |
 | RST | Reset | Reset device |
-| VIN | Power | VIN is a 5V pin that can be used to power the Moddable Four. If the board is powered by USB, this pin can be used to provide that 5V power. This is an unregulated pin; VIN is a direct connection to the 5V input sources. Connects to other 5V inputs and AP2112K voltage regulator.
+| VIN | Power | VIN is a 5V pin that can be used to power Moddable Four. If the board is powered by USB, this pin can be used to provide that 5V power. This is an unregulated pin; VIN is a direct connection to the 5V input sources. Connects to other 5V inputs and AP2112K voltage regulator.
 | GND | GND | Connects to GND |
 | 3.3V | Power | 3.3V input and output. Connects to nRF52 3.3V input and other 3.3V devices. Regulated output power if board is 5V powered via micro USB, VIN external connector or USB. 3.3V can also be provided by the CR2032 coin cell. |
 
 #### Power
 
-The Moddable Four is a 3.3V device. 5V power is regulated to 3.3V by a AP2112K-3.3 voltage regulator (see data sheet for specs). Testing of Moddable Four has been with typical 5V 0.5amp USB source power.
+Moddable Four is a 3.3V device. 5V power is regulated to 3.3V by a AP2112K-3.3 voltage regulator (see data sheet for specs). Testing of Moddable Four has been with typical 5V 0.5amp USB source power.
 
-Power can be supplied to the Moddable Four via the following:
+Power can be supplied to Moddable Four via the following:
 
 * 5V - Micro USB connector
 * 5V - VIN on pin 14 or external header
@@ -85,7 +85,7 @@ Power provided by the CR2032 battery connector can be turned on and off with the
 
 #### 6-pin JTAG connector
 
-The 6-pin JTAG connector can be used for gdb debugging or flashing a new bootloader onto the Moddable Four. Please see the [nrf52 Platform document](./nrf52.md#debugging-native-code) for details.
+The 6-pin JTAG connector can be used for gdb debugging or flashing a new bootloader onto Moddable Four. Please see the [nrf52 Platform document](./nrf52.md#debugging-native-code) for details.
 
 <a id="setup"></a>
 ## SDK and Host Environment Setup
@@ -143,7 +143,7 @@ The hardware and software in Moddable Four have been carefully designed to work 
 * Energy Management
 
 #### LED and Back button
-This code snippet shows the use of the Moddable Four Host object to turn on the LED when the back button is pressed.
+This code snippet shows the use of Moddable Four's' Host object to turn on the LED when the back button is pressed.
 
 ```
 let led = new Host.LED.Default;
@@ -238,7 +238,7 @@ Timer.repeat(() => {
 
 #### Energy Management
 
-The Moddable Four is designed to run on coin-cell batteries for long periods of time. The hardware is carefully designed to achieve maximum energy efficiency. Here is the energy used in various operating modes:
+Moddable Four is designed to run on coin-cell batteries for long periods of time. The hardware is carefully designed to achieve maximum energy efficiency. Here is the energy used in various operating modes:
 
 - Idle mode - 3.7 uA - RAM maintained, waiting for user input, between screens and sensor readings.
 - Deep sleep - 1.85 uA - No software running. Automatically wake after a specified duration. Only retention RAM maintained.
@@ -263,7 +263,7 @@ See the [nRF52 Low Power Notes](./nRF52-low-power.md) for details. Examples of d
 <a id="troubleshooting"></a>
 ## Troubleshooting
 
-See the Troubleshooting section of the [nRF52 documentation](./nrf52.md) for a list of common issues and how to resolve them.
+See the Troubleshooting section of the [nRF52 documentation](./nrf52.md#troubleshooting) for a list of common issues and how to resolve them.
 
 <a id="development-resources"></a>
 ## Development Resources

@@ -2936,8 +2936,11 @@ void fxVReport(void* console, txString theFormat, c_va_list theArguments)
 		fxEcho(the, "</log>");
 		fxEchoStop(the);
 	}
-#endif
-#if defined(DEBUG_EFM)
+#elif defined(nrf52) && defined(mxInstrument)
+	char buf[256];
+	vsnprintf(buf, 256, theFormat, theArguments);
+	modLog_transmit(buf);
+#elif defined(DEBUG_EFM)
 	memmove(_lastDebugStrBuffer, _debugStrBuffer, 256);
 	vsprintf(_debugStrBuffer, theFormat, theArguments);
 	_debugStrBuffer[255] = '\0';
@@ -2957,8 +2960,16 @@ void fxVReportException(void* console, txString thePath, txInteger theLine, txSt
 		fxEcho(the, "!\n</log>");
 		fxEchoStop(the);
 	}
-#endif
-#if defined(DEBUG_EFM)
+#elif defined(nrf52) && defined(mxInstrument)
+	char buf[256];
+	if (thePath && theLine)
+		c_snprintf(buf, 256, "%s:%d: exception: ", thePath, (int)theLine);
+	else
+		c_snprintf(buf, 256, "# exception: ");
+	modLog_transmit(buf);
+	c_snprintf(buf, 256, theFormat, theArguments);
+	modLog_transmit(buf);
+#elif defined(DEBUG_EFM)
 	if (thePath && theLine)
 		sprintf(_debugStrBuffer, "%s:%d: exception: ", thePath, (int)theLine);
 	else
@@ -2982,8 +2993,16 @@ void fxVReportError(void* console, txString thePath, txInteger theLine, txString
 		fxEcho(the, "!\n</log>");
 		fxEchoStop(the);
 	}
-#endif
-#if defined(DEBUG_EFM)
+#elif defined(nrf52) && defined(mxInstrument)
+	char buf[256];
+	if (thePath && theLine)
+		c_snprintf(buf, 256, "%s:%d: error: ", thePath, (int)theLine);
+	else
+		c_snprintf(buf, 256, "# error: ");
+	modLog_transmit(buf);
+	c_snprintf(buf, 256, theFormat, theArguments);
+	modLog_transmit(buf);
+#elif defined(DEBUG_EFM)
 	if (thePath && theLine)
 		sprintf(_debugStrBuffer, "%s:%d: error: ", thePath, (int)theLine);
 	else

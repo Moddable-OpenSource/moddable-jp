@@ -168,11 +168,11 @@ Moddable SDKは以下の4つのGeckoボードをサポートしています。
 
 | | | | |
 | :---: | :---: | :---: | :---: |
-| <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://www.silabs.com/content/dam/siliconlabs/images/products/microcontrollers/32-bit_mcus/giant_gecko/giant-gecko-starter-kit.jpg" width=125></a><BR>Giant Gecko | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://blog.moddable.com/blog/wp-content/uploads/2018/05/gecko-1-300x179.jpg" width=125></a><BR>Mighty Gecko | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://siliconlabs-h.assetsadobe.com/is/image//content/dam/siliconlabs/images/products/Bluetooth/thunderboard/thunderbord-sense-down-2.jpg?" width=125></a><BR>Thunderboard Sense 2 | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://siliconlabs-h.assetsadobe.com/is/image//content/dam/siliconlabs/images/products/Bluetooth/bluetooth_low_energy/bluegiga_bluetooth_low_energy_modules/blue-gecko-soc-kit.jpg?" width=125></a><BR>Blue Gecko
+| <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://www.silabs.com/content/dam/siliconlabs/images/products/microcontrollers/32-bit_mcus/giant_gecko/giant-gecko-starter-kit.jpg" width=125></a><BR>Giant Gecko | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://blog.moddable.com/blog/uploads/2018/05/gecko-1-300x179.jpg" width=125></a><BR>Mighty Gecko | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://siliconlabs-h.assetsadobe.com/is/image//content/dam/siliconlabs/images/products/Bluetooth/thunderboard/thunderbord-sense-down-2.jpg?" width=125></a><BR>Thunderboard Sense 2 | <a href="./documentation/devices/gecko/GeckoBuild.md"><img src="https://siliconlabs-h.assetsadobe.com/is/image//content/dam/siliconlabs/images/products/Bluetooth/bluetooth_low_energy/bluegiga_bluetooth_low_energy_modules/blue-gecko-soc-kit.jpg?" width=125></a><BR>Blue Gecko
 
 ### Qualcomm QCA4020
 
-<a href="./documentation/devices/qca4020/README.md"><img src="https://blog.moddable.com/blog/wp-content/uploads/2019/04/qca4020-image.png" width=175></a>
+<a href="./documentation/devices/qca4020/README.md"><img src="https://blog.moddable.com/blog/uploads/2019/04/qca4020-image.png" width=175></a>
 
 Moddable SDKをQCA4020で使用するには、以下の手順が必要です：
 
@@ -229,7 +229,7 @@ Moddable SDKによってサポートされるJavaScript APIは、[documentation]
 | :---: | :---|
 |<img src="https://miro.medium.com/fit/c/262/262/0*Vrsgi6r4Y0T_P9nd.png" width=50> | 私たちの [Gitterチャットルーム](https://gitter.im/embedded-javascript/moddable) は、Moddableチームのメンバーや他の開発者とModdable SDKについて質問したり議論したりするのに最適な場所です。 |
 | <img src="https://static.thenounproject.com/png/1453176-200.png" width=60> | [Moddableブログ](https://blog.moddable.com) には、Moddableの新機能や興味深いプロジェクト、Moddable SDKやXS JavaScriptエンジンの重要なアップデートについての詳細な投稿が掲載されています。
-| <img src="https://www.moddable.com/images/book/book-hero-full-vert.png" width=200> | [IoT Development for ESP32 and ESP8266 with JavaScript](https://www.moddable.com/book) は、Moddableチームのメンバーである [Peter Hoddie](https://www.moddable.com/peter-hoddie) と [Lizzie Prader](https://www.moddable.com/lizzie-prader) によって書かれた本です。
+| <img src="https://www.moddable.com/assets/images/book/book-hero-full-vert.png" width=200> | [IoT Development for ESP32 and ESP8266 with JavaScript](https://www.moddable.com/book) は、Moddableチームのメンバーである [Peter Hoddie](https://www.moddable.com/peter-hoddie) と [Lizzie Prader](https://www.moddable.com/lizzie-prader) によって書かれた本です。
 | <img src="https://m.media-amazon.com/images/I/51ak-nNiHdL.jpg" width=70> | [実践Moddable JavaScriptではじめるIoTアプリケーション (技術の泉シリーズ](https://meganetaaan.hatenablog.com/entry/2020/09/13/011403) は、開発者の石川真也によって書かれた本です。
 | <img src="https://static.thenounproject.com/png/2067146-200.png" width=50> | Moddable SDKのアップデートに関する [詳細なリリースノート](https://github.com/Moddable-OpenSource/moddable/releases) は、定期的にGitHubに投稿されます。 |
 | <img src="./documentation/assets/getting-started/ts-logo-256.svg" width=50> | Moddable SDKのビルドツールはTypeScriptをサポートしているため、組み込みコードでビルド時の型チェックを使用できます。詳細は [ブログ](https://blog.moddable.com/blog/typescript/) にて。

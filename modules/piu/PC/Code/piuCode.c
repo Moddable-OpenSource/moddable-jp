@@ -185,8 +185,7 @@ void PiuCodeDictionary(xsMachine* the, void* it)
 	slot = PiuString(xsResult);
 	string = PiuToString(slot);
 	(*self)->string = slot;
-	(*self)->size = c_strlen(string);
-	(*self)->length = fxUnicodeLength(string);
+	(*self)->length = fxUnicodeLength(string, (xsIntegerValue*)&((*self)->size));
 	if (xsFindString(xsArg(1), xsID_type, &string)) {
 		if (!c_strcmp(string, "js"))
 			(*self)->type = 1;
@@ -961,8 +960,7 @@ void PiuCode_set_string(xsMachine *the)
 	xsSlot* slot = PiuString(xsArg(0));
 	xsStringValue string = PiuToString(slot);
 	(*self)->string = slot;
-	(*self)->size = c_strlen(string);
-	(*self)->length = fxUnicodeLength(string);
+	(*self)->length = fxUnicodeLength(string, (xsIntegerValue*)&((*self)->size));
 	PiuCodeFormat(self);
 	PiuCodeSearch(self, (*self)->size);
 	PiuCodeSelect(self, (*self)->from, (*self)->to - (*self)->from);

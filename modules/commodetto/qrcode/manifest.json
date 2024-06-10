@@ -3,7 +3,7 @@
 		"*": [
 			"./pocoqrcode"
 		],
-		"commodetto/PocoCore": "$(COMMODETTO)/commodettoPocoCore"
+		"commodetto/Poco": "$(COMMODETTO)/commodettoPoco"
 	},
 	"preload": "pocoqrcode"
 }

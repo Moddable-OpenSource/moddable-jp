@@ -46,11 +46,7 @@ extern "C" {
 
 //#define mxFrequency 1
 #ifndef mxBoundsCheck
-	#ifdef mxDebug
-		#define mxBoundsCheck 1
-	#else
-		#define mxBoundsCheck 0
-	#endif
+	#define mxBoundsCheck 1
 #endif
 #ifndef mxKeysGarbageCollection
 	#define mxKeysGarbageCollection 0
@@ -58,6 +54,10 @@ extern "C" {
 #ifndef mxRegExp
 	#define mxRegExp 1
 #endif
+#ifndef mxStringInfoCacheLength
+	#define mxStringInfoCacheLength 0
+#endif
+
 #ifndef mxMachinePlatform
 	#define mxMachinePlatform \
 		void* host;
@@ -401,6 +401,7 @@ struct sxMachine {
 	void* archive; /* xs.h */
 	txSlot scratch; /* xs.h */
 	txSlot* stackPrototypes; /* xs.h */
+	int exitStatus; /* xs.h */
 	mxMachinePlatform /* xs.h */
 	txFlag status;
 	
@@ -425,6 +426,8 @@ struct sxMachine {
 	txID keyIndex;
 	txID keyOffset;
 	txSlot** keyArrayHost;
+	
+	void* stringInfoCache;
 
 #if mxAliasInstance
 	txID aliasCount;
@@ -1370,6 +1373,24 @@ extern txSlot* fxNewStringInstance(txMachine* the);
 extern txSlot* fxAccessStringProperty(txMachine* the, txSlot* instance, txInteger index);
 extern void fxPushSubstitutionString(txMachine* the, txSlot* string, txInteger size, txInteger offset, txSlot* match, txInteger length, txInteger count, txSlot* captures, txSlot* groups, txSlot* replace);
 
+#if mxStringInfoCacheLength
+extern void fxAllocateStringInfoCache(txMachine* the);
+extern void fxFreeStringInfoCache(txMachine* the);
+extern void fxInvalidateStringInfoCache(txMachine* the);
+extern txSize fxCacheUTF8Length(txMachine* the, txString string);
+extern txSize fxCacheUTF8ToUnicodeOffset(txMachine* the, txString string, txSize offset);
+extern txSize fxCacheUnicodeLength(txMachine* the, txString string);
+extern txSize fxCacheUnicodeToUTF8Offset(txMachine* the, txString string, txSize offset);
+#else
+#define fxAllocateStringInfoCache(THE)
+#define fxFreeStringInfoCache(THE)
+#define fxInvalidateStringInfoCache(THE)
+#define fxCacheUTF8Length(THE,STRING) c_strlen(STRING)
+#define fxCacheUTF8ToUnicodeOffset(THE,STRING,OFFSET) fxUTF8ToUnicodeOffset(STRING,OFFSET)
+#define fxCacheUnicodeLength(THE,STRING) fxUnicodeLength(STRING,C_NULL)
+#define fxCacheUnicodeToUTF8Offset(THE,STRING,OFFSET) fxUnicodeToUTF8Offset(STRING,OFFSET)
+#endif
+
 /* xsRegExp.c */
 mxExport void fx_RegExp(txMachine* the);
 mxExport void fx_RegExp_prototype_get_dotAll(txMachine* the);
@@ -2198,11 +2219,17 @@ enum {
 	(((THE_SLOT)->kind == XS_STRING_KIND) || ((THE_SLOT)->kind == XS_STRING_X_KIND))
 	
 #ifdef mxMetering
+#define mxCheckMetering() \
+	if (the->meterInterval && (the->meterIndex > the->meterCount)) { \
+		fxCheckMetering(the); \
+	}
 #define mxMeterOne() \
 	(the->meterIndex++)
 #define mxMeterSome(_COUNT) \
 	(the->meterIndex += _COUNT)
 #else
+#define mxCheckMetering() \
+	((void)0)
 #define mxMeterOne() \
 	((void)0)
 #define mxMeterSome(_COUNT) \

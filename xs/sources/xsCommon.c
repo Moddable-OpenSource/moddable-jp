@@ -1166,18 +1166,22 @@ txSize fxUTF8ToUnicodeOffset(txString theString, txSize theOffset)
 		return -1;
 }
 
-#if 0
-txSize fxUnicodeLength(txString theString)
+#if 1
+txSize fxUnicodeLength(txString theString, txSize* byteLength)
 {
 	txU1* p = (txU1*)theString;
 	txU1 c;
-	txSize anIndex = 0;
+	txSize unicodeLength = 0;
+	txSize utf8Length = 0;
 	
 	while ((c = c_read8(p++))) {
 		if ((c & 0xC0) != 0x80)
-			anIndex++;
+			unicodeLength++;
+		utf8Length++;
 	}
-	return anIndex;
+	if (byteLength)
+		*byteLength = utf8Length;
+	return unicodeLength;
 }
 #else
  // http://www.daemonology.net/blog/2008-06-05-faster-utf8-strlen.html
@@ -1189,7 +1193,7 @@ txSize fxUnicodeLength(txString theString)
 		__attribute__((no_sanitize("address"))) 
 	#endif
 #endif
-txSize fxUnicodeLength(txString _s)
+txSize fxUnicodeLength(txString _s, txSize* byteLength)
 {
 	const char * s;
 	size_t count = 0;

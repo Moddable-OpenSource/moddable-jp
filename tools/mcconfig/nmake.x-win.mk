@@ -97,6 +97,7 @@ C_DEFINES = \
 	/D mxNoFunctionName=1 \
 	/D mxHostFunctionPrimitive=1 \
 	/D mxFewGlobalsTable=1 \
+	/D mxStringInfoCacheLength=4 \
 	/D mxMessageWindowClass=\"fxMessageWindowClassX\"
 !IF "$(INSTRUMENT)"=="1"
 C_DEFINES = $(C_DEFINES) \

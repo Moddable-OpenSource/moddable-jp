@@ -25,7 +25,7 @@ HOST_OS = win
 !ENDIF
 
 !IF "$(EXPECTED_ESP_IDF)"==""
-EXPECTED_ESP_IDF = v5.1.2
+EXPECTED_ESP_IDF = v5.2.1
 !ENDIF
 
 !IF "$(VERBOSE)"=="1"
@@ -229,16 +229,15 @@ INC_DIRS = \
  	-I$(IDF_PATH)\components\esp_wifi\include \
  	-I$(IDF_PATH)\components\$(ESP_ARCH)\include \
 	-I$(IDF_PATH)\components\$(ESP_ARCH)\$(ESP32_SUBCLASS)\include \
-	-I$(IDF_PATH)\components\freertos\port\$(ESP_ARCH)\include \
- 	-I$(IDF_PATH)\components\freertos\FreeRTOS-Kernel\portable\$(ESP_ARCH)\include \
+	-I$(IDF_PATH)\components\freertos\config\include \
+	-I$(IDF_PATH)\components\freertos\config\include\freertos \
+ 	-I$(IDF_PATH)\components\freertos\config\$(ESP_ARCH)\include \
  	-I$(IDF_PATH)\components\freertos\FreeRTOS-Kernel\include \
  	-I$(IDF_PATH)\components\freertos\FreeRTOS-Kernel\include\freertos \
-	-I$(IDF_PATH)\components\freertos\esp_additions\arch\$(ESP_ARCH)\include \
-	-I$(IDF_PATH)\components\freertos\esp_additions\include \
+	-I$(IDF_PATH)\components\freertos\FreeRTOS-Kernel\portable\$(ESP_ARCH)\include\freertos \
 	-I$(IDF_PATH)\components\freertos\esp_additions\include\freertos \
- 	-I$(IDF_PATH)\components\freertos \
- 	-I$(IDF_PATH)\components\freertos\include \
- 	-I$(IDF_PATH)\components\freertos\include\freertos \
+	-I$(IDF_PATH)\components\freertos\esp_additions\include \
+	-I$(IDF_PATH)\components\freertos\esp_additions\arch\$(ESP_ARCH)\include \
 	-I$(IDF_PATH)\components\hal\include \
 	-I$(IDF_PATH)\components\hal\$(ESP32_SUBCLASS)\include \
 	-I$(IDF_PATH)\components\hal\platform_port\include \

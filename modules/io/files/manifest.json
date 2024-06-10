@@ -1,0 +1,13 @@
+{
+	"platforms": {
+		"mac": {
+			"include": "./posix/manifest.json"
+		},
+		"lin": {
+			"include": "./posix/manifest.json"
+		},
+		"esp32": {
+			"include": "./littlefs/manifest.json"
+		}
+	}
+}
