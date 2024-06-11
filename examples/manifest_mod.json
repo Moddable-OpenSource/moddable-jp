@@ -6,6 +6,21 @@
 		"PIU": "$(MODULES)/piu"
 	},
 	"platforms": {
+		"esp32/esp32c3_cdc": {
+			"build": {
+				"USE_USB": "2"
+			}
+		},
+		"esp32/esp32c6_cdc": {
+			"build": {
+				"USE_USB": "2"
+			}
+		},
+		"esp32/esp32h2_cdc": {
+			"build": {
+				"USE_USB": "2"
+			}
+		},
 		"esp32/esp32s3_cdc": {
 			"build": {
 				"USE_USB": "2"
@@ -80,6 +95,11 @@
 			}
 		},
 		"esp32/m5atom_s3_lite": {
+			"build": {
+				"USE_USB": "2"
+			}
+		},
+		"esp32/m5dial": {
 			"build": {
 				"USE_USB": "2"
 			}
