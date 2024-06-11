@@ -69,7 +69,6 @@
 		#include "tusb_cdc_acm.h"
 	#elif (USE_USB == 2)
 		#include "driver/usb_serial_jtag.h"
-		#include "hal/usb_serial_jtag_ll.h"
 	#endif
 #else
 	#include "driver/uart.h"
@@ -197,7 +196,7 @@ printf("fifo_init - bad size: %ld\r\n", size);
 static void debug_task(void *pvParameter)
 {
 #if (USE_USB == 2)
-	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 2048, .tx_buffer_size = 64 };
+	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 4096, .tx_buffer_size = 2048 };
 	usb_serial_jtag_driver_install(&cfg);
 #endif
 
@@ -404,40 +403,23 @@ uint8_t ESP_setBaud(int baud) {
 
 #else
 
-#define WRITE_CHUNK	64
-#define FAIL_RETRY	2
 WEAK void ESP_put(uint8_t *c, int count) {
 #if (USE_USB == 2)
+	int sent = 0;
 	while (count > 0) {
-		int len = count > WRITE_CHUNK ? WRITE_CHUNK : count;
-		int wrote;
-		int fail = FAIL_RETRY;
-		while ((wrote = usb_serial_jtag_ll_write_txfifo(c, len)) < 1) {
-			if (0 == --fail)
-				goto done;
-			modDelayMilliseconds(1);
-			continue;
-		}
-		usb_serial_jtag_ll_txfifo_flush();
-		c += wrote;
-		count -= wrote;
+		sent = usb_serial_jtag_write_bytes(c, count, 10);
+		c += sent;
+		count -= sent;
 	}
-done:
 #else
 	uart_write_bytes(USE_UART, (char *)c, count);
 #endif
 }
 
 WEAK void ESP_putc(int c) {
-	uint8_t cx = c;
+	char cx = c;
 #if (USE_USB == 2)
-	int fail = FAIL_RETRY;
-	while (usb_serial_jtag_ll_write_txfifo(&cx, 1) < 1) {
-		if (0 == --fail)
-			break;
-		modDelayMilliseconds(1);
-	}
-	usb_serial_jtag_ll_txfifo_flush();
+	usb_serial_jtag_write_bytes(&cx, 1, 1);
 #else
 	uart_write_bytes(USE_UART, &cx, 1);
 #endif

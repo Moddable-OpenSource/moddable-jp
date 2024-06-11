@@ -43,12 +43,7 @@
 
 
 #if USE_USB
-	#if USE_USB == 2
-		#include "driver/usb_serial_jtag.h"
-		#include "hal/usb_serial_jtag_ll.h"
-	#else
-		#error esp32c3 doesnt support TinyUSB
-	#endif
+	#include "driver/usb_serial_jtag.h"
 #else
 	#include "driver/uart.h"
 #endif
@@ -116,12 +111,12 @@ static xsMachine *gThe;		// the main XS virtual machine running
 #if USE_USB
 static void debug_task(void *pvParameter)
 {
-	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 2048, .tx_buffer_size = 64 };
+	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 4096, .tx_buffer_size = 2048 };
 	usb_serial_jtag_driver_install(&cfg);
 
 	while (true) {
 		fxReceiveLoop();
-		modDelayMilliseconds(5);
+		modDelayMilliseconds(1);
 	}
 }
 
@@ -200,40 +195,23 @@ void modLog_transmit(const char *msg)
 	}
 }
 
-#define WRITE_CHUNK		64
-#define FAIL_RETRY		2
 void ESP_put(uint8_t *c, int count) {
 #if USE_USB
+	int sent = 0;
     while (count > 0) {
-        int len = count > WRITE_CHUNK ? WRITE_CHUNK : count;
-		int wrote;
-		int fail = FAIL_RETRY;
-		while ((wrote = usb_serial_jtag_ll_write_txfifo(c, len)) < 1) {
-			if (0 == --fail)
-				goto done;
-			modDelayMilliseconds(1);
-			continue;
-		}
-		usb_serial_jtag_ll_txfifo_flush();
-		c += wrote;
-		count -= wrote;
+		sent = usb_serial_jtag_write_bytes(c, count, 10);
+		c += sent;
+		count -= sent;
     }
-done:
 #else
 	uart_write_bytes(USE_UART, (char *)c, count);
 #endif
 }
 
 void ESP_putc(int c) {
-	uint8_t cx = c;
+	char cx = c;
 #if USE_USB
-	int fail = FAIL_RETRY;
-	while (usb_serial_jtag_ll_write_txfifo(&cx, 1) < 1) {
-		if (0 == --fail)
-				break;
-		modDelayMilliseconds(1);
-	}
-	usb_serial_jtag_ll_txfifo_flush();
+	usb_serial_jtag_write_bytes(&cx, 1, 1);
 #else
 	uart_write_bytes(USE_UART, &cx, 1);
 #endif
