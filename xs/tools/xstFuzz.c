@@ -111,6 +111,8 @@ static uint8_t hashAddress(void *addr)
 	return (uint8_t)sum;
 }
 
+#define kBlockOverhead (64)
+
 static txMutex gLinkMemoryMutex;
 
 static void linkMemoryBlock(void *address, size_t size)
@@ -134,7 +136,7 @@ static void linkMemoryBlock(void *address, size_t size)
 		gBlocks[index]->prev = block;
 	gBlocks[index] = block;
 	
-	gBlocksSize += size;
+	gBlocksSize += (size + kBlockOverhead) + (sizeof(txMemoryBlock) + kBlockOverhead);
 
     fxUnlockMutex(&gLinkMemoryMutex);
 }
@@ -156,7 +158,7 @@ static void unlinkMemoryBlock(void *address)
 	else
 		gBlocks[index] = block->next;
 
-	gBlocksSize -= block->size;
+	gBlocksSize -= (block->size + kBlockOverhead) + (sizeof(txMemoryBlock) + kBlockOverhead);
 
     fxUnlockMutex(&gLinkMemoryMutex);
 
