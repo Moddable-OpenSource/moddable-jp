@@ -517,7 +517,6 @@ void fx_Math_pow(txMachine* the)
 	mxResult->value.number = fx_pow(x, y);
 }
 
-// more bits??
 void fx_Math_random(txMachine* the)
 {
 	uint32_t result;
