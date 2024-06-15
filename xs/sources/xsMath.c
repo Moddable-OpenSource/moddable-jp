@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017  Moddable Tech, Inc.
+ * Copyright (c) 2016-2023  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -517,11 +517,13 @@ void fx_Math_pow(txMachine* the)
 	mxResult->value.number = fx_pow(x, y);
 }
 
+// more bits??
 void fx_Math_random(txMachine* the)
 {
-	uint32_t result = c_rand();
-	while (result == C_RAND_MAX)
+	uint32_t result;
+	do {
 		result = c_rand();
+	} while (result == C_RAND_MAX);
 	mxResult->kind = XS_NUMBER_KIND;
 	mxResult->value.number = (double)result / (double)C_RAND_MAX;
 }
