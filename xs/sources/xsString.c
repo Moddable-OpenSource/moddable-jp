@@ -1226,12 +1226,12 @@ void fx_String_prototype_matchAll(txMachine* the)
 
 void fx_String_prototype_normalize(txMachine* the)
 {
-	txString string = fxCoerceToString(the, mxThis);
 	txFlag form;
+	fxCoerceToString(the, mxThis);
 	if ((mxArgc < 1) || (mxArgv(0)->kind == XS_UNDEFINED_KIND))
 		form = 2;
 	else {
-		string = fxToString(the, mxArgv(0));
+		txString string = fxToString(the, mxArgv(0));
 		if (!c_strcmp(string, "NFC"))
 			form = 2;
 		else if (!c_strcmp(string, "NFD"))
@@ -1251,7 +1251,7 @@ void fx_String_prototype_normalize(txMachine* the)
 #else	
 	{
 		txInteger max = 0;
-		string = mxResult->value.string;
+		txString string = mxResult->value.string;
 		for (;;) {
 			txInteger c;
 			string = mxStringByteDecode(string, &c);
