@@ -1350,7 +1350,8 @@ void fxCreateTypedArraySpecies(txMachine* the)
 	mxNew();
 }
 
-txSlot* fxGetTypedArrayValue(txMachine* the, txSlot* instance, txInteger index)
+#if 0
+txSlot* fxGetTypedArrayValue(txMachine* the, txSlot* instance, txInteger index)		//@@ unused
 {
 	txSlot* dispatch = instance->next;
 	txSlot* view = dispatch->next;
@@ -1364,7 +1365,7 @@ txSlot* fxGetTypedArrayValue(txMachine* the, txSlot* instance, txInteger index)
 	}
 	return C_NULL;
 }
-
+#endif
 void fxReduceTypedArrayItem(txMachine* the, txSlot* function, txSlot* dispatch, txSlot* view, txSlot* data, txInteger index)
 {
 	/* THIS */
