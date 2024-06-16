@@ -1,4 +1,4 @@
-# msods - ユーザーがインストールする拡張機能
+# mods - ユーザーがインストールする拡張機能
 Copyright 2020-2023 Moddable Tech, Inc.<BR>
 改訂： 2023年10月11日
 
@@ -295,7 +295,7 @@ let exports = c.importNow("modExample");
 
 リマッピングは、既存のモジュールの限定版をmodにアクセスさせるために役立ちます。例えば、ホストはmodにHTTPクライアントモジュールへのアクセスを許可したいが、HTTPクライアントが接続できるドメインを制限したい場合があります。ホストは制限のないHTTPモジュール ("http") と制限されたバージョン ("httpRestricted") を持っています。ホストは自身のリクエストに制限のないバージョンを使用します。そして、Compartment内でモジュール指定子を "http" にリマッピングすることにより、modがHTTPクライアントモジュールを "http" をインポートすることによって使用できるように制限版を提供します。
 
-#### 別々のグローバル変数 {/*examples*/}
+#### 別々のグローバル変数
 プロジェクトはしばしば重要なデータやオブジェクトを便利なアクセスのためにグローバル変数に保存します。これらのグローバル変数は、能力やプライベート情報へのアクセスを提供するかもしれませんが、modホストはmodからこれらを隠したいと考えています。SESがなければ、グローバル変数はmodに利用可能です。SESが新しいCompartmentを作成すると、そのCompartmentはmodホストのグローバル変数とは別の自身のグローバル変数セットを受け取ります。Compartmentのグローバル変数には、JavaScript言語によって定義されたグローバル変数のみが含まれます。
 
 次のコードでは、グローバル変数「secret」はmodに利用できません。
@@ -399,7 +399,7 @@ Moddable SDKは、この問題を解決するために、modホストイメー�
 
 ### XSアーカイブ形式
 
-XSアーカイブファイル形式は、[ISO Base Media File Format](https://www.loc.gov/preservation/digital/formats/fdd/fdd000079.shtml)のBox（別名Atom）構造メカニズムを使用してデータを構造化します。XSアーカイブファイルのアトム構造は、次の表に示されています：
+XSアーカイブファイル形式は、[ISO Base Media File Format](https://www.loc.gov/preservation/digital/formats/fdd/fdd000079.shtml)のBox（別名アトム）構造メカニズムを使用してデータを構造化します。XSアーカイブファイルのアトム構造は、次の表に示されています：
 
 ```
 XS_A - signature of the XS archive file
