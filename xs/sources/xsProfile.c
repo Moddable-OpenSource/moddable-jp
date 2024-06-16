@@ -54,6 +54,10 @@ struct sxProfiler {
 	txU8 start;
 	txU8 stop;
 	txU4 interval;
+#ifdef mxMetering
+	txU4 formerMeter;
+	txU4 startMeter;
+#endif
 	txU4 recordCount;
 	txProfilerRecord** records;
 	txU8 sampleCount;
@@ -80,6 +84,9 @@ struct sxProfilerRecord {
 struct sxProfilerSample {
 	txID recordID;
 	txU4 delta;
+#ifdef mxMetering
+	txU4 deltaMeter;
+#endif
 };
 
 static txProfilerRecord* fxFrameToProfilerRecord(txMachine* the, txSlot* frame);
@@ -89,7 +96,11 @@ static txU8 fxMicrosecondsToTicks(txU8 microseconds);
 static void fxPrintID(txMachine* the, FILE* file, txID id);
 static void fxPrintProfiler(txMachine* the, void* stream);
 static void fxPrintString(txMachine* the, FILE* file, txString theString);
+#ifdef mxMetering
+static void fxPushProfilerSample(txMachine* the, txID recordID, txU4 delta, txU4 deltaMeter);
+#else
 static void fxPushProfilerSample(txMachine* the, txID recordID, txU4 delta);
+#endif
 static txProfilerRecord* fxNewProfilerRecord(txMachine* the, txID recordID);
 static txID fxRemoveProfilerCycle(txMachine* the, txProfiler* profiler, txID recordID);
 static txU8 fxTicksToMicroseconds(txU8 ticks);
@@ -130,7 +141,12 @@ void fxCheckProfiler(txMachine* the, txSlot* frame)
 			record = profiler->host;
 		txU4 interval = profiler->interval;
 		record->hitCount++;
+#ifdef mxMetering
+		fxPushProfilerSample(the, record->recordID, (txU4)(time - profiler->former), (txU4)(the->meterIndex - profiler->formerMeter));
+		profiler->formerMeter = the->meterIndex;
+#else
 		fxPushProfilerSample(the, record->recordID, (txU4)(time - profiler->former));
+#endif
 		profiler->former = time;
 		profiler->when = time + interval - (time % interval);
 	}
@@ -145,7 +161,11 @@ void fxCreateProfiler(txMachine* the)
 	profiler->former = fxGetTicks();
 	profiler->when = profiler->former + profiler->interval;
 	profiler->start = profiler->former;
-	
+#ifdef mxMetering
+	profiler->interval >>= 1;
+	profiler->formerMeter = the->meterIndex;
+	profiler->startMeter = profiler->formerMeter;
+#endif
 	profiler->recordCount = 2;
 	profiler->records = (txProfilerRecord**)c_calloc(sizeof(txProfilerRecord*), profiler->recordCount);
 	if (profiler->records == C_NULL)
@@ -443,7 +463,11 @@ void fxPrintProfiler(txMachine* the, void* stream)
 		}
 		recordIndex++;
 	}
-	fprintf(file, "],\"startTime\":%llu,\"endTime\":%llu,\"samples\":[", fxTicksToMicroseconds(profiler->start), fxTicksToMicroseconds(profiler->when));
+	fprintf(file, "],\"startTime\":%llu,\"endTime\":%llu,", fxTicksToMicroseconds(profiler->start), fxTicksToMicroseconds(profiler->when));
+#ifdef mxMetering
+	fprintf(file, "\"startMeter\":%u,\"endMeter\":%u,", profiler->startMeter, the->meterIndex);
+#endif
+	fprintf(file, "\"samples\":[");
 	{
 		txU8 sampleIndex = 0;
 		while (sampleIndex < profiler->sampleIndex) {
@@ -465,6 +489,19 @@ void fxPrintProfiler(txMachine* the, void* stream)
 			sampleIndex++;
 		}
 	}
+#ifdef mxMetering
+	fprintf(file, "],\"meterDeltas\":[");
+	{
+		txU8 sampleIndex = 0;
+		while (sampleIndex < profiler->sampleIndex) {
+			txProfilerSample* sample = profiler->samples + sampleIndex;
+			if (sampleIndex > 0)
+				fprintf(file, ",");
+			fprintf(file, "%u", sample->deltaMeter);
+			sampleIndex++;
+		}
+	}
+#endif
 	fprintf(file, "]}");
 	fclose(file);
 }
@@ -499,7 +536,11 @@ void fxPrintString(txMachine* the, FILE* file, txString theString)
 	}
 }
 
+#ifdef mxMetering
+void fxPushProfilerSample(txMachine* the, txID recordID, txU4 delta, txU4 deltaMeter)
+#else
 void fxPushProfilerSample(txMachine* the, txID recordID, txU4 delta)
+#endif
 {
 	txProfiler* profiler = the->profiler;
 	txU8 sampleCount = profiler->sampleCount;
@@ -515,6 +556,9 @@ void fxPushProfilerSample(txMachine* the, txID recordID, txU4 delta)
 	sample = profiler->samples + sampleIndex;
 	sample->recordID = recordID;
 	sample->delta = delta;
+#ifdef mxMetering
+	sample->deltaMeter = deltaMeter;
+#endif
 	profiler->sampleIndex = sampleIndex + 1;
 }
 

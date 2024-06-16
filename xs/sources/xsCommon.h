@@ -501,7 +501,7 @@ mxExport txSize fxCESU8Length(txInteger character);
 #endif
 
 mxExport txSize fxUTF8ToUnicodeOffset(txString theString, txSize theOffset);
-mxExport txSize fxUnicodeLength(txString theString);
+mxExport txSize fxUnicodeLength(txString theString, txSize* byteLength);
 mxExport txSize fxUnicodeToUTF8Offset(txString theString, txSize theOffset);
 
 txFlag fxIntegerToIndex(void* the, txInteger theInteger, txIndex* theIndex);
@@ -512,6 +512,10 @@ txFlag fxStringToIndex(void* the, txString theString, txIndex* theIndex);
 mxExport char* fxCStackLimit();
 mxExport txID fxGenerateProfileID(void* console);
 mxExport void fxGenerateTag(void* console, txString buffer, txInteger bufferSize, txString path);
+#ifdef mxMetering
+mxExport void fxCheckMeter(void* console);
+mxExport void fxMeterSome(void* console, txU4 count);
+#endif
 mxExport void fxVReport(void* console, txString theFormat, c_va_list theArguments);
 mxExport void fxVReportError(void* console, txString thePath, txInteger theLine, txString theFormat, c_va_list theArguments);
 mxExport void fxVReportWarning(void* console, txString thePath, txInteger theLine, txString theFormat, c_va_list theArguments);
@@ -1215,7 +1219,7 @@ enum {
 	_fromBase64,
 	_fromHex,
 	_lastChunkHandling,
-	_read,
+	_read_,
 	_setFromBase64,
 	_setFromHex,
 	_toBase64,

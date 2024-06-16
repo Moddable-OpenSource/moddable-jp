@@ -239,9 +239,10 @@ class ExpandingKeyRowBehavior extends KeyRowBehavior {
 		color = (tracker && tracker.down) ? Colors.TEXTDOWN : Colors.TEXT;
 		fadeTextColor = KeyPressTextColors[expandState];
 		
+		const y = 3; //(keyHeight - charHeight) >> 1;
 		for (let i = tracker ? tracker.index : 0; i < length; ++i, x += keyWidth + innerKeyGap) {
 			const charWidth = widths[i];
-			port.drawString(chars[i], style, (i === fading) ? fadeTextColor : color, x + ((keyWidth - charWidth) >> 1), 3, charWidth, charHeight);
+			port.drawString(chars[i], style, (i === fading) ? fadeTextColor : color, x + ((keyWidth - charWidth) >> 1), y, charWidth, charHeight);
 		}
 		if (tracker && !tracker.down) {
 			this.tracker = null;

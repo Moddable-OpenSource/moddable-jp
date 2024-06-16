@@ -46,6 +46,8 @@ OSSFUZZ ?= 0
 OSSFUZZ_JSONPARSE ?= 0
 FUZZING ?= 0
 
+METERING ?= 0
+
 C_OPTIONS = \
 	-fno-common \
 	$(MACOS_ARCH) \
@@ -67,6 +69,7 @@ C_OPTIONS = \
 	-DmxSloppy=1 \
 	-DmxSnapshot=1 \
 	-DmxRegExpUnicodePropertyEscapes=1 \
+	-DmxStringInfoCacheLength=4 \
 	-DmxStringNormalize=1 \
 	-I$(INC_DIR) \
 	-I$(PLT_DIR) \
@@ -117,6 +120,10 @@ ifeq ($(GOAL),debug)
 	endif
 	ifneq ($(FUZZILLI),0)
 		C_OPTIONS += -DFUZZILLI=1 -fsanitize-coverage=trace-pc-guard
+	endif
+	
+	ifneq ($(METERING),0)
+		C_OPTIONS += -DmxMetering=1
 	endif
 endif
 
@@ -178,6 +185,8 @@ OBJECTS = \
 	$(TMP_DIR)/textencoder.o \
 	$(TMP_DIR)/modBase64.o \
 	$(TMP_DIR)/xst.o \
+	$(TMP_DIR)/xst262.o \
+	$(TMP_DIR)/xstFuzz.o \
 	$(TMP_DIR)/e_acos.o \
 	$(TMP_DIR)/e_acosh.o \
 	$(TMP_DIR)/e_asin.o \

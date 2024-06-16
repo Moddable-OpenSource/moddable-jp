@@ -1,0 +1,17 @@
+{
+	"platforms": {
+		"mac": {
+			"modules": {
+				"embedded:x-files": "./files-posix"
+			}
+		},
+		"lin": {
+			"modules": {
+				"embedded:x-files": "./files-posix"
+			}
+		}
+	},
+	"preload": [
+		"embedded:x-files"
+	]
+}

@@ -26,7 +26,6 @@ USE_USB ?= 0
 FTDI_TRACE ?= -DUSE_FTDI_TRACE=0
 
 NRF_ROOT ?= $(HOME)/nrf5
-NRFJPROG_ARGS ?= -f nrf52 --qspiini $(QSPI_INI_PATH)
 
 UPLOAD_SPEED ?= 921600
 DEBUGGER_SPEED ?= 921600
@@ -409,10 +408,16 @@ SDK_GLUE_OBJ = \
 	$(TMP_DIR)/xsmain.c.o \
 	$(TMP_DIR)/systemclock.c.o \
 	$(TMP_DIR)/main.c.o \
+	$(TMP_DIR)/ftdi_trace.c.o
+
+ifeq ($(USE_USB),1)
+SDK_GLUE_OBJ += \
 	$(TMP_DIR)/debugger_usbd.c.o \
-	$(TMP_DIR)/ftdi_trace.c.o \
-	$(TMP_DIR)/app_usbd_vendor.c.o \
+	$(TMP_DIR)/app_usbd_vendor.c.o
+else
+SDK_GLUE_OBJ += \
 	$(TMP_DIR)/debugger.c.o
+endif
 
 #	$(TMP_DIR)/nrf52_serial.c.o 
 
@@ -601,8 +606,13 @@ OBJECTS += \
 	$(NRF_HW_CRYPTO_BACKEND_OBJECTS) \
 	$(NRF_DRIVERS) \
 	$(NRF_LIBRARIES) \
-	$(NRF_SOFTDEVICE) \
+	$(NRF_SOFTDEVICE)
+
+ifeq ($(USE_USB),1)
+OBJECTS += \
 	$(NRF_USBD)
+endif
+
 
 #	$(NRF_LOG_OBJECTS)
 
@@ -722,6 +732,10 @@ else
 endif
 ifeq ($(INSTRUMENT),1)
 	C_DEFINES += -DMODINSTRUMENTATION=1 -DmxInstrument=1
+endif
+
+ifeq ($(NRF52_CUSTOM_PWM_FREQ),1)
+	C_DEFINES += -DNRF52_CUSTOM_PWM_FREQ=1
 endif
 
 ifeq ($(USE_WDT),1)
@@ -849,6 +863,10 @@ flash: precursor $(BIN_DIR)/xs_nrf52.hex
 	"$(NRFJPROG)" $(NRFJPROG_ARGS) --program $(BIN_DIR)/xs_nrf52.hex $(NRFJPROG_ERASE)
 	"$(NRFJPROG)" $(NRFJPROG_ARGS) --verify $(BIN_DIR)/xs_nrf52.hex
 	"$(NRFJPROG)" --reset
+
+readuicr:
+	@echo Read UICR
+	"$(NRFJPROG)" $(NRFJPROG_ARGS) --readuicr $(BIN_DIR)/uicr.bin
 
 debugger:
 	@echo Starting xsbug. Reset device to connect.

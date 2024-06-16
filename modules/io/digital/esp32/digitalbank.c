@@ -279,7 +279,11 @@ void xs_digitalbank_destructor(void *data)
 		builtinFreePins(digital->bank, digital->pins);
 	}
 
+#if defined(_NO_ATOMICS)
+	if (0 == --digital->useCount)
+#else
 	if (0 == __atomic_sub_fetch(&digital->useCount, 1, __ATOMIC_SEQ_CST))
+#endif
 		c_free(data);
 }
 
@@ -377,7 +381,11 @@ void IRAM_ATTR digitalISR(void *refcon)
 		uint32_t triggered = walker->triggered;
 		walker->triggered |= pin;
 		if (!triggered) {
+#if defined(_NO_ATOMICS)
+			walker->useCount++;
+#else
 			__atomic_add_fetch(&walker->useCount, 1, __ATOMIC_SEQ_CST);
+#endif
 			modMessagePostToMachineFromISR(walker->the, digitalDeliver, walker);
 		}
 		break;
@@ -389,7 +397,12 @@ void digitalDeliver(void *the, void *refcon, uint8_t *message, uint16_t messageL
 	Digital digital = refcon;
 	uint32_t triggered;
 
-	if (0 == __atomic_sub_fetch(&digital->useCount, 1, __ATOMIC_SEQ_CST)) {
+#if defined(_NO_ATOMICS)
+	if (0 == --digital->useCount)
+#else
+	if (0 == __atomic_sub_fetch(&digital->useCount, 1, __ATOMIC_SEQ_CST))
+#endif
+	{
 		c_free(digital);
 		return;
 	}

@@ -1,15 +1,15 @@
-# Using defines in manifests
+# マニフェストでのdefineの使用
 Copyright 2017 Moddable Tech, Inc.<BR>
-Revised: December 11, 2017
+改訂： 2017年12月11日
 
-## Introduction
+## はじめに
 
-The defines block in the manifest creates a set of C language #define preprocessor statements. The defines block is designed to configure the C language implementation of hardware drivers. The defines allow the configuration to occur at build time rather than at runtime. Build time configuration generally results in smaller code and faster execution by allowing unused native code to be removed by conditional compilation in C and linker dead stripping.
+マニフェストのdefinesブロックは、C言語の#defineプリプロセッサステートメントのセットを作成します。definesブロックは、ハードウェアドライバーのC言語実装を設定するために設計されています。definesを使用すると、実行時ではなくビルド時に設定が行われます。ビルド時の設定は、通常、使用されていないネイティブコードをC言語の条件付きコンパイルとリンカーのデッドストリッピングによって削除することができるため、コードが小さくなり、実行が速くなります。
 
-This static configuration approach is used instead of a dynamic mechanism which would configure all parameters at runtime. Such an approach is common on Linux systems, but has higher code and time overhead. For microcontroller deployments, a static configuration is optimal and consistent with other aspects of the Moddable SDK which use static configuration (display pixel format and rotation, JavaScript memory heaps, available modules, etc).
+この静的な設定アプローチは、実行時にすべてのパラメータを設定する動的なメカニズムの代わりに使用されます。このようなアプローチはLinuxシステムで一般的ですが、コードと時間のオーバーヘッドが高くなります。マイクロコントローラのデプロイメントでは、静的な設定が最適であり、静的な設定（ディスプレイのピクセル形式と回転、JavaScriptメモリヒープ、利用可能なモジュールなど）を使用するModdable SDKと一致しています。
 
-### #defines for ILI9341 display driver
-The following shows the use of the defines block for the ILI9341 display driver.
+### ILI9341ディスプレイドライバーのための#define
+以下は、ILI9341ディスプレイドライバーのためのdefinesブロックの使用を示しています。
 
 	{
 		"build": {
@@ -41,7 +41,7 @@ The following shows the use of the defines block for the ILI9341 display driver.
 		...
 	}
 
-The JSON defines configuration parameters of the driver, here width and height, as well as the connections (CS, DC, and SPI). The C #define statements generated are:
+JSONはドライバーの設定パラメーター（ここでは幅と高さ）と接続（CS、DC、SPI）を定義します。生成されるCの#defineステートメントは以下の通りです：
 
 	#define MODDEF_ILI9341_WIDTH (240)
 	#define MODDEF_ILI9341_HEIGHT (320)
@@ -51,10 +51,10 @@ The JSON defines configuration parameters of the driver, here width and height, 
 	#define MODDEF_ILI9341_DC_PIN (2)
 	#define MODDEF_ILI9341_SPI_PORT "HSPI"
 
-The GPIO pin connections (CS, DC) include both a port name and a pin number. In this example, the host target device does not use the port name, so it is left as null. The SPI port is defined by name, here the string "HSPI" for the ESP8266 "hardware" SPI bus. The "#" prefix on the string indicates that the value in the #define statement should be a quoted string.
+GPIOピン接続（CS、DC）にはポート名とピン番号の両方が含まれます。この例では、ホストターゲットデバイスはポート名を使用しないため、nullとして残されています。SPIポートは名前で定義されており、ここではESP8266の「ハードウェア」SPIバスのための文字列"HSPI"です。文字列に"#"プレフィックスが付いているのは、#defineステートメントの値が引用符で囲まれた文字列であるべきことを示しています。
 
-### Optional defines
-A device driver may support optional #defines. The ILI9341, for example, allows the SPI bus speed to be configured, the horizontal and vertical flip to be enabled, and the Reset pin to be supported.
+### オプションの定義
+デバイスドライバーはオプションの#defineをサポートすることがあります。例えば、ILI9341では、SPIバスの速度を設定したり、水平および垂直方向の反転を有効にしたり、リセットピンをサポートすることができます。
 
 	"defines": {
 		"ili9341": {
@@ -70,7 +70,7 @@ A device driver may support optional #defines. The ILI9341, for example, allows 
 			},
 			...
 
-To support option #defines, the driver implementation provides default values and behaviors. The ILI9341 C code implements default values for the hz, flipX, and flipY defines as follows:
+オプションの#defineをサポートするために、ドライバー実装はデフォルトの値と動作を提供します。ILI9341のCコードは、hz、flipX、flipYの定義について以下のようにデフォルト値を実装しています：
 
 	#ifndef MODDEF_ILI9341_HZ
 		#define MODDEF_ILI9341_HZ (40000000)
@@ -82,64 +82,74 @@ To support option #defines, the driver implementation provides default values an
 		#define MODDEF_ILI9341_FLIPY (false)
 	#endif
 
-Many deployments do not need to reset the ILI9341 display explicitly, as the automatic reset at power-up is sufficient. The reset pin has a behavior which is only implemented when the reset pin is defined in the manifest.
+多くのデプロイメントでは、電源投入時の自動リセットが十分であるため、ILI9341ディスプレイを明示的にリセットする必要はありません。リセットピンは、マニフェストでリセットピンが定義されている場合にのみ動作するように実装されています。
 
-	#ifdef MODDEF_ILI9341_RST_PIN
-		SCREEN_RST_INIT;
-		SCREEN_RST_ACTIVE;
-		modDelayMilliseconds(10);
-		SCREEN_RST_DEACTIVE;
-		modDelayMilliseconds(1);
-	#endif
+```c
+#ifdef MODDEF_ILI9341_RST_PIN
+	SCREEN_RST_INIT;
+	SCREEN_RST_ACTIVE;
+	modDelayMilliseconds(10);
+	SCREEN_RST_DEACTIVE;
+	modDelayMilliseconds(1);
+#endif
+```
 
-The implementations of flipX and flipY use the #define directly allowing the compiler to remove the corresponding code when either value is false.
+flipXとflipYの実装は、#defineを直接使用しており、どちらかの値がfalseの場合、コンパイラが対応するコードを削除できます。
 
+```c
 	data[0] = 0x48;
 	if (MODDEF_ILI9341_FLIPX)
 		data[0] ^= 0x40;
 	if (MODDEF_ILI9341_FLIPY)
 		data[0] ^= 0x80;
 	ili9341Command(sd, 0x36, data, 1);
+```
 
-The ESP8266 platform does not use a port name for GPIO pins, so the ILI9341 sets the port to NULL when it is not specified:
+ESP8266プラットフォームはGPIOピンのポート名を使用しないため、ILI9341は指定されていない場合、ポートをNULLに設定します：
 
-	#ifndef MODDEF_ILI9341_CS_PORT
-		#define MODDEF_ILI9341_CS_PORT NULL
-	#endif
-	#ifndef MODDEF_ILI9341_DC_PORT
-		#define MODDEF_ILI9341_DC_PORT NULL
-	#endif
+```c
+#ifndef MODDEF_ILI9341_CS_PORT
+	#define MODDEF_ILI9341_CS_PORT NULL
+#endif
+#ifndef MODDEF_ILI9341_DC_PORT
+	#define MODDEF_ILI9341_DC_PORT NULL
+#endif
+```
 
-This allows a more concise statement of the pin connections:
+これにより、ピン接続の記述がより簡潔になります：
 
-	"defines": {
-		"ili9341": {
-			...
-			"cs": {
-				"pin": 4
-			},
-			"dc": {
-				"pin": 2
-			},
-			...
-		}
-	},
+```json
+"defines": {
+	"ili9341": {
+		...
+		"cs": {
+			"pin": 4
+		},
+		"dc": {
+			"pin": 2
+		},
+		...
+	}
+},
+```
 
-Or simply:
+または単純に：
 
-	"defines": {
-		"ili9341": {
-			...
-			"cs_pin": 4,
-			"dc_pin": 2,
-			...
-		}
-	},
+```json
+"defines": {
+	"ili9341": {
+		...
+		"cs_pin": 4,
+		"dc_pin": 2,
+		...
+	}
+},
+```
 
-### Platform overrides
-For each driver, the configuration settings (e.g. width, height, flipX, flipY, hz) are typically consistent across all target platforms. The connections, however, are almost always different. The #defines block follows the pattern of mcconfig platform blocks by allowing a platform specific block to add values and override others.
+### プラットフォームのオーバーライド
+各ドライバーにおいて、設定（例：width、height、flipX、flipY、hz）は通常、全てのターゲットプラットフォームにわたって一貫しています。しかし、接続はほぼ常に異なります。#definesブロックは、プラットフォーム固有のブロックを追加し、他の値を上書きすることを許可するmcconfigプラットフォームブロックのパターンに従います。
 
-The portion of the ILI9341 configuration shared across all devices could be:
+全デバイスに共通のILI9341設定の一部は以下のようになります：
 
 	"defines": {
 		"ili9341": {
@@ -150,7 +160,7 @@ The portion of the ILI9341 configuration shared across all devices could be:
 		}
 	},
 
-Here is the platform defines block ESP8266, Gecko, and Zephyr platforms:
+これらはESP8266、Gecko、Zephyrプラットフォームのプラットフォーム定義ブロックです：
 
 	"platforms": {
 		"esp": {
@@ -206,8 +216,8 @@ Here is the platform defines block ESP8266, Gecko, and Zephyr platforms:
 		}
 	}
 
-### Application overrides
-An application can override specific parameters of the defines for a given driver. For example, if a particular device configuration requires a slower speed SPI connection to the display, that can be specified in the application's manifest:
+### アプリケーションのオーバーライド
+アプリケーションは、特定のドライバーの定義パラメータをオーバーライドすることができます。例えば、特定のデバイス設定でディスプレイへのSPI接続速度を遅くする必要がある場合、それはアプリケーションのマニフェストで指定できます：
 
 	{
 		"include": "../all.json",
@@ -221,8 +231,8 @@ An application can override specific parameters of the defines for a given drive
 		}
 	}
 
-### Configuration data
-The defines block is most often used to define numbers, booleans, and strings. It can also be used to define arrays of numbers, which is useful for more complex configurations, such as device registers.
+### 設定データ
+definesブロックは、数値、ブール値、文字列を定義するために最もよく使用されます。これは、デバイスレジスタのような複雑な設定のために、数値の配列を定義するためにも使用できます。
 
 	"defines": {
 		"ili9341": {
@@ -232,11 +242,11 @@ The defines block is most often used to define numbers, booleans, and strings. I
 		}
 	},
 
-The registers property is output as a statically initialized C array:
+registersプロパティは静的に初期化されたC言語の配列として出力されます：
 
 	#define MODDEF_ILI9341_REGISTERS {0, 54, 32, 99, 255, 255, 255, 0, 65}
 
-This can be used as:
+これは次のように使用できます：
 
 	static const uint8_t gRegisters = MODDEF_ILI9341_REGISTERS;
 	int i;
@@ -244,11 +254,11 @@ This can be used as:
 	for (i = 0; i < sizeof(gRegisters); i++)
 		;	// gRegisters[i]
 
-Because JSON allows only decimal values, hex and binary values must be converted to decimal values. An alternative is to define the registers property as a string in C language syntax:
+JSONは10進数の値のみを許可するため、16進数および2進数の値は10進数に変換する必要があります。代替案として、レジスタのプロパティをC言語の構文で文字列として定義することができます：
 
 		"registers": "{0x00, 0x38, 0x20, 0x63, 0xFF, 0xFF, 0xFF, 0x00 0x41}"
 
-JSON does not allow line breaks in string literals. To allow multiline string literals, an array of strings is converted to a multiline `#define`. Each element of the array is output as a separate line. The following JSON,
+JSONは文字列リテラル内で改行を許可しません。複数行の文字列リテラルを許可するために、文字列の配列が複数行の`#define`に変換されます。配列の各要素は別々の行として出力されます。以下のJSON、
 
 		"registers": [
 		   "0xCB, 5, 0x39, 0x2C, 0x00, 0x34, 0x02,",
@@ -256,22 +266,22 @@ JSON does not allow line breaks in string literals. To allow multiline string li
 		   "0xE8, 3, 0x85, 0x00, 0x78"
 		]
 
-generates this `#define`
+はこの`#define`を生成します：
 
 		#define MODDEF_ILI9341_REGISTERS \
 		0xCB, 5, 0x39, 0x2C, 0x00, 0x34, 0x02, \
 		0xCF, 3, 0x00, 0xC1, 0X30, \
 		0xE8, 3, 0x85, 0x00, 0x78
 
-which can be used as follows:
+以下のように使用できます：
 
 		static const uint8_t gRegisters[] = {
 			MODDEF_ILI9341_REGISTERS
 		};
 
 
-### Multiple devices
-The manifest can contain #define data for several devices:
+### 複数のデバイス
+マニフェストには複数のデバイスのための#defineデータを含むことができます：
 
 	"defines": {
 		"ili9341": {
@@ -285,5 +295,5 @@ The manifest can contain #define data for several devices:
 		}
 	},
 
-## Original idea
-The idea and syntax to include #define data in the manifest was suggested by Shotaro Uchida.
+## 元のアイデア
+マニフェストに#defineデータを含めるアイデアと構文はShotaro Uchida氏によって提案されました。

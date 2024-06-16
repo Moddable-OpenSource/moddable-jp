@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -22,8 +22,6 @@
 #include "xsPlatform.h"
 
 #if USE_DEBUGGER_USBD
-
-//#ifdef mxDebug
 
 #include "nrf.h"
 #include "nrf_queue.h"
@@ -785,11 +783,16 @@ bail:
 	return -1;
 }
 
-#else
+#else // !(defined(mxDebug) || defined(mxInstrument))
 
 void ESP_putc(int c) { }
 int ESP_getc(void) { return -1; }
 
 #endif
+
+#else // ! USE_DEBUGGER_USBD
+
+void ESP_putc(int c) { }
+int ESP_getc(void) { return -1; }
 
 #endif	// USE_DEBUGGER_USBD

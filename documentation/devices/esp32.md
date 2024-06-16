@@ -1,6 +1,6 @@
 # Using the Moddable SDK with ESP32
 Copyright 2016-2024 Moddable Tech, Inc.<BR>
-Revised: April 3, 2024
+Revised: May 23, 2024
 
 This document provides a guide to building apps for the ESP32 line of SoCs from Espressif. The Moddable SDK supports [ESP32](https://www.espressif.com/en/products/socs/esp32), [ESP32-S2](https://www.espressif.com/en/products/socs/esp32-s2), [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3), [ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3), [ESP32-C6](https://www.espressif.com/en/products/socs/esp32-c6), and [ESP32-H2](https://www.espressif.com/en/products/socs/esp32-h2).
 
@@ -27,6 +27,11 @@ This document provides a guide to building apps for the ESP32 line of SoCs from 
 
 * [Troubleshooting](#troubleshooting)
 * [Using USB on ESP32](#using_usb)
+	* [Multi-port devices](#usb_multiport)
+	* [Build configuration](#usb_build)
+	* [TinyUSB](#usb_tinyusb) (esp32s2, esp32s3)
+	* [Serial-JTAG](#usb_serial_jtag) (esp32s3, esp32c3, esp32c6, esp32h2)
+
 
 <a id="overview"></a>
 ## Overview
@@ -47,7 +52,7 @@ When building with `mcconfig`, you specify your device target by providing the *
 mcconfig -d -m -p esp32/moddable_two
 ```
 
-A list of available ESP32 and ESP32-S2 subplatforms and their platform identifiers is provided in the **Platforms** section below.
+A list of available ESP32, ESP32-S2, ESP32-S3, ESP32-C3, ESP32-C6 and ESP32-H2 subplatforms and their platform identifiers is provided in the **Platforms** section below.
 
 <a id="platforms"></a>
 ## Platforms
@@ -69,7 +74,7 @@ The Moddable SDK supports many devices built on ESP32. The following table lists
 | Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
 | <img src="./../assets/devices/moddable-two.png" width=125><BR>Moddable Two | `esp32/moddable_two`<BR>`simulator/moddable_two` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>Capacitive touch<BR><BR>20 External pins  | <li>[Moddable Two developer guide](./moddable-two.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
-| <img src="./../assets/devices/moddable-display-2.png" height=125><BR>Moddable Display 2 | `esp32/moddable_display_2`<BR>`simulator/moddable_two` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>Capacitive touch<BR><BR>20 External pins  | <li>[Moddable Display developer guide](./moddable-display.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
+| <img src="./../assets/devices/moddable-display-2.png" width=125><BR>Moddable Display 2 | `esp32/moddable_display_2`<BR>`simulator/moddable_two` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>Capacitive touch<BR><BR>20 External pins  | <li>[Moddable Display developer guide](./moddable-display.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
 | ![ESP32](./../assets/devices/esp32.png)<BR>Node MCU ESP32 | `esp32/nodemcu` | | 
 | ![M5Stack](./../assets/devices/m5stack.png)<BR> M5Stack | `esp32/m5stack`<BR>`esp32/m5stack_core2` | **1.8" LCD display**<BR>320 x 240 QVGA<BR>16-bit color<BR><BR>Audio playback<BR>Accelerometer<BR>NeoPixels  | <li>[Product page](https://m5stack.com/collections/m5-core/products/basic-core-iot-development-kit)</li> |
 | ![M5Stack Fire](./../assets/devices/m5stack-fire.png)<BR>M5Stack Fire | `esp32/m5stack_fire` | **1.8" LCD display**<BR>320 x 240 QVGA<BR>16-bit color<BR><BR>Audio playback<BR>Accelerometer<BR>NeoPixels | <li>[Product page](https://m5stack.com/collections/m5-core/products/fire-iot-development-kit?variant=16804798169178)</li> |
@@ -246,7 +251,7 @@ Omitting the `-d` and `-i` options on the `mcconfig` command line selects a rele
 <a id="mac"></a>
 ## macOS
 
-The Moddable SDK build for ESP32 currently uses ESP-IDF v5.1.2 (commit `482a8fb`) and the CMake option of Espressif's [`idf.py` tool](https://github.com/espressif/esp-idf/blob/master/tools/idf.py). 
+The Moddable SDK build for ESP32 currently uses ESP-IDF v5.2.2 (commit `3b8741b1`) and the CMake option of Espressif's [`idf.py` tool](https://github.com/espressif/esp-idf/blob/master/tools/idf.py). 
 
 <a id="mac-instructions"></a>
 ### Installing
@@ -261,11 +266,11 @@ The Moddable SDK build for ESP32 currently uses ESP-IDF v5.1.2 (commit `482a8fb`
 	
 	If you are using macOS 10.16 (Big Sur) or later, you do not need to install the VCP driver.
 
-4. If this is your first install, clone the `ESP-IDF` GitHub repository into your `~/esp32` directory. Make sure to specify the `--recursive` option. Be sure to checkout the `v5.1.2` tag:
+4. If this is your first install, clone the `ESP-IDF` GitHub repository into your `~/esp32` directory. Make sure to specify the `--recursive` option. Be sure to checkout the `v5.2.2` tag:
 
 	```text
 	cd ~/esp32
-	git clone -b v5.1.2 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.1.2
+	git clone -b v5.2.2 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.2.2
 	```
 
 5. (Optional) Update homebrew and then install Python, cmake, ninja, the pip package management system, and pyserial. Also run a `brew upgrade` on those packages, in case you already had older versions installed:
@@ -296,7 +301,7 @@ The Moddable SDK build for ESP32 currently uses ESP-IDF v5.1.2 (commit `482a8fb`
 8. Add the following line to the file you just opened and save. This sets the `IDF_PATH` environment variable to point at your ESP-IDF directory.
 
 	```text
-	export IDF_PATH=$HOME/esp32/esp-idf-v5.1.2
+	export IDF_PATH=$HOME/esp32/esp-idf-v5.2.2
 	```
 
 	<a id="upload_port_mac"></a>
@@ -370,7 +375,8 @@ There are a few reasons this can happen:
  
 1. Your device is not plugged into your computer. Make sure it's plugged in when you run the build commands. 
 2. You have a USB cable that is power only. Make sure you're using a data sync-capable USB cable.
-3. The computer does not recognize your device. To fix this problem, follow the instructions below.
+3. A different application is connected to the serial port. For example, a serial monitor may have the port opened. Close the application or disconnect the device from the application.
+4. The computer does not recognize your device. To fix this problem, follow the instructions below.
 
 
 Unplug the device and enter the following command.
@@ -421,7 +427,7 @@ This is a substantial update. We have found it best to start with a clean clone.
 	```text
 	cd ~/esp32
 	rm -rf esp-idf
-	git clone -b v5.1.2 --recursive https://github.com/espressif/esp-idf.git
+	git clone -b v5.2.2 --recursive https://github.com/espressif/esp-idf.git
 	```
 	
 2. (Optional - you probably don't have to do this.) Update homebrew and then verify that you have all the necessary tools and that they are up to date:
@@ -477,7 +483,7 @@ This is a substantial update. We have found it best to start with a clean clone.
 <a id="win"></a>	
 ## Windows
 
-The Moddable SDK build for ESP32 currently uses ESP-IDF v5.1.2 (commit `482a8fb`) and the CMake option of Espressif's [`idf.py` tool](https://github.com/espressif/esp-idf/blob/master/tools/idf.py). 
+The Moddable SDK build for ESP32 currently uses ESP-IDF v5.2.2 (commit `3b8741b1`) and the CMake option of Espressif's [`idf.py` tool](https://github.com/espressif/esp-idf/blob/master/tools/idf.py). 
 
 <a id="win-instructions"></a>
 ### Installing
@@ -486,13 +492,13 @@ The Moddable SDK build for ESP32 currently uses ESP-IDF v5.1.2 (commit `482a8fb`
 
 2. Download and install the Silicon Labs [CP210x USB to UART VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers). The driver zip file contains x64 and x86 versions of the installer. Most modern PCs run 64-bit Windows and should use the x64 version of the VCP driver. If you run a 32-bit version of Windows, use the x86 version of the driver. (You can determine if your computer is running a 64-bit version of Windows by checking "About your PC" in System Settings.)
 
-3. Download and run the Espressif [ESP-IDF Windows Installer](https://dl.espressif.com/dl/esp-idf/?idf=5.1.2). This will install the ESP32 Xtensa gcc toolchain, Ninja Build, OpenOCD, and a KConfig Frontend. This tool will also set your `PATH` to include the newly downloaded tools, as necessary.
+3. Download and run the Espressif [ESP-IDF Windows Installer](https://dl.espressif.com/dl/esp-idf/?idf=5.2.2). This will install the ESP32 Xtensa gcc toolchain, Ninja Build, OpenOCD, and a KConfig Frontend. This tool will also set your `PATH` to include the newly downloaded tools, as necessary.
 
     It is safe to accept all of the default options in the installer, or to change install locations as necessary.
 
     If you do not already have CMake or Python, the installer will also prompt you to download and install those tools (you should do so if needed).
 
-	The installer will offer to clone the ESP-IDF git repository for you. If you choose this option, select the "v5.1.2(release version)" option and clone into a directory called `esp32\esp-idf` within your home folder.
+	The installer will offer to clone the ESP-IDF git repository for you. If you choose this option, select the "v5.2.2(release version)" option and clone into a directory called `esp32\esp-idf` within your home folder.
 
 
 4. If you did not clone the ESP-IDF using the ESP-IDF Windows Installer, create an `esp32` directory in your home folder, either from File Explorer or a Command Prompt:
@@ -502,14 +508,14 @@ The Moddable SDK build for ESP32 currently uses ESP-IDF v5.1.2 (commit `482a8fb`
     mkdir esp32
     ```
 
-5. If you did not clone the ESP-IDF using the ESP-IDF Windows Installer, clone the `ESP-IDF` Github repository into your `~/esp32` directory. Make sure to specify the `--recursive` option. Then checkout the `v5.1.2` tag:
+5. If you did not clone the ESP-IDF using the ESP-IDF Windows Installer, clone the `ESP-IDF` Github repository into your `~/esp32` directory. Make sure to specify the `--recursive` option. Then checkout the `v5.2.2` tag:
 
     ```text
     cd %USERPROFILE%\esp32
-    git clone -b v5.1.2 --recursive https://github.com/espressif/esp-idf.git
+    git clone -b v5.2.2 --recursive https://github.com/espressif/esp-idf.git
     ```
 
-	If you already have a cloned copy of the ESP-IDF, the simplest way to do the update is to delete the existing `esp-idf` folder and clone it again. [See Espressif's Get ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/v5.1.2/esp32/get-started/index.html#get-started-get-esp-idf)
+	If you already have a cloned copy of the ESP-IDF, the simplest way to do the update is to delete the existing `esp-idf` folder and clone it again. [See Espressif's Get ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/v5.2.2/esp32/get-started/index.html#get-started-get-esp-idf)
 
 6. Connect the ESP32 device to your Windows host with a USB cable.
 	
@@ -535,13 +541,13 @@ The Moddable SDK build for ESP32 currently uses ESP-IDF v5.1.2 (commit `482a8fb`
 	install.bat
 	```
 	
-10. The ESP-IDF Windows Installer provides a command prompt called "ESP-IDF 5.1.2 CMD" that automatically sets important environment variables and paths. We recommend building ESP32 projects with "ESP-IDF 5.1.2 CMD." In each new command prompt instance you will need to run the Visual Studio x86 initialization batch file manually. Adjust the path as necessary for your system.
+10. The ESP-IDF Windows Installer provides a command prompt called "ESP-IDF 5.2.2 CMD" that automatically sets important environment variables and paths. We recommend building ESP32 projects with "ESP-IDF 5.2.2 CMD." In each new command prompt instance you will need to run the Visual Studio x86 initialization batch file manually. Adjust the path as necessary for your system.
 
 	```text
 	"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"
 	```
 
-	**Note for experts:** If you are comfortable editing Windows shortcuts, a convenient alternative to this manual process is to modify the "ESP-IDF 5.1.2 CMD" shortcut to initialize both the ESP-IDF environment and the Visual Studio x86 environment. To do this, right-click the "ESP-IDF 5.1.2 CMD" shortcut and select "Properties." In the "Target" field of the Properties window, you should see a command that looks like:
+	**Note for experts:** If you are comfortable editing Windows shortcuts, a convenient alternative to this manual process is to modify the "ESP-IDF 5.2.2 CMD" shortcut to initialize both the ESP-IDF environment and the Visual Studio x86 environment. To do this, right-click the "ESP-IDF 5.2.2 CMD" shortcut and select "Properties." In the "Target" field of the Properties window, you should see a command that looks like:
 
 	```text
 	C:\WINDOWS\system32\cmd.exe /k "C:\Users\<username>\.espressif\idf_cmd_init.bat"
@@ -555,9 +561,9 @@ The Moddable SDK build for ESP32 currently uses ESP-IDF v5.1.2 (commit `482a8fb`
 
 	It is also convenient to update the "Start in" field of the shortcut to `%MODDABLE%` to start your Command Prompt session in the Moddable SDK directory.
 
-	> Note: These instructions assume you only have one copy of the ESP-IDF installed. `idf_cmd_init.bat` can also take an argument to specify a particular ESP-IDF installation, if necessary. This argument should be set up in the default "ESP-IDF 5.1.2 CMD" shortcut.
+	> Note: These instructions assume you only have one copy of the ESP-IDF installed. `idf_cmd_init.bat` can also take an argument to specify a particular ESP-IDF installation, if necessary. This argument should be set up in the default "ESP-IDF 5.2.2 CMD" shortcut.
 
-11. In the "ESP-IDF 5.1.2 CMD" command prompt, verify the setup by building `helloworld` for your device target:
+11. In the "ESP-IDF 5.2.2 CMD" command prompt, verify the setup by building `helloworld` for your device target:
 
 	```text
 	cd %MODDABLE%\examples\helloworld
@@ -577,7 +583,7 @@ The built-in anti-virus software included with Windows 10 and 11 (Microsoft Defe
 
 #### Python Versions
 
-Espressif recommends using Python 3.9 or later when building with ESP-IDF v5.1.2. Python 3.9 will be installed by the ESP-IDF Windows Installer.
+Espressif recommends using Python 3.9 or later when building with ESP-IDF v5.2.2. Python 3.9 will be installed by the ESP-IDF Windows Installer.
 
 If you had a previous version of Python (such as Python 2.7) installed on your system, you may need to remove it from the System PATH so that Python 3.9 is chosen by default. Look for entries like `C:\Python27\` or `C:\Python27\Scripts\` in your PATH and remove them if you encounter Python errors during the build process. 
 
@@ -625,16 +631,16 @@ To ensure that your build environment is up to date, perform the following steps
 
     If you do not already have CMake or Python, the installer will also prompt you to download and install those tools (you should do so if needed).
     
-    If you choose to clone the ESP-IDF, select the `v5.1.2 (release version)` of the esp-idf.
+    If you choose to clone the ESP-IDF, select the `v5.2.2 (release version)` of the esp-idf.
 
-	If you use the installer to clone the ESP-IDF, please follow the instructions in the next step to update to the `v5.1.2` tag.
+	If you use the installer to clone the ESP-IDF, please follow the instructions in the next step to update to the `v5.2.2` tag.
 
 
-2. If you did not clone the ESP-IDF using the ESP-IDF Windows Installer, clone  the `ESP-IDF` Github repository into your `~/esp32` directory. Make sure to specify the `--recursive` option and branch `v5.1.2` tag:
+2. If you did not clone the ESP-IDF using the ESP-IDF Windows Installer, clone  the `ESP-IDF` Github repository into your `~/esp32` directory. Make sure to specify the `--recursive` option and branch `v5.2.2` tag:
 
     ```text
     cd %USERPROFILE%\esp32
-	git clone -b v5.1.2 --recursive https://github.com/espressif/esp-idf.git
+	git clone -b v5.2.2 --recursive https://github.com/espressif/esp-idf.git
     ```
 
 3. Open the "Environment Variables" dialog of the Control Panel app by following [these instructions](https://www.architectryan.com/2018/08/31/how-to-change-environment-variables-on-windows-10/). From that dialog, verify the `IDF_PATH` Windows environment variable is set correctly.
@@ -691,7 +697,7 @@ To ensure that your build environment is up to date, perform the following steps
 <a id="esp32-linux"></a>
 ## Linux
 
-The Moddable SDK build for ESP32 currently uses ESP-IDF v5.1.2 (commit `482a8fb`) and the CMake option of Espressif's [`idf.py` tool](https://github.com/espressif/esp-idf/blob/master/tools/idf.py). 
+The Moddable SDK build for ESP32 currently uses ESP-IDF v5.2.2 (commit `3b8741b1`) and the CMake option of Espressif's [`idf.py` tool](https://github.com/espressif/esp-idf/blob/master/tools/idf.py). 
 
 <a id="lin-instructions"></a>
 ### Installing
@@ -723,23 +729,12 @@ The Moddable SDK build for ESP32 currently uses ESP-IDF v5.1.2 (commit `482a8fb`
 
 3. Create an `esp32` directory in your home directory at `~/esp32` for required third party SDKs and tools. 
 
-4. If this is your first install, clone the `ESP-IDF` GitHub repository into your `~/esp32` directory. Make sure to specify the `--recursive` option. Then checkout the `v5.1.2` tag:
+4. If this is your first install, clone the `ESP-IDF` GitHub repository into your `~/esp32` directory. Make sure to specify the `--recursive` option. Then checkout the `v5.2.2` tag:
 
 	```text
-cd ~/esp32
-git clone -b v5.1.2 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.1.2
+	cd ~/esp32
+	git clone -b v5.2.2 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.2.2
 	```
-
-	<!--
-	If you already have a clone of the ESP-IDF, update to the `v5.1.2` tag by using the [update instructions below](#lin-update).
-
-	```text
-	cd ~/esp32/esp-idf
-	git fetch --all --tags
-	git checkout v5.1.2
-	git submodule update --init --recursive
-	```
-	-->
 
 5. Connect the ESP32 device to your Linux host with a USB cable.
 
@@ -776,7 +771,7 @@ git clone -b v5.1.2 --recursive https://github.com/espressif/esp-idf.git esp-idf
 
 	```text
 	cd $IDF_PATH
-	./install.sh
+	sh ./install.sh
 	```
 
 9. Set up your build environment by sourcing the ESP-IDF `export.sh` script. **This must be run every time you open a new shell instance,** either manually or by a startup script. 
@@ -843,8 +838,6 @@ export UPLOAD_PORT=/dev/ttyUSB1
 <a id="lin-update"></a>	
 ### Updating
 
-### Updating
-
 This is a substantial update. We have found it best to start with a clean clone.
 
 0. If you have the disk space, you may want to back up your old ESP-IDF.
@@ -859,7 +852,7 @@ This is a substantial update. We have found it best to start with a clean clone.
 	```text
 	cd ~/esp32
 	rm -rf esp-idf
-	git clone -b v5.1.2 --recursive https://github.com/espressif/esp-idf.git
+	git clone -b v5.2.2 --recursive https://github.com/espressif/esp-idf.git
 	```
 
 2. (optional) Update apt, then install any missing packages (and upgrade existing packages) required to compile with the `ESP-IDF`. The packages to install vary based on your distribution's default Python version.
@@ -995,13 +988,27 @@ To manually put your ESP32 into bootloader mode, follow these steps:
 <a id="using_usb"></a>
 ## Using USB on ESP32
 
-Originally, programming and debugging with the ESP32 was done over a serial connection. Some devices contain an integrated serial-to-USB chip, and some use an external programmer.
+Originally, programming and debugging with the ESP32 was done over a serial or **UART** connection. Some devices contain an integrated serial-to-USB chip (UART), and some use an external programmer.
 
 In newer devices, Espressif has added USB support. Starting with the ESP32-S2, TinyUSB support was added. TinyUSB support continued with ESP32-S3.
 
-Starting with the ESP32-S3 and ESP32-C3, support for USB was integrated into the device with a USB Serial/JTAG driver.
+Starting with the ESP32-S3 and continuing with the ESP32-C3, ESP32-C6 and ESP32-H2, support for USB is integrated into the device with a USB Serial/JTAG driver. Using the Serial/JTAG driver is preferred as it uses the built-in driver which results in a smaller binary.
+
+<a id="usb_multiport"></a>
+### Multi-port devices
+
+There are some development boards that include both the UART and USB connections.
+
+<img src="./../assets/devices/esp32-dual-port.png" width=400>
+
+On macOS, when plugged into the **UART** port, the device is enumerated as a `/dev/cu.usbserial-#####` device. When plugged into the **USB** port, the device is enumerated as a `/dev/cu.usbmodem-#####` device.
+
+The Espressif IDF will install the app to whatever is connected. However, the `xsbug` connection will only work in the method that the application was built for. For example, building an app for the `esp32/esp32s3` target will use the **UART** port to connect to the debugger. Building the app for `esp32/esp32s3_cdc` or `esp32/esp32s3_usb` will connect over the **USB** port.
+
+> Note: If you have built with **USB** configured and are connected to the **UART** port, `xsbug` will not be able to connect.
 
 
+<a id="usb_build"></a>
 #### Build configuration
 
 In a device's manifest.json file, the `USE_USB` build option specifies which USB implementation to use. The `SDKCONFIGPATH` is also specified to pick up the ESP-IDF config files specific to this device:
@@ -1014,6 +1021,7 @@ In a device's manifest.json file, the `USE_USB` build option specifies which USB
 		...
 ```
 
+<a id="usb_tinyusb"></a>
 ### `USE_USB: 1` - TinyUSB
 
 TinyUSB works with the ESP32-S2 and ESP32-S3 devices.
@@ -1058,6 +1066,13 @@ These devices use this technique:
 | `esp32/s2mini` | Lolin S2 mini |
 | `esp32/s3_tft_feather` | Adafruit ESP32-S3 TFT Feather |
 
+
+> Note: A quirk with this variant is that the device enumerates to a different `/dev/cu.usbmodem-#####` whether it is in programming mode or run mode.
+>
+> For example, building for `esp32/esp32s3_usb` I see `/dev/cu.usbmodem123401` in programming mode. In run-mode, I see `/dev/cu.usbmodem1234561`. So I set `DEBUGGER_PORT=/dev/cu.usbmodem1234561` and `UPLOAD_PORT=/dev/cu.usbmodem123401` to ensure the proper connections are made.
+
+
+<a id="usb_serial_jtag"></a>
 ### `USE_USB: 2` - SERIAL-JTAG
 
 The built-in SERIAL-JTAG driver can be used with the ESP32-S3 and ESP32-C3 devices.

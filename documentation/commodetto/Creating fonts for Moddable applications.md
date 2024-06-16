@@ -1,47 +1,47 @@
-# Creating fonts for applications built on the Moddable SDK
+# Moddable SDKを使用してアプリケーション用のフォントを作成する
 Copyright 2017-2024 Moddable Tech, Inc.<BR>
-Revised: March 21, 2024
+改訂日： 2024年3月21日
 
-Moddable uses the [BMFont](http://www.angelcode.com/products/bmfont/doc/file_format.html) format for fonts
+Moddableはフォントに[BMFont](http://www.angelcode.com/products/bmfont/doc/file_format.html)形式を使用します
 
-The Moddable SDK supports any input character (up to 4-byte UTF-8 values) making it possible to render the glyphs for any language written with glyphs having a Unicode representation.
+Moddable SDKは任意の入力文字（最大4バイトのUTF-8値）をサポートしており、Unicode表現を持つグリフで書かれた任意の言語のグリフをレンダリングすることが可能です。
 
-Each font asset consists of a (.png) glyph file and a corresponding font metrics file (.fnt) saved in BMFont Binary format.
+各フォントアセットは（.png)グリフファイルと、対応するフォントメトリクスファイル（.fnt)で構成され、BMFontバイナリ形式で保存されます。
 
-This allows anti-aliased or non-anti-aliased font sets to be generated as desired. The Poco renderer in the Moddable SDK does not implement a font scaler. Consequently, each required font size/weight must be generated and included as an asset in the application.
+これにより、アンチエイリアスまたは非アンチエイリアスのフォントセットを必要に応じて生成することができます。Moddable SDKのPocoレンダラーはフォントスケーラーを実装していないため、必要なフォントサイズ/ウェイトごとに生成し、アプリケーションにアセットとして含める必要があります。
 
-BMFont allows an arbitrary number of glyphs in the font.
-Moddable supports non-contiguous glyph ranges allowing the developer or graphic designer to create an efficient font asset with just the characters needed for the application. This can significantly reduce asset storage size.
+BMFontはフォント内の任意の数のグリフを許可します。
+Moddableは非連続グリフ範囲をサポートしており、開発者やグラフィックデザイナーがアプリケーションに必要な文字だけを含む効率的なフォントアセットを作成することができます。これにより、アセットのストレージサイズを大幅に削減することができます。
 
-Fonts are generated in black. This allows the Moddable SDK build tools to create alpha masks of the characters. To render the fonts in color, applications apply styles.
+フォントは黒で生成されます。これにより、Moddable SDKのビルドツールが文字のアルファマスクを作成できます。フォントをカラーでレンダリングするには、アプリケーションがスタイルを適用します。
 
-There are many tools available for converting TrueType and OpenType fonts on the BMFont format. The Moddable team often uses [Glyph Designer](https://71squared.com/glyphdesigner) (macOS). Another good options is the [fontbm](https://github.com/vladimirgamalyan/fontbm) command line tool by Vladimir Gamalyan. Instructions for using both are provided below.
+BMFont形式でTrueTypeおよびOpenTypeフォントを変換するためのツールは多数あります。Moddableチームはよく[Glyph Designer](https://71squared.com/glyphdesigner)（macOS）を使用します。もう1つの良い選択肢は、Vladimir Gamalyanによるコマンドラインツール[fontbm](https://github.com/vladimirgamalyan/fontbm)です。両方の使用方法についての指示は以下に提供されています。
 
-## Glyph Designer instructions
+## Glyph Designerの使い方
 
-Select font and weight. Set font color to black and no outline.
+フォントとウェイトを選択します。フォントの色を黒に設定し、アウトラインをなしにします。
 
 ![](../assets/create-fonts/screen01.png)
 
-Using the character selection tool select needed characters.
+文字選択ツールを使用して必要な文字を選択します。
 
 ![](../assets/create-fonts/screen02.png)
 
-Export .png glyph and .fnt font metrics files in the BMFont Binary format.
+BMFontバイナリ形式で.pngグリフと.fntフォントメトリクスファイルをエクスポートします。
 
 ![](../assets/create-fonts/screen03.png)
 
-## fontbm instructions
+## fontbmの使い方
 
-To use fontbm, you must first install it on your system. For Windows users, a binary is [available for download](https://github.com/vladimirgamalyan/fontbm/releases/latest). Instructions are provided for [macOS](https://github.com/vladimirgamalyan/fontbm#building-macos) and [Linux](https://github.com/vladimirgamalyan/fontbm#building-linux) users must currently build it from source code following the instructions.
+fontbmを使用するには、まずシステムにインストールする必要があります。Windowsユーザー向けには、[ダウンロード可能なバイナリ](https://github.com/vladimirgamalyan/fontbm/releases/latest)が用意されています。現在[macOS](https://github.com/vladimirgamalyan/fontbm#building-macos)および[Linux](https://github.com/vladimirgamalyan/fontbm#building-linux)ユーザーは、手順に従ってソースコードからビルドする必要があります。
 
-Once you have fontbm, you may use it from the command line to generate the .fnt and .png files needed to add fonts to the Moddable SDK.
+fontbmを入手したら、コマンドラインから使用して、Moddable SDKにフォントを追加するために必要な.fntファイルと.pngファイルを生成できます。
 
-The Moddable SDK project manifest.json file may be used invoke fontbm automatically as part of building a project. This makes it much easier to use different fonts and font sizes in your projects. To use fontbm support in `mcconfig` or `mcrun`, you must first set the environment variable `FONTBM` to the path to the fontbm executable to allow the Moddable SDK build tools to find fontbm.
+Moddable SDKプロジェクトのmanifest.jsonファイルを使用して、プロジェクトのビルドの一部としてfontbmを自動的に呼び出すことができます。これにより、プロジェクトで異なるフォントやフォントサイズを使用するのが非常に簡単になります。`mcconfig`や`mcrun`でfontbmサポートを使用するには、まず環境変数`FONTBM`をfontbm実行ファイルへのパスに設定して、Moddable SDKビルドツールがfontbmを見つけられるようにする必要があります。
 
-### fontbm in manifest.json
+### manifest.jsonでのfontbmの使用
 
-Adding TrueType fonts to a manifest is similar to adding pre-built BMFonts. Here's what a compressed BMFont looks like in the manifest:
+TrueTypeフォントをマニフェストに追加するのは、事前にビルドされたBMFontsを追加するのと似ています。以下は、マニフェスト内の圧縮BMFontの例です：
 
 ```json
 "resources":{
@@ -50,7 +50,7 @@ Adding TrueType fonts to a manifest is similar to adding pre-built BMFonts. Here
 	]
 }
 ```
-To use a TrueType font, it looks like this:
+TrueTypeフォントを使用する場合、次のようになります：
 
 ```json
 "resources": {
@@ -63,9 +63,9 @@ To use a TrueType font, it looks like this:
 }
 ```
 
-This generates two resources, `OpenSans-Regular-20.fnt` and  `OpenSans-Regular-20-alpha.bmp`. The `size` property is required: there is no default size.
+これにより、`OpenSans-Regular-20.fnt`と`OpenSans-Regular-20-alpha.bmp`の2つのリソースが生成されます。`size`プロパティは必須です：デフォルトのサイズはありません。
 
-Similarly, a pre-built uncompressed BMFont looks like this:
+同様に、事前にビルドされた非圧縮BMFontは次のようになります：
 
 ```json
 "resources":{
@@ -75,7 +75,7 @@ Similarly, a pre-built uncompressed BMFont looks like this:
 }
 ```
 
-To use a TrueType font, it looks like this:
+TrueTypeフォントを使用するには、次のようになります：
 
 ```json
 "resources": {
@@ -88,10 +88,10 @@ To use a TrueType font, it looks like this:
 }
 ```
 
-This generates one resource, `OpenSans-Regular-20.bm4`.
+これにより、1つのリソース `OpenSans-Regular-20.bm4` が生成されます。
 
-#### Naming
-Often the name of a TrueType font file isn't exactly how you want to name your font resources. The `name` property allows you specify a name to be used instead:
+#### 名前付け
+TrueTypeフォントファイルの名前がフォントリソースの名前として適切でないことがよくあります。`name` プロパティを使用して、代わりに使用する名前を指定できます：
 
 ```json
 "resources": {
@@ -104,13 +104,13 @@ Often the name of a TrueType font file isn't exactly how you want to name your f
 	]
 }
 ```
-This generates one resource, `FiraMono-Regular-22.bm4`.
+これにより、1つのリソース `FiraMono-Regular-22.bm4` が生成されます。
 
-#### Selecting Glyphs to Include
-By default, the font output by the conversion process includes Unicode characters from 32 to 127 (inclusive). There are four properties that override this behavior: `characters`, `characterFiles`, `blocks`, and `localization`. When more than one of these properties is present, all characters they select are included.
+#### 含めるグリフの選択
+デフォルトでは、変換プロセスによって出力されるフォントには、Unicode文字の32から127までが含まれます。この動作を上書きするプロパティが4つあります：`characters`、`characterFiles`、`blocks`、および `localization`。これらのプロパティが複数存在する場合、それらが選択するすべての文字が含まれます。
 
-##### Character List
-The `characters` property is a string that indicates which characters to include. This example include only the characters used to display decimal numbers:
+##### 文字リスト
+`characters` プロパティは、含める文字を示す文字列です。この例では、10進数を表示するために使用される文字のみが含まれます：
 
 ```json
 "resources": {
@@ -124,8 +124,8 @@ The `characters` property is a string that indicates which characters to include
 }
 ```
 
-##### Character List Files
-The `characterFiles` property is an array of paths to UTF-8 encoded text files. All of the characters used in the file are included. 
+##### 文字リストファイル
+`characterFiles` プロパティは、UTF-8エンコードされたテキストファイルへのパスの配列です。ファイルで使用されているすべての文字が含まれます。
 
 ```json
 "resources": {
@@ -141,8 +141,8 @@ The `characterFiles` property is an array of paths to UTF-8 encoded text files. 
 }
 ```
 
-##### Unicode Blocks
-The `blocks` property is an array of [Unicode block](https://en.wikipedia.org/wiki/Unicode_block) names. These are a convenient way to include groups of characters. For example, here blocks is used to include Basic Latin 1 and Cyrillic characters:
+##### Unicode ブロック
+`blocks` プロパティは、[Unicode ブロック](https://en.wikipedia.org/wiki/Unicode_block) 名の配列です。これらは文字のグループを含めるための便利な方法です。例えば、ここではBasic Latin 1とキリル文字を含めるためにブロックが使用されています：
 
 ```json
 "resources": {
@@ -156,8 +156,8 @@ The `blocks` property is an array of [Unicode block](https://en.wikipedia.org/wi
 }
 ```
 
-##### Localization Character Summary
-The Piu user interface framework has built-in support for localization. As part of building the localization maps for a Piu, the `mclocal` tool also generates a list of all characters used in the localization table. This list can be used to select the glyphs included in a font by setting the `localization` property to `true`:
+##### ローカライゼーション文字サマリー
+Piuユーザーインターフェースフレームワークには、ローカライゼーションのサポートが組み込まれています。Piuのローカライゼーションマップを構築する一環として、`mclocal` ツールはローカライゼーションテーブルで使用されるすべての文字のリストも生成します。このリストは、`localization` プロパティを `true` に設定することでフォントに含まれるグリフを選択するために使用できます：
 
 ```json
 "resources": {
@@ -172,8 +172,8 @@ The Piu user interface framework has built-in support for localization. As part 
 ```
 
 
-#### Kerning
-By default, kerning tables are not output. Kerning is enabled by setting the `kern` property to `true`:
+#### カーニング
+デフォルトでは、カーニングテーブルは出力されません。カーニングは `kern` プロパティを `true` に設定することで有効になります：
 
 ```json
 "resources": {
@@ -186,7 +186,7 @@ By default, kerning tables are not output. Kerning is enabled by setting the `ke
 	]
 }
 ```
-The Poco renderer does not kern by default in order to maximize performance. Kerning support is be enabled in the manifest with the following setting:
+Pocoレンダラーは、パフォーマンスを最大化するためにデフォルトではカーニングを行いません。カーニングサポートは、以下の設定でマニフェストにて有効にできます。
 
 ```json
 "defines": {
@@ -196,8 +196,8 @@ The Poco renderer does not kern by default in order to maximize performance. Ker
 }
 ```
 
-#### Monochrome
-By default, the glyphs output are anti-aliased. Monochrome output can be generated (perfect for 1-bit displays like Moddable Three and Moddable Four) by setting the `monochrome` property to `true`:
+#### モノクローム
+デフォルトでは、出力されるグリフはアンチエイリアスされています。モノクローム出力（Moddable ThreeやModdable Fourのような1ビットディスプレイに最適）は、`monochrome`プロパティを`true`に設定することで生成できます。
 
 ```json
 "resources": {
@@ -210,6 +210,3 @@ By default, the glyphs output are anti-aliased. Monochrome output can be generat
 	]
 }
 ```
-
-
-

@@ -149,6 +149,8 @@ OBJECTS = \
 	$(TMP_DIR)\textencoder.obj \
 	$(TMP_DIR)\modBase64.obj \
 	$(TMP_DIR)\xst.obj \
+	$(TMP_DIR)\xst262.obj \
+	$(TMP_DIR)\xstFuzz.obj \
 	$(TMP_DIR)\e_acos.obj \
 	$(TMP_DIR)\e_acosh.obj \
 	$(TMP_DIR)\e_asin.obj \

@@ -40,6 +40,7 @@
 
 #include "stdint.h"
 #include "stdbool.h"
+#include "mc.defines.h"
 
 #if ESP32
 	#define ICACHE_FLASH_ATTR __attribute__((section(".rodata.mod.0")))

@@ -36,9 +36,12 @@ export default class Poco @ "xs_poco_destructor" {
 	constructor(pixelsOut, options = {}) {
 		this.pixelsOut = pixelsOut;
 
-		let pixels = pixelsOut.width << 1;								// default is enough for double buffering at full width to allow async pixel transmission
-		if (options.pixels >= pixelsOut.width)							// caller can request larger or smaller (down to a single scan line)
-			pixels = options.pixels;
+		let pixels = pixelsOut.pixels?.(options.pixels)
+		if (!pixels) {
+			pixels = pixelsOut.width << 1;									// default is enough for double buffering at full width to allow async pixel transmission
+			if (options.pixels >= pixelsOut.width)							// caller can request larger or smaller (down to a single scan line)
+				pixels = options.pixels;
+		}
 
 		build.call(this,
 					pixelsOut.width,
