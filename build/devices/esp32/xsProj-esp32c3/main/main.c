@@ -116,7 +116,7 @@ static xsMachine *gThe;		// the main XS virtual machine running
 #if USE_USB
 static void debug_task(void *pvParameter)
 {
-	const usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 2048, .tx_buffer_size = 64 };
+	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 2048, .tx_buffer_size = 64 };
 	usb_serial_jtag_driver_install(&cfg);
 
 	while (true) {
@@ -315,14 +315,14 @@ void app_main() {
 
 #ifdef mxDebug
 	QueueHandle_t uartQueue;
-	uart_driver_install(USE_UART, UART_FIFO_LEN * 2, 0, 8, &uartQueue, 0);
+	uart_driver_install(USE_UART, UART_HW_FIFO_LEN(USE_UART) * 2, 0, 8, &uartQueue, 0);
 	xTaskCreate(debug_task, "debug", (768 + XT_STACK_EXTRA) / sizeof(StackType_t), uartQueue, 8, NULL);
 	#if MODDEF_ECMA419_ENABLED
 		builtinUsePin(USE_UART_TX);
 		builtinUsePin(USE_UART_RX);
 	#endif
 #else
-	uart_driver_install(USE_UART, UART_FIFO_LEN * 2, 0, 0, NULL, 0);
+	uart_driver_install(USE_UART, UART_HW_FIFO_LEN(USE_UART) * 2, 0, 0, NULL, 0);
 #endif
 
 #endif	// !USE_USB

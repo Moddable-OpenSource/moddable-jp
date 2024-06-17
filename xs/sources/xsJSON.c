@@ -678,7 +678,7 @@ void fxStringifyJSON(txMachine* the, txJSONStringifier* theStringifier)
 			theStringifier->indentLength = aCount;
 		}
 		else if (mxIsStringPrimitive(aSlot)) {
-			txInteger aCount = fxUnicodeLength(aSlot->value.string);
+			txInteger aCount = fxUnicodeLength(aSlot->value.string, C_NULL);
 			if (aCount > 10) {
 				aCount = fxUnicodeToUTF8Offset(aSlot->value.string, 10);
 			}

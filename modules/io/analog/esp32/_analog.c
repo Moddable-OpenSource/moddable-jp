@@ -211,7 +211,7 @@ void xs_analog_constructor_(xsMachine *the)
 		if (ADC_UNIT_1 != gADC1_cali_config.unit_id) {
 			gADC1_cali_config.unit_id = ADC_UNIT_1;
 			gADC1_cali_config.bitwidth = ADC_WIDTH;
-			gADC1_cali_config.atten = ADC_ATTEN_DB_11;
+			gADC1_cali_config.atten = ADC_ATTEN_DB_12;
 
 			#if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
 			adc_cali_create_scheme_curve_fitting(&gADC1_cali_config, &gADC1_cali_handle);
@@ -226,7 +226,7 @@ void xs_analog_constructor_(xsMachine *the)
 		if (ADC_UNIT_2 != gADC2_cali_config.unit_id) {
 			gADC2_cali_config.unit_id = ADC_UNIT_2;
 			gADC2_cali_config.bitwidth = ADC_WIDTH;
-			gADC2_cali_config.atten = ADC_ATTEN_DB_11;
+			gADC2_cali_config.atten = ADC_ATTEN_DB_12;
 
 			#if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
 			adc_cali_create_scheme_curve_fitting(&gADC1_cali_config, &gADC1_cali_handle);
@@ -256,7 +256,7 @@ void xs_analog_constructor_(xsMachine *the)
 	adc_oneshot_unit_init_cfg_t unit_cfg = {0};
 	adc_oneshot_chan_cfg_t config = {
 		.bitwidth = ADC_WIDTH,
-		.atten = ADC_ATTEN_DB_11,
+		.atten = ADC_ATTEN_DB_12,
 	};
 
 	if (port == 1) {

@@ -1,4 +1,3 @@
-import Digital from "pins/digital";
 import PWM from "pins/pwm";
 import config from "mc/config";
 import Button from "button";
@@ -10,13 +9,16 @@ class Backlight extends PWM {
 		this.write(brightness);
 	}
 	write(value) {
-		value = 100 - value;		// PWM is inverted
+		value /= 100;
 		if (value <= 0)
-			value = 0;
-		else if (value >= 100)
 			value = 1023;
-		else
-			value = (value / 100) * 1023;
+		else if (value >= 1)
+			value = 0;
+		else {
+			value *= value;
+			value = 1 - value;	// PWM is inverted from brightness (0 is full power, 1023 is no power)
+			value *= 1023;
+		}
 		super.write(value);
 	}
 }
@@ -48,14 +50,3 @@ globalThis.Host = Object.freeze({
 		Flash
 	}
 }, true);
-
-export default function (done) {
-	if ((undefined === config.brightness) || ("none" === config.brightness))
-		Digital.write(config.backlight, 0);
-	else if ("off" === config.brightness)
-		Digital.write(config.backlight, 1);
-	else
-		globalThis.backlight = new Backlight(parseInt(config.brightness));
-
-	done();
-}

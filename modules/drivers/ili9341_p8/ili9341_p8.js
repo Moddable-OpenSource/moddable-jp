@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2023  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -22,16 +22,18 @@
 	MIPI - 8-bit parallel
 */
 
-const frameRate = Uint8Array.of(
-	119, 111, 105, 99, 94, 90, 86, 82, 78, 75, 72, 69, 67, 64, 62, 60,
-	58, 57, 55, 53, 52, 50, 49, 48, 46, 45, 44, 43, 42, 41, 40, 30);
+// from data sheet
+//const frameRate = Uint8Array.of(119, 111, 105, 99, 94, 90, 86, 82, 78, 75, 72, 69, 67, 64, 62, 60, 58, 57, 55, 53, 52, 50, 49, 48, 46, 45, 44, 43, 42, 41, 40, 30);
+
+// from device measurements
+const frameRate = Uint8Array.of(114,108,102,96,91,87,83,79,76,73,70,67,65,63,61,59,57,55,53,52,50,49,48,46,45,44,43,42,41,40,39,38);
 
 export default class ILI9341 @ "xs_ILI9341p8_destructor" {
 	constructor(options) @ "xs_ILI9341p8";
 
 	begin(x, y, width, height) @ "xs_ILI9341p8_begin";
 	send(pixels, offset, count) @ "xs_ILI9341p8_send";
-	end() @  "xs_ILI9341p8_end";
+	end() @ "xs_ILI9341p8_end";
 
 	adaptInvalid() {}
 	continue() {}
@@ -57,4 +59,9 @@ export default class ILI9341 @ "xs_ILI9341p8_destructor" {
 	}
 
 	close() @ "xs_ILI9341p8_close";
+	
+	pixels(value = 0) {
+		const pixels = this.width << 5;		// 32 scan lines
+		return (value > pixels) ? value : pixels;
+	}
 }

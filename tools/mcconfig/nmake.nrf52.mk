@@ -406,14 +406,19 @@ NRF_USBD_OBJ = \
 
 SDK_GLUE_OBJ = \
 	$(TMP_DIR)\debugger.o \
-	$(TMP_DIR)\debugger_usbd.o \
 	$(TMP_DIR)\ftdi_trace.o \
 	$(TMP_DIR)\main.o \
 	$(TMP_DIR)\systemclock.o \
 	$(TMP_DIR)\xsmain.o \
-	$(TMP_DIR)\app_usbd_vendor.o
 
 #	$(TMP_DIR)\nrf52_serial.o 
+
+!IF "$(USE_USB)"=="1"
+SDK_GLUE_OBJ = \
+	$(SDK_GLUE_OBJ) \
+	$(TMP_DIR)\debugger_usbd.o \
+	$(TMP_DIR)\app_usbd_vendor.o
+!ENDIF
 
 STARTUP_OBJ = \
 	$(LIB_DIR)\moddable_startup_nrf52840.o \
@@ -477,8 +482,13 @@ OBJECTS = \
 	$(NRF_LOG_OBJ) \
 	$(NRF_LIBRARIES_OBJ) \
 	$(NRF_SOFTDEVICE_OBJ) \
-	$(NRF_USBD_OBJ) \
 	$(STARTUP_OBJ)
+
+!IF "$(USE_USB)"=="1"
+OBJECTS = \
+	$(OBJECTS) \
+	$(NRF_USBD_OBJ)
+!ENDIF
 
 FINAL_LINK_OBJ = \
 	$(LIB_DIR)\buildinfo.o \
@@ -549,7 +559,11 @@ C_DEFINES = $(C_DEFINES) -DMODINSTRUMENTATION=1 -DmxInstrument=1
 !IF "$(DEBUG)"=="1"
 C_DEFINES = $(C_DEFINES) -DmxDebug=1 -DDEBUG=1 $(DEBUGGER_USBD) -g2 -Os
 !ELSE
-C_DEFINES = $(C_DEFINES) -Os -DUSE_WATCHDOG=0
+C_DEFINES = $(C_DEFINES) -Os
+!ENDIF
+
+!IF "$(NRF52_CUSTOM_PWM_FREQ)"=="1"
+C_DEFINES = $(C_DEFINES) -DNRF52_CUSTOM_PWM_FREQ=1
 !ENDIF
 
 HW_DEBUG_OPT = $(FP_OPTS)
@@ -582,8 +596,15 @@ C_FLAGS = \
 	-nostdinc
 !IF "$(DEBUG)"=="1"
 C_FLAGS = $(C_FLAGS) $(HW_DEBUG_OPT)
+!ELSEIF "$(INSTRUMENT)"=="1"
+C_FLAGS = $(C_FLAGS) $(HW_OPT)
 !ELSE
 C_FLAGS = $(C_FLAGS) $(HW_OPT)
+!ENDIF
+
+!IF "$(USE_WDT)"=="1" && "$(DEBUG)"!="1"
+C_FLAGS = $(C_FLAGS) \
+	-DUSE_WATCHDOG=1
 !ENDIF
 
 C_FLAGS_NODATASECTION = $(C_FLAGS)

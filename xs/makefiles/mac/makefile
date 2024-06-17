@@ -25,6 +25,9 @@ export BUILD_DIR
 
 all: debug release
 
+clean:
+	make clean -f xst.mk 
+
 debug:
 	make -f xst.mk
 

@@ -219,5 +219,7 @@ txSlot* fxNewArgumentsStrictInstance(txMachine* the, txIndex count)
 
 void fxThrowTypeError(txMachine* the)
 {
+	if (mxFunction->value.reference->flag & XS_CAN_CONSTRUCT_FLAG)
+		mxTypeError("secure mode");
 	mxTypeError("strict mode");
 }

@@ -50,6 +50,9 @@ class Backlight {
 			value *= 1023;
 		this.#io.write(value);
 	}
+	write(value) {		// compatibility
+		this.brightness = value / 100;
+	}
 }
 
 class LED {

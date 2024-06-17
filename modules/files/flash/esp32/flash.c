@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2023  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -23,7 +23,6 @@
 #include "mc.xs.h"			// for xsID_ values
 
 #include "esp_partition.h"
-#include "app_update/include/esp_ota_ops.h"
 #include "spi_flash_mmap.h"
 
 struct modFlashRecord {

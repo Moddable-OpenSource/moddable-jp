@@ -157,10 +157,8 @@ static txBoolean fxToNumericNumberBinary(txMachine* the, txSlot* a, txSlot* b, t
 
 #if mxBoundsCheck
 #define mxAllocStack(_COUNT) \
-	if ((mxStack - _COUNT) < the->stackBottom) { \
-		mxSaveState; \
-		fxAbort(the, XS_STACK_OVERFLOW_EXIT); \
-	} \
+	if ((mxStack - _COUNT) < the->stackBottom) \
+		goto STACK_OVERFLOW; \
 	mxStack -= _COUNT
 #else
 #define mxAllocStack(_COUNT) \
@@ -4149,7 +4147,7 @@ XS_CODE_JUMP:
 		mxCase(XS_CODE_EVAL)
 			offset = mxStack->value.integer;
 			slot = mxStack + 1 + offset + 4;
-			if (slot->value.reference == mxEvalFunction.value.reference) {
+			if (mxIsReference(slot) && mxIsFunction(slot->value.reference) && (mxFunctionInstanceCode(slot->value.reference)->value.callback.address == mxFunctionInstanceCode(mxEvalFunction.value.reference)->value.callback.address)) {
 				mxSaveState;
 				gxDefaults.runEval(the);
 				mxRestoreState;
@@ -4162,7 +4160,7 @@ XS_CODE_JUMP:
 		mxCase(XS_CODE_EVAL_TAIL)
 			offset = mxStack->value.integer;
 			slot = mxStack + 1 + offset + 4;
-			if (slot->value.reference == mxEvalFunction.value.reference) {
+			if (mxIsReference(slot) && mxIsFunction(slot->value.reference) && (mxFunctionInstanceCode(slot->value.reference)->value.callback.address == mxFunctionInstanceCode(mxEvalFunction.value.reference)->value.callback.address)) {
 				mxSaveState;
 				gxDefaults.runEval(the);
 				mxRestoreState;
@@ -4304,6 +4302,10 @@ XS_CODE_JUMP:
 			mxBreak;
 		}
 	}
+
+STACK_OVERFLOW:
+	mxSaveState;
+	fxAbort(the, XS_STACK_OVERFLOW_EXIT);
 }
 
 #ifdef mxMetering
@@ -5039,8 +5041,20 @@ void fxRunUsingAsync(txMachine* the)
 #endif
 }
 
-
-
+#ifdef mxMetering
+void fxCheckMeter(void* console)
+{
+	txMachine* the = console;
+	if (the->meterInterval && (the->meterIndex > the->meterCount)) {
+		fxCheckMetering(the);
+	}
+}
+void fxMeterSome(void* console, txU4 count)
+{
+	txMachine* the = console;
+	the->meterIndex += count;
+}
+#endif
 
 
 

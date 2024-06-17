@@ -198,7 +198,7 @@ printf("fifo_init - bad size: %d\r\n", size);
 static void debug_task(void *pvParameter)
 {
 #if (USE_USB == 2)
-	const usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 2048, .tx_buffer_size = 64 };
+	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 2048, .tx_buffer_size = 64 };
 	usb_serial_jtag_driver_install(&cfg);
 #endif
 
@@ -501,9 +501,9 @@ void app_main() {
 
 #ifdef mxDebug
 	QueueHandle_t uartQueue;
-	uart_driver_install(USE_UART, UART_FIFO_LEN * 2, 0, 8, &uartQueue, 0);
+	uart_driver_install(USE_UART, UART_HW_FIFO_LEN(USE_UART) * 2, 0, 8, &uartQueue, 0);
 #else
-	uart_driver_install(USE_UART, UART_FIFO_LEN * 2, 0, 0, NULL, 0);
+	uart_driver_install(USE_UART, UART_HW_FIFO_LEN(USE_UART) * 2, 0, 0, NULL, 0);
 #endif
 
 	err = uart_param_config(USE_UART, &uartConfig);

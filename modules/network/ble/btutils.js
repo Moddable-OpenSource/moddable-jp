@@ -117,7 +117,7 @@ export function typedBufferToValue(type, buffer) {
 }
 
 const hex = "0123456789ABCDEF";
-function toHexString(buffer, delimeter = '') {
+function toHexString(buffer, delimiter = '') {
 	const bytes = new Uint8Array(buffer);
 	const length = buffer.byteLength;
 	let result = new Array(length);
@@ -125,7 +125,7 @@ function toHexString(buffer, delimeter = '') {
 		const byte = bytes[index];
 		result[length - index - 1] = hex[byte >> 4] + hex[byte & 0x0F];
 	}
-	return result.join(delimeter);
+	return result.join(delimiter);
 }
 
 export class Bytes extends ArrayBuffer {
@@ -141,7 +141,7 @@ export class Bytes extends ArrayBuffer {
 		this.set(bytes, true === littleEndian);
 	}
 	toString() {
-		// this function assumes the bytes are in little endian order
+		// implementation assumes bytes are in little endian order
 		const byteLength = this.byteLength;
 		if (6 === byteLength)
 			return toHexString(this, ':');

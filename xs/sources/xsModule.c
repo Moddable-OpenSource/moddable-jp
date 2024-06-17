@@ -458,7 +458,6 @@ void fxLinkCircularities(txMachine* the, txSlot* module, txSlot* circularities, 
 	txSlot* transfer;
 	txSlot* aliases;
 	txSlot* alias;
-	txSlot* local;
 	txSlot* circularitiesCopy;
 	txSlot* circularityCopy;
 	txSlot* from;
@@ -493,20 +492,23 @@ void fxLinkCircularities(txMachine* the, txSlot* module, txSlot* circularities, 
 		txBoolean starFlag = 0;
 		transfer = transfers->value.reference->next;
 		while (transfer) {
-			local = mxTransferLocal(transfer);
 			aliases = mxTransferAliases(transfer);
 			if (aliases->kind == XS_REFERENCE_KIND) {
 				alias = aliases->value.reference->next;
-				while (alias) {
-					export = export->next = fxNewSlot(the);
-					export->ID = alias->value.symbol;
-					export->kind = transfer->kind;
-					export->value = transfer->value;
-					alias = alias->next;
+				if (alias) {
+					while (alias) {
+						export = export->next = fxNewSlot(the);
+						export->ID = alias->value.symbol;
+						export->kind = transfer->kind;
+						export->value = transfer->value;
+						alias = alias->next;
+					}
+				}
+				else {
+					mxCheck(the, mxTransferLocal(transfer)->kind == XS_NULL_KIND);
+					starFlag = 1;
 				}
 			}
-			else if (local->kind == XS_NULL_KIND)
-				starFlag = 1;
 			transfer = transfer->next;
 		}
 		if (starFlag) {
@@ -517,9 +519,8 @@ void fxLinkCircularities(txMachine* the, txSlot* module, txSlot* circularities, 
 			reexport = reexportsInstance;
 			transfer = transfers->value.reference->next;
 			while (transfer) {
-				local = mxTransferLocal(transfer);
 				aliases = mxTransferAliases(transfer);
-				if ((local->kind == XS_NULL_KIND) && (aliases->kind == XS_NULL_KIND)) {
+				if ((aliases->kind == XS_REFERENCE_KIND) && (aliases->value.reference->next == C_NULL)) {
 					from = mxTransferFrom(transfer);
 					fxNewInstance(the);
 					circularitiesCopy = the->stack;
@@ -662,6 +663,7 @@ void fxLinkModules(txMachine* the, txSlot* queue)
 	txSlot* local;
 	txSlot* from;
 	txSlot* import;
+	txSlot* aliases;
 	txSlot* closure;
 	txSlot* property;
 	txSlot* circularities;
@@ -686,6 +688,7 @@ void fxLinkModules(txMachine* the, txSlot* queue)
 				local = mxTransferLocal(transfer);
 				from = mxTransferFrom(transfer);
 				import = mxTransferImport(transfer);
+				aliases = mxTransferAliases(transfer);
 				if (local->kind != XS_NULL_KIND) {
 					if ((from->kind == XS_NULL_KIND) || (import->kind == XS_NULL_KIND)) {
 						closure = mxTransferClosure(transfer);
@@ -696,7 +699,7 @@ void fxLinkModules(txMachine* the, txSlot* queue)
 					}
 				}
 				else {
-					if ((from->kind != XS_NULL_KIND) && (import->kind == XS_NULL_KIND)) {
+					if ((from->kind != XS_NULL_KIND) && (import->kind == XS_NULL_KIND) && (aliases->kind != XS_NULL_KIND)) {
 						closure = mxTransferClosure(transfer);
 						closure->value.export.closure = fxNewSlot(the);
 						closure->value.export.closure->kind = XS_UNINITIALIZED_KIND;
@@ -1930,8 +1933,10 @@ void fxPrepareTransfer(txMachine* the)
 	if (c > 3) {
 		mxPush(mxObjectPrototype);
 		slot = fxLastProperty(the, fxNewObjectInstance(the));
-		for (i = 3; i < c; i++)
-			slot = fxNextSlotProperty(the, slot, argument--, XS_NO_ID, XS_DONT_ENUM_FLAG);
+		if (argument->kind != XS_NULL_KIND) {
+			for (i = 3; i < c; i++)
+				slot = fxNextSlotProperty(the, slot, argument--, XS_NO_ID, XS_DONT_ENUM_FLAG);
+		}
 		property = fxNextSlotProperty(the, property, the->stack, mxID(_aliases), XS_DONT_ENUM_FLAG);
 		mxPop();
 	}
@@ -3104,41 +3109,52 @@ void fx_ModuleSource_prototype_get_bindings(txMachine* the)
 		}
 		else if (aliases->kind == XS_REFERENCE_KIND) {
 			txSlot* alias = aliases->value.reference->next;
-			while (alias) {
-				txSlot* slot = fxNewObject(the);
-				if (from->kind != XS_NULL_KIND) {
-					if (import->kind == XS_NULL_KIND) {
-						mxPushString(from->value.string);
-						slot = fxNextSlotProperty(the, slot, the->stack, fxID(the, "exportAllFrom"), XS_NO_FLAG);
-						mxPop();
-						fxPushKeyString(the, alias->value.symbol, C_NULL);
-						slot = fxNextSlotProperty(the, slot, the->stack, mxID(_as), XS_NO_FLAG);
-						mxPop();
-					}
-					else {
-						fxPushKeyString(the, import->value.symbol, C_NULL);
-						slot = fxNextSlotProperty(the, slot, the->stack, mxID(_export), XS_NO_FLAG);
-						mxPop();
-						if (alias->value.symbol != import->value.symbol) {
+			if (alias) {
+				while (alias) {
+					txSlot* slot = fxNewObject(the);
+					if (from->kind != XS_NULL_KIND) {
+						if (import->kind == XS_NULL_KIND) {
+							mxPushString(from->value.string);
+							slot = fxNextSlotProperty(the, slot, the->stack, fxID(the, "exportAllFrom"), XS_NO_FLAG);
+							mxPop();
 							fxPushKeyString(the, alias->value.symbol, C_NULL);
 							slot = fxNextSlotProperty(the, slot, the->stack, mxID(_as), XS_NO_FLAG);
 							mxPop();
 						}
-						mxPushString(from->value.string);
-						slot = fxNextSlotProperty(the, slot, the->stack, mxID(_from), XS_NO_FLAG);
-						mxPop();
+						else {
+							fxPushKeyString(the, import->value.symbol, C_NULL);
+							slot = fxNextSlotProperty(the, slot, the->stack, mxID(_export), XS_NO_FLAG);
+							mxPop();
+							if (alias->value.symbol != import->value.symbol) {
+								fxPushKeyString(the, alias->value.symbol, C_NULL);
+								slot = fxNextSlotProperty(the, slot, the->stack, mxID(_as), XS_NO_FLAG);
+								mxPop();
+							}
+							mxPushString(from->value.string);
+							slot = fxNextSlotProperty(the, slot, the->stack, mxID(_from), XS_NO_FLAG);
+							mxPop();
+						}
+						resultItem = resultItem->next = fxNewSlot(the);
+						mxPullSlot(resultItem);
+						resultArray->value.array.length++;
 					}
-					resultItem = resultItem->next = fxNewSlot(the);
-					mxPullSlot(resultItem);
-					resultArray->value.array.length++;
+					alias = alias->next;
 				}
-				alias = alias->next;
+			}
+			else {
+				txSlot* slot = fxNewObject(the);
+				mxPushString(from->value.string);
+				slot = fxNextSlotProperty(the, slot, the->stack, fxID(the, "exportAllFrom"), XS_NO_FLAG);
+				mxPop();
+				resultItem = resultItem->next = fxNewSlot(the);
+				mxPullSlot(resultItem);
+				resultArray->value.array.length++;
 			}
 		}
 		else if ((from->kind != XS_NULL_KIND) && (import->kind == XS_NULL_KIND)) {
 			txSlot* slot = fxNewObject(the);
 			mxPushString(from->value.string);
-			slot = fxNextSlotProperty(the, slot, the->stack, fxID(the, "exportAllFrom"), XS_NO_FLAG);
+			slot = fxNextSlotProperty(the, slot, the->stack, fxID(the, "importFrom"), XS_NO_FLAG);
 			mxPop();
 			resultItem = resultItem->next = fxNewSlot(the);
 			mxPullSlot(resultItem);

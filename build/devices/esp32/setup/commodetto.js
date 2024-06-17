@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -19,16 +19,39 @@
  */
 
 import config from "mc/config";
+import Digital from "pins/digital";
+
+if (!config.Screen)
+	throw new Error("no screen configured");
 
 export default function (done) {
-	if (!global.screen && config.Screen) {
-		global.screen = new config.Screen({});
+	if (!global.screen) {
+		globalThis.screen = new config.Screen({});
+
 		if (config.driverRotation) {
 			if (config.rotation)
 				screen.rotation = (config.driverRotation + config.rotation) % 360;
 			else
 				screen.rotation = config.driverRotation;
 		}
+
+		if (globalThis.Host?.Backlight || globalThis.device?.peripheral?.Backlight) {
+			let brightness = config.brightness;
+			if ((undefined === brightness) || ("none" === brightness))
+				brightness = 100;
+			else if ("off" === brightness)
+				brightness = 0;
+			else
+				brightness = parseInt(brightness);
+			
+			if (globalThis.Host?.Backlight)
+				globalThis.backlight = new Host.Backlight(brightness);
+			else {
+				globalThis.backlight = new device.peripheral.Backlight;
+				globalThis.backlight.brightness = brightness / 100;
+			}
+		}
 	}
+
 	done();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2023 Moddable Tech, Inc.
+ * Copyright (c) 2016-2024 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK.
  * 
@@ -42,7 +42,8 @@ const transparentWhiteSkin = new Skin({
 
 class DimmingBehavior extends Behavior {
 	onDisplaying(content) {
-		this.backlight = new Host.Backlight
+		if (undefined === globalThis.backlight)
+			throw new Error("backlight missing")
 		this.adjustBrightness(content);
 	}
 	onTouchBegan(content, id, x, y) {
@@ -58,7 +59,7 @@ class DimmingBehavior extends Behavior {
 	adjustBrightness(content) {
 		let fraction = content.first.height / content.height;
 		if (fraction <= 0) fraction = 0.01;		// don't turn off backlight completely
-		this.backlight.write(fraction * 100);
+		backlight.write(fraction * 100);
 	}
 };
 
@@ -73,7 +74,7 @@ const ScreenDimmingApplication = Application.template($ => ({
 			active: true, Behavior: DimmingBehavior,
 			contents: [
 				Content($, {
-					left: 0, right: 0, bottom: 0, height: 100,
+					left: 0, right: 0, bottom: 0, height: 150,
 					skin: transparentWhiteSkin
 				}),
 			],
