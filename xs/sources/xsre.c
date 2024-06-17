@@ -2396,6 +2396,9 @@ txBoolean fxCompileRegExp(void* the, txString pattern, txString modifier, txInte
 			offset = parser->size;
 			parser->size += sizeof(txInteger);
 		#ifdef mxRun
+			#ifdef mxMetering
+				fxMeterSome(the, parser->size >> 6);
+			#endif
 			if (the)
 				*code = fxNewChunk(the, parser->size);
 			else
