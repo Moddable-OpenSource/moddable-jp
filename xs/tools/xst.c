@@ -1011,6 +1011,20 @@ void fxLoadModule(txMachine* the, txSlot* module, txID moduleID)
 	c_strncpy(path, fxGetKeyName(the, moduleID), C_PATH_MAX - 1);
 	path[C_PATH_MAX - 1] = 0;
 	if (c_realpath(path, real)) {
+#if mxWindows
+		DWORD attributes;
+		attributes = GetFileAttributes(path);
+		if (attributes != 0xFFFFFFFF) {
+			if (attributes & FILE_ATTRIBUTE_DIRECTORY)
+				return;
+		}
+#else
+		struct stat a_stat;
+		if (stat(path, &a_stat) == 0) {
+			if (S_ISDIR(a_stat.st_mode)) 
+				return;
+		}
+#endif	
 		script = fxLoadScript(the, real, flags);
 		if (script)
 			fxResolveModule(the, module, moduleID, script, C_NULL, C_NULL);
