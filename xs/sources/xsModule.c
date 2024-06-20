@@ -958,11 +958,15 @@ void fxLoadModules(txMachine* the, txSlot* queue)
 						mxCall();
 						fxPushKeyString(the, moduleID, C_NULL);
 						mxRunCount(1);
-						if (!mxIsReference(the->stack))
-							mxTypeError("loadHook returned no object");
-						promise = the->stack->value.reference;
-						if (!mxIsPromise(promise))
-							mxTypeError("loadHook returned no promise");
+						promise = the->stack;
+						
+						mxPushUndefined();
+						mxPush(mxPromiseConstructor);
+						mxPushSlot(promise);
+						fx_Promise_resolveAux(the);
+						mxPop();
+						mxPop();
+						promise = the->stack;
 
 						function = fxNewHostFunction(the, fxLoadModulesFulfilled, 1, XS_NO_ID, mxLoadModulesFulfilledProfileID);
 						home = mxFunctionInstanceHome(function);
@@ -976,7 +980,7 @@ void fxLoadModules(txMachine* the, txSlot* queue)
 						home->value.home.module = module->value.reference;
 						rejectLoadFunction = the->stack;
 					
-						fxPromiseThen(the, promise, resolveLoadFunction, rejectLoadFunction, C_NULL, C_NULL);
+						fxPromiseThen(the, promise->value.reference, resolveLoadFunction, rejectLoadFunction, C_NULL, C_NULL);
 						
 						mxPop();
 						mxPop();
