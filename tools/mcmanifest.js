@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2023 Moddable Tech, Inc.
+ * Copyright (c) 2016-2024 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Tools.
  *
@@ -581,11 +581,10 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 
 		for (var result of tool.jsFiles) {
 			var source = result.source;
-			var sourceParts = tool.splitPath(source);
+			// var sourceParts = tool.splitPath(source);
 			var target = result.target;
 			var targetParts = tool.splitPath(target);
-			let escapedHash = tool.windows ? "^#" : "\\#";
-			this.line("$(MODULES_DIR)", tool.slash, target.replaceAll("#", escapedHash), ": ", source.replaceAll("#", escapedHash));
+			this.line("$(MODULES_DIR)", tool.slash, target.replaceAll("#", tool.escapedHash), ": ", source.replaceAll("#", tool.escapedHash));
 			this.echo(tool, "xsc ", target);
 			var options = "";
 			if (result.commonjs)
@@ -594,7 +593,7 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 				options += " -d";
 			if (tool.nativeCode)
 				options += " -c";
-			this.line("\txsc ", source, options, " -e -o $(@D) -r ", targetParts.name);
+			this.line("\txsc ", source, options, " -e -o $(@D) -r ", targetParts.name.replaceAll("#", "\\#"));
 		}
 		this.line("");
 		
@@ -623,7 +622,7 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 				var target = result.target;
 				var targetParts = tool.splitPath(target);
 				var temporary = source.slice(common, -3) + ".js"
-				this.line("$(MODULES_DIR)", tool.slash, target, ": $(MODULES_DIR)", temporary);
+				this.line("$(MODULES_DIR)", tool.slash, target.replaceAll("#", tool.escapedHash), ": $(MODULES_DIR)", temporary.replaceAll("#", tool.escapedHash));
 				this.echo(tool, "xsc ", target);
 				var options = "";
 				if (result.commonjs)
@@ -634,7 +633,7 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 					options += " -c";
 				this.line("\txsc $(MODULES_DIR)", temporary, options, " -e -o $(@D) -r ", targetParts.name);
 				if (tool.windows)
-					this.line("$(MODULES_DIR)", temporary, ": TSCONFIG");
+					this.line("$(MODULES_DIR)", temporary.replaceAll("#", tool.escapedHash), ": TSCONFIG");
 				temporaries.push("%" + temporary);
 			}
 			if (tool.windows)
@@ -1568,6 +1567,7 @@ export class Tool extends TOOL {
 		this.verbose = false;
 		this.windows = this.currentPlatform == "win";
 		this.slash = this.windows ? "\\" : "/";
+		this.escapedHash = this.windows ? "^#" : "\\#";
 
 		this.buildPath = this.moddablePath + this.slash + "build";
 		this.xsPath = this.moddablePath + this.slash + "xs";
