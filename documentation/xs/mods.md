@@ -367,7 +367,7 @@ JavaScriptモジュールはXSバイトコードに事前コンパイルされ�
 
 マニフェスト内の画像、フォント、およびオーディオリソースは、マニフェストの[リソースルール](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md#resources)に従って、対象デバイスと互換性のある形式に変換されます。
 
-modのソースコードはプラットフォームに依存しないものの、modのバイナリ形式はプラットフォームに依存します。画像のピクセル形式や回転は特定のホストに最適化されており、生成されるXSバイトコードは特定のXSエンジンのバージョン用です等。アーカイブはmodの一般的な配布形式ではありません。
+modのソースコードはプラットフォームに依存しないものの、modのバイナリ形式はプラットフォームに依存します。画像のピクセル形式や回転は特定のホストに最適化されており、生成されるXSバイトコードは特定のXSエンジンのバージョン用です。アーカイブはmodの一般的な配布形式ではありません。
 
 `mcrun` ツールは、modホストのシンボルテーブルを知らずにmodをビルドします。XSバイトコードは16ビットIDでシンボルを参照します。modがmodホストによって実行されると、XSは自動的にmodのバイトコード内のシンボルID値を更新して、ホストのIDと一致させます。このプロセスは非常に高速です。modのシンボルIDはホストが変更されたときのみ更新され、毎回の実行時に更新されるわけではありません。
 
@@ -402,21 +402,21 @@ Moddable SDKは、この問題を解決するために、modホストイメー�
 XSアーカイブファイル形式は、[ISO Base Media File Format](https://www.loc.gov/preservation/digital/formats/fdd/fdd000079.shtml)のBox（別名アトム）構造メカニズムを使用してデータを構造化します。XSアーカイブファイルのアトム構造は、次の表に示されています：
 
 ```
-XS_A - signature of the XS archive file
-    VERS - XS version number used in byte code
-    SIGN - the MD5 checksum of this mod's modules and data (before mapping)
-    NAME - the dotted name of the mod (null terminated string)
-    SYMB - the XS symbol table for the mods
-    IDEN - host identifiers in the order of the symbol table (array of XS ID values)
-    MAPS - symbol table indexes in the order of their occurrence in the CODE atoms
-    MODS - the modules of this mod
-        PATH - the path of this module (null terminated string)
-        CODE - the byte code of of this module
-        (Additional PATH / CODE pairs follow - one per module]
-    RSRC - the data of this mod
-        PATH - the path of this module (null terminated string)
-        DATA - the data of this resource
-        (Additional PATH / DATA pairs follow - one per piece of data]
+XS_A - XSアーカイブファイルの署名
+    VERS - バイトコードでのXSバージョン番号
+    SIGN - このmodのモジュールとデータのMD5チェックサ (マッピング前)
+    NAME - モジュールのドット表記の名前 (null終端文字列)
+    SYMB - modのためのXSシンボルテーブル
+    IDEN - シンボルテーブルの順序でのホスト識別子（XS ID値の配列）
+    MAPS - CODEアトムの出現順序でのシンボルテーブルインデックス
+    MODS - このmodのモジュール
+        PATH - このモジュールのパス (null終端文字列)
+        CODE - このモジュールのバイトコード
+        (追加の PATH / CODE のペアが続く - モジュールごとに１つ]
+    RSRC - このmodのデータ
+        PATH - このモジュールのパス (null終端文字列)
+        DATA - このリソースのデータ
+        (追加のPATH / DATA のペアが続く - データの部分ごとに１つ]
 ```
 
 `MODS` アトムの前にあるアトムの順序は、マイクロコントローラの実装がこのレイアウトを期待しているため、示された通りでなければなりません。
