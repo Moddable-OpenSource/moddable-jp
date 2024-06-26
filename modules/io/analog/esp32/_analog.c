@@ -339,9 +339,9 @@ void xs_analog_read_(xsMachine *the)
 #endif
 #endif
 	if (-1 == millivolts)
-		millivolts = raw;		// uncalibrated
+		millivolts = (raw * ((1 << ADC_RESOLUTION) - 1)) / 3300;
 
-	xsmcSetInteger(xsResult, (millivolts * ((1 << ADC_RESOLUTION) - 1)) / 3300);
+	xsmcSetInteger(xsResult, millivolts);
 }
 
 void xs_analog_get_resolution_(xsMachine *the)
