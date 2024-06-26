@@ -9,6 +9,15 @@ const phases = Object.freeze([
 ], true);
 
 export default function (done) {
+	
+	const brightness = config.brightness;
+	if (brightness !== 'none') {
+		globalThis.backlight = new Host.Backlight;
+		if (brightness !== undefined) {
+			backlight.write(parseInt(brightness));
+		}
+	}
+
 	if (config.led.rainbow) {
 		const neopixel = new Host.LED.Default;
 		const STEP = 3;
@@ -39,7 +48,7 @@ export default function (done) {
 			neopixel.setPixel(0, neopixel.makeRGB(rgb[0], rgb[1], rgb[2]));
 			neopixel.update();
 		}, 33);
-	}
+	}	
 	done?.();
 }
 

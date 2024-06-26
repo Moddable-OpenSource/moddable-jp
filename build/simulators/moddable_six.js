@@ -54,7 +54,9 @@ class MockupBehavior extends DeviceBehavior {
 			this.onDefaultButtonUp(container);
 	}
 	onJSON(container, json) {
-		if ("led" in json)
+		if ("backlight" in json)
+			container.last.transparency = ((100 - json.backlight) / 100) * 0.9;
+		else if ("led" in json)
 			container.distribute("onLEDChanged", json.led);
 		else if ("xsbug" in json) {
 			if (json.xsbug == "abort")

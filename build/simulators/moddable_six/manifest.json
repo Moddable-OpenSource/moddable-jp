@@ -3,6 +3,7 @@
 		"*": [
 			"../modules/control",
 			"../modules/button",
+			"./backlight",
 			"./led",
 			"./host"
 		],
@@ -10,6 +11,7 @@
 	},
 	"preload": [
 		"control",
+		"backlight",
 		"button",
 		"led",
 		"host",
