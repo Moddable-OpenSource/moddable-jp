@@ -1,7 +1,7 @@
 # Moddable Six Developer Guide
 
 Copyright 2024 Moddable Tech, Inc.<BR>
-Revised: June 6, 2024
+Revised: June 28, 2024
 
 This document provides information about Moddable Six, including details about its pins and built-in components, how to build and deploy apps, and links to additional development resources.
 
@@ -285,12 +285,16 @@ The screen on Moddable Six can operate at refresh rates between 30 and 100 frame
 screen.frameRate = 75;
 ```
 
-The optimal hardware refresh rate for the display depends on what the animation and how quickly the ESP32-S3 inside Moddable Six is able to render the frames.
+The optimal hardware refresh rate for the display depends on the animation design and how quickly the ESP32-S3 inside Moddable Six is able to render the frames.
 
 <a id="tearing-effect"></a>
 #### Tearing Effect
 
-The display controller in Moddable Six has a "tearing effect" output. This is used to eliminate visible tearing on screen by synchronizing the refresh of the screen with the hardware refresh. This provides a much more stable display and smoother animation. However, if the frames cannot be rendered quickly enough, they will still tear. In that case, either use the frame rate control to reduce the rendering frame rate or optimize the animations.
+The display controller in Moddable Six has a "tearing effect" output. This is used to eliminate visible tearing on screen by synchronizing the refresh of the screen with the hardware refresh. This provides a much more stable display and smoother animation. However, if the frames cannot be rendered quickly enough, they will still tear. In that case, either use the frame rate control to reduce the rendering frame rate or optimize the animations. In some cases it may be preferable to disable use of the tearing effect pin. This can be done in your project's script:
+
+```js
+screen.syncFrames = false;
+```
 
 The tearing effect output of the display controller is connected to GPIO 47 of the ESP32-S3. It is managed by the ILI9341_P8 display driver, and so should not be used by your code if you are using the display driver.
 
