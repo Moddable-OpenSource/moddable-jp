@@ -2397,7 +2397,7 @@ txBoolean fxCompileRegExp(void* the, txString pattern, txString modifier, txInte
 			parser->size += sizeof(txInteger);
 		#ifdef mxRun
 			#ifdef mxMetering
-				fxMeterSome(the, parser->size >> 6);
+				((txMachine*)the)->meterIndex += parser->size * XS_PARSE_REGEXP_METERING;
 			#endif
 			if (the)
 				*code = fxNewChunk(the, parser->size);
@@ -2668,7 +2668,7 @@ txBoolean fxMatchRegExp(void* the, txInteger* code, txInteger* data, txString su
 						}
 					}
 					former = step;
-					((txMachine*)the)->meterIndex++;
+					((txMachine*)the)->meterIndex += XS_REGEXP_METERING;
 				}
 				#endif
 				mxSwitch(which) {
