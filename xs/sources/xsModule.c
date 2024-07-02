@@ -2284,9 +2284,6 @@ void fxRunImportNow(txMachine* the, txSlot* realm, txID moduleID)
 						}
 						else {
 							txSlot* descriptor;
-							txSlot* internal = mxModuleInternal(module);
-							moduleID = internal->value.module.id;
-							realm = internal->value.module.realm;
 							done = 0;
 							mxModuleStatus(module) = XS_MODULE_STATUS_LOADING;
 							mxPushUndefined();
