@@ -1,8 +1,8 @@
 # Pins
 Copyright 2017-2023 Moddable Tech, Inc.<BR>
-Revised: April 10, 2023
+改訂： 2023年4月10日
 
-## Table of Contents
+## 目次
 
 * [Digital](#digital)
 * [Monitor](#monitor)
@@ -15,12 +15,12 @@ Revised: April 10, 2023
 * [SPI](#spi)
 
 <a id="digital"></a>
-## class Digital
+## Digital クラス
 
-- **Source code:** [digital](../../modules/pins/digital)
-- **Relevant Examples:** [blink](../../examples/pins/blink), [button](../../examples/pins/button)
+- **ソースコード:** [digital](../../modules/pins/digital)
+- **関連するサンプル:** [blink](../../examples/pins/blink), [button](../../examples/pins/button)
 
-The `Digital` class provides access to the GPIO pins.
+`Digital` クラスはGPIOピンへのアクセスを提供します。
 
 ```js
 import Digital from "pins/digital";
@@ -29,23 +29,23 @@ import Digital from "pins/digital";
 ### `constructor(dictionary)`
 ### `constructor([port], pin, mode)`
 
-The Digital constructor establishes a connection to the GPIO pin specified. There are two ways to configure the pin: by passing a dictionary or by passing separate arguments.
+Digitalコンストラクタは、指定されたGPIOピンへの接続を確立します。ピンを構成する方法は、辞書を渡す方法と、個別の引数を渡す方法の2つがあります。
 
-When using a dictionary, the `pin` and `mode` properties are required. The port property is optional, with a default value of `NULL`.
+辞書を使用する場合、`pin` と `mode` プロパティが必要です。portプロパティはオプションで、デフォルト値は `NULL` です。
 
-Pin numbers and port names are device dependent.
+ピン番号とポート名はデバイスに依存します。
 
 ```js
 let pin = new Digital({pin: 4, mode: Digital.Input});
 ```
 
-When providing separate arguments, the  `port` and `pin` arguments specify the pin. If the port is not provided, the default port (`NULL`) is used. The `mode` parameters is passed to the instance's `mode` function to configure the GPIO hardware.
+引数を個別に指定する場合、`port` と `pin` 引数はピンを指定します。portが指定されていない場合、デフォルト (`NULL`) が使用されます。`mode` パラメータはインスタンスの `mode` 関数に渡され、GPIOハードウェアを構成します。
 
 ```js
 let pin = new Digital(4, Digital.Input);
 ```
 
-To open a GPIO pin on a specific port, use the Digital constructor with the optional first argument.
+特定のポートでGPIOピンを開くには、オプションの最初の引数を使用してDigitalコンストラクタを使用します。
 
 ```js
 let blink = 1;
@@ -57,7 +57,7 @@ Timer.repeat(id => {
 }, 500);
 ```
 
-The following mode values are available.
+次のモード値が利用可能です。
 
 ```js
 Digital.Input
@@ -72,9 +72,9 @@ Digital.OutputOpenDrain
 
 ### `static read(pin)`
 
-The `read` function sets the pin to `Digital.Input` mode and samples the value of the specified pin, returning 0 or 1. The default port is used.
+`read` 関数はピンを `Digital.Input` モードに設定し、指定されたピンの値をサンプリングして0または1を返します。デフォルトポートが使用されます。
 
-The following example configures pin 0 as an input and then tests to see if a button connected to the input is pressed. On an ESP8266 NodeMCU board pin 0 is the built-in user button.
+次の例では、ピン0を入力として構成し、入力に接続されたボタンが押されているかどうかをテストします。ESP8266 NodeMCUボードでは、ピン0は内蔵のユーザーボタンです。
 
 ```js
 if (Digital.read(0))
@@ -85,9 +85,9 @@ if (Digital.read(0))
 
 ### `static write(pin)`
 
-The `write` function sets the pin to `Digital.Output` mode and its value to either 0 or 1. The default port is used.
+`write` 関数はピンを `Digital.Output` モードに設定し、その値を0または1に設定します。デフォルトポートが使用されます。
 
-The following example configures pin 5 as an output and then blinks it one per second. On the ESP8266 NodeMCU board, pin 5 is the built-in LED.
+次の例では、ピン5を出力として設定し、1秒ごとに点滅させます。ESP8266 NodeMCUボードでは、ピン5は内蔵LEDです。
 
 ```js
 let blink = 1;
@@ -102,9 +102,9 @@ Timer.repeat(id => {
 
 ### `read()`
 
-Samples the state of the pin and returns it as 0 or 1.
+ピンの状態をサンプリングし、0または1として返します。
 
-The static `Digital.read` and `Digital.write` do not allow configuring all pin modes. Use the Digital constructor for full configuration, for example setting the input to use an internal pull-up resistor.
+静的な `Digital.read` と `Digital.write` はすべてのピンモードを設定することはできません。完全な設定を行うには、Digitalコンストラクタを使用します。例えば、内部プルアップ抵抗を使用するように入力を設定します。
 
 ```js
 let button = new Digital(0, Digital.InputPullUp);
@@ -114,8 +114,7 @@ trace(`button state is ${button.read()}`;
 ***
 
 ### `write(value)`
-
-Sets the current value of the pin to 0 or 1.
+ピンの現在の値を0または1に設定します。
 
 ```js
 let led = new Digital(0, Digital.Output);
@@ -126,7 +125,7 @@ led.write(1);
 
 ### `mode(mode)`
 
-The mode function sets the mode of the pin. Not all pins support all modes, so refer to the hardware documentation for details.
+mode関数はピンのモードを設定します。すべてのピンがすべてのモードをサポートしているわけではないので、ハードウェアのドキュメントを参照してください。
 
 ```js
 pin.mode(Digital.Input);
@@ -136,9 +135,9 @@ pin.mode(Digital.Input);
 
 ### `wakeEdge and onWake() callback`
 
-On platforms that support device wake-up from deep sleep on digital input triggers, an `onWake` callback can be provided in the `Digital` constructor. The `onWake` callback is called the first time the pin is instantiated after waking with that pin being the reset reason. The wake-up edge event trigger is configured by the `wakeEdge` property.
+デジタル入力トリガーでデバイスをディープスリープからウェイクアップすることをサポートするプラットフォームでは、`Digital` コンストラクタに `onWake` コールバックを提供できます。`onWake` コールバックは、そのピンがリセットとなる理由でウェイクアップした後、最初にピンがインスタンス化されたときに呼び出されます。ウェイクアップエッジイベントトリガーは `wakeEdge` プロパティで設定されます。
 
-The following example configures input pin 7 to trigger wake-up on a falling edge using an internal pull-up resistor:
+次の例では、内部プルアップ抵抗を使用して、入力ピン7が立ち下がりエッジでウェイクアップをトリガーするように設定します。
 
 ```js
 let digital = new Digital({
@@ -151,38 +150,38 @@ let digital = new Digital({
 });
 ```
 
-The following edge events are available for configuring the wake-up trigger.
+次のエッジイベントがウェイクアップトリガーの設定に利用できます。
 
 ```js
 Digital.WakeOnRise = (1 << 6);
 Digital.WakeOnFall = (1 << 7);
 ```
 
-**Note**: Only nRF52 devices currently support deep sleep wake-up from digital input triggers.
+**注**: 現在、nRF52デバイスのみがデジタル入力トリガーからのディープスリープウェイクアップをサポートしています。
 
 ### `close()`
 
-The `close` function releases the resources associated with the `Digital` instance.
+`close` 関数は、`Digital` インスタンスに関連付けられたリソースを解放します。
 
 ***
 
 <a id="monitor"></a>
-## class Monitor
+## Monitor クラス
 
-- **Source code:** [monitor](../../modules/pins/digital/monitor)
-- **Relevant Examples:** [monitor](../../examples/pins/monitor)
+- **ソースコード:** [monitor](../../modules/pins/digital/monitor)
+- **関連する例:** [monitor](../../examples/pins/monitor)
 
-The `Monitor` class tracks changes in the state of Digital input pins. An instance is configured to trigger on rising and/or falling edge events. When a trigger event occurs, a callback function is invoked. In addition, the instance maintains a counter of the total number of events triggered.
+`Monitor` クラスは、デジタル入力ピンの状態変化を追跡します。インスタンスは、立ち上がりエッジおよび/または立ち下がりエッジイベントでトリガーするように設定されます。トリガーイベントが発生すると、コールバック関数が呼び出されます。さらに、インスタンスはトリガーされたイベントの総数をカウントします。
 
 ```js
 import Monitor from "pins/digital/monitor";
 ```
 
-**Note**: For efficiency reasons, implementations may only support a single monitor for each pin. Scripts should only instantiate a single monitor for a given pin.
+**注意**: 効率の理由から、実装は各ピンに対して単一のモニターのみをサポートする場合があります。スクリプトは特定のピンに対して単一のモニターのみをインスタンス化する必要があります。
 
 ### `constructor(dictionary)`
 
-The constructor takes a single dictionary argument containing properties to configure the instance. The `Monitor` dictionary is an extension of the `Digital` constructor accepting `pin`, `port`, and `mode` arguments. Only input modes are allowed for a `Monitor` instance  and the mode cannot be changed after instantiation.
+コンストラクターは、インスタンスを構成するプロパティを含む単一の辞書を取ります。`Monitor`辞書は`Digital`コンストラクターの拡張であり、`pin`、`port`、および`mode`引数を受け入れます。`Monitor`インスタンスには入力モードのみが許可され、インスタンス化後にモードを変更することはできません。
 
 ```js
 let monitor = new Monitor({pin: 0, port: "B", mode: Digital.Input, edge: Monitor.Rising});
@@ -190,9 +189,9 @@ let monitor = new Monitor({pin: 0, port: "B", mode: Digital.Input, edge: Monitor
 
 ***
 
-### `onChanged()` callback
+### `onChanged()` コールバック
 
-A script must install an `onChanged` callback on the instance to be invoked with the specified edge events occur.
+スクリプトは、指定されたエッジイベントが発生したときに呼び出される`onChanged`コールバックをインスタンスに設定する必要があります。
 
 ```js
 monitor.onChanged = function() {
@@ -200,13 +199,13 @@ monitor.onChanged = function() {
 }
 ```
 
-The `onChanged` function is called as soon as possible following the event trigger. This may occur some time after the event occurs, as it may take some time to dispatch to a point where the script can be invoked safely. Because of this delay, it is possible the value of the pin may have again changed. For this reason, scripts should not assume the value of the pin when the callback is invoked but instead call the instances `read` function to retrieve the current value.
+`onChanged`関数は、イベントトリガーの直後にできるだけ早く呼び出されます。これは、イベントが発生した後、スクリプトを安全に呼び出せるポイントにディスパッチするのに時間がかかる場合があるため、イベントが発生してからしばらく後に発生する可能性があります。この遅延のため、ピンの値が再び変わっている可能性があります。このため、スクリプトはコールバックが呼び出されたときのピンの値を仮定せず、代わりにインスタンスの`read`関数を呼び出して現在の値を取得する必要があります。
 
 ***
 
 ### `read()`
 
-The `read` function returns the current value of the pin.
+`read` 関数はピンの現在の値を返します。
 
 ```js
 let value = this.read();
@@ -214,18 +213,18 @@ let value = this.read();
 
 ***
 
-### `wakeEdge and onWake() callback`
+### `wakeEdge と onWake() コールバック`
 
-On platforms that support device wake-up from deep sleep on digital input triggers, an `onWake` callback can be provided in the `Monitor` constructor. The `onWake` callback is called the first time the pin is instantiated after waking with that pin being the reset reason. The wake-up edge event trigger is configured by the `wakeEdge` property.
+デジタル入力トリガーでデバイスがディープスリープからウェイクアップすることをサポートするプラットフォームでは、`Monitor` コンストラクタに `onWake` コールバックを提供できます。`onWake` コールバックは、そのピンがリセット理由としてウェイクアップした後、最初にピンがインスタンス化されたときに呼び出されます。ウェイクアップエッジイベントトリガーは `wakeEdge` プロパティによって設定されます。
 
-The following edge events are available for configuring the wake-up trigger.
+以下のエッジイベントがウェイクアップトリガーの設定に利用可能です。
 
 ```js
 Digital.WakeOnRise = (1 << 6);
 Digital.WakeOnFall = (1 << 7);
 ```
 
-The following example configures input pin 7 to trigger wake-up on a falling edge using an internal pull-up resistor:
+次の例では、内部プルアップ抵抗を使用して、入力ピン7が立ち下がりエッジでウェイクアップをトリガーするように設定しています：
 
 ```js
 let monitor = new Monitor({
@@ -238,23 +237,23 @@ let monitor = new Monitor({
 });
 ```
 
-**Note**: Only nRF52 devices currently support deep sleep wake-up from digital input triggers.
+**Note**: 現在、nRF52デバイスのみがデジタル入力トリガーからのディープスリープウェイクアップをサポートしています。
 
 ### `close()`
 
-The `close` function releases the resources associated with the `Monitor` instance.
+`close` 関数は `Monitor` インスタンスに関連付けられたリソースを解放します。
 
 ```js
 monitor.close();
 ```
 
-The monitor is not eligible to be garbage collected until its `close` function is called.
+モニターは、その `close` 関数が呼び出されるまでガベージコレクションの対象にはなりません。
 
 ***
 
-### `rises` and `falls` properties
+### `rises` と `falls` プロパティ
 
-The `rises` and `falls` properties return the total number of the corresponding trigger events since the instance was created. Events may trigger more quickly than the `onChanged` callback can be invoked, which makes maintaining an accurate count of trigger events using the `onChanged` callback impossible.
+`rises` と `falls` プロパティは、インスタンスが作成されてから対応するトリガーイベントの総数を返します。イベントは `onChanged` コールバックが呼び出されるよりも速くトリガーされることがあるため、`onChanged` コールバックを使用してトリガーイベントの正確な数を維持することは不可能です。
 
 ```js
 let triggers = this.rises + this.falls;
@@ -262,8 +261,8 @@ let triggers = this.rises + this.falls;
 
 ***
 
-### Example: Receiving notifications
-The following example shows how to receive callbacks on rising and falling edge events.
+### 例: 通知を受け取る
+次の例は、立ち上がりエッジと立ち下がりエッジイベントでコールバックを受け取る方法を示しています。
 
 ```js
 let monitor = new Monitor({pin: 4, mode: Digital.InputPullUp, edge: Monitor.Rising | Monitor.Falling});
@@ -275,12 +274,12 @@ monitor.onChanged = function() {
 ***
 
 <a id="analog"></a>
-## class Analog
+## Analog クラス
 
-- **Source code:** [analog](../../modules/pins/analog)
-- **Relevant Examples:** [simple-analog](../../examples/pins/simpleAnalog/), [analog](../../examples/pins/analog/)
+- **ソースコード:** [analog](../../modules/pins/analog)
+- **関連する例:** [simple-analog](../../examples/pins/simpleAnalog/), [analog](../../examples/pins/analog/)
 
-The `Analog` class provides access to the analog input pins.
+`Analog` クラスはアナログ入力ピンへのアクセスを提供します。
 
 ```js
 import Analog from "pins/analog";
@@ -288,41 +287,41 @@ import Analog from "pins/analog";
 
 ### `constructor(dictionary)`
 
-The `Analog` dictionary requires a `pin` property. On platforms supporting wake-up from deep sleep on analog input triggers, the `onWake`, `wakeCrossing`, and `wakeValue` properties are additionally required to configure the analog input as a wake-up trigger. Refer to the `onWake() callback` section below for further details.
+`Analog` の辞書には `pin` プロパティが必要です。アナログ入力トリガーでディープスリープからのウェイクアップをサポートするプラットフォームでは、アナログ入力をウェイクアップトリガーとして設定するために、`onWake`、`wakeCrossing`、および `wakeValue` プロパティも必要です。詳細については、以下の `onWake() コールバック` セクションを参照してください。
 
-The following shows how to configure an analog input instance and read the analog value:
+以下は、アナログ入力インスタンスを設定し、アナログ値を読み取る方法を示しています：
 
 ```js
 let analog = new Analog({ pin: 5 });
 trace(`Analog value is ${analog.read()}\n`);
 ```
 
-**Note**: The nRF52 platform currently only supports the constructor and instance read function. On all other platforms, the Analog class provides only static functions.
+**注意**: 現在、nRF52プラットフォームはコンストラクタとインスタンスの読み取り機能のみをサポートしています。他のすべてのプラットフォームでは、Analogクラスは静的関数のみを提供します。
 
 ### `static read(pin)`
 
-The `read` function samples the value of the specified pin, returning a value from 0 to 1023.
+`read` 関数は指定されたピンの値をサンプリングし、0から1023の値を返します。
 
-Pin numbers are device dependent:
- - The ESP8266 NodeMCU board has a single analog input pin, analog pin number 0.
- - On the ESP32, use the analog channel number, not the associated GPIO number. You can find GPIO number to analog channel mappings for ESP32 and ESP32-S2 in the [ESP-IDF ADC documentation](https://docs.espressif.com/projects/esp-idf/en/v4.2-beta1/esp32/api-reference/peripherals/adc.html#_CPPv414adc1_channel_t). Only ADC1 is supported on the ESP32.
+ピン番号はデバイスに依存します：
+ - ESP8266 NodeMCUボードには単一のアナログ入力ピンがあり、アナログピン番号は0です。
+ - ESP32では、関連するGPIO番号ではなくアナログチャネル番号を使用します。ESP32およびESP32-S2のGPIO番号とアナログチャネルのマッピングは [ESP-IDF ADC ドキュメント](https://docs.espressif.com/projects/esp-idf/en/v4.2-beta1/esp32/api-reference/peripherals/adc.html#_CPPv414adc1_channel_t) で確認できます。ESP32ではADC1のみがサポートされています。
 
-The following example samples an analog temperature sensor, converting the result to celsius degrees.
+次の例では、アナログ温度センサーをサンプリングし、その結果を摂氏度に変換します。
 
 	let temperature = (Analog.read(0) / 1023) * 330 - 50;
 	trace(`Temperature is ${temperature} degrees celsius\n`);
 
-The example works with a widely-available low-cost [temperature sensor](https://learn.adafruit.com/tmp36-temperature-sensor/overview).
+この例は、広く利用可能な低コストの[温度センサー](https://learn.adafruit.com/tmp36-temperature-sensor/overview)で動作します。
 
-> Caution: The output voltage range of the TMP36 temperature sensor is 0.1V to 2.0V and the input voltage range of the analog to digital converter on the ESP8266 is 0V to 1.0V. To avoid damaging the ESP8266 a voltage divider should be used to reduce the magnitude of the TMP36 output voltage. The ESP8266 NodeMCU board has a voltage divider for this purpose. Other boards may not have a voltage divider.
+> 注意: TMP36温度センサーの出力電圧範囲は0.1Vから2.0Vであり、ESP8266のアナログからデジタルコンバーターの入力電圧範囲は0Vから1.0Vです。ESP8266を損傷しないようにするためには、TMP36の出力電圧の大きさを減少させるために電圧分圧器を使用する必要があります。ESP8266 NodeMCUボードにはこの目的のための電圧分圧器が備わっています。他のボードには電圧分圧器がない場合があります。
 
 ***
 
-### `onWake() callback`
+### `onWake() コールバック`
 
-On platforms that support device wake-up from deep sleep on analog input triggers, an `onWake` callback can be provided in the `Analog` constructor. The `onWake` callback is called the first time the pin is instantiated after waking with that pin being the reset reason. The wake-up trigger is configured by the `wakeValue` and `wakeCrossing` properties.
+デバイスがアナログ入力トリガーでディープスリープからウェイクアップすることをサポートするプラットフォームでは、`Analog`コンストラクターに`onWake`コールバックを提供できます。`onWake`コールバックは、そのピンがリセット理由としてウェイクアップした後に初めてインスタンス化されたときに呼び出されます。ウェイクアップトリガーは`wakeValue`および`wakeCrossing`プロパティによって構成されます。
 
-The following example configures input pin 5 to trigger wake-up when the analog input crosses above or below a value of 512:
+次の例では、アナログ入力が512を超えるか下回るときにウェイクアップをトリガーするように、入力ピン5を設定します：
 
 ```js
 let analog = new Analog({
@@ -337,7 +336,7 @@ let analog = new Analog({
 });
 ```
 
-The following crossing mode values are available for configuring the wake-up trigger.
+ウェイクアップトリガーを設定するために利用可能なクロッシングモード値は次の通りです。
 
 ```js
 Analog.CrossingUp = 0;
@@ -345,15 +344,15 @@ Analog.CrossingDown = 1;
 Analog.CrossingUpDown = 2;
 ```
 
-**Note:**: Only nRF52 devices currently support deep sleep wake-up from analog input triggers.
+**注意:** 現在、nRF52デバイスのみがアナログ入力トリガーからのディープスリープウェイクアップをサポートしています。
 
 <a id="pwm"></a>
-## class PWM
+## PWM クラス
 
-- **Source code:** [pwm](../../modules/pins/pwm)
-- **Relevant Examples:** [tricolor-led](../../examples/pins/tricolor-led/)
+- **ソースコード:** [pwm](../../modules/pins/pwm)
+- **関連する例:** [tricolor-led](../../examples/pins/tricolor-led/)
 
-The `PWM` class provides access to the PWM output pins.
+`PWM`クラスはPWM出力ピンへのアクセスを提供します。
 
 ```js
 import PWM from "pins/pwm";
@@ -361,9 +360,9 @@ import PWM from "pins/pwm";
 
 ### `constructor(dictionary)`
 
-The PWM constructor takes a dictionary which contains the pin number to use. Pin numbers are device dependent.
+PWMコンストラクタは、使用するピン番号を含む辞書を受け取ります。ピン番号はデバイスに依存します。
 
-The dictionary may optionally contain a `port` property. If the port is not provided, the default port (`NULL`) is used.
+辞書にはオプションで`port`プロパティを含めることができます。ポートが提供されない場合、デフォルトのポート（`NULL`）が使用されます。
 
 ```js
 let pwm = new PWM({ pin: 12 });
@@ -373,7 +372,7 @@ let pwm = new PWM({ pin: 12 });
 
 ### `write(value)`
 
-Sets the current value of the pin. Value should be between 0 and 1023.
+ピンの現在の値を設定します。値は0から1023の間である必要があります。
 
 ```js
 pwm.write(512);
@@ -383,7 +382,7 @@ pwm.write(512);
 
 ### `close()`
 
-The `close` function releases the resources associated with the `PWM` instance.
+`close`関数は、`PWM`インスタンスに関連付けられたリソースを解放します。
 
 ```js
 pwm.close();
@@ -392,12 +391,12 @@ pwm.close();
 ***
 
 <a id="i2c"></a>
-## class I2C
+## I2C クラス
 
-- **Source code:** [i2c](../../modules/pins/i2c)
-- **Relevant Examples:** [bmp180](../../examples/drivers/bmp180/), [lis3dh](../../examples/drivers/lis3dh)
+- **ソースコード:** [i2c](../../modules/pins/i2c)
+- **関連する例:** [bmp180](../../examples/drivers/bmp180/), [lis3dh](../../examples/drivers/lis3dh)
 
-The `I2C` class provides access to the I2C bus connected to a pair of pins
+`I2C`クラスは、ピンのペアに接続されたI2Cバスへのアクセスを提供します。
 
 ```js
 import I2C from "pins/i2c";
@@ -405,25 +404,25 @@ import I2C from "pins/i2c";
 
 ### `constructor(dictionary)`
 
-The I2C constructor takes a dictionary which contains the pin numbers to use for clock and data (`scl` and `sda`, respectively), as well as the I2C address of the target device. Pin numbers are device dependent.
+I2Cコンストラクタは、クロックとデータ（それぞれ`scl`と`sda`）に使用するピン番号、およびターゲットデバイスのI2Cアドレスを含む辞書を受け取ります。ピン番号はデバイスに依存します。
 
 ```js
 let sensor = new I2C({sda: 5, scl: 4, address: 0x48});
 ```
 
-The constructor dictionary has an optional `hz` property to specify the speed of the I2C bus when using this instance.
+コンストラクタの辞書には、このインスタンスを使用する際のI2Cバスの速度を指定するためのオプションの`hz`プロパティがあります。
 
 ```js
 let sensor = new I2C({sda: 5, scl: 4, address: 0x48, hz: 1000000});
 ```
 
-The constructor dictionary also has an optional `timeout` property to specify the I2C clock stretching timeout in microseonds (μs). Support for this property is device dependent.
+コンストラクタ辞書には、I2Cクロックストレッチングのタイムアウトをマイクロ秒（μs）で指定するためのオプションの `timeout` プロパティもあります。このプロパティのサポートはデバイスに依存します。
 
 ```js
 let sensor = new I2C({sda: 5, scl: 4, address: 0x48, timeout: 600});
 ```
 
-Many devices have a default I2C bus. On these devices, the `sda` and `scl` parameters may be omitted from the dictionary to use the default I2C bus.
+多くのデバイスにはデフォルトのI2Cバスがあります。これらのデバイスでは、デフォルトのI2Cバスを使用するために辞書から `sda` および `scl` パラメータを省略することができます。
 
 ```js
 let sensor = new I2C({address: 0x48});
@@ -433,13 +432,13 @@ let sensor = new I2C({address: 0x48});
 
 ### `read(count [, buffer])`
 
-The `read` function reads `count` bytes from the target device, returning them in a `Uint8Array`. The maximum value of `count` is 34.
+`read` 関数はターゲットデバイスから `count` バイトを読み取り、それらを `Uint8Array` で返します。`count` の最大値は34です。
 
 ```js
 let bytes = sensor.read(4);
 ```
 
-An optional buffer parameter is used to provide an `ArrayBuffer` to be used to store the result. Using the same buffer for multiple reads can be more efficient by eliminating memory allocations and running the garbage collector less frequently.
+オプションのバッファパラメータは、結果を格納するために使用される `ArrayBuffer` を提供するために使用されます。複数の読み取りに同じバッファを使用することは、メモリ割り当てを排除し、ガベージコレクタの実行頻度を減らすことで、より効率的になる可能性があります。
 
 ```js
 let bytes = new UInt8Array(4);
@@ -452,9 +451,9 @@ sensor.read(3, bytes.buffer);
 
 ### `write(...value [, stop])`
 
-The `write` function writes up to 40 bytes to the target device. The write function accepts multiple arguments, concatenating them together to send to the device. The values may be numbers, which are transmitted as bytes, Arrays, TypedArrays, and strings (which are transmitted as UTF-8 encoded text bytes).
+`write` 関数はターゲットデバイスに最大40バイトを書き込みます。`write` 関数は複数の引数を受け取り、それらを連結してデバイスに送信します。値は数値（バイトとして送信される）、配列、TypedArrays、および文字列（UTF-8エンコードされたテキストバイトとして送信される）である可能性があります。
 
-The `write` function accepts an optional final boolean argument, `stop`, which indicates if a stop condition should be sent when the write is complete. If the final argument is not a boolean value, a stop condition is sent.
+`write` 関数は、書き込みが完了したときにストップ条件を送信するかどうかを示すオプションの最後のブール引数 `stop` を受け取ります。最後の引数がブール値でない場合、ストップ条件が送信されます。
 
 ```js
 let sensor = new I2C({address: 0x48});
@@ -462,9 +461,9 @@ sensor.write(0);
 ```
 ***
 
-### Example: Reading an I2C temperature sensor
+### 例: I2C温度センサーの読み取り
 
-The following example instantiates an I2C connection to a [temperature sensor](https://www.sparkfun.com/products/11931) with address 0x48 connected to pins 4 and 5.
+次の例では、アドレス0x48の[温度センサー](https://www.sparkfun.com/products/11931)にピン4と5を接続してI2C接続をインスタンス化します。
 
 ```js
 let sensor = new I2C({sda: 5, scl: 4, address: 0x48});
@@ -486,12 +485,12 @@ trace(`Celsius temperature: ${value}\n`);
 ***
 
 <a id="smbus"></a>
-## class SMBus
+## SMBus クラス
 
-- **Source code:** [smbus](../../modules/pins/smbus)
-- **Relevant Examples:** [HMC5883L](../../examples/drivers/HMC5883L)
+- **ソースコード:** [smbus](../../modules/pins/smbus)
+- **関連する例:** [HMC5883L](../../examples/drivers/HMC5883L)
 
-The `SMBus` class implements support for the [System Management Bus](https://en.wikipedia.org/wiki/System_Management_Bus) protocol, which is commonly used with I2C devices. The `SMBus` class extends the `I2C` class with additional functions.
+`SMBus` クラスは、I2Cデバイスで一般的に使用される[システム管理バス](https://en.wikipedia.org/wiki/System_Management_Bus)プロトコルのサポートを実装します。`SMBus` クラスは追加の関数を持つ `I2C` クラスを拡張します。
 
 ```js
 import SMBus from "pins/smbus";
@@ -499,50 +498,49 @@ import SMBus from "pins/smbus";
 
 ### `constructor(dictionary)`
 
-The `SMBus` constructor is identical to the `I2C` constructor.
+`SMBus` コンストラクタは `I2C` コンストラクタと同じです。
 
 ***
 
 ### `readByte(register)`
 
-Reads a single byte of data from the specified register.
+指定されたレジスタから1バイトのデータを読み取ります。
 
 ***
 
 ### `readWord(register)`
 
-Reads a 16-bit data value starting from the specified register. The data is assumed to be transmitted in little-endian byte order.
+指定されたレジスタから始まる16ビットのデータ値を読み取ります。データはリトルエンディアンのバイト順で送信されると仮定されます。
 
 ***
 
 ### `readBlock(register, count [, buffer])`
-
-Reads count bytes of data starting from the specified register. Up to 34 bytes of data may be read. The data is returned in a `Uint8Array`. `readBlock` accepts an optional `buffer` argument that behaves the same as the optional `buffer` argument to the `I2C` class `read` function.
+指定されたレジスタから始まるcountバイトのデータを読み取ります。最大34バイトのデータを読み取ることができます。データは `Uint8Array` で返されます。`readBlock` は、`I2C` クラスの `read` 関数のオプションの `buffer` 引数と同じように動作するオプションの `buffer` 引数を受け取ります。
 
 ***
 
 ### `writeByte(register, value)`
 
-Writes a single byte of data to the specified register.
+指定されたレジスタに1バイトのデータを書き込みます。
 
 ***
 
 ### `writeWord(register, value)`
 
-Writes a 16-bit data value starting at the specified register. The value is transmitted in little-endian byte order.
+指定されたレジスタから始まる16ビットのデータ値を書き込みます。値はリトルエンディアンのバイト順で送信されます。
 
 ***
 
 ### `writeBlock(register, ...value)`
 
-Writes the provided data values starting at the specified register. The value arguments are handled in the same way as the arguments to the `write` function of the `I2C` class.
+指定されたレジスタから始まる提供されたデータ値を書き込みます。値の引数は `I2C` クラスの `write` 関数の引数と同じように処理されます。
 
 ***
 
 
-### Example: Initializing a triple axis magnetometer
+### 例: 三軸磁力計の初期化
 
-The following example establishes an SMBus connection to a [triple axis magnetometer](https://www.sparkfun.com/products/10530). Once connected, it checks the device ID to confirm that it is the expected device model. It them puts the device into continuous measure mode.
+次の例では、[三軸磁力計](https://www.sparkfun.com/products/10530)へのSMBus接続を確立します。接続が確立されると、デバイスIDを確認して、期待されるデバイスモデルであることを確認します。その後、デバイスを連続測定モードに設定します。
 
 ```js
 let sensor = new SMBus({address: 0x1E});
@@ -559,12 +557,12 @@ sensor.writeByte(2, 0);	// continuous measurement mode
 
 
 <a id="servo"></a>
-## class Servo
+## クラス Servo
 
-- **Source code:** [servo](../../modules/pins/servo)
-- **Relevant Examples:** [servo](../../examples/pins/servo), [servo-sweep](../../examples/pins/servo-sweep)
+- **ソースコード:** [servo](../../modules/pins/servo)
+- **関連する例:** [servo](../../examples/pins/servo), [servo-sweep](../../examples/pins/servo-sweep)
 
-The `Servo` class uses digital pins to control servo motors. The API is designed around the Arduino Servo class.
+`Servo`クラスはデジタルピンを使用してサーボモーターを制御します。APIはArduinoのServoクラスを基に設計されています。
 
 ```js
 import Servo from "pins/servo";
@@ -572,7 +570,7 @@ import Servo from "pins/servo";
 
 ### `constructor(dictionary)`
 
-The Servo constructor takes a dictionary. The `pin` property is required, and specifies the digital pin to use. The `min` and `max` properties are optional, and specify the range of the pulse duration in microseconds.
+Servoコンストラクタは辞書を受け取ります。`pin`プロパティは必須で、使用するデジタルピンを指定します。`min`および`max`プロパティはオプションで、マイクロ秒単位のパルス持続時間の範囲を指定します。
 
 ```js
 let servo = new Servo({pin: 5, min: 500, max: 2400});
@@ -582,9 +580,9 @@ let servo = new Servo({pin: 5, min: 500, max: 2400});
 
 ### `write(degrees)`
 
-The `write` call changes the servo position to the number of degrees specified. Fractional degrees are supported.
+`write` 呼び出しは、指定された度数にサーボの位置を変更します。小数点以下の度数もサポートされています。
 
-The following example instantiates a Servo on pin 4 and rotates it to to 45 degrees.
+次の例では、ピン4にサーボをインスタンス化し、45度に回転させます。
 
 ```js
 let servo = new Servo({pin: 4});
@@ -595,9 +593,9 @@ servo.write(45);
 
 ### `writeMicroseconds(us)`
 
-The `writeMicroseconds` call sets the duration of the pulse width in microseconds. The value provided is pinned by the `min` and `max` values.
+`writeMicroseconds` 呼び出しは、パルス幅の持続時間をマイクロ秒単位で設定します。提供された値は `min` と `max` の値によって固定されます。
 
-The Servo implementation pulses a digital signal for a number of microseconds that is proportional to the angle of rotation. Scripts may provide the number of microseconds for the signal pulse instead of degrees, for greater precision.
+サーボの実装は、回転角度に比例したマイクロ秒数のデジタル信号をパルスします。スクリプトは、より高い精度のために度数の代わりに信号パルスのマイクロ秒数を提供することができます。
 
 ```js
 servo.writeMicroseconds(1000);
@@ -606,12 +604,12 @@ servo.writeMicroseconds(1000);
 ***
 
 <a id="rmt"></a>
-## class RMT
+## RMT クラス
 
-- **Source code:** [rmt](../../modules/pins/rmt)
-- **Relevant Examples:** [write](../../examples/pins/rmt/write), [read](../../examples/pins/rmt/read)
+- **ソースコード:** [rmt](../../modules/pins/rmt)
+- **関連する例:** [write](../../examples/pins/rmt/write), [read](../../examples/pins/rmt/read)
 
-The `RMT` class provides access to a RMT (remote control) module. `RMT` is supported on ESP32 and ESP32-S2 microcontrollers.
+`RMT` クラスは、RMT（リモートコントロール）モジュールへのアクセスを提供します。`RMT` はESP32およびESP32-S2マイクロコントローラーでサポートされています。
 
 ```js
 import RMT from "pins/rmt";
@@ -619,29 +617,29 @@ import RMT from "pins/rmt";
 
 ### `constructor(dictionary)`
 
-The RMT constructor initializes the RMT module and associates it with the specified pin.
+RMTコンストラクタはRMTモジュールを初期化し、指定されたピンに関連付けます。
 
-The RMT constructor takes a dictionary. The `pin` property is required, and specifies the pin to associate with the RMT module.
+RMTコンストラクタは辞書を受け取ります。`pin`プロパティは必須で、RMTモジュールに関連付けるピンを指定します。
 
 ```js
 let rmt = new RMT({pin: 17});
 ```
 
-The constructor dictionary also has several optional properties:
+コンストラクタの辞書にはいくつかのオプションプロパティもあります：
 
-- The `channel` property specifies the RMT channel to use with this instance, with a default value of `0`.
-- The `divider` property specifies the clock divider used to generate RMT ticks, with a range of `1` to `255` and a default value of `255`.
-- The `direction` property specifies whether to use this RMT as an input or an output. Use `"rx"` for input and `"tx"` for output. The default is output.
+- `channel`プロパティは、このインスタンスで使用するRMTチャンネルを指定し、デフォルト値は`0`です。
+- `divider`プロパティはRMTティックを生成するために使用されるクロック分周器を指定し、範囲は`1`から`255`で、デフォルト値は`255`です。
+- `direction`プロパティは、このRMTを入力として使用するか出力として使用するかを指定します。入力には`"rx"`を、出力には`"tx"`を使用します。デフォルトは出力です。
 
 ```js
 let rmt = new RMT({pin: 17, channel: 1, divider: 100});
 ```
 
-When using the RMT for input, there are additional optional properties in the dictionary:
+RMTを入力として使用する場合、辞書には追加のオプションプロパティがあります：
 
-- The `filter` property configures the RMT module to filter out received pulses shorter than a number of ticks, with a range of `0` to `255` and a default value of `0`.
-- The `timeout` property specifies the length of a pulse (in ticks) that will trigger the RMT module to enter its idle mode, with a range of `0` to `65_535` and a default value of `5000`.
-- The `ringbufferSize` property configures the size of the RMT module's input buffer in bytes, with a default value of `1024`.
+- `filter`プロパティは、指定されたティック数より短い受信パルスをフィルタリングするようにRMTモジュールを設定し、範囲は`0`から`255`で、デフォルト値は`0`です。
+- `timeout`プロパティは、RMTモジュールがアイドルモードに入るトリガーとなるパルスの長さ（ティック単位）を指定し、範囲は`0`から`65_535`で、デフォルト値は`5000`です。
+- `ringbufferSize`プロパティは、RMTモジュールの入力バッファのサイズ（バイト単位）を設定し、デフォルト値は`1024`です。
 
 ```js
 let inputRMT = new RMT({pin: 17, channel: 3, divider: 100, direction: "rx", filter: 100, timeout: 7000, ringbufferSize: 512});
@@ -651,21 +649,21 @@ let inputRMT = new RMT({pin: 17, channel: 3, divider: 100, direction: "rx", filt
 
 ### `write(firstValue, durations)`
 
-The `write` function transmits alternating pulses of 1s and 0s (i.e. high and low voltages) on the configured pin via the RMT module. The `firstValue` parameter specifies if the first pulse in the sequence will be `1` or `0`. The `durations` parameter must be an Array of integers that specify the duration (in RMT module ticks) of each pulse in the sequence to write to the pin.
+`write` 関数は、RMTモジュールを介して設定されたピンに1と0（つまり高電圧と低電圧）の交互のパルスを送信します。`firstValue` パラメータは、シーケンス内の最初のパルスが `1` か `0` かを指定します。`durations` パラメータは、ピンに書き込むシーケンス内の各パルスの持続時間（RMTモジュールのティック単位）を指定する整数の配列でなければなりません。
 
-The following example pulses the pin high for 2000 ticks then low for 5000 ticks, repeating 3 times in total, then ends with a high pulse of 10000 ticks.
+次の例では、ピンを2000ティックの間高にし、その後5000ティックの間低にし、これを合計3回繰り返し、最後に10000ティックの高パルスで終了します。
 
 ```js
 rmt.write(1, [2000, 5000, 2000, 5000, 2000, 5000, 10000]);
 ```
 
-The write is performed asynchronously, so `write` returns immediately. When the write is complete, the `onWriteable` callback is invoked and another `write` may be issued.
+書き込みは非同期で実行されるため、`write` は即座に戻ります。書き込みが完了すると、`onWriteable` コールバックが呼び出され、別の `write` を発行することができます。
 
 ***
 
-### `onWriteable()` callback
+### `onWriteable()` コールバック
 
-A script may install an `onWriteable` callback on the instance to be invoked when the RMT module is ready to write data.
+スクリプトは、RMTモジュールがデータを書き込む準備ができたときに呼び出される `onWriteable` コールバックをインスタンスに設定することができます。
 
 ```js
 rmt.onWritable = function() {
@@ -673,19 +671,19 @@ rmt.onWritable = function() {
 }
 ```
 
-The `onWriteable` function is called once when the RMT module is initialized and ready to receive the first call to `write`. It is then subsequently called each time a write completes and the RMT module is ready to transmit a new sequence.
+`onWriteable` 関数は、RMTモジュールが初期化され、最初の `write` 呼び出しを受け取る準備ができたときに一度呼び出されます。その後、書き込みが完了し、RMTモジュールが新しいシーケンスを送信する準備ができるたびに呼び出されます。
 
 ***
 
 ### `read(buffer)`
 
-The `read` function returns RMT data in an ArrayBuffer provided by the `buffer` argument. Up to `buffer.byteLength` bytes from the RMT module's ring buffer are returned in the ArrayBuffer.
+`read` 関数は、`buffer` 引数で提供されたArrayBufferにRMTデータを返します。RMTモジュールのリングバッファから `buffer.byteLength` バイトまでがArrayBufferに返されます。
 
-`read` returns an object with three properties:
+`read` は3つのプロパティを持つオブジェクトを返します：
 
-- The `buffer` property is the ArrayBuffer provided to `read` as an argument, filled with the received pulse duration sequence read by the RMT module.
-- The `count` property is the total number of pulses received in the sequence.
-- The `phase` property is the logic level of the first item in the sequence (`0` or `1`) — subsequent pulses in the `buffer` alternate logic levels.
+- `buffer` プロパティは、RMTモジュールによって読み取られた受信パルス持続時間シーケンスで満たされた、引数として `read` に提供されたArrayBufferです。
+- `count` プロパティは、シーケンス内で受信されたパルスの総数です。
+- `phase` プロパティは、シーケンス内の最初の項目の論理レベル (`0` または `1`) です — `buffer` 内の後続のパルスは論理レベルが交互に変わります。
 
 ```js
 const data = new Uint16Array(512);
@@ -706,7 +704,7 @@ Timer.repeat(() => {
 
 ### `close()`
 
-The `close` function releases the resources associated with the `RMT` instance.
+`close` 関数は、`RMT` インスタンスに関連付けられたリソースを解放します。
 
 ```js
 rmt.close();
@@ -715,6 +713,6 @@ rmt.close();
 ***
 
 <a id="spi"></a>
-## class SPI
+## SPI クラス
 
-There is no JavaScript API to access SPI at this time.
+現在、SPIにアクセスするためのJavaScript APIはありません。
