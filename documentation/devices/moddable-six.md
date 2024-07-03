@@ -457,7 +457,7 @@ c
 
 ```
 cd $MODDABLE/contributed/somafm
-mcconfig -d -m -p esp32/moddable_four ssid="YOU WI-FI ACCESS POINT" password="YOUR WI-FI PASSWORD"
+mcconfig -d -m -p esp32/moddable_six ssid="YOU WI-FI ACCESS POINT" password="YOUR WI-FI PASSWORD"
 ```
 
 > **Note**: To use GDB, connect Moddable Six to your computer using the USB port on Moddable Six, not the serial port. GDB is only supported over the USB port. If you want to use xsbug at the same time as GDB, you can also connect the serial port to your computer using a Moddable Programmer.
