@@ -1,162 +1,159 @@
-# Using the Moddable SDK with nRF52
+# Moddable SDKでnRF52を使用する
 
 Copyright 2021-2024 Moddable Tech, Inc.<BR>
-Revised: January 9, 2024
+改訂： 2024年1月19日
 
-This document is a guide to building apps for the nRF52840 SoC from Nordic using the Moddable SDK.
+このドキュメントは、Moddable SDKを使用してNordicのnRF52840 SoC向けにアプリを構築するためのガイドです。
 
-## Table of Contents
+## 目次
 
-* [Overview](#overview)
-* [Platforms](#platforms)
+* [概要](#overview)
+* [プラットフォーム](#platforms)
 	* [nrf52](#platforms-nrf52)
-* [Build Types](#builds)
-	* [Debug](#build-debug)
-	* [Instrumented](#build-instrumented)
-	* [Release](#build-release)
-* Setup instructions
+* [ビルドタイプ](#builds)
+	* [デバッグ](#build-debug)
+	* [instrumented](#build-instrumented)
+	* [リリース](#build-release)
+* セットアップ手順
 
     | [![Apple logo](./../assets/moddable/mac-logo.png)](#mac) | [![Windows logo](./../assets/moddable/win-logo.png)](#win) | [![Linux logo](./../assets/moddable/lin-logo.png)](#lin) |
     | :--- | :--- | :--- |
-    | •  [Installing](#mac-instructions)<BR>•  [Troubleshooting](#mac-troubleshooting) | •  [Installing](#win-instructions)<BR>•  [Troubleshooting](#win-troubleshooting) | •  [Installing](#lin-instructions)<BR>•  [Troubleshooting](#lin-troubleshooting)
+    | •  [インストール](#mac-instructions)<BR>•  [トラブルシューティング](#mac-troubleshooting) | •  [インストール](#win-instructions)<BR>•  [トラブルシューティング](#win-troubleshooting) | •  [インストール](#lin-instructions)<BR>•  [トラブルシューティング](#lin-troubleshooting)
 
-* [Troubleshooting](#troubleshooting)
-* [Debugging Over Serial](#serial-debugging)
-* [Updating over BLE](#ble-update)
-	* [Ensure your nRF52 device has version 8 of the Bootloader ](#ble-update-1)
-	* [Update the nRF52 Bootloader](#ble-update-bootloader)
-	* [Build an update package](#ble-update-2)
-	* [Transfer the package to your mobile](#ble-update-3)
-	* [Put the device in DFU OTA mode](#ble-update-4)
-	* [Use nRF Connect for Mobile to Wirelessly update device](#ble-update-5)
-* [Installing Apps via Serial](#install-apps-via-serial)
-* [Debugging Native Code](#debugging-native-code)
-* [Bootloader](#bootloader)
-	* [Installing the bootloader](#install-bootloader)
-	* [Updating the bootloader](#update-bootloader)
-* [nRF5 SDK modifications](#nrf5-sdk-mods)
-
+* [トラブルシューティング](#troubleshooting)
+* [シリアル経由のデバッグ](#serial-debugging)
+* [BLE経由の更新](#ble-update)
+	* [nRF52デバイスにバージョン8のブートローダーがインストールされていることを確認](#ble-update-1)
+	* [nRF52ブートローダーの更新](#ble-update-bootloader)
+	* [更新パッケージのビルド](#ble-update-2)
+	* [パッケージをモバイルに転送](#ble-update-3)
+	* [デバイスをDFU OTAモードにする](#ble-update-4)
+	* [nRF Connect for Mobileを使用してデバイスをワイヤレスで更新](#ble-update-5)
+* [シリアル経由でのアプリのインストール](#install-apps-via-serial)
+* [ネイティブコードのデバッグ](#debugging-native-code)
+* [ブートローダー](#bootloader)
+	* [ブートローダーのインストール](#install-bootloader)
+	* [ブートローダーの更新](#update-bootloader)
+* [nRF5 SDKの変更](#nrf5-sdk-mods)
 
 <a id="overview"></a>
-## Overview
+## 概要
 
-Before you can build applications, you need to:
+アプリケーションをビルドする前に、以下のことを行う必要があります：
 
-- Install the Moddable SDK and build its tools
-- Install the required drivers and development tools for the nRF52 platform
+- Moddable SDKをインストールし、そのツールをビルドする
+- nRF52プラットフォーム用の必要なドライバと開発ツールをインストールする
 
-The instructions below will have you verify your setup by running the `helloworld` example on your device using `mcconfig`, the command line tool to build and run applications using the Moddable SDK.
+以下の手順では、Moddable SDKを使用してアプリケーションをビルドおよび実行するためのコマンドラインツールである`mcconfig`を使用して、デバイス上で`helloworld`の例を実行することでセットアップを確認します。
 
-> See the [Tools documentation](./../tools/tools.md) for more information about `mcconfig`
+> `mcconfig`の詳細については、[ツールのドキュメント](./../tools/tools.md)を参照してください。
 
-
-To build for Moddable Four,  run `mcconfig` with `nrf52/moddable_four` for the **platform identifier**:
+Moddable Four用にビルドするには、**プラットフォーム識別子**として`nrf52/moddable_four`を指定して`mcconfig`を実行します：
 
 ```text
 mcconfig -d -m -p nrf52/moddable_four
 ```
 
-A list of available nRF52 subplatforms and their platform identifiers is in the **Platforms** section below.
+利用可能なnRF52サブプラットフォームとそのプラットフォーム識別子のリストは、以下の**プラットフォーム**セクションにあります。
 
 <a id="platforms"></a>
-## Platforms
+## プラットフォーム
 
 <a id="platforms-nrf52"></a>
 ### nRF52
 
-nRF52840 has the following features:
+nRF52840には以下の機能があります：
 
 - 64 MHz Cortex-M4 with FPU
 - BLE
 - 256 KB RAM
 - 1 MB Flash
 
-| Name | Platform identifier | Key features | Links |
+| 名前 | プラットフォーム識別子 | 主な機能 | リンク |
 | :---: | :--- | :--- | :--- |
-| <img src="./../assets/devices/moddable-four.png" width=125><BR>Moddable Four | `nrf52/moddable_four`<BR>`simulator/moddable_four` | - **1.28" 128x128 Monochrome**<BR>- Sharp Mirror display<BR>- BLE<BR>- Jogdial<BR>- Accelerometer<BR>- Button and LED<BR>- CR2032 coin-cell power<BR>- 12 External GPIO pins  | <li>[Moddable Four developer guide](./moddable-four.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
-| <img src="./../assets/devices/moddable-display-4.png" height=150><BR>Moddable Display 4 | `nrf52/moddable_display_4`<BR>`simulator/moddable_four` | - **1.28" 128x128 Monochrome**<BR>- Sharp Mirror display<BR>- BLE<BR>- Jogdial<BR>- Accelerometer<BR>- Button and LED<BR>- CR2032 coin-cell power<BR>- 12 External GPIO pins  | <li>[Moddable Display developer guide](./moddable-display.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
-| <img src="./../assets/devices/nrf52-pca10056.png" width=125><BR>Nordic nRF52840 DK pca10056 | `nrf52/dk` | - 4 LEDs<BR>- 4 Buttons<BR>- All pins accessible<BR>- BLE<BR>- CR2032 coin-cell power  | <li>[Product page](https://www.nordicsemi.com/Products/Development-hardware/nrf52840-dk)</li> |
-| <img src="./../assets/devices/nrf52-sparkfun.png" width=125><BR>Sparkfun Pro nRF52840 Mini | `nrf52/sparkfun` | - 1 LED<BR>- 1 Button<BR>- BLE<BR>- JST Power connector<BR>- Qwiic connector<BR>- 17 GPIO pins  | <li>[Product page](https://www.sparkfun.com/products/15025)</li> |
-| <img src="./../assets/devices/nrf52-makerdiary.png" width=125><BR>Makerdiary nRF58240 MDK | `nrf52/makerdiary` | - 1  3-color LED<BR>- 1 Button<BR>- BLE<BR>- 12 GPIO pins  | <li>[Product page](https://makerdiary.com/products/nrf52840-mdk-usb-dongle)</li> |
-| <img src="./../assets/devices/nrf52-xiao.png" width=125><BR>Seeed Studio XIAO nRF52840 | `nrf52/xiao` | - 1 3-color LED<BR>- 1 Button<BR>- BLE<BR>- 11 GPIO pins  | <li>[Product page](https://www.seeedstudio.com/Seeed-XIAO-BLE-nRF52840-p-5201.html)</li> |
-| <img src="./../assets/devices/nrf52-itsybitsy.png" width=125><BR>Adafruit ItsyBitsy nRF52840 Express | `nrf52/itsybitsy` | - 1 LED<BR>- 1 Button<BR>- BLE<BR>- 21 GPIO pins  | <li>[Product page](https://www.adafruit.com/product/4481)</li> |
-| <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `nrf52/xiao_ili9341` | ili9341 QVGA display<BR>320 x 240<BR>16-bit color | <li>[Wiring Guide](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
+| <img src="./../assets/devices/moddable-four.png" width=125><BR>Moddable Four | `nrf52/moddable_four`<BR>`simulator/moddable_four` | - **1.28" 128x128 モノクローム**<BR>- シャープミラーディスプレイ<BR>- BLE<BR>- ジョグダイヤル<BR>- 加速度計<BR>- ボタンとLED<BR>- CR2032コインセル電源<BR>- 12 外部GPIOピン  | <li>[Moddable Four開発者ガイド](./moddable-four.md)</li><li>[Moddable製品ページ](https://www.moddable.com/hardware)</li> |
+| <img src="./../assets/devices/moddable-display-4.png" height=150><BR>Moddable Display 4 | `nrf52/moddable_display_4`<BR>`simulator/moddable_four` | - **1.28" 128x128 モノクローム**<BR>- シャープミラーディスプレイ<BR>- BLE<BR>- ジョグダイヤル<BR>- 加速度計<BR>- ボタンとLED<BR>- CR2032コインセル電源<BR>- 12 外部GPIOピン  | <li>[Moddable Display開発者ガイド](./moddable-display.md)</li><li>[Moddable製品ページ](https://www.moddable.com/hardware)</li> |
+| <img src="./../assets/devices/nrf52-pca10056.png" width=125><BR>Nordic nRF52840 DK pca10056 | `nrf52/dk` | - 4つのLED<BR>- 4つのボタン<BR>- すべてのピンにアクセス可能<BR>- BLE<BR>- CR2032コインセル電源  | <li>[製品ページ](https://www.nordicsemi.com/Products/Development-hardware/nrf52840-dk)</li> |
+| <img src="./../assets/devices/nrf52-sparkfun.png" width=125><BR>Sparkfun Pro nRF52840 Mini | `nrf52/sparkfun` | - 1つのLED<BR>- 1つのボタン<BR>- BLE<BR>- JST電源コネクタ<BR>- Qwiicコネクタ<BR>- 17 GPIOピン  | <li>[製品ページ](https://www.sparkfun.com/products/15025)</li> |
+| <img src="./../assets/devices/nrf52-makerdiary.png" width=125><BR>Makerdiary nRF58240 MDK | `nrf52/makerdiary` | - 1つの3色LED<BR>- 1つのボタン<BR>- BLE<BR>- 12 GPIOピン  | <li>[製品ページ](https://makerdiary.com/products/nrf52840-mdk-usb-dongle)</li> |
+| <img src="./../assets/devices/nrf52-xiao.png" width=125><BR>Seeed Studio XIAO nRF52840 | `nrf52/xiao` | - 1つの3色LED<BR>- 1つのボタン<BR>- BLE<BR>- 11 GPIOピン  | <li>[製品ページ](https://www.seeedstudio.com/Seeed-XIAO-BLE-nRF52840-p-5201.html)</li> |
+| <img src="./../assets/devices/nrf52-itsybitsy.png" width=125><BR>Adafruit ItsyBitsy nRF52840 Express | `nrf52/itsybitsy` | - 1つのLED<BR>- 1つのボタン<BR>- BLE<BR>- 21 GPIOピン  | <li>[製品ページ](https://www.adafruit.com/product/4481)</li> |
+| <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `nrf52/xiao_ili9341` | ili9341 QVGAディスプレイ<BR>320 x 240<BR>16ビットカラー | <li>[配線ガイド](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
 
 <a id="builds"></a>
-## Build Types
-The nRF52 supports three kinds of builds: debug, instrumented, and release. Each is appropriate for different stages in the product development process. You select which kind of build you want from the command line when running `mcconfig`.
+## ビルドタイプ
+nRF52は、デバッグ、instrumented、およびリリースの3種類のビルドをサポートしています。それぞれは製品開発プロセスの異なる段階に適しています。`mcconfig`を実行する際にコマンドラインからどの種類のビルドを行うか選択します。
 
-> **Note**: Deep sleep APIs are only available instrumented and release builds.
+> **注**: ディープスリープAPIはinstrumentedおよびリリースビルドでのみ利用可能です。
 
 <a id="build-debug"></a>
-### Debug
-A debug build is used for debugging JavaScript. In a debug build, the device will attempt to connect to xsbug at startup over USB or serial depending on the device configuration. Symbols will be included for native gdb debugging.
+### デバッグ
+デバッグビルドはJavaScriptのデバッグに使用されます。デバッグビルドでは、デバイスは起動時にUSBまたはシリアル経由でxsbugに接続しようとします（デバイスの設定によります）。ネイティブgdbデバッグ用のシンボルが含まれます。
 
-The `-d` option on the `mcconfig` command line selects a debug build.
+`mcconfig`コマンドラインの`-d`オプションでデバッグビルドを選択します。
 
 <a id="build-instrumented"></a>
-### Instrumented
-An instrumented build is used for debugging native code. In an instrumented build, the JavaScript debugger is disabled. The instrumentation data usually available in xsbug is output to the serial console once a second. Deep sleep APIs are available in an instrumented build.
+### instrumented
+instrumentedビルドはネイティブコードのデバッグに使用されます。instrumentedビルドでは、JavaScriptデバッガーが無効になります。通常xsbugで利用可能な計測データは、1秒ごとにシリアルコンソールに出力されます。ディープスリープAPIはinstrumentedビルドで利用可能です。
 
-The `-i` option on the `mcconfig` command line selects an instrumented build.
+`mcconfig` コマンドラインの `-i` オプションは、計測ビルドを選択します。
 
 <a id="build-release"></a>
-### Release
-A release build is for production. In a release build, the JavaScript debugger is disabled, instrumentation statistics are not collected, and serial console output is suppressed. Deep sleep APIs are available in a release build.
+### リリース
+リリースビルドは、製品用です。リリースビルドでは、JavaScriptデバッガーが無効になり、計測統計が収集されず、シリアルコンソール出力が抑制されます。リリースビルドでは、ディープスリープAPIが利用可能です。
 
-Omitting both the `-d` and `-i` options on the `mcconfig` command line selects a release. Note that `-r` specifies display rotation rather than selecting a release build.
-
+`mcconfig` コマンドラインで `-d` と `-i` の両方のオプションを省略すると、リリースが選択されます。`-r` はリリースビルドの選択ではなく、ディスプレイの回転を指定することに注意してください。
 
 <a id="setup"></a>
 <a id="mac"></a>
 ## macOS
 
-The Moddable SDK build for nRF52 currently uses Nordic nRF5 SDK v17.0.2.
+Moddable SDKのnRF52用ビルドは、現在Nordic nRF5 SDK v17.0.2を使用しています。
 
 <a id="mac-instructions"></a>
-### Installing
+### インストール
 
-1. Install the Moddable SDK tools by following the instructions in the [Getting Started document](./../Moddable%20SDK%20-%20Getting%20Started.md).
+1. [Getting Started ドキュメント](./../Moddable%20SDK%20-%20Getting%20Started.md) の指示に従って、Moddable SDKツールをインストールします。
 
-2. Create an `nrf5` directory in your home directory at `~/nrf5 ` for required third party SDKs and tools.
+2. 必要なサードパーティSDKとツールのために、ホームディレクトリに `~/nrf5` ディレクトリを作成します。
 
-3. If you use macOS Catalina (version 10.15) or later, add an exemption to allow Terminal (or your alternate terminal application of choice) to run software locally that does not meet the system's security policy. Without this setting, the precompiled GNU Arm Embedded Toolchain downloaded in the next step will not be permitted to run.
+3. macOS Catalina (バージョン10.15) 以降を使用している場合、システムのセキュリティポリシーを満たさないソフトウェアをローカルで実行できるように、ターミナル (または選択した別のターミナルアプリケーション） に例外を追加します。この設定がないと、次のステップでダウンロードされる事前コンパイル済みのGNU Arm Embedded Toolchainを実行することができません。
 
-    To set the security policy exemption for Terminal, go to Security & Privacy System Preferences, select the Privacy tab, choose Developer Tools from the list on the left, and then tick the checkbox for Terminal or the alternate terminal application from which you will be building Moddable SDK apps. The end result should look like this:
+    ターミナルのセキュリティポリシーの例外を設定するには、セキュリティとプライバシーのシステム環境設定に移動し、プライバシータブを選択し、左側のリストから開発者ツールを選び、ターミナルまたはModdable SDKアプリをビルドするために使用する代替ターミナルアプリケーションのチェックボックスをオンにします。最終的には次のようになります：
 
     ![Catalina Developer Options](../assets/getting-started/catalina-security.png)
 
-4. On **x86** Mac, Download version 12.2.1 [AArch32 bare-metal target (arm-none-eabi)](https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-darwin-x86_64-arm-none-eabi.tar.xz) of the GNU Arm Embedded Toolchain from the [Arm Developer](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads) website. Uncompress the archive and move the `arm-gnu-toolchain-12.2.rel1-darwin-x86_64-arm-none-eabi` directory into the `nrf5` directory.
+4. **x86** Macの場合、GNU Arm Embedded Toolchainのバージョン12.2.1 [AArch32 bare-metal target (arm-none-eabi)](https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-darwin-x86_64-arm-none-eabi.tar.xz) を[Arm Developer](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)ウェブサイトからダウンロードします。アーカイブを解凍し、`arm-gnu-toolchain-12.2.rel1-darwin-x86_64-arm-none-eabi`ディレクトリを`nrf5`ディレクトリに移動します。
 
-5. On **Arm-based** Mac, Download version 12.2.1 [AArch32 bare-metal target (arm-none-eabi)](https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-darwin-arm64-arm-none-eabi.tar.xz) of the GNU Arm Embedded Toolchain from the [Arm Developer](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads) website. Uncompress the archive and move the `arm-gnu-toolchain-12.2.rel1-darwin-arm64-arm-none-eabi` directory into the `nrf5` directory.
+5. **Armベース**のMacの場合、GNU Arm Embedded Toolchainのバージョン12.2.1 [AArch32 bare-metal target (arm-none-eabi)](https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-darwin-arm64-arm-none-eabi.tar.xz) を[Arm Developer](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)ウェブサイトからダウンロードします。アーカイブを解凍し、`arm-gnu-toolchain-12.2.rel1-darwin-arm64-arm-none-eabi`ディレクトリを`nrf5`ディレクトリに移動します。
 
     <!-- is this brew step necessary with the v 12.2.1? You will also need some items from `brew`:
 
     `brew install gmp mpfr libmpc isl libelf`
      -->
 
-6. Moddable Four uses a modified [Adafruit nRF52 Bootloader](https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader) that supports the UF2 file format for flashing firmware to a device. Moddable uses the `uf2conv.py` Python tool from Microsoft that packages the UF2 binary for transfer to the device. Download the [uf2conv](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/uf2conv.py) tool. Move or copy the `uf2conv.py` file into the `nrf5` directory.
+6. Moddable Fourは、デバイスにファームウェアをフラッシュするためのUF2ファイル形式をサポートする修正された[Adafruit nRF52 Bootloader](https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader)を使用します。Moddableは、デバイスへの転送用にUF2バイナリをパッケージ化するMicrosoftの`uf2conv.py` Pythonツールを使用します。[uf2conv](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/uf2conv.py)ツールをダウンロードしてください。`uf2conv.py`ファイルを`nrf5`ディレクトリに移動またはコピーします。
 
-    Use `chmod` to change the access permissions of `uf2conv` to make it executable.
+    `chmod`を使用して`uf2conv`のアクセス権限を変更し、実行可能にします。
 
     ```text
     cd ~/nrf5
     chmod 755 uf2conv.py
     ```
 
-6. Download the [Nordic nRF5 SDK](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/nRF5_SDK_17.0.2_d674dde-mod.zip) with Moddable Four modifications.
+6. Moddable Fourの修正が加えられた[Nordic nRF5 SDK](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/nRF5_SDK_17.0.2_d674dde-mod.zip)をダウンロードします。
 
-    Unzip the archive and copy the `nRF5_SDK_17.0.2_d674dde` directory into the `nrf5` directory.
+    アーカイブを解凍し、`nRF5_SDK_17.0.2_d674dde`ディレクトリを`nrf5`ディレクトリにコピーします。
 
-    > FYI – See the section [nRF5 SDK modifications](#nrf5-sdk-mods) for information on the modifications to the nRF5 SDK. These modifications have already been applied to the archive you just downloaded.
+    > FYI – nRF5 SDKの変更に関する情報については、[nRF5 SDK modifications](#nrf5-sdk-mods)のセクションを参照してください。これらの変更は、先ほどダウンロードしたアーカイブに既に適用されています。
 
-7. Setup the `NRF_SDK_DIR` environment variable to point at the nRF5 SDK directory:
+7. `NRF_SDK_DIR`環境変数をnRF5 SDKディレクトリに設定します：
 
     ```text
     export NRF_SDK_DIR=$HOME/nrf5/nRF5_SDK_17.0.2_d674dde
     ```
 
-8. Verify the setup by building `helloworld` for your device target:
+8. デバイスターゲット用に`helloworld`をビルドしてセットアップを確認します：
 
     ```text
     cd ${MODDABLE}/examples/helloworld
@@ -164,21 +161,21 @@ The Moddable SDK build for nRF52 currently uses Nordic nRF5 SDK v17.0.2.
     ```
 
 <a id="mac-troubleshooting"></a>
-### Troubleshooting
+### トラブルシューティング
 
-- If the macOS **DISK NOT EJECTED PROPERLY** remain on your screen, you can download and use the [`ejectfix.py`](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/ejectfix.py) tool to make them auto-dismiss.
+- macOSで**DISK NOT EJECTED PROPERLY**が画面に残る場合は、[`ejectfix.py`](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/ejectfix.py)ツールをダウンロードして使用することで、自動的に解除できます。
 
-   See the [article at the Adafruit blog](https://blog.adafruit.com/2021/05/11/how-to-tone-down-macos-big-surs-circuitpy-eject-notifications/) for details.
+   詳細については、[Adafruitブログの記事](https://blog.adafruit.com/2021/05/11/how-to-tone-down-macos-big-surs-circuitpy-eject-notifications/)を参照してください。
 
 <a id="win"></a>
 ## Windows
 
 <a id="win-instructions"></a>
-### Installing
+### インストール
 
-1. Install the Moddable SDK tools by following the instructions in the [Getting Started document](./../Moddable%20SDK%20-%20Getting%20Started.md).
+1. [開始ガイド](./../Moddable%20SDK%20-%20Getting%20Started.md)の指示に従って、Moddable SDKツールをインストールします。
 
-2. Create a `nrf5` directory in your `%USERPROFILE%` directory, e.g. `C:\Users\<your-user-name>` for required third party SDKs and tools.
+2. 必要なサードパーティSDKおよびツールのために、`%USERPROFILE%`ディレクトリに`nrf5`ディレクトリを作成します。例：`C:\Users\<your-user-name>`。
 
     ```text
     cd %USERPROFILE%
@@ -186,32 +183,32 @@ The Moddable SDK build for nRF52 currently uses Nordic nRF5 SDK v17.0.2.
     cd nrf5
     ```
 
-3. Download version 12.2.1 [`AArch32 bare-metal target (arm-none-eabi)`](https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi.zip) of the GNU Arm Embedded Toolchain from the [Arm Developer](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads) website. Uncompress the archive and move the `arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi` directory into the `nrf5` directory.
+3. [Arm Developer](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)ウェブサイトから、GNU Arm Embedded Toolchainのバージョン12.2.1 [`AArch32 bare-metal target (arm-none-eabi)`](https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi.zip)をダウンロードします。アーカイブを解凍し、`arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi`ディレクトリを`nrf5`ディレクトリに移動します。
 
-4. Moddable Four uses a modified [Adafruit nRF52 Bootloader](https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader) that supports the UF2 file format for flashing firmware to a device. `uf2conv.py` is a Python tool from Microsoft that packages the UF2 binary for transfer to the device. Download the [uf2conv](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/uf2conv.py) tool. Move or copy the `uf2conv.py` file into the `nrf5` directory.
+4. Moddable Fourは、デバイスにファームウェアをフラッシュするためのUF2ファイル形式をサポートする修正された[Adafruit nRF52 Bootloader](https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader)を使用します。`uf2conv.py`は、デバイスへの転送用にUF2バイナリをパッケージ化するMicrosoftのPythonツールです。[uf2conv](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/uf2conv.py)ツールをダウンロードします。`uf2conv.py`ファイルを`nrf5`ディレクトリに移動またはコピーします。
 
-5. Download the [Nordic nRF5 SDK](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/nRF5_SDK_17.0.2_d674dde-mod.zip) with Moddable Four modifications.
+5. Moddable Fourの修正が加えられた[Nordic nRF5 SDK](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/nRF5_SDK_17.0.2_d674dde-mod.zip)をダウンロードします。
 
-    Unzip the archive and copy the `nRF5_SDK_17.0.2_d674dde` directory into the `nrf5` directory.
+    アーカイブを解凍し、`nRF5_SDK_17.0.2_d674dde`ディレクトリを`nrf5`ディレクトリにコピーします。
 
-    > FYI – See the section [nRF5 SDK modifications](#nrf5-sdk-mods) for information on the modifications to the nRF5 SDK. These modifications have already been applied to the archive you just downloaded.
+    > FYI – nRF5 SDKの修正に関する情報は、[nRF5 SDK modifications](#nrf5-sdk-mods)のセクションを参照してください。これらの修正は、今ダウンロードしたアーカイブに既に適用されています。
 
-6. Setup the `NRF52_SDK_PATH` environment variable to point at your nRF5 SDK directory:
+6. `NRF52_SDK_PATH`環境変数をnRF5 SDKディレクトリに設定します：
 
     ```text
     set NRF52_SDK_PATH = %USERPROFILE%\nrf5\nRF5_SDK_17.0.2_d674dde
     ```
 
-7. Download and run the [Python installer](https://www.python.org/ftp/python/2.7.15/python-2.7.15.msi) for Windows. Choose the default options.
+7. Windows用の[Pythonインストーラー](https://www.python.org/ftp/python/2.7.15/python-2.7.15.msi)をダウンロードして実行します。デフォルトのオプションを選択します。
 
-8. Edit the system `PATH` environment variable to include the Python directories:
+8. システムの`PATH`環境変数を編集して、Pythonディレクトリを含めます：
 
     ```text
     C:\Python27
     C:\Python27\Scripts
     ```
 
-9. Verify the setup by building `helloworld` for your device target:
+9. デバイスターゲット用に`helloworld`をビルドしてセットアップを確認します：
 
     ```text
     cd %MODDABLE%\examples\piu\balls
@@ -219,17 +216,17 @@ The Moddable SDK build for nRF52 currently uses Nordic nRF5 SDK v17.0.2.
     ```
 
 <a id="win-troubleshooting"></a>
-### Troubleshooting
+### トラブルシューティング
 
 <a id="lin"></a>
 ## Linux
 
 <a id="lin-instructions"></a>
-### Installing
+### インストール
 
-1. Install the Moddable SDK tools by following the instructions in the [Getting Started document](./../Moddable%20SDK%20-%20Getting%20Started.md).
+1. [Getting Started document](./../Moddable%20SDK%20-%20Getting%20Started.md) の指示に従って、Moddable SDKツールをインストールします。
 
-2. Create a `nrf5` directory in your home directory at `~/nrf5` for required third party SDKs and tools.
+2. 必要なサードパーティのSDKとツールのために、ホームディレクトリに `nrf5` ディレクトリを作成します。
 
     ```text
     cd $HOME
@@ -237,23 +234,23 @@ The Moddable SDK build for nRF52 currently uses Nordic nRF5 SDK v17.0.2.
     cd nrf5
     ```
 
-3. Download version 12.2.1 [AArch32 bare-metal target (arm-none-eabi)](https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi.tar.xz) of the GNU Arm Embedded Toolchain from the [Arm Developer](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads) website. Uncompress the archive and move the `arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi` directory into the `nrf5` directory.
+3. GNU Arm Embedded Toolchainのバージョン12.2.1 [AArch32 bare-metal target (arm-none-eabi)](https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi.tar.xz) を [Arm Developer](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads) ウェブサイトからダウンロードします。アーカイブを解凍し、`arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi` ディレクトリを `nrf5` ディレクトリに移動します。
 
-4. Moddable Four uses a modified [Adafruit nRF52 Bootloader](https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader) that supports the UF2 file format for flashing firmware to a device. `uf2conv.py` is a Python tool from Microsoft that packages the UF2 binary for transfer to the device. Download the [uf2conv](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/uf2conv.py) tool. Move or copy the `uf2conv.py` file into the `nrf5` directory.
+4. Moddable Fourは、デバイスにファームウェアをフラッシュするためのUF2ファイル形式をサポートする修正された [Adafruit nRF52 Bootloader](https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader) を使用します。`uf2conv.py` は、デバイスへの転送用にUF2バイナリをパッケージ化するMicrosoftのPythonツールです。[uf2conv](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/uf2conv.py) ツールをダウンロードします。`uf2conv.py` ファイルを `nrf5` ディレクトリに移動またはコピーします。
 
-5. Download the [Nordic nRF5 SDK](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/nRF5_SDK_17.0.2_d674dde-mod.zip) with Moddable Four modifications.
+5. Moddable Fourの修正が加えられた[Nordic nRF5 SDK](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/nRF5_SDK_17.0.2_d674dde-mod.zip)をダウンロードします。
 
-    Unzip the archive and copy the `nRF5_SDK_17.0.2_d674dde` directory into the `nrf5` directory.
+    アーカイブを解凍し、`nRF5_SDK_17.0.2_d674dde`ディレクトリを`nrf5`ディレクトリにコピーします。
 
-    > FYI – See the section [nRF5 SDK modifications](#nrf5-sdk-mods) for information on the modifications to the nRF5 SDK. These modifications have already been applied to the archive you just downloaded.
+    > FYI – nRF5 SDKの修正に関する情報は、[nRF5 SDK modifications](#nrf5-sdk-mods)のセクションを参照してください。これらの修正は、ダウンロードしたアーカイブに既に適用されています。
 
-6. Setup the `NRF_SDK_DIR` environment variable to point at the nRF5 SDK directory:
+6. `NRF_SDK_DIR`環境変数をnRF5 SDKディレクトリに設定します：
 
     ```text
     export NRF_SDK_DIR=$HOME/nrf5/nRF5_SDK_17.0.2_d674dde
     ```
 
-7. Verify the setup by building `helloworld` for your device target:
+7. デバイスターゲット用に`helloworld`をビルドしてセットアップを確認します：
 
     ```text
     cd ${MODDABLE}/examples/helloworld
@@ -261,25 +258,25 @@ The Moddable SDK build for nRF52 currently uses Nordic nRF5 SDK v17.0.2.
     ```
 
 <a id="lin-troubleshooting"></a>
-### Linux Troubleshooting
+### Linuxのトラブルシューティング
 
-When you're trying to install applications, you may experience roadblocks in the form of errors or warnings; this section explains some common issues on Linux and how to resolve them.
+アプリケーションをインストールしようとすると、エラーや警告の形で障害に遭遇することがあります。このセクションでは、Linux上での一般的な問題とその解決方法について説明します。
 
-For other issues that are common on macOS, Windows, and Linux, see the [Troubleshooting section](#troubleshooting) at the bottom of this document.
+macOS、Windows、Linuxで共通のその他の問題については、このドキュメントの下部にある[トラブルシューティングセクション](#troubleshooting)を参照してください。
 
 
-#### Permission denied
+#### 許可が拒否されました
 
-The nrf52 communicates with the Linux host via the ttyACM0 device. On Ubuntu Linux the ttyACM0 device is owned by the `dialout` group. If you get a **permission denied error** when trying to connect to the `xsbug` debugger, add your user to the `dialout` group:
+nrf52はttyACM0デバイスを介してLinuxホストと通信します。Ubuntu Linuxでは、ttyACM0デバイスは`dialout`グループによって所有されています。`xsbug`デバッガに接続しようとしたときに**許可が拒否されましたエラー**が発生した場合は、ユーザーを`dialout`グループに追加してください：
 
 ```text
 sudo adduser <username> dialout
 sudo reboot
 ```
 
-#### Permission problems with `MODDABLE4` or other `nrf52` disk
+#### `MODDABLE4`またはその他の`nrf52`ディスクの許可の問題
 
-When the nrf52 device is in programming mode (ie. double-press the reset button), it should appear on the desktop. If there are permissions problems, try the following command to mount the disk:
+nrf52デバイスがプログラミングモード（つまり、リセットボタンをダブルプレス）にある場合、デスクトップに表示されるはずです。許可の問題がある場合は、次のコマンドを試してディスクをマウントしてください：
 
 ```text
 udisksctl mount -b /dev/sdb -t FAT
@@ -287,17 +284,17 @@ udisksctl mount -b /dev/sdb -t FAT
 
 
 <a id="troubleshooting"></a>
-## Troubleshooting
+## トラブルシューティング
 
-### Stack overflow
+### スタックオーバーフロー
 
 	region RAM overflowed with stack
 
-If you are building an application and the link fails with an error `arm-none-eabi/bin/ld: region RAM overflowed with stack`, you will need to reduce the amount of RAM allocated to the heap.
+アプリケーションをビルドしていて、リンクが`arm-none-eabi/bin/ld: region RAM overflowed with stack`エラーで失敗する場合、ヒープに割り当てられるRAMの量を減らす必要があります。
 
-By default, `NRF52_HEAP_SIZE` is set to 0x35000.
+デフォルトでは、`NRF52_HEAP_SIZE` は0x35000に設定されています。
 
-In your application manifest, you can change the `NRF52_HEAP_SIZE` allocation:
+アプリケーションマニフェストで、`NRF52_HEAP_SIZE` の割り当てを変更できます：
 
 ```text
     "build": {
@@ -305,35 +302,35 @@ In your application manifest, you can change the `NRF52_HEAP_SIZE` allocation:
      }
 ```
 
-### Application too large
+### アプリケーションが大きすぎる
 
 	ld: region FLASH overflowed with .data and user data
 	section '.text' will not fit in region 'FLASH'
 	ld: region `FLASH' overflowed by 2285384 bytes
 
-If you are building an application and the link fails with an error like those above, your application is too large. Reduce the size of the application resources or restructure your code.
+アプリケーションをビルドしていて、上記のようなエラーでリンクに失敗する場合、アプリケーションが大きすぎます。アプリケーションリソースのサイズを減らすか、コードを再構成してください。
 
 
 <a id="advanced"></a>
-## Advanced
+## 高度な設定
 
 <a id="serial-debugging"></a>
-### Debugging Over Serial
+### シリアル経由でのデバッグ
 
-Custom devices and some development boards may not have a USB port for debugging.
+カスタムデバイスや一部の開発ボードには、デバッグ用のUSBポートがない場合があります。
 
-The Moddable SDK can connect to `xsbug` over a serial connection.
+Moddable SDKはシリアル接続を介して `xsbug` に接続できます。
 
-#### `manifest.json` changes
+#### `manifest.json` の変更
 
-In the `build` section, ensure the following settings:
+`build` セクションで、以下の設定を確認してください：
 
 ```
 "USE_USB": "0",
 "FTDI_TRACE": "-DUSE_FTDI_TRACE=0"
 ```
 
-In the `defines` section, set up a `debugger` clause, setting up pins and baudrate:
+`defines` セクションで、ピンとボーレートを設定する `debugger` 条項を設定します：
 
 ```
 "debugger": {
@@ -343,21 +340,21 @@ In the `defines` section, set up a `debugger` clause, setting up pins and baudra
 },
 ```
 
-#### Environment changes
+#### 環境の変更
 
-Set the `DEBUGGER_PORT` environment variable to refer to your serial adapter and set the `DEBUGGER_SPEED`.
+`DEBUGGER_PORT` 環境変数をシリアルアダプタに設定し、`DEBUGGER_SPEED` を設定します。
 
 ```
 export DEBUGGER_PORT=/dev/cu.usbserial-0001
 export DEBUGGER_SPEED=460800
 ```
 
-Build and install the application.
+アプリケーションをビルドしてインストールします。
 
 
-#### Connect to the debugger
+#### デバッガに接続する
 
-If `xsbug` is not running, launch it:
+`xsbug` が実行されていない場合は、起動します：
 
 macOS:
 
@@ -365,40 +362,40 @@ macOS:
 open $MODDABLE/build/bin/mac/release/xsbug.app
 ```
 
-On Windows and Linux you can just type:
+WindowsとLinuxでは、次のコマンドを入力するだけです：
 
 ```
 xsbug
 ```
 
-Run `serial2xsbug` to connect:
+接続するために `serial2xsbug` を実行します：
 
 ```
 serial2xsbug $DEBUGGER_PORT $DEBUGGER_SPEED 8N1
 ```
 
-Reset the device, and it will connect to `xsbug`.
+デバイスをリセットすると、`xsbug` に接続されます。
 
 <a id="install-apps-via-serial"></a>
-### Installing apps via Serial
+### シリアル経由でアプリをインストールする
 
-The bootloader and Moddable SDK support installation of firmware using the serial port. Note that a build of the bootloader supports either programming via USB or Serial but not both.
+ブートローダーとModdable SDKは、シリアルポートを使用したファームウェアのインストールをサポートしています。ブートローダーのビルドは、USB経由またはシリアル経由のいずれかのプログラミングをサポートしますが、両方はサポートしません。
 
-To install via serial, you need to take the follow steps:
+シリアル経由でインストールするには、次の手順を実行する必要があります：
 
-1. Modify your bootloader `board.h` file
-2. Build and install the bootloader
-3. Build your Moddable apps with a special target
+1. ブートローダーの `board.h` ファイルを修正する
+2. ブートローダーをビルドしてインストールする
+3. 特別なターゲットでModdableアプリをビルドする
 
-These steps are explained in detail below.
+これらの手順は以下で詳しく説明されています。
 
-#### Bootloader
+#### ブートローダー
 
-The bootloader needs to be built specifically for the device being targeted. You need to modify the `BOARD` definitions file and use a build define.
+ブートローダーは、ターゲットデバイスに特化してビルドする必要があります。`BOARD` 定義ファイルを修正し、ビルド定義を使用する必要があります。
 
-##### `BOARD` definitions
+##### `BOARD` 定義
 
-Add this section to the `src/boards/<boardname>/board.h` file:
+このセクションを `src/boards/<boardname>/board.h` ファイルに追加します：
 
 ```
 //--------------------------------------------------------------------+
@@ -411,42 +408,41 @@ Add this section to the `src/boards/<boardname>/board.h` file:
 #define HWFC               false
 ```
 
-Set the `RX_PIN_NUMBER` and `TX_PIN_NUMBER` to the appropriate values for your board.
+`RX_PIN_NUMBER` と `TX_PIN_NUMBER` をボードに適した値に設定します。
 
-The status LED is useful as it blinks rapidly when the device is in programming mode. It is defined as `LED_PRIMARY_PIN` in this file.
+ステータスLEDは、デバイスがプログラミングモードにあるときに急速に点滅するため便利です。このファイルでは `LED_PRIMARY_PIN` として定義されています。
 
-##### Build line
+##### ビルドライン
 
-When building the bootloader, add `SERIAL_DFU=1` to the build line. For example:
+ブートローダーをビルドする際に、ビルドラインに `SERIAL_DFU=1` を追加します。例えば：
 
 ```
 make BOARD=<boardname> SERIAL_DFU=1 flash
 ```
 
-See below for more details on building the [bootloader](#bootloader).
+ブートローダーのビルドに関する詳細は、[ブートローダー](#bootloader) を参照してください。
 
-#### Moddable application build target
+#### Moddable アプリケーションビルドターゲット
 
-In order to install over the serial port instead of USB, use either of the targets `installDFU` or `debugDFU`.
+USBではなくシリアルポート経由でインストールするためには、`installDFU` または `debugDFU` のいずれかのターゲットを使用します。
 
 ```
 mcconfig -d -m -p nrf52/<boardname> -t debugDFU
 ```
 
-`installDFU` simply installs the app to your device.
+`installDFU` は単にアプリをデバイスにインストールします。
 
-`debugDFU` installs the app, launches xsbug, and then connects to it with serial2xsbug.
+`debugDFU` はアプリをインストールし、xsbugを起動し、serial2xsbugで接続します。
 
-Installation is done by mcconfig using Adafruit's adafruit-nrfutil.
+インストールはAdafruitのadafruit-nrfutilを使用してmcconfigによって行われます。
 
 #### Setup
 
-Install Adafruit's `adafruit-nrfutil` as described at the github repository:
+Adafruitの `adafruit-nrfutil` をGitHubリポジトリで説明されているようにインストールします：
 
 [`https://github.com/adafruit/Adafruit_nRF52_nrfutil`](https://github.com/adafruit/Adafruit_nRF52_nrfutil)
 
-
-Set the environment variable `UPLOAD_PORT` to the serial port that is connected to your device.
+環境変数 `UPLOAD_PORT` をデバイスに接続されているシリアルポートに設定します。
 
 ```
 export UPLOAD_PORT=/dev/cu.usbserial-0001
@@ -454,11 +450,11 @@ export UPLOAD_PORT=/dev/cu.usbserial-0001
 
 #### Device target
 
-In the device target's `manifest.json` file, ensure that the debugger tx and rx pins and baudrate are defined.
+デバイスターゲットの `manifest.json` ファイルで、デバッガーのtxおよびrxピンとボーレートが定義されていることを確認します。
 
-The manifest.json file is located at `$MODDABLE/build/devices/nrf52/targets/<boardname>/manifest.json`.
+manifest.jsonファイルは `$MODDABLE/build/devices/nrf52/targets/<boardname>/manifest.json` にあります。
 
-In the `"defines"` section:
+`"defines"` セクションで：
 
 ```
 "defines": {
@@ -472,13 +468,13 @@ In the `"defines"` section:
 
 #### Build and install
 
-The device needs to be in firmware update mode in order to receive the installation. Double-tap the reset button to put the device into programming mode. The status LED will blink rapidly.
+インストールを受け取るためには、デバイスをファームウェア更新モードにする必要があります。リセットボタンをダブルタップしてデバイスをプログラミングモードにします。ステータスLEDが急速に点滅します。
 
 ```
 mcconfig -d -m -p nrf52/<boardname> -t debugDFU
 ```
 
-After the build information scrolls by, the console will progress to installing:
+ビルド情報がスクロールした後、コンソールはインストールに進みます：
 
 ```
 Sending DFU start packet
@@ -496,57 +492,57 @@ Device programmed.
 ```
 
 <a id="ble-update"></a>
-## Updating nRF52 over BLE (DFU OTA)
+## nRF52のBLE経由での更新 (DFU OTA)
 
-The Moddable SDK supports updating nRF52 firmware over BLE using Nordic's "nRF Connect for Mobile" apps on iOS and Android. This works with Moddable Four and other supported nRF52-powered boards.
+Moddable SDKは、iOSおよびAndroidのNordicの「nRF Connect for Mobile」アプリを使用して、BLE経由でnRF52ファームウェアを更新することをサポートしています。これは、Moddable Fourおよび他のサポートされているnRF52搭載ボードで動作します。
 
-These are the five steps to prepare your device and update the nRF52 firmware over BLE.
+デバイスを準備し、BLE経由でnRF52ファームウェアを更新するための5つのステップは次のとおりです。
 
-1. [Ensure that your nRF52 device has version 8](#ble-update-1) (or later) of the [Moddable fork of the AdaFruit bootloader](https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader).
-2. [Build your project firmware](#ble-update-2) into an update package
-3. [Transfer the update package](#ble-update-3) to your mobile device
-4. [Put the target device into DFU OTA mode](#ble-update-4)
-5. [Use "nRF Connect for Mobile" to install the firmware](#ble-update-5) onto the device wirelessly with BLE
+1. [nRF52デバイスがAdaFruitブートローダーのModdableフォークのバージョン8](#ble-update-1)（またはそれ以降）を持っていることを確認します。(https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader)
+2. [プロジェクトファームウェアをビルド](#ble-update-2)して更新パッケージにします
+3. [更新パッケージをモバイルデバイスに転送](#ble-update-3)します
+4. [ターゲットデバイスをDFU OTAモードにします](#ble-update-4)
+5. [「nRF Connect for Mobile」を使用してファームウェアをインストール](#ble-update-5)し、BLEでデバイスにワイヤレスでインストールします
 
-The following sections explain these steps in detail.
+以下のセクションでは、これらの手順を詳細に説明します。
 
-> Note: If the OTA firmware update fails, the device will reboot to DFU OTA mode until software has been successfully updated.
+> 注: OTAファームウェアの更新に失敗した場合、デバイスはソフトウェアが正常に更新されるまでDFU OTAモードで再起動します。
 
 <a id="ble-update-1"></a>
-### 1) Ensure your nRF52 device has version 8.1 of the Bootloader
+### 1) nRF52デバイスにバージョン8.1のブートローダーがインストールされていることを確認する
 
-Put your device into Programming mode (double-tap the reset button) and open the volume that appears on your desktop. Open the INFO_UF2.TXT file. Look for
+デバイスをプログラミングモードにして（リセットボタンをダブルタップ）、デスクトップに表示されるボリュームを開きます。INFO_UF2.TXTファイルを開きます。以下のような情報を探します。
 
 ```
 Bootloader: Moddable 8.1
 Date: Nov  8 2023
 ```
 
-If the version is earlier than 8.1, update your bootloader.
+バージョンが8.1よりも前の場合は、ブートローダーを更新してください。
 
 <a id="ble-update-bootloader"></a>
-#### Update the nRF52 Bootloader
+#### nRF52ブートローダーの更新
 
-You can update your Moddable nRF52 Bootloader with a prebuilt version for your board, or you can customize it and build it yourself.
+Moddable nRF52ブートローダーは、ボード用に事前にビルドされたバージョンで更新することも、自分でカスタマイズしてビルドすることもできます。
 
-The [Moddable Four Bootloader](https://github.com/Moddable-OpenSource/moddable/tree/public/build/devices/nrf52/bootloader) can be found in the repository at `$MODDABLE/build/devices/nrf52/bootloader/`. Put your device into Programming mode and copy the current.uf2 file to the device.
+[Moddable Four Bootloader](https://github.com/Moddable-OpenSource/moddable/tree/public/build/devices/nrf52/bootloader)は、リポジトリの`$MODDABLE/build/devices/nrf52/bootloader/`にあります。デバイスをプログラミングモードにして、current.uf2ファイルをデバイスにコピーします。
 
-If you've got a different device, build and install the updated bootloader to your nRF52 device by first configuring, then building the Bootloader.
+もし異なるデバイスをお持ちの場合は、まずブートローダーを構成し、次にブートローダーをビルドして、更新されたブートローダーをnRF52デバイスにインストールしてください。
 
-Use the [Moddable fork of the Adafruit nRF52 bootloader](https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader). The minimum version to use for DFU OTA is version 8.
+[ModdableのAdafruit nRF52ブートローダーのフォーク](https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader)を使用してください。DFU OTAを使用するための最低バージョンはバージョン8です。
 
 <a id="configure-the-bootloader"></a>
-#### Configure the Bootloader
+#### ブートローダーの構成
 
-You can configure the bootloader to check the state of a GPIO pin during boot to put the device into DFU OTA mode.
+ブート中にGPIOピンの状態をチェックしてデバイスをDFU OTAモードにするようにブートローダーを構成できます。
 
-Set the `BUTTON_DFU` define in your board.h file to specify which GPIO to use. The board.h file is located in `Adafruit_nRF52_Bootloader/src/boards/<boardname>/board.h`.
+`board.h`ファイルで`BUTTON_DFU`定義を設定して、使用するGPIOを指定します。`board.h`ファイルは`Adafruit_nRF52_Bootloader/src/boards/<boardname>/board.h`にあります。
 
-If you do not define a GPIO, you can programmatically set the device to reboot in DFU OTA mode. [See below](#dfu-software-switch)
+GPIOを定義しない場合は、プログラムでデバイスをDFU OTAモードで再起動するように設定できます。[以下を参照](#dfu-software-switch)
 
-#### Build and install the Bootloader using USB
+#### USBを使用してブートローダーをビルドおよびインストールする
 
-For devices that communicate over USB, build the bootloader update file:
+USB経由で通信するデバイスの場合、ブートローダー更新ファイルをビルドします：
 
 ```
 cd .../Adafruit_nRF52_Bootloader
@@ -554,15 +550,15 @@ rm -rf _build
 git pull --rebase
 make BOARD=moddable_four bootloaderuf2
 ```
-Put your device into Programming mode and copy the `current.uf2` file to the device:
+デバイスをプログラミングモードにして、`current.uf2`ファイルをデバイスにコピーします：
 
 ```
 cp current.uf2 /Volumes/MODDABLE4
 ```
 
-#### Or Build and install the Bootloader using JTAG for a UART device
+#### または、UARTデバイス用のJTAGを使用してブートローダーをビルドおよびインストールする
 
-For devices that update over serial, use JTAG to push install the new bootloader:
+シリアル経由で更新するデバイスの場合、新しいブートローダーをインストールするためにJTAGを使用します：
 
 ```
 cd .../Adafruit_nRF52_Bootloader
@@ -571,13 +567,12 @@ git pull --rebase
 make SERIAL_DFU=1 BOARD=test flash
 ```
 
-> Note: With `SERIAL_DFU=1`, the example above is for a device that uses serial instead of USB for programming. Installing this bootloader will disable updating over USB.
-
+> 注: `SERIAL_DFU=1` を使用すると、上記の例はUSBではなくシリアルを使用してプログラムするデバイス用です。このブートローダーをインストールすると、USB経由での更新が無効になります。
 
 <a id="ble-update-2"></a>
-### 2) Build an update package
+### 2) 更新パッケージをビルドする
 
-Build your application with the `-t ble-package` target. The build will complete and indicate where the `ble-package.zip ` file can be found.
+`-t ble-package` ターゲットを使用してアプリケーションをビルドします。ビルドが完了し、`ble-package.zip` ファイルの場所が表示されます。
 
 ```
  % cd .../my_app
@@ -588,82 +583,82 @@ Zip created at .../my_app/ble-package.zip
 ```
 
 <a id="ble-update-3"></a>
-### 3) Transfer the package to your mobile
+### 3) パッケージをモバイルに転送する
 
-Transfer the `ble-package.zip` file to your mobile device so that it can be accessed by "nRF Connect for Mobile".
+`ble-package.zip` ファイルをモバイルデバイスに転送し、「nRF Connect for Mobile」でアクセスできるようにします。
 
 <a id="ble-update-4"></a>
-### 4) Put the device in DFU OTA mode
+### 4) デバイスをDFU OTAモードにする
 
-When the device is in DFU OTA mode, the status LED will double-blink regularly.
+デバイスがDFU OTAモードにあると、ステータスLEDが定期的にダブルブリンクします。
 
 <a id="dfu-software-switch"></a>
-#### Put nRF52 into Update Mode (programmatically)
+#### nRF52を更新モードにする（プログラム的に）
 
-Put the nRF52 device into BLE DFU update mode by calling the `nrf52_rebootToOTA()` C function. The `$(MODDABLE)/build/devices/nrf52/examples/BLE_DFU` app is an example of how to use it from an app.
+nRF52デバイスをBLE DFUアップデートモードにするには、`nrf52_rebootToOTA()` C関数を呼び出します。`$(MODDABLE)/build/devices/nrf52/examples/BLE_DFU`アプリは、アプリからそれを使用する方法の例です。
 
 ```
 cd $MODDABLE/build/devices/nrf52/examples/BLE_DFU
 mcconfig -d -m -p nrf52/moddable_four
 ```
-#### Put nRF52 into Update Mode (GPIO)
+#### nRF52をアップデートモードにする (GPIO)
 
-If your device and bootloader have a button defined as the `BUTTON_DFU`, hold that button and reset the device.
+デバイスとブートローダーに`BUTTON_DFU`として定義されたボタンがある場合、そのボタンを押しながらデバイスをリセットします。
 
 <a id="ble-update-5"></a>
-#### 5) Use nRF Connect for Mobile to Wirelessly update device
+#### 5) nRF Connect for Mobileを使用してデバイスをワイヤレスでアップデートする
 
-Once the nRF52 is in BLE DFU update mode, use the [nRF Connect for Mobile](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-mobile) to transfer the firmware contained in the `ble-package.zip` file to the nRF52 device.
+nRF52がBLE DFUアップデートモードになったら、[nRF Connect for Mobile](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-mobile)を使用して、`ble-package.zip`ファイルに含まれるファームウェアをnRF52デバイスに転送します。
 
-Launch the application and follow these steps:
+アプリケーションを起動し、以下の手順に従います：
 
-1. Open the filter
-2. Enable Nordic DFU Service
-3. Enable "Remove Unconnectable"
-4. Connect to the AdaDFU device<br>
+1. フィルターを開く
+2. Nordic DFUサービスを有効にする
+3. "Remove Unconnectable"を有効にする
+4. AdaDFUデバイスに接続する<br>
 	<img src=../assets/dfu/nrfConnect0.jpeg width=40%>&nbsp;<img src=../assets/dfu/nrfConnect1.jpeg width=40%>
-5. Select the DFU tab
-6. Click the "Connect" button
-When the device has connected,
-7. Click "Open Document Picker"<br>
+5. DFUタブを選択する
+6. "Connect"ボタンをクリックする
+デバイスが接続されたら、
+7. "Open Document Picker"をクリックする<br>
 	<img src=../assets/dfu/nrfConnect2.jpeg width=40%>&nbsp;<img src=../assets/dfu/nrfConnect3.jpeg width=40%>
-8. Choose your upload package
-9. Press the "Start" button<br>
+8. アップロードパッケージを選択する
+9. "Start"ボタンを押す<br>
 	<img src=../assets/dfu/nrfConnect4.jpeg width=40%>&nbsp;<img src=../assets/dfu/nrfConnect5.jpeg width=40%>
-10. The Status area will display "Starting" for some time as the flash area is erased.
-11. After the area is erased, the status changes to "Uploading" and progress will be displayed as the upload continues.<br>
+10. フラッシュ領域が消去される間、ステータスエリアに「Starting」と表示されます。
+11. 領域が消去された後、ステータスが「Uploading」に変わり、アップロードが続行されると進行状況が表示されます。<br>
 	<img src=../assets/dfu/nrfConnect6.jpeg width=40%>&nbsp;<img src=../assets/dfu/nrfConnect7.jpeg width=40%>
-12. When the transfer has completed, "Success!" is displayed. The device will reboot to the newly install firmware image.
+12. 転送が完了すると、「Success!」と表示されます。デバイスは新しくインストールされたファームウェアイメージに再起動します。
 
 	<img src=../assets/dfu/nrfConnect8.jpeg width=40%>
 
 <a id="debugging-native-code"></a>
-### Debugging Native Code
+### ネイティブコードのデバッグ
 
-As with all Moddable platforms, you can debug script code using `xsbug` over the USB serial interface with Moddable Four. For more information, see the [`xsbug` documentation](../xs/xsbug.md). For native code source level debugging, you can use [GDB](https://www.gnu.org/software/gdb/documentation/).
+すべてのModdableプラットフォームと同様に、Moddable FourではUSBシリアルインターフェースを介して`xsbug`を使用してスクリプトコードをデバッグできます。詳細については、[`xsbug`のドキュメント](../xs/xsbug.md)を参照してください。ネイティブコードのソースレベルデバッグには、[GDB](https://www.gnu.org/software/gdb/documentation/)を使用できます。
 
-Debugging native code on the Moddable Four requires a [Nordic nRF52840-DK board](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK), [Segger J-Link Plus](https://www.segger.com/products/debug-probes/j-link/models/j-link-plus/) or compatible device.
+Moddable Fourでネイティブコードをデバッグするには、[Nordic nRF52840-DKボード](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)、[Segger J-Link Plus](https://www.segger.com/products/debug-probes/j-link/models/j-link-plus/)または互換デバイスが必要です。
 
 <a id="j-link-connection"></a>
-For example, connect your Moddable Four to the nRF52840-DK board as follows:
+例えば、Moddable FourをnRF52840-DKボードに次のように接続します：
 
 | nRF52840 DK | Moddable Four |  |
 | :---: | :---: | :---
 | SWD CLK | SWDCLK |
 | SWD IO | SWDIO |
-| RESET | RESET | (optional)
+| RESET | RESET | (オプション)
 | GND DETECT | GND |
 | VTG | 3V3 |
 
 <img src="../assets/devices/moddable-four-dk-pinout.png" width="100%"><BR>
 
-If you have a Segger J-Link Plus, the connections to the J-Link are as follows:
+セガー J-Link Plusをお持ちの場合、J-Linkへの接続は以下の通りです：
 
 | Moddable Four | J-Link | |
 | :---: | :---: | :---
 | SWDCLK | TCK |
 | SWDIO | TMS |
-| RESET | RESET | (optional)
+| RESET | RESET | (オプション)
 | GND | GND |
 | 3V3 | VTref |
 
@@ -673,13 +668,13 @@ If you have a Segger J-Link Plus, the connections to the J-Link are as follows:
 
 
 
-[GDB](https://www.gnu.org/software/gdb/documentation/) is the GNU debugger widely used on Unix-like build hosts to debug native code. GDB is included in the Arm Embedded Toolchain archive downloaded during the [SDK and Host Environment Setup](#setup) step.
+[GDB](https://www.gnu.org/software/gdb/documentation/) は、Unix系のビルドホストでネイティブコードをデバッグするために広く使用されているGNUデバッガです。GDBは、[SDKおよびホスト環境のセットアップ](#setup)ステップでダウンロードされたArm Embedded Toolchainアーカイブに含まれています。
 
-GDB communicates with the nRF58240 device via a J-Link connection in the nRF52840-DK board, Segger j-link Plus or other J-Link compatible device. Take the following steps to install/configure the required tools and launch GDB:
+GDBは、nRF52840-DKボード、セガー J-Link Plusまたは他のJ-Link互換デバイスのJ-Link接続を介してnRF58240デバイスと通信します。必要なツールをインストール/構成し、GDBを起動するために次の手順を実行してください：
 
-1. [Install the nRF Command Line Tools](https://www.nordicsemi.com/Software-and-tools/Development-Tools/nRF-Command-Line-Tools). Make sure the `JLinkGDBServer` is somewhere in your `$PATH`.
+1. [nRFコマンドラインツール](https://www.nordicsemi.com/Software-and-tools/Development-Tools/nRF-Command-Line-Tools)をインストールします。`JLinkGDBServer`が`$PATH`のどこかにあることを確認してください。
 
-2. Create a GDB startup command text file `gdb_cmds.txt` in the `nrf5` directory with the following contents:
+2. `nrf5`ディレクトリに、以下の内容でGDBスタートアップコマンドテキストファイル `gdb_cmds.txt` を作成します：
 
     ```text
     target remote localhost:2331
@@ -691,22 +686,22 @@ GDB communicates with the nRF58240 device via a J-Link connection in the nRF5284
     continue
     ```
 
-3. Connect both your device and debugger USB ports to your computer. Both USB ports can be connected to the computer via a USB hub.
+3. デバイスとデバッガーの両方のUSBポートをコンピュータに接続します。両方のUSBポートはUSBハブを介してコンピュータに接続できます。
 
-4. Build the Moddable app that includes the native code you plan to debug. For this example, we build the BLE [heart-rate-server](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/network/ble/heart-rate-server) example:
+4. デバッグする予定のネイティブコードを含むModdableアプリをビルドします。この例では、BLEの[heart-rate-server](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/network/ble/heart-rate-server)の例をビルドします：
 
     ```text
     cd $MODDABLE/examples/network/ble/heart-rate-server
     mcconfig -d -m -p nrf52/moddable_four -t build
     ```
 
-5. Launch the J-Link GDB server from a command line console:
+5. コマンドラインコンソールからJ-Link GDBサーバーを起動します：
 
     ```text
     JLinkGDBServer -device nRF52840_xxAA -if swd -port 2331
     ```
 
-    The GDB server will connect to the nRF52840-DK target and wait for a client connection:
+    GDBサーバーはnRF52840-DKターゲットに接続し、クライアント接続を待ちます：
 
     ```text
     Connecting to J-Link...
@@ -721,164 +716,163 @@ GDB communicates with the nRF58240 device via a J-Link connection in the nRF5284
     Waiting for GDB connection...
     ```
 
-6. From a second command line console, launch the GDB client, passing the application ELF and GDB startup command text files as command line arguments:
+6. 別のコマンドラインコンソールからGDBクライアントを起動し、アプリケーションELFとGDBスタートアップコマンドテキストファイルをコマンドライン引数として渡します：
 
     ```text
     arm-none-eabi-gdb $MODDABLE/build/tmp/nrf52/moddable_four/debug/heart-rate-server/xs_nrf52.out -x ~/nrf5/gdb_cmds.txt
     ```
 
-    The GDB server connects with the client, downloads the application and stops at the breakpoint `main` specified in the GDB setup command file:
+GDBサーバーはクライアントと接続し、アプリケーションをダウンロードし、GDBセットアップコマンドファイルで指定されたブレークポイント`main`で停止します：
 
-    ```text
-    Breakpoint 1 at 0x46550: file /Users/<user>/Projects/moddable/build/devices/nrf52/xsProj/main.c, line 149.
+```text
+Breakpoint 1 at 0x46550: file /Users/<user>/Projects/moddable/build/devices/nrf52/xsProj/main.c, line 149.
     Resets core & peripherals via SYSRESETREQ & VECTRESET bit.
 
     Breakpoint 1, main () at /Users/<user>/Projects/moddable/build/devices/nrf52/xsProj/main.c:149
 
     149     clock_init();
     (gdb)
-    ```
+```
 
-7. At the `(gdb)` prompt, type `c` to continue execution and/or set other breakpoints, etc...
+7. `(gdb)`プロンプトで、`c`と入力して実行を続行するか、他のブレークポイントを設定します。
 
 <a id="bootloader"></a>
-## Bootloader
+## ブートローダー
 
-Applications using the Moddable SDK running on the nRF52 SoC typically use a modified [Adafruit nRF52 Bootloader](https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader) that supports the UF2 file format for flashing firmware to a device.
+nRF52 SoC上で動作するModdable SDKを使用するアプリケーションは、通常、デバイスにファームウェアをフラッシュするためのUF2ファイル形式をサポートする修正された[Adafruit nRF52 Bootloader](https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader)を使用します。
 
-### Programming mode
+### プログラミングモード
 
-If the device has a debug build of a Moddable SDK app installed, the Moddable tools can automatically set the device to programming mode so you do not have to manually reset the board.
+デバイスにModdable SDKアプリのデバッグビルドがインストールされている場合、Moddableツールはデバイスを自動的にプログラミングモードに設定するため、ボードを手動でリセットする必要はありません。
 
-Otherwise **double-tap** the reset button on the device to put it into programming mode. The on-board LED blinks every second and a USB disk named **MODDABLE4** appears on your desktop.
+それ以外の場合は、デバイスのリセットボタンを**ダブルタップ**してプログラミングモードにします。オンボードLEDが毎秒点滅し、**MODDABLE4**という名前のUSBディスクがデスクトップに表示されます。
 
-Drag a `.uf2` file to the **MODDABLE4** disk to program it.
+`.uf2`ファイルを**MODDABLE4**ディスクにドラッグしてプログラムします。
 
-> Note: The bootloader can be updated in the same way.
+> 注: ブートローダーは同じ方法で更新できます。
 
-> Note: The disk that appears may be named **MODDABLEnRF**
+> 注: 表示されるディスクは **MODDABLEnRF** と名付けられている場合があります。
 
 <a id="install-bootloader"></a>
-### Installing the bootloader the first time
+### 初めてのブートローダーのインストール
 
-To use a nRF52840 device with the Moddable SDK, you will have to install the bootloader to that device. This will replace the functionality of the previous bootloader.
+Moddable SDKを使用するためには、nRF52840デバイスにブートローダーをインストールする必要があります。これにより、以前のブートローダーの機能が置き換えられます。
 
-> Note: The Moddable Four has the bootloader pre-installed.
+> 注: Moddable Fourにはブートローダーが事前にインストールされています。
 
-> Note: You may brick your device.
+> 注: デバイスが壊れる可能性があります。
 
-You will need a Segger J-Link or equivalent to program the bootloader for the first time. Once a Moddable bootloader is installed, you can use the UF2 installation method.
+初めてブートローダーをプログラムするには、Segger J-Linkまたは同等のものが必要です。一度Moddableブートローダーがインストールされると、UF2インストール方法を使用できます。
 
-1. Connect your device to the J-Link in the same way that you would for the debugger. See the
-[Debugging Native Code](#debugging-native-code)
-section.
+1. デバイスをJ-Linkに接続します。デバッガーと同じ方法で接続します。詳細は
+[ネイティブコードのデバッグ](#debugging-native-code)
+セクションを参照してください。
 
-2. Fetch the bootloader repository:
+2. ブートローダーリポジトリを取得します：
 
    ```
    git clone https://github.com/Moddable-OpenSource/Adafruit_nRF52_Bootloader --recurse-submodules
    ```
 
-3. Build for your device
+3. デバイス用にビルドします
 
    ```
    cd Adafruit_nRF52_Bootloader
    make BOARD=moddable_four
    ```
 
-   > Note: The following BOARD configurations have been updated to support Moddable.
-   - `moddable_four`
-   - `moddable_itsybitsy_nrf52`
-   - `moddable_makerdiary_nrf52`
-   - `moddable_pca10056`
-   - `moddable_sparkfun52840`
-   - `moddable_xiao`
+> 注: 以下のBOARD構成はModdableをサポートするように更新されました。
+- `moddable_four`
+- `moddable_itsybitsy_nrf52`
+- `moddable_makerdiary_nrf52`
+- `moddable_pca10056`
+- `moddable_sparkfun52840`
+- `moddable_xiao`
 
-
-4. Install to your device. First install the SoftDevice, then flash the bootloader:
+4. デバイスにインストールします。まずSoftDeviceをインストールし、次にブートローダーをフラッシュします：
 
    ```
    make BOARD=moddable_four sd
    make BOARD=moddable_four flash
    ```
 
-5. Double-tap the reset button to set the device to Programming mode. The LED will blink regularly, and the `MODDABLEnRF` volume will appear on the desktop.
+5. リセットボタンをダブルタップしてデバイスをプログラミングモードに設定します。LEDが定期的に点滅し、デスクトップに`MODDABLEnRF`ボリュームが表示されます。
 
-   You can now program the device.
+   これでデバイスをプログラムできます。
 
    <a id="bootloader-update-file"></a>
-6. Once a Moddable bootloader has been installed on your device, you can use the **bootloaderuf2** Makefile target to build an update file and copy the file to your device.
+6. デバイスにModdableブートローダーがインストールされたら、**bootloaderuf2** Makefileターゲットを使用して更新ファイルをビルドし、そのファイルをデバイスにコピーできます。
 
-   Build the bootloader with the `bootloaderuf2` target
+   `bootloaderuf2`ターゲットでブートローダーをビルドします
 
    ```
    cd .../Adafruit_nRF52_Bootloader
    make BOARD=moddable_four bootloaderuf2
    ```
 
-   Put your device into Programming mode and copy the `current.uf2` file to your device.
+   デバイスをプログラミングモードにして、`current.uf2`ファイルをデバイスにコピーします。
 
 ----
 
 <a id="nrf5-sdk-mods"></a>
-## nRF5 SDK Modifications
+## nRF5 SDKの変更点
 
-Moddable Four requires a few small adjustments to the Nordic nRF5 SDK. You can use the prepared SDK at [Nordic nRF5 SDK](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/nRF5_SDK_17.0.2_d674dde-mod.zip).
+Moddable Fourには、Nordic nRF5 SDKにいくつかの小さな調整が必要です。準備されたSDKは[Nordic nRF5 SDK](https://github.com/Moddable-OpenSource/tools/releases/download/v1.0.0/nRF5_SDK_17.0.2_d674dde-mod.zip)から使用できます。
 
-Or you can make your own by following these steps to modify the SDK:
+または、以下の手順に従ってSDKを変更することで、自分で作成することもできます：
 
-1. Download the [Nordic nRF5 SDK](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK/Download) by taking the following steps:
+1. 次の手順に従って[Nordic nRF5 SDK](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK/Download)をダウンロードします：
 
-    - Select `v17.0.2` from the nRF5 SDK versions section.
+    - nRF5 SDKバージョンセクションから`v17.0.2`を選択します。
 
         ![](../assets/devices/nrf5-sdk-versions.png)
 
-    - Uncheck all SoftDevices.
+    - すべてのSoftDevicesのチェックを外します。
 
         ![](../assets/devices/softdevices.png)
 
-    - Click the **Download Files** button at the bottom of the page. You should see the same selection as in the image below.
+    - ページの下部にある**Download Files**ボタンをクリックします。以下の画像と同じ選択が表示されるはずです。
 
         ![](../assets/devices/nrf5-sdk-selected.png)
 
-    The downloaded archive is named `DeviceDownload.zip`. Unzip the archive and copy the `nRF5_SDK_17.0.2_d674dde` directory into the `nrf5` directory.
+    ダウンロードされたアーカイブは`DeviceDownload.zip`という名前です。アーカイブを解凍し、`nRF5_SDK_17.0.2_d674dde`ディレクトリを`nrf5`ディレクトリにコピーします。
 
-2. Setup the `NRF_SDK_DIR` environment variable to point at the nRF5 SDK directory:
+2. `NRF_SDK_DIR` 環境変数をnRF5 SDKディレクトリに設定します：
 
     ```text
     export NRF_SDK_DIR=$HOME/nrf5/nRF5_SDK_17.0.2_d674dde
     ```
 
-3. Add a board definition file for the Moddable Four to the Nordic nRF5 SDK. The board definition file includes Moddable Four LED, button and pin definitions. To add the Moddable Four board definition file, take the following steps:
+3. Moddable Fourのボード定義ファイルをNordic nRF5 SDKに追加します。ボード定義ファイルにはModdable FourのLED、ボタン、およびピンの定義が含まれています。Moddable Fourボード定義ファイルを追加するには、次の手順を実行します：
 
-    - The `moddable_four.h` board definition file is found in `$MODDABLE/build/devices/nrf52/config/moddable_four.h`. Copy the `moddable_four.h` file to the Nordic nRF5 SDK `components/boards/` directory.
+    - `moddable_four.h` ボード定義ファイルは `$MODDABLE/build/devices/nrf52/config/moddable_four.h` にあります。`moddable_four.h` ファイルをNordic nRF5 SDKの `components/boards/` ディレクトリにコピーします。
 
     ```text
     cp $MODDABLE/build/devices/nrf52/config/moddable_four.h $NRF_SDK_DIR/components/boards
     ```
 
-    - Modify `$NRF_SDK_DIR/components/boards/boards.h`, adding the following before `#elif defined(BOARD_CUSTOM)`:
+    - `$NRF_SDK_DIR/components/boards/boards.h` を修正し、次の内容を `#elif defined(BOARD_CUSTOM)` の前に追加します：
 
     ```c
     #elif defined (BOARD_MODDABLE_FOUR)
       #include "moddable_four.h"
     ```
 
-4. Add `SPIM3` support:
+4. `SPIM3` サポートを追加します：
 
-    The nRF5 SDK has a file `integration/nrfx/legacy/apply_old_config.h` that needs a small change. Add `|| NRFX_SPIM3_ENABLED` after the `NRFX_SPIM2_ENABLED` as shown in the line below:
+    nRF5 SDKには `integration/nrfx/legacy/apply_old_config.h` というファイルがあり、少し変更が必要です。以下の行に示すように、`NRFX_SPIM2_ENABLED` の後に `|| NRFX_SPIM3_ENABLED` を追加します：
 
-    ```text
-    #define NRFX_SPIM_ENABLED \
-    (SPI_ENABLED && (NRFX_SPIM0_ENABLED || NRFX_SPIM1_ENABLED || NRFX_SPIM2_ENABLED || NRFX_SPIM3_ENABLED))
-    ```
+```text
+#define NRFX_SPIM_ENABLED \
+(SPI_ENABLED && (NRFX_SPIM0_ENABLED || NRFX_SPIM1_ENABLED || NRFX_SPIM2_ENABLED || NRFX_SPIM3_ENABLED))
+```
 
-5. Enable LE secure connection support:
+5. LEセキュア接続サポートを有効にする：
 
-	Disable the stack overflow check in the `nrf_stack_info_overflowed` function In the Nordic SDK `nrf_stack_info.h` file:
+    Nordic SDKの`nrf_stack_info.h`ファイル内の`nrf_stack_info_overflowed`関数でスタックオーバーフローチェックを無効にします：
 
-    ```c
-    __STATIC_INLINE bool nrf_stack_info_overflowed(void)
+```c
+__STATIC_INLINE bool nrf_stack_info_overflowed(void)
     {
     #if 0
         if (NRF_STACK_INFO_GET_SP() < NRF_STACK_INFO_BASE)
@@ -888,6 +882,4 @@ Or you can make your own by following these steps to modify the SDK:
     #endif
         return false;
     }
-    ```
-
-
+```
