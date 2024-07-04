@@ -1,99 +1,106 @@
-# JavaScript language considerations on embedded devices using the XS engine
+# 組み込みデバイス上でXSエンジンを使用する際のJavaScript言語の考慮事項
+
 Copyright 2018-2023 Moddable Tech, Inc.<BR>
-Revised: September 22, 2023
+改訂： 2023年9月22日
 
-## Ultra-light JavaScript
-XS is the JavaScript engine at the core of Moddable applications and tools. XS has existed since the beginning of this century. You can get the latest version on [GitHub](https://github.com/Moddable-OpenSource/moddable).
+## 超軽量JavaScript
 
-Other JavaScript engines are primarily used for client or server side web development. Their main focus is speed, their main cost is the significant resources they consume to get that speed.
+XSはModdableアプリケーションとツールの中核をなすJavaScriptエンジンです。XSは今世紀の初めから存在しています。最新バージョンは[GitHub](https://github.com/Moddable-OpenSource/moddable)で入手できます。
 
-The XS engine targets embedded platforms built around microcontrollers like the [ESP8266](https://www.espressif.com/en/products/hardware/esp8266ex/overview) or [ESP32](https://www.espressif.com/en/products/hardware/esp32/overview). XS also runs on the usual desktop and mobile platforms.
+他のJavaScriptエンジンは主にクライアントまたはサーバーサイドのWeb開発に用いられます。主な焦点は速度であり、速度を得るために多大なリソースを消費します。
 
-The challenges of embedded development are well known: limited memory and limited performance. Compared to hardware that usually runs JavaScript for the web on the client or the server sides, the differences are measured in orders of magnitude, not percentages. Moreover battery life is often critical.
+XSエンジンは、[ESP8266](https://www.espressif.com/en/products/hardware/esp8266ex/overview)や[ESP32](https://www.espressif.com/en/products/hardware/esp32/overview)といったマイクロコントローラを中心に構築された組み込みプラットフォームを対象にしています。通常のデスクトップやモバイルプラットフォームでも動作します。
 
-Despite such constraints, and unlike other scripting libraries available on microcontrollers, XS always strives to fully implement the quite extensive [ECMAScript Language Specification](https://tc39.github.io/ecma262/).
+組み込み開発の課題はよく知られています：限られたメモリと限られた性能です。通常のWebでクライアントやサーバーサイドでJavaScriptを実行するハードウェアと比較すると、その差は何パーセントかではなく桁違いで測定されます。加えて、バッテリー寿命も非常に重要です。
 
-These constraints have consequences. This document highlights key differences between XS, with its focus on embedded devices, and  JavaScript engines focused on web development.
+こういった制約があるにもかかわらず、また、マイクロコントローラ上で利用可能な他のスクリプトライブラリとは異なり、XSは非常に広範な[ECMAScript 言語仕様](https://tc39.github.io/ecma262/)を完全に実装するよう常に努めています。
 
-## Spare runtime resources
-Embedded platforms do not exist alone. You need a computer to develop applications for them. Therefore, you should prepare in advance of execution, at *compile* time, everything you can in order to spare *run*-time resources.
+これらの制約には影響があります。このドキュメントでは、組み込みデバイスに焦点を当てたXSと、ウェブ開発に重点を置いたJavaScriptエンジンとの主な違いを説明します。
 
-On the web, JavaScript engines currently execute scripts and modules from their source code. For microcontrollers, the XS compiler transforms modules source code into byte code on your computer, so the XS engine on the microcontroller only has to execute byte code.
+## 実行時リソースの節約
 
-At Moddable, we generalized this approach beyond scripts to all kinds of assets. Fonts, movies, pictures, sounds, and textures are always encoded on your computer into the most practical format for the specific hardware target.
+組み込みプラットフォームは単独で存在するものではありません。アプリケーション開発にはコンピュータが必要です。したがって、実行の前に、つまりコンパイル時に、実行時リソースを節約するためにできる限りの準備をする必要があります。
 
-> It is a common to mischaracterize web applications as static or dynamic based on whether its assets are adapted for a specific target device. Using content negotiation, for example, web applications can be as live as you want while still running optimized modules and assets. In this case, the *compile*-time is on the server side, the *run*-time is on the client side, with caches in between.
+Webでは、JavaScriptエンジンがスクリプトやモジュールをそのソースコードから実行しています。マイクロコントローラの場合、XSコンパイラがコンピュータ上でモジュールのソースコードをバイトコードに変換するため、マイクロコントローラ上のXSエンジンはバイトコードを実行するだけで済みます。
 
-Despite being based on JavaScript, embedded development with XS is more similar to mobile development than web development. Applications built with XS are described by a manifest and built with a tool chain that includes the XS compiler and linker, asset encoders, C compiler and linker, a debugger, and ROM flasher.
+Moddableでは、このアプローチをスクリプトだけでなく、すべての種類のアセットに一般化しました。フォント、動画、画像、音声、およびテクスチャは、常にコンピュータ上で特定のハードウェアターゲットに最適な形式にエンコードされます。
 
-## Prepare the environment
-On embedded platforms, the amount of RAM is extremely small, often under 64 KB. The amount of ROM is larger, 512 KB to 4 MB, roughly the same amount of data downloaded for a typical modern web page. An application's native code and data are flashed into ROM.
+> アセットが特定のデバイスに適応されているかどうかに基づいて、Web アプリケーションを静的または動的とするのはよくある誤解です。たとえば、コンテンツネゴシエーションを使用することで、Web アプリケーションは必要なだけ動的にしながらも、最適化されたモジュールとアセットを利用できます。この場合、コンパイル時はサーバー側で行われ、実行時はクライアント側で行われ、キャッシュがその間に存在します。
 
-JavaScript modules compiled to byte code and encoded assets are stored in flash ROM as part of the native data. This allows the byte code and assets to be used in place, rather than being copied to RAM first. For example, the XS engine executes byte code directly from ROM. Still, a significant amount of RAM is needed for the JavaScript environment your application runs in. For example:
+JavaScriptに基づいているにもかかわらず、XSを使用した組み込み開発は、Web開発よりもモバイル開発に似ています。XSで構築されたアプリケーションは、マニフェストで記述され、XSコンパイラおよびリンカー、アセットエンコーダ、Cコンパイラおよびリンカー、デバッガー、およびROMフラッシャーを含むツールチェーンで構築されます。
 
-- JavaScript Built-ins including `Object`, `Function`, `Boolean`, `Symbol`, `Error`, `Number`, `Math`, `Date`, `String`, `RegExp`, `Array`, `TypedArray`, `Map`, `Set`, `WeakMap`, `WeakSet`, `ArrayBuffer`, `SharedArrayBuffer`, `DataView`, `Atomics`, `JSON`, `Generator`, `AsyncGenerator`, `AsyncFunction`, `Promise`, `Reflect`, `Proxy`, etc.
-- Modules your application uses to do something useful, like a user interface framework, a secure network framework, etc.
+## 環境の準備
 
-Constructing built-ins and loading modules creates many classes, functions, and prototype objects. These objects often require more RAM than is present on a modest microcontroller.
+組み込みプラットフォームでは、RAMの量は非常に小さく、しばしば64KB以下です。ROMの量はより大きく、512KBから4MBで、これは現代の典型的なウェブページがダウンロードするデータ量とほぼ同じです。アプリケーションのネイティブコードとデータはROMにフラッシュされます。
 
-To solve this problem, the XS linker allows you to prepare a JavaScript environment on your computer. The XS linker constructs all built-ins and preloads most modules, then saves the result as native data, which is flashed into ROM.
+JavaScriptモジュールはバイトコードにコンパイルされ、エンコードされたアセットはネイティブデータの一部としてフラッシュROMに保存されます。これにより、バイトコードやアセットを最初にRAMにコピーすることなく、そのまま使用できます。例えば、XSエンジンはバイトコードをROMから直接実行します。それでも、アプリケーションが動作するJavaScript環境にはかなりの量のRAMが必要です。例えば：
 
-The benefits are significant:
+- `Object`, `Function`, `Boolean`, `Symbol`, `Error`, `Number`, `Math`, `Date`, `String`, `RegExp`, `Array`, `TypedArray`, `Map`, `Set`, `WeakMap`, `WeakSet`, `ArrayBuffer`, `SharedArrayBuffer`, `DataView`, `Atomics`, `JSON`, `Generator`, `AsyncGenerator`, `AsyncFunction`, `Promise`, `Reflect`, `Proxy`などのJavaScriptのビルトイン。
+- ユーザーインターフェースフレームワークやセキュアネットワークフレームワークなど、アプリケーションが何か便利なことをするために使うモジュール。
 
-- Since almost nothing is ever copied from ROM to RAM, your application runs with a small amount of RAM.
-- Since everything is ready in ROM, your application boots instantaneously.
+ビルトインの構築やモジュールのロードは、多くのクラス、関数、およびプロトタイプオブジェクトを作成します。これらのオブジェクトは、マイクロコントローラに搭載されている控えめなRAMよりも多くのRAMを必要とすることがよくあります。
 
-> The XS linker cannot preload a module with a body that calls a native function that is only available on the microcontroller. Typically there will be only one module like that to start your application.
+この問題を解決するために、XSリンカーはコンピュータ上でJavaScript環境を準備することを可能にします。XSリンカーはすべてのビルトインを構築し、ほとんどのモジュールを事前にロードし、その結果をネイティブデータとして保存し、ROMにフラッシュします。
 
-## Freeze most objects
-But what happens when applications want to modify objects that the XS linker prepared in ROM?
+この方法の利点は大きいです：
 
-The XS engine maintains a a table of aliases which is initially empty. All aliasable objects in ROM have an index in that table. When an application modifies an aliasable object, the aliasable object is cloned into RAM and inserted into the table to override the aliasable object.
+- ほとんど何もROMからRAMにコピーされないため、アプリケーションは少量のRAMで動作します。
+- すべてがROMで準備されているため、アプリケーションは瞬時に起動します。
 
-Such a mechanism has a cost in memory footprint and performance, but is essential for conformance with the JavaScript language specification. However JavaScript has a feature to specify that an object cannot be modified: `Object.freeze`. When objects are frozen, the XS linker does not index them as aliasable.
+> XS リンカーは、マイクロコントローラでのみ利用可能なネイティブ関数を呼び出すボディを持つモジュールを事前にロードすることはできません。通常、そういったアプリケーションを開始するためのモジュールは 1 つだけです。
 
-Modules can use `Object.freeze` in their body to tell the XS linker which objects do not need to be indexed as aliasable. Calling that for each object is tedious enough, so the XS linker can automatically freeze all class, function and prototype objects, as well as other built-in objects like `Atomics`, `JSON`, `Math` and `Reflect`.
+## ほとんどのオブジェクトを凍結する
 
-In ECMAScript parlance, that is related to a [frozen realm](https://github.com/tc39/proposal-frozen-realms).
+しかし、XSリンカーがROMに準備したオブジェクトを、アプリケーションが変更したい場合はどうなりますか？
 
-> Freezing most objects is healthy, especially for dynamic applications, since you can be sure that nothing can modify the JavaScript environment.
+XSエンジンは、最初は空のエイリアステーブルを保持します。ROM内のエイリアス可能オブジェクトは、そのテーブルにインデックスを持ちます。アプリケーションがエイリアス可能オブジェクトを変更すると、そのオブジェクトはRAMにクローンされ、エイリアス可能オブジェクトをオーバーライドするためにテーブルに挿入されます。
 
-## Strip unused features
-As mentioned above, JavaScript defines many of built-ins, which are all implemented in the XS engine with native code. It is often the case that your application does not use all built-in language features.
+このようなメカニズムにはメモリ容量とパフォーマンスのコストがかかりますが、JavaScript言語仕様に準拠するためには不可欠です。しかし、JavaScriptにはオブジェクトを変更不可に指定する機能があります：`Object.freeze` です。オブジェクトが凍結されると、XSリンカーはそれらをエイリアス可能としてインデックス付けしません。
 
-Based on the byte code of your modules, the XS linker can strip unused native code from the XS engine itself. So your application will run its own version of the XS engine, tailored to reduce its ROM footprint.
+モジュールはその本体で `Object.freeze` を使用して、XSリンカーにどのオブジェクトをエイリアス可能としてインデックス付けする必要がないかを指示できます。各オブジェクトに対してこれを呼び出すのは面倒なので、XSリンカーは自動的にすべてのクラス、関数、およびプロトタイプオブジェクト、ならびに `Atomics`、`JSON`、`Math`、`Reflect` などの他の組み込みオブジェクトを凍結することができます。
 
-That is automatic for applications that are self-contained and updated as a whole, which is still common on embedded platforms for the sake of consistency, safety, and security.
+ECMAScriptの用語では、これは[frozen realm](https://github.com/tc39/proposal-frozen-realms)に関連しています。
 
-For applications that expect to be customized or updated with separate modules, you can manually specify the built-in features to strip from the XS engine and to document the profiled JavaScript environment. For instance you can strip `eval`, `Function`, etc to get rid of the XS parser and byte coder.
+> ほとんどのオブジェクトを凍結することは、特に動的アプリケーションにとって健全です。JavaScript 環境を何も変更できないことが確実だからです。
 
-> Although there are no profiles in JavaScript, your application can define its own.
+## 未使用機能の削除
 
-## Use native code
+前述のように、JavaScriptは多くの組み込み機能を定義しており、それらはすべてネイティブコードでXSエンジンに実装されています。多くの場合、アプリケーションがすべての組み込み言語機能を使用するわけではありません。
 
-That may seem contradictory when talking about a JavaScript engine! But the simplicity of [XS in C](./XS%20in%20C.md), the C programming interface of XS, has always been essential to develop efficient applications.
+モジュールのバイトコードに基づいて、XSリンカーはXSエンジン自体から未使用のネイティブコードを削除することができます。これにより、ROM占有量を減らすように調整された独自バージョンのXSエンジンを実行することになります。
 
-Web development often claims to be "pure" JavaScript while it is in fact relying on the huge amount of native code required to implement web browsers. The reality is of course that web development is restricted to JavaScript on the client side.
+自己完結型で全体更新されるアプリケーションでは自動で行われます。一貫性、安全性、セキュリティを目的としたこの方法は組み込みプラットフォームでは一般的です。
 
-At Moddable, we use native code only when necessary, for instance to build drivers, or when the memory footprint or performance gains are obvious, for instance in our graphics library and user interface framework.
+個別のモジュールでカスタマイズや更新が予想されるアプリケーションでは、XSエンジンから削除する組み込み機能を手動で指定し、プロファイリングされたJavaScript環境を文書化することができます。例えば、`eval` や `Function` などを削除して、XSパーサーやバイトコーダーを取り除くことができます。
 
-Indeed a reasonable solution to sparing resources is to sometimes use native code instead of JavaScript. Remember that your application is in charge of everything.
+>JavaScript にはプロファイルという概念はありませんが、あなたのアプリケーションで独自のプロファイルを定義することができます。
 
-> Since the tool chain always requires compiling and linking native code, there is no overhead in your development cycle.
+## ネイティブコードの使用
 
-## Conformance
-When its environment is not frozen and when its engine is not stripped, XS passes **99.5%** of the tests that are part of the [Official ECMAScript Conformance Test Suite](https://github.com/tc39/test262). The [XS Conformance](./XS%20Conformance.md) document describes the results and test procedures.
+JavaScriptエンジンについて話しているときに、「ネイティブコードの使用」は矛盾しているように思えるかもしれません！しかし、XSのCプログラミングインターフェースである [XS in C](./XS%20in%20C.md) のシンプルさは、効率的なアプリケーションを開発するために常に重要です。
 
-Here are a few incompatibilities that you should be aware of:
+Web開発はしばしば「純粋な」JavaScriptであると主張しますが、実際にはWebブラウザを実装するために必要な大量のネイティブコードに依存しています。もちろん、Web開発はクライアント側ではJavaScriptに限定されています。
 
-- **Function**: XS does not store the source code of functions so `Function.prototype.toString` always fails.
+Moddableでは、必要な場合にのみネイティブコードを使用します。例えば、ドライバを作成する場合や、メモリのフットプリントやパフォーマンスの向上が明らかな場合、グラフィックスライブラリやユーザーインターフェースフレームワークを用いる場合です。
 
-- **RegExp**: By default the Unicode property escapes are not built-in because of the size of the tables they require.
+実際、リソースを節約する合理的な解決策は、JavaScriptの代わりに時々ネイティブコードを使用することです。あなたのアプリケーションはすべてを管理していることを覚えておいてください。
 
-- **String**: Strings are UTF-8 encoded internally by default, their length is the number of code points instead of the number of code units they contain and they are indexed by code points instead of code units. Defining the `mxCESU8` build flag encodes strings using [CESU-8](https://en.wikipedia.org/wiki/CESU-8) which provides full conformance. When using CESU-8, XS encodes the NUL character using Java's [Modified UTF-8](https://en.wikipedia.org/wiki/UTF-8#Modified_UTF-8).
+> ツールチェーンは常にネイティブコードのコンパイルとリンクを必要とするため、開発サイクルにオーバーヘッドはありません
 
-- **Tagged Template**: XS supports tagged templates but does not currently implement the tagged templates cache.
+## 適合性
 
-No XS hosts are web browsers, so the Annex B of the ECMAScript Language Specification is not supported. However XS implements `Date.prototype.getYear`, `Date.prototype.setYear`, `Object.prototype.__proto__`, `String.prototype.substr`, `escape`, and `unescape`.
+環境が凍結されておらず、エンジンがストリップされていない場合、XSは [Official ECMAScript Conformance Test Suite](https://github.com/tc39/test262) の**99.5%**に合格します。[XS 適合性](./XS%20Conformance.md) のドキュメントでは、結果とテスト手順について説明しています。
 
-The ECMAScript Internationalization API Specification is separate from the ECMAScript Language Specification and is not supported by XS.
+以下は、いくつかの互換性の問題に関する注意点です：
+
+- **Function**: XSは関数のソースコードを保存しないため、`Function.prototype.toString` は常に失敗します。
+
+- **RegExp**: デフォルトではUnicodeプロパティエスケープは、それらが必要とするテーブルのサイズのために組み込まれていません。
+
+- **String**: デフォルトでは文字列は内部でUTF-8にエンコードされており、その長さは含まれるコード単位数ではなくコードポイント数であり、コード単位ではなくコードポイントによってインデックスが付けられています。`mxCESU8`ビルドフラグを定義すると、文字列は完全な適合性を提供する[CESU-8](https://en.wikipedia.org/wiki/CESU-8)を使用してエンコードされます。CESU-8を使用する場合、XSはNUL文字をJavaの[Modified UTF-8](https://en.wikipedia.org/wiki/UTF-8#Modified_UTF-8)を使用してエンコードします。
+
+- **Tagged Template**: XSはタグ付きテンプレートをサポートしていますが、タグ付きテンプレートキャッシュは現在実装していません。
+
+XSのホストはウェブブラウザではないため、ECMAScript言語仕様のAnnex Bはサポートされていません。ただし、XSは `Date.prototype.getYear`、`Date.prototype.setYear`、`Object.prototype.__proto__`、`String.prototype.substr`、`escape`、および `unescape` を実装しています。
+
+ECMAScript国際化API仕様はECMAScript言語仕様とは別のものであり、XSではサポートされていません。
