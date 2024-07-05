@@ -1,0 +1,34 @@
+name: textlint
+on:
+  push:
+    branches:
+      - dev/translate-jp
+  pull_request:
+    branches:
+      - dev/translate-jp
+jobs:
+  textlint:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Run textlint
+        run: cd textlint && npm install && npm run textlint:ci
+      - name: Upload lint results artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: textlint-results
+          path: textlint/results.xml
+      - name: Comment lint results on PR
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: ScaCap/action-surefire-report@v1
+        with:
+          report_paths: 'textlint/results.xml'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
