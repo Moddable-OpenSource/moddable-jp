@@ -1,7 +1,7 @@
 # Moddable Six Developer Guide
 
 Copyright 2024 Moddable Tech, Inc.<BR>
-Revised: June 28, 2024
+Revised: July 1, 2024
 
 This document provides information about Moddable Six, including details about its pins and built-in components, how to build and deploy apps, and links to additional development resources.
 
@@ -60,7 +60,7 @@ The brightness of the display can be adjusted programatically.
 The touch panel uses a GT911 touch controller that supports multi-touch input. The a new touch driver and hardware design enables touch interrupts to increase responsiveness and minimize CPU overhead.
 
 #### Amplified Speaker
-A built-in, amplified speaker allows for audio user-interface feedback, streaming music, and voice prompts. It delivers high quality audio using PDM which helps to minimize the cost of the design.
+A built-in, amplified speaker allows for audio user-interface feedback, streaming music, and voice prompts. It delivers high quality audio using a low-cost design, reducing the cost of bringing audio feedback to commercial products. 
 
 #### STEMMA QT / Qwiic / JST SH 1mm Quick Connections
 Moddable Six has a JST SH connector for easy connection of I²C sensors and peripherals. This connector is called STEMMA QT by Adafruit and Qwiic by SparkFun.
@@ -305,7 +305,7 @@ Examples: [somafm](https://github.com/Moddable-OpenSource/moddable/tree/public/c
 [resource-stream](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/pins/audioout/resource-stream)
 [mp3-resource-stream](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/pins/audioout/mp3-resource-stream)
 
-Moddable Six plays audio using PDM through a [PAM8302A](https://www.diodes.com/part/view/PAM8302A?BackID=8156) amplifier.
+Moddable Six plays audio using [PDM](https://en.wikipedia.org/wiki/Pulse-density_modulation) through a [PAM8302A](https://www.diodes.com/part/view/PAM8302A?BackID=8156) amplifier.
 
 The audio signal is output on GPIO 45. Pin IO45 can also be found on the expansion header. The signal on IO45 is the unfiltered, unamplified PDM output directly from the ESP32-S3. This may be used to drive your own external filter, amplifier, and speaker. The output of the amplifier goes only to the onboard speaker, not to Pin IO45. If your project does not play audio, PIN IO45 is available to use as a GPIO.
 
@@ -457,7 +457,7 @@ c
 
 ```
 cd $MODDABLE/contributed/somafm
-mcconfig -d -m -p esp32/moddable_four ssid="YOU WI-FI ACCESS POINT" password="YOUR WI-FI PASSWORD"
+mcconfig -d -m -p esp32/moddable_six ssid="YOU WI-FI ACCESS POINT" password="YOUR WI-FI PASSWORD"
 ```
 
 > **Note**: To use GDB, connect Moddable Six to your computer using the USB port on Moddable Six, not the serial port. GDB is only supported over the USB port. If you want to use xsbug at the same time as GDB, you can also connect the serial port to your computer using a Moddable Programmer.
