@@ -1200,10 +1200,12 @@ void fx_String_prototype_localeCompare(txMachine* the)
 	{
 		txSize aLength = fxUnicodeLength(aString, C_NULL);
 		txSize bLength = fxUnicodeLength(bString, C_NULL);
-		if (aLength < bLength)
-			the->meterIndex += aLength;
-		else
-			the->meterIndex += bLength;
+		if (aLength < bLength) {
+			the->meterIndex += aLength * XS_STRING_METERING;
+		}
+		else {
+			the->meterIndex += bLength * XS_STRING_METERING;
+		}
 	}
 #endif	
 	mxResult->value.integer = fxUTF8Compare(aString, bString);

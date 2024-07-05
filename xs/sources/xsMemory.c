@@ -1655,6 +1655,9 @@ void* fxNewChunk(txMachine* the, txSize size)
 	if (!chunk) {
 		chunk = fxGrowChunk(the, size);
 	}
+#ifdef mxMetering
+	the->meterIndex += size * XS_CHUNK_ALLOCATION_METERING;
+#endif
 	return fxCheckChunk(the, chunk, size, offset);
 }
 
@@ -1678,6 +1681,9 @@ void* fxNewGrowableChunk(txMachine* the, txSize size, txSize capacity)
 			}
 		}
 	}
+#ifdef mxMetering
+	the->meterIndex += size * XS_CHUNK_ALLOCATION_METERING;
+#endif
 	return fxCheckChunk(the, chunk, size, offset);
 #endif
 }
@@ -1713,6 +1719,9 @@ again:
 		the->currentHeapCount++;
 		if (the->peakHeapCount < the->currentHeapCount)
 			the->peakHeapCount = the->currentHeapCount;
+#ifdef mxMetering
+		the->meterIndex += XS_SLOT_ALLOCATION_METERING;
+#endif
 		return aSlot;
 	}
 	if (once) {
@@ -1760,6 +1769,9 @@ void* fxRenewChunk(txMachine* the, void* theData, txSize size)
 		if (the->peakChunksSize < the->currentChunksSize)
 			the->peakChunksSize = the->currentChunksSize;
 		aChunk->size = size;
+	#ifdef mxMetering
+		the->meterIndex += size * XS_CHUNK_ALLOCATION_METERING;
+	#endif
 		return theData;
 	}
 	while (aBlock) {
@@ -1774,6 +1786,9 @@ void* fxRenewChunk(txMachine* the, void* theData, txSize size)
 				aChunk->size = size;
 			#ifdef mxSnapshot
 				c_memset(aData + capacity, 0, delta);
+			#endif
+			#ifdef mxMetering
+				the->meterIndex += size * XS_CHUNK_ALLOCATION_METERING;
 			#endif
 				return theData;
 			}

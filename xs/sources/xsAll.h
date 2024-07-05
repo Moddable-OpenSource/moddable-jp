@@ -499,9 +499,9 @@ struct sxMachine {
 #endif
 #ifdef mxMetering
 	txBoolean (*meterCallback)(txMachine*, txU4);
-	txU4 meterCount;
-	txU4 meterIndex;
-	txU4 meterInterval;
+	txU8 meterCount;
+	txU8 meterIndex;
+	txU8 meterInterval;
 #endif
 	txID profileID;
 #if defined(mxInstrument) || defined(mxProfile)
@@ -2224,9 +2224,9 @@ enum {
 		fxCheckMetering(the); \
 	}
 #define mxMeterOne() \
-	(the->meterIndex++)
+	(the->meterIndex += XS_BUILTIN_METERING)
 #define mxMeterSome(_COUNT) \
-	(the->meterIndex += _COUNT)
+	(the->meterIndex += _COUNT * XS_BUILTIN_METERING)
 #else
 #define mxCheckMetering() \
 	((void)0)
