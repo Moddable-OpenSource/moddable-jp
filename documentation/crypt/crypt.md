@@ -1,22 +1,21 @@
 # Crypt
 Copyright 2017-2022 Moddable Tech, Inc.<BR>
-Revised: June 14, 2022
-
+改訂： 2022年6月14日
 
 <a id="digest"></a>
-## class Digest (Crypt)
+## Digest (Crypt)クラス
 
-The Digest class creates cryptographic hashes using a variety of algorithms.
+Digestクラスは、さまざまなアルゴリズムを使用して暗号ハッシュを作成します。
 
 	import {Digest} from "crypt";
 
-### MD5 Hash
+### MD5ハッシュ
 
 	let digest = new Digest("MD5");
 	digest.write("hello, world);
 	trace(`MD5 Hash: ${digest.close()}\n`);
 
-### SHA1 Hash
+### SHA1ハッシュ
 
 	let digest = new Digest("SHA1");
 	digest.write("hello,");
@@ -25,11 +24,11 @@ The Digest class creates cryptographic hashes using a variety of algorithms.
 
 ### new Digest(type)
 
-The `Digest` constructor takes the type of the hash to calculate as its sole argument.
+`Digest`コンストラクタは、計算するハッシュのタイプのみを引数として受け取ります。
 
 	let digest = new Digest("SHA1");
 
-The following hash functions are supported:
+次のハッシュ関数がサポートされています：
 
 * MD5
 * SHA1
@@ -40,37 +39,37 @@ The following hash functions are supported:
 
 ### write(message)
 
-The `write` function adds a message to the hash being calculated. There is no restriction on the length of the message. The message argument to write may be a `String` or `ArrayBuffer`. The `write` function may be called more than once for a given digest calculation.
+`write`関数は、計算中のハッシュにメッセージを追加します。メッセージの長さに制限はありません。`write`のメッセージ引数は`String`または`ArrayBuffer`である可能性があります。`write`関数は、特定のダイジェスト計算に対して複数回呼び出すことができます。
 
 	digest.write("123");
 	digest.write("456");
 
 ### close()
 
-The `close` function returns the the calculated hash. The hash is returned as an `ArrayBuffer`. The `close` function may only be called once, as it frees all resources associated with the digest calculation.
+`close`関数は計算されたハッシュを返します。ハッシュは`ArrayBuffer`として返されます。`close`関数は一度しか呼び出すことができません。なぜなら、ハッシュ計算に関連するすべてのリソースを解放するからです。
 
 <!-- 11/7/2017 BSF
-We should probably document the reset function here with an example.
+ここでリセット関数を例とともに文書化する必要があるかもしれません。
 -->
 
 <!-- 11/7/2017 BSF
-There are also blockSize and outputSize accessor/getter functions in addition to process and update helper functions. Should those be documented here?
+ブロックサイズと出力サイズのアクセサ/ゲッタ関数に加えて、プロセスと更新のヘルパー関数もあります。これらもここで文書化する必要がありますか？
 -->
 
 <!-- 11/7/2017 BSF
-BlockCipher, StreamCipher and Mode classes need to be documented. They are used in the cryptblockcipher example app.
+BlockCipher、StreamCipher、およびModeクラスを文書化する必要があります。これらはcryptblockcipherの例アプリで使用されています。
 -->
 
 <a id="transform"></a>
-## class Transform
+## Transform クラス
 
-The `Transform` class contains static methods to perform common transformations of certificate data.
+`Transform`クラスは、証明書データの一般的な変換を行う静的メソッドを含んでいます。
 
 	import Transform from "crypt/transform";
 
-Whenever possible, transformation of data should not be performed at runtime because it uses additional time and memory. Instead, the data should be stored in the optimal format for the target device. These transformation functions are provided for situations where the transformation must be performed at runtime, such as some device provisioning flows.
+可能な限り、データの変換は実行時に行うべきではありません。なぜなら、追加の時間とメモリを使用するからです。代わりに、データはターゲットデバイスに最適な形式で保存されるべきです。これらの変換関数は、デバイスプロビジョニングフローなど、実行時に変換を行う必要がある状況のために提供されています。
 
-Add the `Transform` module in a manifest to use it in a project.
+プロジェクトで使用するために、マニフェストに `Transform` モジュールを追加します。
 
 ```json
 "modules": {
@@ -81,24 +80,25 @@ Add the `Transform` module in a manifest to use it in a project.
 <a id="transform-pemToDER"></a>
 ### static pemToDER(data)
 
-The `pemToDER` function transforms a certificate in PEM format (Base64 encoded ASCII) to [DER](https://en.wikipedia.org/wiki/X.690#DER_encoding) format (binary data). The input `data` may be a `String`, `ArrayBuffer`, or host buffer. The return value is an `ArrayBuffer`.
+`pemToDER` 関数は、PEM形式（Base64エンコードされたASCII）の証明書を [DER](https://en.wikipedia.org/wiki/X.690#DER_encoding) 形式（バイナリデータ）に変換します。入力 `data` は `String`、`ArrayBuffer`、またはホストバッファである可能性があります。戻り値は `ArrayBuffer` です。
 
-For PEM files containing more than one certificate, `pemToDER` converts only the first certificate.
+複数の証明書を含むPEMファイルの場合、`pemToDER` は最初の証明書のみを変換します。
 
-This function is similar to the following `openssl` command line:
+この関数は、以下の `openssl` コマンドラインに似ています：
 
 ```
 openssl x509 -inform pem -in data.pem -out data.der -outform der
 ```
 
-`pemToDER` looks for both `-----BEGIN CERTIFICATE-----` and `-----BEGIN RSA PRIVATE KEY-----` as delimeters.
+`pemToDER` は、デリミタとして `-----BEGIN CERTIFICATE-----` および `-----BEGIN RSA PRIVATE KEY-----` の両方を探します。
 
 <a id="transform-privateKeyToPrivateKeyInfo"></a>
 ### static privateKeyToPrivateKeyInfo(data[, oid])
 
-The `privateKeyToPrivateKeyInfo ` function transforms a Private Key to a Private Key Info (both in binary DER format). The input `data` is an `ArrayBuffer` or host buffer. The optional `oid` parameter is the Object ID for the key algorithm as an `Array`. If not provided, it defaults to the OID for `PKCS#1`, `[1, 2, 840, 113549, 1, 1, 1]`. The return value is an `ArrayBuffer`.
+`privateKeyToPrivateKeyInfo` 関数は、秘密鍵を秘密鍵情報に変換します（どちらもバイナリDER形式）。入力 `data` は `ArrayBuffer` またはホストバッファです。オプションの `oid` パラメータは、`Array` としてのキーアルゴリズムのオブジェクトIDです。指定されていない場合、デフォルトで `PKCS#1` のOID `[1, 2, 840, 113549, 1, 1, 1]` が使用されます。戻り値は `ArrayBuffer` です。
 
-Using `pemToDER` and `privateKeyToPrivateKeyInfo ` together is similar to the following `openssl` command line:
+
+`pemToDER` と `privateKeyToPrivateKeyInfo` を一緒に使用することは、次の `openssl` コマンドラインに似ています：
 
 ```
 openssl pkcs8 -topk8 -in private_key.pem -inform pem -out private_key.pk8.der -outform der -nocrypt

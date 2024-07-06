@@ -1,39 +1,39 @@
 # Worker
 Copyright 2018-2023 Moddable Tech, Inc.<BR>
-Revised: August 20, 2023
+改訂： 2023年8月20日
 
-The Moddable runtime integrates with XS to allow a multiple virtual machines to co-exist on a single microcontroller. The majority of projects use only a single virtual machine. However, there are situations where the several independent runtime contexts provided by having several virtual machines is advantageous. This isolation is useful to fully separate a particular set of scripts, for example user installed modules, from the core project functionality for security, privacy, and reliability reasons. Another useful situation is to allow scripts to perform blocking operations in one virtual machine while scripts in another virtual machine remain fully responsive. On microcontrollers with multiple CPU cores, workers may execute in parallel to take full advantage of the available CPU power.
+ModdableランタイムはXSと統合されており、複数の仮想マシンが単一のマイクロコントローラ上で共存できるようになっています。ほとんどのプロジェクトでは単一の仮想マシンのみを使用しますが、複数の仮想マシンを使用することで提供される複数の独立したランタイムコンテキストが有利になる状況もあります。この分離は、例えばユーザーがインストールしたモジュールをコアプロジェクトの機能から完全に分離するために、セキュリティ、プライバシー、および信頼性の理由で役立ちます。もう1つの有用な状況は、一つの仮想マシンでスクリプトがブロッキング操作を実行している間に、別の仮想マシンのスクリプトが完全に応答し続けることを可能にすることです。複数のCPUコアを持つマイクロコントローラでは、ワーカーが並行して実行され、利用可能なCPUパワーを最大限に活用できます。
 
-Undertake the use of multiple virtual machines in a project with care. Each virtual machine requires additional RAM, and RAM is the most limited resource on most microcontroller deployments. In addition, the asynchronous nature of communication between virtual machines adds complexity to the overall system. Still, having multiple virtual machines is useful, even essential, in some circumstances. The remainder of this document describes how to use multiple virtual machines with the Moddable SDK together with some implementation details.
+プロジェクトで複数の仮想マシンを使用する際は注意が必要です。各仮想マシンは追加のRAMを必要とし、RAMはほとんどのマイクロコントローラの展開で最も限られたリソースです。さらに、仮想マシン間の通信の非同期性はシステム全体の複雑さを増します。それでも、特定の状況では複数の仮想マシンを持つことは有用であり、場合によっては不可欠です。このドキュメントの残りの部分では、Moddable SDKを使用して複数の仮想マシンを使用する方法といくつかの実装の詳細について説明します。
 
 ## Web Workers
-The `Worker` class is an API for working with virtual machines. The implementation is based on the [Web Workers](https://www.w3.org/TR/workers/) API from the web with some differences:
+`Worker` クラスは仮想マシンを操作するためのAPIです。この実装はWebの [Web Workers](https://www.w3.org/TR/workers/) APIに基づいていますが、いくつかの違いがあります：
 
-- The implementation is a small subset of the Web Workers API.
-- Workers are always launched from a module, never from a script file.
-- One addition has been made to specify the memory configuration of a new worker.
-- Posting a message to a worker throws in additional situations.
+- 実装はWeb Workers APIの小さなサブセットです。
+- ワーカーは常にモジュールから起動され、スクリプトファイルからは起動されません。
+- 新しいワーカーのメモリ構成を指定するための追加が行われています。
+- ワーカーにメッセージを投稿する際に追加の状況で例外が発生します。
 
-Those familiar with Web Workers are strongly advised to read this document to understand the implementation differences that may be relevant to their use of workers.
+Web Workersに精通している方は、このドキュメントを読んで、ワーカーの使用に関連する実装の違いを理解することを強くお勧めします。
 
-This document contains a standalone description of the `Worker` class implemented in the Moddable SDK. The [`worker` example](../../examples/base/worker/) is a simple example of using the `Worker` class.
+このドキュメントには、Moddable SDKに実装されている `Worker` クラスの独立した説明が含まれています。[`worker` のサンプル](../../examples/base/worker/) は、`Worker` クラスを使用する簡単な例です。
 
-## class Worker
-Scripts import the `Worker` class to be able to create a new worker.
+## Worker クラス
+スクリプトは `Worker` クラスをインポートして、新しいワーカーを作成できるようにします。
 
 	import Worker from "worker";
 
-> **Note**: The memory for a Worker's virtual machine is allocated from global system memory.
+> **注意**: ワーカーの仮想マシンのメモリは、グローバルシステムメモリから割り当てられます。
 
-### Launching a worker
-To launch a worker, create an instance of the `Worker` class, passing the name of the module to invoke when the worker starts to run. In the following example, the module run at worker start is `simpleworker`.
+### ワーカーの起動
+ワーカーを起動するには、`Worker` クラスのインスタンスを作成し、ワーカーが実行を開始するときに呼び出すモジュールの名前を渡します。次の例では、ワーカー開始時に実行されるモジュールは `simpleworker` です。
 
 	let aWorker = new Worker("simpleworker");
 
-The call to the `Worker` constructor returns only after execution of the specified module completes. If the worker module generates an exception during this step, an exception is propagated so that the call to `new Worker` throws an exception. This behavior means that the invoking virtual machine blocks until the new worker virtual machine has completed initialization. Consequently, any operations performed in a newly instantiated virtual machine should be relatively brief.
+`Worker` コンストラクタの呼び出しは、指定されたモジュールの実行が完了した後にのみ戻ります。このステップでワーカーモジュールが例外を生成した場合、例外が伝播されるため、`new Worker` の呼び出しが例外をスローします。この動作は、新しいワーカー仮想マシンの初期化が完了するまで、呼び出し元の仮想マシンがブロックされることを意味します。したがって、新しくインスタンス化された仮想マシンで実行される操作は比較的短時間であるべきです。
 
-### Launching a worker with memory configuration
-The previous example launches the worker with the default memory creation configuration used for the main virtual machine. This may not be large enough for the worker, or may allocate more RAM than needed by the worker. An optional configuration object allows the script instantiating a new virtual machine to set the memory use.
+### メモリ構成でワーカーを起動する
+前の例では、メイン仮想マシンに使用されるデフォルトのメモリ作成構成でワーカーを起動します。これはワーカーにとって十分でない場合や、ワーカーが必要とする以上のRAMを割り当てる場合があります。オプションの構成オブジェクトを使用すると、新しい仮想マシンをインスタンス化するスクリプトがメモリ使用量を設定できます。
 
 ```js
 let aWorker = new Worker("simpleworker", {
@@ -42,29 +42,33 @@ let aWorker = new Worker("simpleworker", {
 	heap: {
 		initial: 64,
 		incremental: 32
-	}		
+	}
 });
 ```
 
-### Sending a message to a worker
-Messages to workers are JavaScript objects and binary data.
+### ワーカーへのメッセージ送信
+ワーカーへのメッセージはJavaScriptオブジェクトおよびバイナリデータです。
 
 	aWorker.postMessage({hello: "world", count: 12});
 	aWorker.postMessage(new ArrayBuffer(12));
 
-The worker implementation uses [XS Marshalling](../xs/XS%20Marshalling.md) to send messages. It supports sending more types of data than the implementation of workers in web browsers. If an object cannot be sent using XS Marshalling, `postMessage` throws an exception.
+ワーカーの実装はメッセージを送信するために[XS Marshalling](../xs/XS%20Marshalling.md)を使用します。これは、Webブラウザのワーカーの実装よりも多くの種類のデータを送信することをサポートしています。オブジェクトがXS Marshallingを使用して送信できない場合、`postMessage`は例外をスローします。
 
-Messages are passed by copy (with a few exceptions, such as `SharedArrayBuffer`) so the size of the message should be as small as practical. If the memory allocation fails, `postMessage` throws an exception.
+メッセージはコピーによって渡されます（`SharedArrayBuffer`などのいくつかの例外を除く）ので、メッセージのサイズは実用的な範囲でできるだけ小さくするべきです。メモリ割り当てに失敗した場合、`postMessage`は例外をスローします。
 
-### Receiving a message from a worker
-The worker instance has an `onmessage` function which receives all messages from the worker. It is typically assigned immediately after the worker is constructed:
+### ワーカーからのメッセージ受信
+ワーカーインスタンスには、ワーカーからのすべてのメッセージを受信する`onmessage`関数があります。これは通常、ワーカーが構築された直後に割り当てられます。
 
+```
 	aWorker.onmessage = function(message) {
 		trace(message, "\n");
 	}
+```
 
-An alternative approach is to create a subclass of `Worker` which contains the `onmessage` function. This uses less memory and runs somewhat faster.
+別のアプローチとして、`onmessage`関数を含む`Worker`のサブクラスを作成する方法があります。これにより、メモリ使用量が少なくなり、若干高速に実行されます。
 
+
+```
 	class MyWorker extends Worker {
 		onmessage(message) {
 			trace(message, "\n");
@@ -72,16 +76,17 @@ An alternative approach is to create a subclass of `Worker` which contains the `
 	}
 	...
 	let aWorker = new MyWorker("simpleworker");
+```
 
-### Terminating a worker
-The script that instantiates a worker may terminate the worker.
+### ワーカーの終了
+ワーカーをインスタンス化するスクリプトは、ワーカーを終了させることができます。
 
 	aWorker.terminate();
 
-Once a worker is terminated, no further calls should be made to the worker instance. Attempting to post a message to a terminated work throws an exception.
+ワーカーが終了すると、そのワーカーインスタンスに対してこれ以上呼び出しを行うべきではありません。終了したワーカーにメッセージを送信しようとすると、例外が発生します。
 
-### Worker script start-up
-When the Worker constructor is called, the module at the path specified (`simpleworker` in the preceding examples) is loaded and run. The worker itself typically performs two tasks. The first is initialization and the second is installing a function to receive messages. The receiving function is installed on the global object `self` and is named `onmessage`.
+### ワーカースクリプトの起動
+Workerコンストラクタが呼び出されると、指定されたパス（前述の例では`simpleworker`）のモジュールがロードされ、実行されます。ワーカー自体は通常、2つのタスクを実行します。1つ目は初期化で、2つ目はメッセージを受信する関数のインストールです。受信関数はグローバルオブジェクト`self`にインストールされ、`onmessage`という名前が付けられます。
 
 	let count = 1;
 	let state = INITIALIZED;
@@ -90,23 +95,25 @@ When the Worker constructor is called, the module at the path specified (`simple
 		trace(message, "\n");
 	}
 
-### Sending a message from worker script
-The messages sent by a worker script may be a JavaScript object or an `ArrayBuffer`, just as with messages sent to a worker script. Messages are sent using the `postMessage` function on the global object `self`.
+### ワーカースクリプトからのメッセージ送信
+ワーカースクリプトから送信されるメッセージは、ワーカースクリプトに送信されるメッセージと同様に、JavaScriptオブジェクトまたは`ArrayBuffer`である場合があります。メッセージはグローバルオブジェクト`self`の`postMessage`関数を使用して送信されます。
+```
 
 	self.postMessage({hello: "from  worker", counter: count++});
+```
 
-### Worker script terminating itself
-A worker script terminates itself by calling `close` on the global object `self`.  This is equivalent to the instantiating script calling `terminate` on the worker instance.
+### ワーカースクリプトの自己終了
+ワーカースクリプトは、グローバルオブジェクト `self` に対して `close` を呼び出すことで自己終了します。これは、インスタンス化スクリプトがワーカーインスタンスに対して `terminate` を呼び出すのと同等です。
 
 	self.close()
 
-### API Reference
+### APIリファレンス
 #### constructor(modulePath[, dictionary])
-The `Worker` constructor takes a path to the module used to initialize the new worker instance.
+`Worker` コンストラクタは、新しいワーカーインスタンスを初期化するために使用されるモジュールへのパスを取ります。
 
 	let aWorker = new Worker("simpleworker");
 
-An optional dictionary contains creation properties for the new worker. If the dictionary is not provided, the default parameters are used. These defaults vary by host runtime, so it is recommended to always provide a memory configuration. The creation properties are the same as the `creation` section of a manifest. See the [manifest documentation](../tools/manifest.md#creation) for details.
+オプションの辞書には、新しいワーカーの作成プロパティが含まれています。辞書が提供されない場合、デフォルトのパラメータが使用されます。これらのデフォルトはホストランタイムによって異なるため、常にメモリ構成を提供することをお勧めします。作成プロパティはマニフェストの `creation` セクションと同じです。詳細については、[マニフェストのドキュメント](../tools/manifest.md#creation)を参照してください。
 
 ```js
 let aWorker = new Worker("simpleworker", {
@@ -115,72 +122,71 @@ let aWorker = new Worker("simpleworker", {
 	heap: {
 		initial: 64,
 		incremental: 32
-	}		
+	}
 });
 ```
 
-> **Note**: An earlier implementation of `Worker` used different properties to configure the memory creation. These have been deprecated and are no longer included in the documentation. It is recommended to update scripts to use the new format.
+> **注意**: 以前の `Worker` の実装では、メモリ作成を構成するために異なるプロパティが使用されていました。これらは非推奨となり、ドキュメントには含まれていません。スクリプトを新しい形式に更新することをお勧めします。
 
-If an error occurs or an exception is thrown during execution of the module, the `Worker` constructor also throws an error.
+モジュールの実行中にエラーが発生したり例外がスローされた場合、`Worker` コンストラクタもエラーをスローします。
 
 #### terminate()
-The `terminate` function immediately ends execution of the worker instance, freeing all resources owned by the worker.
+`terminate` 関数は、ワーカーインスタンスの実行を即座に終了し、ワーカーが所有するすべてのリソースを解放します。
 
 	aWorker.terminate();
 
-Once a worker has been terminated, no further calls should be made to it.
+ワーカーが終了した後は、それに対してさらに呼び出しを行うべきではありません。
 
 #### postMessage(msg)
-The `postMessage` function queues a message for delivery to the worker. Messages can be anything supported in JSON, binary buffers (`TypedArray`, `ArrayBuffer`, `SharedArrayBuffer`, `DataView`) and anything else supported by [XS Marshalling](../xs/XS%20Marshalling.md).
+`postMessage` 関数は、ワーカーへの配信メッセージをキューに入れます。メッセージはJSONでサポートされているもの、バイナリバッファ (`TypedArray`, `ArrayBuffer`, `SharedArrayBuffer`, `DataView`) および [XS Marshalling](../xs/XS%20Marshalling.md) でサポートされているその他のものを使用できます。
 
 	aWorker.postMessage("hello");
 	aWorker.postMessage({msg: "hello", when: Date.now()});
 	aWorker.postMessage(new ArrayBuffer(8));
 
-Messages are delivered in the same order they are sent.
+メッセージは送信された順序で配信されます。
 
-Messages are passed by copy (with a few exceptions, such as `SharedArrayBuffer`, so the size of the message should be as small as practical.  If the memory allocation fails, `postMessage` throws an exception.
+メッセージはコピーによって渡されます（`SharedArrayBuffer` などのいくつかの例外を除く）、したがってメッセージのサイズは実用的に小さくするべきです。メモリ割り当てに失敗した場合、`postMessage` は例外をスローします。
 
 #### onmessage property
-The worker `onmessage` property contains a function which receives messages from the worker.
+workerの `onmessage` プロパティには、workerからのメッセージを受信する関数が含まれています。
 
 	aWorker.onmessage = function(msg) {
 		trace(msg, "\n");
 	}
 
 ## Shared Workers
-The `SharedWorker` class is an API for working with shared virtual machines. The implementation is based on the [Shared Workers](https://html.spec.whatwg.org/multipage/workers.html#shared-workers-introduction) API from the web with some differences, including:
+`SharedWorker` クラスは、共有仮想マシンを操作するためのAPIです。この実装は、いくつかの違いがあるウェブの [Shared Workers](https://html.spec.whatwg.org/multipage/workers.html#shared-workers-introduction) APIに基づいています。違いには以下があります：
 
-- The `close` function on the message port is not yet implemented, so Shared Workers cannot be terminated
-- Workers are always launched from a module, never from a script file.
+- メッセージポートの `close` 関数はまだ実装されていないため、Shared Workersを終了することはできません。
+- Workersは常にモジュールから起動され、スクリプトファイルからは起動されません。
 
-
-## class SharedWorker
-Scripts import the `SharedWorker` class to be able to connect to a shared worker, creating the shared worker if it is not currently instantiated.
+## SharedWorkerクラス
+スクリプトは `SharedWorker` クラスをインポートして共有workerに接続し、現在インスタンス化されていない場合は共有workerを作成します。
 
 	import {SharedWorker} from "worker";
 
-**Note**: Examples and documentation needed.
+**注意**: サンプルとドキュメントが必要です。
 
 ## Scheduling
-Depending on the host runtime, workers may be preemptively scheduled (e.g. run in parallel to each other and the main virtual machine, or they may be cooperatively scheduled (e.g. other virtual machines may only run after the current virtual machine yields). Cooperative scheduling is useful for isolating scripts but does not prevent one virtual machine from blocking another.
+ホストランタイムに応じて、workersはプリエンプティブにスケジュールされる場合があります（例：他のworkerやメイン仮想マシンと並行して実行される）、または協調的にスケジュールされる場合があります（例：現在の仮想マシンが譲歩した後にのみ他の仮想マシンが実行される）。協調スケジューリングはスクリプトを分離するのに役立ちますが、ある仮想マシンが他の仮想マシンをブロックするのを防ぐことはできません。
 
-The Web Worker specification requires assumes that all Workers are preemptively scheduled. On some microcontrollers, preemptive scheduling is impractical (too much memory required) or nearly impossible (not supported by the host RTOS).
+Web Worker仕様では、すべてのWorkerがプリエンプティブにスケジュールされることを前提としています。しかし、一部のマイクロコントローラーでは、プリエンプティブスケジューリングが実用的でない（メモリが多く必要）か、ほぼ不可能（ホストRTOSがサポートしていない）です。
 
-Each host of the Moddable SDK runtime decided whether to support multiple virtual machines. If it does, it then decides whether to support preemptive or cooperative scheduling.  The ESP8266 runtime is built on a cooperative task model and so implements cooperative scheduling of virtual machines. The ESP32 is built on FreeRTOS, a preemptively scheduled RTOS, an so supports preemptive scheduling. When deciding whether to use multiple virtual machines in a project, check to see what is supported by the host runtime.
+Moddable SDKランタイムの各ホストは、複数の仮想マシンをサポートするかどうかを決定します。サポートする場合、プリエンプティブスケジューリングか協調スケジューリングかを決定します。ESP8266ランタイムは協調タスクモデルに基づいて構築されているため、仮想マシンの協調スケジューリングを実装しています。ESP32はプリエンプティブにスケジュールされるRTOSであるFreeRTOS上に構築されているため、プリエンプティブスケジューリングをサポートしています。プロジェクトで複数の仮想マシンを使用するかどうかを決定する際には、ホストランタイムがサポートしているかどうかを確認してください。
 
-## xsbug support
-The debugger for the XS virtual machine, `xsbug`, supports working with multiple virtual machines simultaneously. Each virtual machine appears in a separate tab with the name of the module path used to initialize the worker.
+## xsbugサポート
+XS仮想マシンのデバッガである`xsbug`は、複数の仮想マシンを同時に操作することをサポートしています。各仮想マシンは、ワーカーを初期化するために使用されたモジュールパスの名前で別々のタブに表示されます。
 
 ![](assets/xsbug.png)
 
-## Shared Memory and Atomics
-The ECMAScript 2016 standard includes support for Shared Memory and Atomics. These are powerful tools for efficient communication between virtual machines. The XS virtual machine fully implements these features. They are supported on some microcontrollers (ESP32) but not all (ESP8266).
+## 共有メモリとアトミック
+ECMAScript 2016標準には、共有メモリとアトミックのサポートが含まれています。これらは仮想マシン間の効率的な通信のための強力なツールです。XS仮想マシンはこれらの機能を完全に実装しています。これらは一部のマイクロコントローラ（ESP32）でサポートされていますが、すべてではありません（ESP8266）。
 
-## Configuration Options
-The Web Workers implementation uses `modMessagePostToMachine()`, the native IPC facility of the Moddable SDK, to pass messages between threads. On ESP32 this is implemented using FreeRTOS queues.
+## 設定オプション
+Web Workersの実装は、スレッド間でメッセージを渡すためにModdable SDKのネイティブIPC機能である`modMessagePostToMachine()`を使用します。ESP32では、これはFreeRTOSキューを使用して実装されています。
 
-By default the message queue has 10 elements. A message is posted while the queue is full blocks until space become available in the queue. This behavior generally works well as the number of messages being posted is relatively infrequent. If many messages are being sent between the sender and receiver, a deadlock is possible. Two build options are available in the manifest to help if necessary.
+デフォルトでは、メッセージキューには10個の要素があります。キューがいっぱいの間にメッセージが投稿されると、キューに空きができるまでブロックされます。この動作は、投稿されるメッセージの数が比較的少ないため、一般的にはうまく機能します。送信者と受信者の間で多くのメッセージが送信される場合、デッドロックが発生する可能性があります。必要に応じて役立つ2つのビルドオプションがマニフェストに用意されています。
 
 ```json
 "defines": {
@@ -190,6 +196,6 @@ By default the message queue has 10 elements. A message is posted while the queu
 	}
 }
 ```
-The `queueLength` property changes the size of the message queues to the value specified. The `queueWait` property allows posting messages to fail after the specified timeout (given in milliseconds). If a message cannot be enqueued after this timeout period, `postMessage` throws an exception.
+`queueLength`プロパティは、メッセージキューのサイズを指定された値に変更します。`queueWait`プロパティは、指定されたタイムアウト（ミリ秒単位）後にメッセージの投稿が失敗するようにします。このタイムアウト期間後にメッセージをキューに入れることができない場合、`postMessage`は例外をスローします。
 
-By default, a debug build sets `queueWait` to 1000 milliseconds. In a well-balanced system, messages should enqueue instantaneously and certainly shouldn't block for more than a few millisecond. This default allows debugging of potential queue related issues by throwing instead of deadlocking when message sends take unexpectedly long. By default, release and instrumented builds have an infinite wait for `queueWait` and so never time out.
+デフォルトでは、デバッグビルドは `queueWait` を1000ミリ秒に設定します。バランスの取れたシステムでは、メッセージは瞬時にキューに入るべきであり、数ミリ秒以上ブロックすることはありません。このデフォルト設定により、メッセージ送信が予想外に長くかかる場合にデッドロックする代わりに例外を投げることで、キュー関連の潜在的な問題をデバッグできます。デフォルトでは、リリースビルドおよび計測ビルドは `queueWait` に無限待機を設定しているため、タイムアウトすることはありません。

@@ -1,8 +1,8 @@
 # Base
 Copyright 2017-2024 Moddable Tech, Inc.<BR>
-Revised: January 19, 2024
+改訂： 2024年1月19日
 
-## Table of Contents
+## 目次
 
 * [Timer](#timer)
 * [Time](#time)
@@ -16,76 +16,76 @@ Revised: January 19, 2024
 * [Worker](#worker)
 
 <a id="timer"></a>
-## class Timer
+## Timer クラス
 
-- **Source code:** [timer](../../modules/base/timer)
-- **Relevant Examples:** [timers](../../examples/base/timers/)
+- **ソースコード:** [timer](../../modules/base/timer)
+- **関連するサンプル:** [timers](../../examples/base/timers/)
 
-The `Timer` class provides both time-based callbacks and a delay function.
+`Timer` クラスは、時間ベースのコールバックと遅延関数の両方を提供します。
 
 ```js
 import Timer from "timer";
 ```
 
-Timer callbacks are invoked with `this` set to `globalThis`. Use an arrow function or `Function.prototype.bind` to bind the callback's `this` to another value.
+タイマーコールバックは `this` が `globalThis` に設定された状態で呼び出されます。コールバックの `this` を別の値にバインドするには、アロー関数または `Function.prototype.bind` を使用します。
 
-Each timer has two intervals: the initial interval and a repeat interval. The intervals are in milliseconds. The initial interval is the time until the callback is first invoked. The repeat interval is the time between successive invocations of the callback after the initial interval. The API reference that follows indicates how each API modifies the initial and repeat intervals.
+各タイマーには2つの間隔があります： 初期間隔と繰り返し間隔。間隔はミリ秒単位です。初期間隔はコールバックが最初に呼び出されるまでの時間です。繰り返し間隔は初期間隔の後、コールバックが連続して呼び出される間の時間です。以下のAPIリファレンスでは、各APIが初期間隔と繰り返し間隔をどのように変更するかを示しています。
 
-If the repeat interval is zero when the timer's callback returns, the timer is automatically cleared and can no longer be used. The repeat interval may be changed by the callback using `Timer.schedule`.
+タイマーのコールバックが返されるときにリピート間隔がゼロの場合、タイマーは自動的にクリアされ、再利用できなくなります。リピート間隔はコールバックによって `Timer.schedule` を使用して変更することができます。
 
-The `Timer.set` and `Timer.repeat` functions create a new timer and return the ID of the timer. Timer IDs are opaque that are only useful for passing to `Timer` functions.
+`Timer.set` と `Timer.repeat` 関数は新しいタイマーを作成し、そのタイマーのIDを返します。タイマーIDは不透明であり、`Timer` 関数に渡すためだけに使用されます。
 
-Timer callbacks can provide the basic behaviors of `setImmediate`, `setTimeout` and `setInterval`. The [timers example]() shows how to do this.
+タイマーのコールバックは `setImmediate`、`setTimeout`、および `setInterval` の基本的な動作を提供できます。[Timerのサンプル]()では、その方法を示しています。
 
 ### `Timer.set(callback[, initialInterval, repeatInterval])`
 
-The `set` function requests a function be called once after a certain period. `Timer.set` returns the new timer's ID.
+`set` 関数は、一定の期間後に関数を一度だけ呼び出すことを要求します。`Timer.set` は新しいタイマーのIDを返します。
 
-An immediate timer is called on the next cycle through the run loop. To set an immediate timer, call `set` with a single argument.
+即時タイマーは、実行ループの次のサイクルで呼び出されます。即時タイマーを設定するには、引数を1つだけ指定して `set` を呼び出します。
 
 ```js
 Timer.set(id => trace("immediate fired\n"));
 ```
 
-A one shot timer is called once after a specified number of milliseconds. If the number of milliseconds is zero, a one shot timer is equivalent to an immediate timer.
+ワンショットタイマーは、指定されたミリ秒数の後に一度だけ呼び出されます。ミリ秒数がゼロの場合、ワンショットタイマーは即時タイマーと同等です。
 
 ```js
 Timer.set(id => trace("one shot fired\n"), 1000);
 ```
 
-Calling `set` with a `repeat` is equivalent to a repeating timer with the first callback triggered after the `interval`.
+`repeat` を指定して `set` を呼び出すと、最初のコールバックが `interval` 後にトリガーされる繰り返しタイマーと同等です。
 
 ```js
 Timer.set(id => trace("repeat fired\n"), 1000, 100);
 ```
 
-The callback function receives the timer id as the first argument.
+コールバック関数は、最初の引数としてタイマーIDを受け取ります。
 
-If `Timer.set` is called without the initial interval and repeat interval, it is an immediate one-shot timer (initial and repeat intervals are set to 0). If `Timer.set` is called with only an initial interval, it is a one-shot timer (repeat interval is set to 0). If `Timer.set` is called with both an initial and a non-zero repeat interval, it is a repeating timer.
+`Timer.set` が初期間隔と繰り返し間隔なしで呼び出された場合、それは即時のワンショットタイマーです（初期間隔と繰り返し間隔は0に設定されます）。`Timer.set` が初期間隔のみで呼び出された場合、それはワンショットタイマーです（繰り返し間隔は0に設定されます）。`Timer.set` が初期間隔と非ゼロの繰り返し間隔の両方で呼び出された場合、それは繰り返しタイマーです。
 
 ***
 
 ### `Timer.repeat(callback, repeatInterval)`
 
-A repeating timer is called continuously until stopped using the `Timer.clear` function. `Timer.repeat` returns the new timer's ID.
+繰り返しタイマーは `Timer.clear` 関数を使用して停止されるまで連続して呼び出されます。`Timer.repeat` は新しいタイマーのIDを返します。
 
 ```js
 Timer.repeat(id => trace("repeat fired\n"), 1000);
 ```
 
-The callback function receives the timer id as the first argument.
+コールバック関数は、最初の引数としてタイマーIDを受け取ります。
 
-This function sets both the initial interval and repeat interval to the value specified by `repeatInterval`. Use `Timer.set` to create a timer with an initial interval that is different from the repeat interval.
+この関数は、初期間隔と繰り返し間隔の両方を `repeatInterval` で指定された値に設定します。初期間隔が繰り返し間隔と異なるタイマーを作成するには、`Timer.set` を使用します。
 
 ***
 
 ### `Timer.schedule(id [, initialInterval[, repeatInterval]])`
 
-The `schedule` function reschedules or unschedules an existing timer.
+`schedule` 関数は、既存のタイマーを再スケジュールまたはスケジュール解除します。
 
-If called with an initial interval but no repeat interval, the timer behaves like a one shot timer created with `Timer.set`. If called with both an initial interval and non-zero repeat interval, it behaves like a repeating timer created with `Timer.set` with both initial interval and repeat interval arguments. If called without interval arguments, the timer is unscheduled and will not trigger until rescheduled using `Timer.schedule` (an unscheduled timer is considered to have infinite initial and repeat intervals).
+初期間隔のみを指定して呼び出された場合、タイマーは `Timer.set` で作成されたワンショットタイマーのように動作します。初期間隔とゼロ以外の繰り返し間隔の両方を指定して呼び出された場合、初期間隔と繰り返し間隔の引数を持つ `Timer.set` で作成された繰り返しタイマーのように動作します。間隔引数なしで呼び出された場合、タイマーはスケジュール解除され、`Timer.schedule` を使用して再スケジュールされるまでトリガーされません（スケジュール解除されたタイマーは無限の初期および繰り返し間隔を持つと見なされます）。
 
-In the following example, the callback function is triggered twice at one second intervals and then rescheduled to once every two seconds.
+次の例では、コールバック関数が1秒間隔で2回トリガーされ、その後2秒ごとに1回再スケジュールされます。
 
 ```js
 let state = 0;
@@ -99,47 +99,47 @@ Timer.repeat(id => {
 }, 1000);
 ```
 
-When `Timer.schedule` is used to set the initial interval, the callback is next invoked after the new initial interval has elapsed.
+`Timer.schedule` を使用して初期間隔を設定すると、新しい初期間隔が経過した後に次のコールバックが呼び出されます。
 
-> **Note**: If the next trigger time is unknown, unscheduling a timer is preferred to scheduling for a long time in the future. Unscheduling and rescheduling a timer can more efficient than clearing a timer and later allocating a new one.
+> **注意**: 次のトリガー時間が不明な場合、タイマーを長時間先にスケジュールするよりもスケジュール解除する方が望ましいです。タイマーをスケジュール解除して再スケジュールする方が、タイマーをクリアして新しいものを後で割り当てるよりも効率的な場合があります。
 
 ***
 
 ### `Timer.clear(id)`
 
-The `clear` function cancels a timer. The `Timer.set` and `Timer.repeat` functions returns the ID for a timer, which is then passed to clear.
+`clear` 関数はタイマーをキャンセルします。`Timer.set` および `Timer.repeat` 関数はタイマーのIDを返し、それを `clear` に渡します。
 
 ```js
 let aTimer = Timer.set(id => trace("one shot\n"), 1000);
 Timer.clear(aTimer);
 ```
 
-> **Note**: Immediate and one shot timers are automatically cleared after invoking their callback function. There is no need to call `clear` except to cancel the timer before it fires.
+> **注意**: 即時およびワンショットタイマーは、コールバック関数を呼び出した後に自動的にクリアされます。タイマーが発火する前にキャンセルする場合を除き、`clear` を呼び出す必要はありません。
 
-> **Note**: If `Timer.clear` is passed a value of `undefined` or `null` for the ID, no exception is generated.
+> **注意**: `Timer.clear` に `undefined` または `null` の値がIDとして渡された場合、例外は発生しません。
 
 ***
 
 ### `Timer.delay(ms)`
 
-The `delay` function delays execution for the specified number of milliseconds.
+`delay` 関数は、指定されたミリ秒数だけ実行を遅延させます。
 
 ```js
-Timer.delay(500);	// delay 1/2 second
+Timer.delay(500);	// 1/2秒遅延
 ```
 
-**Note**: In general, the preferred style of JavaScript programming is to avoid long delays that block execution. `Timer.delay` is provided because in embedded development it is common to need short delays when interacting with hardware. For longer delays, using an alternative such as a Timer callback or asynchronous execution with Promises may be more appropriate.
+**注意**: 一般的に、JavaScriptプログラミングの推奨スタイルは、実行をブロックする長い遅延を避けることです。`Timer.delay` は、組み込み開発ではハードウェアと対話する際に短い遅延が必要なことが一般的であるため提供されています。長い遅延の場合は、タイマーコールバックやPromiseを使用した非同期実行などの代替手段を使用する方が適切な場合があります。
 
 ***
 
 <a id="time"></a>
-## class Time
+## Time クラス
 
-- **Source code:** [time](../../modules/base/time)
-- **Source code:** [time](../../modules/base/microseconds)
-- **Relevant Examples:** [sntp](../../examples/network/sntp/), [ntpclient](../../examples/network/mdns/ntpclient), [ios-time-sync](../../examples/network/ble/ios-time-sync)
+- **ソースコード:** [time](../../modules/base/time)
+- **ソースコード:** [time](../../modules/base/microseconds)
+- **関連するサンプル** [sntp](../../examples/network/sntp/), [ntpclient](../../examples/network/mdns/ntpclient), [ios-time-sync](../../examples/network/ble/ios-time-sync)
 
-The `Time` class provides time functions and a tick counter.
+`Time` クラスは時間関数とティックカウンターを提供します。
 
 ```js
 import Time from "time";
@@ -147,33 +147,33 @@ import Time from "time";
 
 ### `Time.set(seconds)`
 
-The `set` function sets the system time. The `seconds` argument corresponds to the number of seconds elapsed since January 1, 1970, i.e. Unix time.
+`set` 関数はシステム時間を設定します。`seconds` 引数は1970年1月1日から経過した秒数、すなわちUnix時間に対応します。
 
 ***
 
-### `timezone` property
+### `timezone` プロパティ
 
-The `timezone` property is set to the time zone offset in seconds from UTC.
+`timezone` プロパティはUTCからの秒単位のタイムゾーンオフセットに設定されます。
 
 ```js
-Time.timezone = +9 * 60 * 60;	// Set time zone to UTC+09:00
+Time.timezone = +9 * 60 * 60;	// タイムゾーンをUTC+09:00に設定
 ```
 
 ***
 
-### `dst` property
+### `dst` プロパティ
 
-The `dst` property is set to the daylight saving time (DST) offset in seconds.
+`dst` プロパティは秒単位の夏時間（DST）オフセットに設定されます。
 
 ```js
-Time.dst = 60 * 60;	// Set DST
+Time.dst = 60 * 60;	// DSTを設定
 ```
 
 ***
 
-### `ticks` property
+### `ticks` プロパティ
 
-The `ticks` property returns the value of a millisecond counter. The value returned does not correspond to the time of day. The milliseconds are used to calculate time differences.
+`ticks` プロパティはミリ秒カウンターの値を返します。返される値は時刻には対応していません。ミリ秒は時間差を計算するために使用されます。
 
 ```js
 const start = Time.ticks;
@@ -183,23 +183,24 @@ const stop = Time.ticks;
 trace(`Operation took ${Time.delta(start, stop)} milliseconds\n`);
 ```
 
-On devices that supports multiple concurrent JavaScript virtual machines (for example, using Workers), the clock used to determine the value of the `ticks` property is the same across all virtual machines. This allows `tick` values created in one machine to be compared with values from another.
+複数の同時実行JavaScript仮想マシンをサポートするデバイス（例えば、Workersを使用する場合）では、`ticks`プロパティの値を決定するために使用されるクロックはすべての仮想マシンで同じです。これにより、あるマシンで作成された`tick`値を別のマシンの値と比較することができます。
 
-The range of the value depends on the host. On most microcontrollers, the value is a signed 32-bit integer. On the simulator, it is a positive 64-bit floating point value. To determine the difference between two `ticks` values, use `Time.delta()` which is guaranteed to give a correct result for the host.
+値の範囲はホストによって異なります。ほとんどのマイクロコントローラでは、値は符号付き32ビット整数です。シミュレータでは、正の64ビット浮動小数点値です。2つの`ticks`値の差を求めるには、ホストに対して正しい結果を保証する`Time.delta()`を使用します。
 
 ***
 
 ### `Time.delta(start[, end])`
 
-The `delta` function calculates the difference between two values returned by `Time.ticks`. It is guaranteed to return a correct result even when the value rolls over. If the optional `end` argument is omitted the current value of `Time.ticks` is used.
+`delta`関数は、`Time.ticks`によって返される2つの値の差を計算します。値がロールオーバーしても正しい結果を返すことが保証されています。オプションの`end`引数が省略された場合、現在の`Time.ticks`の値が使用されます。
 
 ***
 
-### `microseconds` property  *(optional)*
+### `microseconds`プロパティ  *(オプション)*
 
-The `microseconds` property returns the value of a microseconds counter. The value returned does not correspond to the time of day. The microseconds are used to calculate time differences.
+`microseconds`プロパティは、マイクロ秒カウンタの値を返します。返される値は時刻に対応していません。マイクロ秒は時間差を計算するために使用されます。
 
-To use the `microseconds` property, include its manifest in the project manifest:
+
+`microseconds` プロパティを使用するには、プロジェクトのマニフェストにそのマニフェストを含めます：
 
 ```
 	"include": [
@@ -208,9 +209,9 @@ To use the `microseconds` property, include its manifest in the project manifest
 	],
 ```
 
-The `microseconds` property is used in the same way as the `ticks` property. Like the `ticks` property, a single time source is used when there multiple concurrent virtual machines. The range of the `microseconds` property is a 64-bit floating point value.
+`microseconds` プロパティは `ticks` プロパティと同じ方法で使用されます。`ticks` プロパティと同様に、複数の同時実行仮想マシンがある場合でも単一の時間ソースが使用されます。`microseconds` プロパティの範囲は64ビット浮動小数点値です。
 
-Unlike `Time.ticks`, the values returned by `Time.microseconds` may always be subtracted from one another to calculate intervals.
+`Time.ticks` とは異なり、`Time.microseconds` によって返される値は常に互いに減算して間隔を計算することができます。
 
 ```js
 const start = Time.microseconds;
@@ -220,16 +221,16 @@ const stop = Time.microseconds;
 trace(`Operation took ${stop - start} microseconds\n`);
 ```
 
-> **Note**: Not all hosts implement microseconds. Hosts that do not implement microseconds generate an error at build time.
+> **注意**: すべてのホストがマイクロ秒を実装しているわけではありません。マイクロ秒を実装していないホストはビルド時にエラーを生成します。
 
 ***
 
 <a id="debug"></a>
-## class Debug
+##  Debug クラス
 
-- **Source code:** [debug](../../modules/base/debug)
+- **ソースコード:** [debug](../../modules/base/debug)
 
-The `Debug` class provides functions that are useful during the development process.
+`Debug` クラスは開発プロセス中に役立つ関数を提供します。
 
 ```js
 import Debug from "debug";
@@ -237,39 +238,39 @@ import Debug from "debug";
 
 ### `Debug.gc([enable])`
 
-The `gc` function can be used to turn the JavaScript garbage collector on and off, as well as to run the garbage collector on-demand.
+`gc` 関数は、JavaScriptガベージコレクタをオンまたはオフにするため、またはオンデマンドでガベージコレクタを実行するために使用できます。
 
-Calling `Debug.gc` with no arguments runs the garbage collector immediately.
+`Debug.gc` を引数なしで呼び出すと、ガベージコレクタが即座に実行されます。
 
 ```js
 Debug.gc();
 ```
 
-Calling `Debug.gc` with a single boolean argument enables or disables the garbage collector.
+`Debug.gc` を単一のブール引数で呼び出すと、ガベージコレクタを有効または無効にします。
 
 ```js
-Debug.gc(true)	// enable garbage collector
-Debug.gc(false);	// disable garbage collector
+Debug.gc(true)	// ガベージコレクタを有効にする
+Debug.gc(false);	// ガベージコレクタを無効にする
 ```
 
 ***
 
 <a id="uuid"></a>
-## class UUID
+## UUID　クラス
 
-- **Source code:** [uuid](../../modules/base/uuid)
+- **ソースコード:** [uuid](../../modules/base/uuid)
 
-The `UUID` class provides a single function to generate a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) string.
+`UUID` クラスは、[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) 文字列を生成するための単一の関数を提供します。
 
 ```js
 import UUID from "uuid";
 ```
 
-> **Note**: Generating a truly unique UUID requires that the device running this function have a unique MAC address and the valid time. Neither of these is guaranteed on all microcontrollers. For production software release, check your device configuration.
+> **注意**: 真にユニークな UUID を生成するには、この関数を実行するデバイスがユニークな MAC アドレスと有効な時間を持っている必要があります。これらの条件はすべてのマイクロコントローラで保証されているわけではありません。製品ソフトウェアのリリースには、デバイスの構成を確認してください。
 
 ### `UUID()`
 
-The `UUID` function returns a new UUID formatted as a string.
+`UUID` 関数は、文字列としてフォーマットされた新しいUUIDを返します。
 
 ```js
 let value = UUID();	// 1080B49C-59FC-4A32-A38B-DE7E80117842
@@ -280,18 +281,19 @@ let value = UUID();	// 1080B49C-59FC-4A32-A38B-DE7E80117842
 <a id="deepequal"></a>
 ## function deepEqual(a, b [,options])
 
-- **Source code:** [deepEqual](../../modules/base/deepEqual)
-- **Tests:** [deepEqual](../../tests/modules/base/deepEqual)
 
-The `deepEqual` function implements a deep comparison between two JavaScript object.
+- **ソースコード:** [deepEqual](../../modules/base/deepEqual)
+- **テスト:** [deepEqual](../../tests/modules/base/deepEqual)
+
+`deepEqual` 関数は、2つのJavaScriptオブジェクト間の深い比較を実装します。
 
 ```js
 import deepEqual from "deepEqual";
 ```
 
-There is no standard algorithm for deeply comparing two objects in JavaScript, and there are many possible correct approaches. The Moddable SDK adopts the behavior of `assert.deepEqual` and `assert.deepStrictEqual` from Node.js for its implementation of `deepEqual`.
+JavaScriptで2つのオブジェクトを深く比較するための標準アルゴリズムは存在せず、多くの正しいアプローチが考えられます。Moddable SDKは、Node.jsの `assert.deepEqual` および `assert.deepStrictEqual` の動作を `deepEqual` の実装に採用しています。
 
-The `deepEqual` function has an optional third parameter, an options object. By default the `deepEqual` [comparison is not-strict](https://nodejs.org/api/assert.html#assertdeepequalactual-expected-message), similar to using `==` for comparisons. Passing `{strict: true}` for the options object uses [strict comparison](https://nodejs.org/api/assert.html#assertdeepstrictequalactual-expected-message), similar to using `===` for comparisons.
+`deepEqual` 関数にはオプションの第3パラメータとしてオプションオブジェクトがあります。デフォルトでは、`deepEqual` の[比較は非厳密](https://nodejs.org/api/assert.html#assertdeepequalactual-expected-message)であり、比較に `==` を使用するのと似ています。オプションオブジェクトに `{strict: true}` を渡すと、[厳密な比較](https://nodejs.org/api/assert.html#assertdeepstrictequalactual-expected-message)が行われ、比較に `===` を使用するのと似ています。
 
 ```js
 const a = {a: 1, b: 0, c: "str"};
@@ -301,41 +303,41 @@ deepEqual(a, b, {strict: true});		// false
 
 ```
 
-The known differences between the Moddable SDK implementation and Node.js will not impact most uses:
+Moddable SDKの実装とNode.jsの既知の違いは、ほとんどの使用に影響を与えません：
 
-- `WeakMap` and `WeakSet` using read-only objects as keys
-- XS does not call `valueOf` to compare boxed primitives
+- 読み取り専用オブジェクトをキーとして使用する`WeakMap`と`WeakSet`
+- XSはボックス化されたプリミティブを比較するために`valueOf`を呼び出しません
 
 ***
 
 <a id="structuredclone"></a>
-## function structuredClone(object[, transferables])
+## function structuredClone(object[, transferables]) {/*examples*/}
 
-- **Source code:** [structuredClone](../../modules/base/structuredClone)
-- **Tests:** [structuredClone](../../tests/modules/base/structuredClone)
+- **ソースコード:** [structuredClone](../../modules/base/structuredClone)
+- **テスト:** [structuredClone](../../tests/modules/base/structuredClone)
 
-The `structuredClone` function creates a deep copy of a JavaScript object.
+`structuredClone`関数は、JavaScriptオブジェクトのディープコピーを作成します。
 
 ```js
 import structuredClone from "structuredClone";
 ```
 
-The `structuredClone` function in the Moddable SDK implements the [algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm) defined by WHATWG for the web platform as much as practical, including circular references and the `transferables` option.
+Moddable SDKの`structuredClone`関数は、循環参照や`transferables`オプションを含む、可能な限りWHATWGによって定義された[アルゴリズム](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)を実装しています。
 
 ```js
 const a = {a: 1, b: Uint8Array.of(1, 2, 3,)}
 const aCopy = structuredClone(a);
 ```
 
-The Moddable SDK implementation of `structuredClone` implements all [supported types](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm#supported_types) that are part of the JavaScript language standard. It does not, of course, clone object types that are part of the web platform and not present on embedded systems such as `DOMException`.
+Moddable SDKの`structuredClone`の実装は、JavaScript言語標準の一部である[サポートされている型](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm#supported_types)をすべて実装しています。もちろん、`DOMException`のような埋め込みシステムに存在しないWebプラットフォームのオブジェクト型はクローンしません。
 
 <a id="instrumentation"></a>
-## class Instrumentation
+## Instrumentation クラス
 
-- **Source code:** [instrumentation](../../modules/base/instrumentation)
-- **Relevant Examples:** [instrumentation](../../examples/base/instrumentation/instrumentation), [xsuse](../../examples/base/instrumentation/xsuse)
+- **ソースコード:** [instrumentation](../../modules/base/instrumentation)
+- **関連するサンプル:** [instrumentation](../../examples/base/instrumentation/instrumentation), [xsuse](../../examples/base/instrumentation/xsuse)
 
-The `Instrumentation` class returns statistics on the behavior of the runtime, including memory use, open file count, and rendering frame rate.
+`Instrumentation` クラスは、メモリ使用量、オープンファイル数、レンダリングフレームレートなど、ランタイムの動作に関する統計情報を返します。
 
 ```js
 import Instrumentation from "instrumentation";
@@ -343,29 +345,28 @@ import Instrumentation from "instrumentation";
 
 ### `get(what)`
 
-The `get` function returns the value of the instrumented item at the index specified by the `what` parameter. Instrumented items are consecutively numbered starting at index 1.
+`get` 関数は、`what` パラメータで指定されたインデックスの計測項目の値を返します。計測項目はインデックス1から連続して番号が付けられています。
 
 ```js
 let pixelsDrawn = Instrumentation.get(1);
 ```
 
-The index of instrumentation items depends on the host and varies between different devices based on the supported features. Use `Instrumentation.map()` to determine the index of a specific instrumentation on the running host.
+計測項目のインデックスはホストによって異なり、サポートされている機能に基づいてデバイスごとに異なります。実行中のホストで特定の計測のインデックスを確認するには、`Instrumentation.map()` を使用します。
 
 ### `map(name)`
 
-The `map` function returns the instrumentation index for a name.
+`map` 関数は、名前に対する計測インデックスを返します。
 
 ```js
 let pixelsDrawnIndex = Instrumentation.map("Pixels Drawn");
 let pixelsDrawn = Instrumentation.get(pixelsDrawnIndex);
 ```
 
-If the instrumentation item named is unavailable, `map` returns `undefined`.
+指定された名前の計測項目が利用できない場合、`map`は`undefined`を返します。
 
 ### `name(index)`
 
-The `name` function returns the name of the instrumentation item at the specified index. It can be used to iterate through all available instrumentation items.
-
+`name`関数は、指定されたインデックスの計測項目の名前を返します。これを使用して、利用可能なすべての計測項目を反復処理することができます。
 
 ```js
 for (let i = 1; true; i++) {
@@ -376,64 +377,62 @@ for (let i = 1; true; i++) {
 }
 ```
 
+### 計測項目
 
-### Instrumentation items
+以下の表は、利用可能な計測項目を説明しています。次の計測項目は1秒間隔でリセットされます： Pixels Drawn, Frames Drawn, Poco Display List Used, Piu Command List Used, Network Bytes Read, Network Bytes Written, and Garbage Collection Count.
 
-The table below describes the instrumented items that are available. The following instrumented items are reset at one second intervals: Pixels Drawn, Frames Drawn, Poco Display List Used, Piu Command List Used, Network Bytes Read, Network Bytes Written, and Garbage Collection Count.
-
-| Name | Long Description |
+| 名前 | 詳細説明 |
 | ---: | :--- |
-| `Pixels Drawn` | The total number of pixels rendered to by Poco during the current interval. This value includes pixels drawn to a display device and pixels rendered offscreen.
-| `Frames Drawn` | The total number of frames rendered by Poco during the most recent interval. Frames are counted by calls to Poco.prototype.end() and by Piu frame updates.
-| `Network Bytes Read` | The total number of bytes received by the Socket module during the current interval. This includes bytes received over TCP and UDP.
-| `Network Bytes Written` | The total number of bytes send by the Socket module during the current interval. This includes bytes sent using TCP and UDP.
-| `Network Sockets` |The total number of active network sockets created by the Socket module. This includes TCP sockets, TCP listeners, and UDP sockets.
-| `Timers` | The number of allocated timers created by the Timer module.
-| `Files` | The number of open files and directory iterators created the File module.
-| `Poco Display List Used` | The peak size in bytes of the Poco display list in the current interval.
-| `Piu Command List Used` | The peak size in bytes of the Piu command list in the current interval.
-| `Turns` | The number of times the event loop has run in the current interval.
-| `CPU 0` | The load on CPU 0 during the current interval.
-| `CPU 1` | The load on CPU 1 during the current interval.
-| `System Free Memory` | The number of free bytes in the system memory heap. This value is not available in the simulator.
-| `XS Slot Heap Used` | Number of bytes in use in the slot heap of the primary XS machine. Some of these bytes may be freed when the garbage collector next runs.
-| `XS Chunk Heap Used` | Number of bytes in use in the chunk heap of the primary XS machine. Some of these bytes may be freed when the garbage collector next runs.
-| `XS Keys Used` | Number of runtime keys allocated by the primary XS machine. Once allocated keys are never deallocated.
-| `XS Garbage Collection Count` | The number of times the garbage collector has run in the current interval.
-| `XS Modules Loaded` | The number of JavaScript modules that are currently loaded in the primary XS machine. This number does not include modules which are preloaded.
-| `XS Stack Used` | The maximum depth in bytes of the stack of the primary XS virtual machine during the current interval.
-| `XS Promises Settled` | The number of Promises settled. This is useful as a measure of Promisee/async/await activity.
-
+| `Pixels Drawn` | 現在の間隔中にPocoによってレンダリングされたピクセルの総数。この値には、ディスプレイデバイスに描画されたピクセルとオフスクリーンにレンダリングされたピクセルが含まれます。
+| `Frames Drawn` | 最近の間隔中にPocoによってレンダリングされたフレームの総数。フレームはPoco.prototype.end()の呼び出しとPiuフレームの更新によってカウントされます。
+| `Network Bytes Read` | 現在の間隔中にSocketモジュールによって受信されたバイトの総数。これにはTCPおよびUDPで受信されたバイトが含まれます。
+| `Network Bytes Written` | 現在の間隔中にSocketモジュールによって送信されたバイトの総数。これにはTCPおよびUDPで送信されたバイトが含まれます。
+| `Network Sockets` | Socketモジュールによって作成されたアクティブなネットワークソケットの総数。これにはTCPソケット、TCPリスナー、およびUDPソケットが含まれます。
+| `Timers` | Timerモジュールによって作成された割り当てられたタイマーの数。
+| `Files` | Fileモジュールによって作成された開いているファイルおよびディレクトリイテレータの数。
+| `Poco Display List Used` | 現在の間隔中のPocoディスプレイリストのピークサイズ（バイト単位）。
+| `Piu Command List Used` | 現在の間隔中のPiuコマンドリストのピークサイズ（バイト単位）。
+| `Turns` | 現在の間隔中にイベントループが実行された回数。
+| `CPU 0` | 現在の間隔中のCPU 0の負荷。
+| `CPU 1` | 現在の間隔中のCPU 1の負荷。
+| `System Free Memory` | システムメモリヒープの空きバイト数。この値はシミュレータでは利用できません。
+| `XS Slot Heap Used` | プライマリXSマシンのスロットヒープで使用されているバイト数。これらのバイトの一部は次回のガベージコレクタの実行時に解放される可能性があります。
+| `XS Chunk Heap Used` | プライマリXSマシンのチャンクヒープで使用されているバイト数。これらのバイトの一部は次回のガベージコレクタの実行時に解放される可能性があります。
+| `XS Keys Used` | プライマリXSマシンによって割り当てられたランタイムキーの数。一度割り当てられたキーは決して解放されません。
+| `XS Garbage Collection Count` | 現在の間隔中にガベージコレクタが実行された回数。
+| `XS Modules Loaded` | 現在プライマリXSマシンにロードされているJavaScriptモジュールの数。この数にはプリロードされたモジュールは含まれません。
+| `XS Stack Used` | 現在の間隔中のプライマリXS仮想マシンのスタックの最大深度（バイト単位）。
+| `XS Promises Settled` | 解決されたPromiseの数。これはPromise/async/awaitの活動の指標として役立ちます。
 
 ***
 
 <a id="console"></a>
-## class Console
+##  Console クラス
 
-- **Source code:** [console](../../modules/base/console)
-- **Relevant Examples:** [console](../../examples/base/console)
+- **ソースコード:** [console](../../modules/base/console)
+- **関連する例:** [console](../../examples/base/console)
 
-The `Console` class implements a serial terminal for debugging and diagnostic purposes. The `Console` module uses `CLI` modules to implement the terminal commands.
+`Console` クラスは、デバッグおよび診断のためのシリアルターミナルを実装します。`Console` モジュールは、ターミナルコマンドを実装するために `CLI` モジュールを使用します。
 
 <!-- complete -->
 
 ***
 
 <a id="cli"></a>
-## class CLI
+## CLI クラス
 
-- **Source code:** [cli](../../modules/base/cli)
-- **Relevant Examples:** [console](../../examples/base/console), [telnet](../../examples/network/telnet)
+- **ソースコード:** [cli](../../modules/base/cli)
+- **関連する例:** [console](../../examples/base/console), [telnet](../../examples/network/telnet)
 
-The `CLI` class is a plug-in interface for commands used in a command line interface. `CLI` classes implement commands for use by the `Console` module (serial command line) and `Telnet` module (network command line).
+`CLI` クラスは、コマンドラインインターフェースで使用されるコマンドのプラグインインターフェースです。`CLI` クラスは、`Console` モジュール（シリアルコマンドライン）および `Telnet` モジュール（ネットワークコマンドライン）で使用されるコマンドを実装します。
 
 <!-- complete -->
 
 ***
 
 <a id="worker"></a>
-## class Worker
+## Worker クラス
 
-See the [Worker documentation](./worker.md) for information about the `Worker` class.
+`Worker` クラスに関する情報は、[Worker ドキュメント](./worker.md) を参照してください。
 
 
