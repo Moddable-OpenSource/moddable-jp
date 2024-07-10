@@ -265,7 +265,7 @@ void app_main() {
 #if USE_USB
 #ifdef mxDebug
 	xTaskCreate(debug_task, "debug", (768 + XT_STACK_EXTRA) / sizeof(StackType_t), 0, 8, NULL);
-	printf("START USB CONSOLE!!!\n");
+	printf("USB CONNECTED\r\n");
 #endif
 #else
 	esp_err_t err;
