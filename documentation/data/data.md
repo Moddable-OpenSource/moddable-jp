@@ -1,8 +1,8 @@
 # Data
 Copyright 2017-2024 Moddable Tech, Inc.<BR>
-Revised: March 29, 2024
+改訂： 2024年3月29日
 
-## Table of Contents
+## 目次
 
 * [Base64](#base64)
 * [Hex](#hex)
@@ -13,17 +13,17 @@ Revised: March 29, 2024
 * [URL & URLSearchParams](#url)
 
 <a id="base64"></a>
-## class Base64
+## Base64 クラス
 
-> **Note**: Base64 encoding and decoding are now supported directly in JavaScript. See the [Base64 proposal](https://tc39.es/proposal-arraybuffer-base64/) for details. The Moddable SDK no longer uses the Base64 module. The Base64 module is still supported for compatibility but it is not recommended for use in new code.
+> **注意**: Base64エンコーディングとデコーディングは、現在JavaScriptで直接サポートされています。詳細は[Base64 proposal](https://tc39.es/proposal-arraybuffer-base64/)を参照してください。Moddable SDKはもはやBase64モジュールを使用していません。Base64モジュールは互換性のためにまだサポートされていますが、新しいコードでの使用は推奨されていません。
 
-The `Base64` class provides static functions to encode and decode using the Base64 algorithm defined in [RFC 4648](https://tools.ietf.org/html/rfc4648).
+`Base64` クラスは、[RFC 4648](https://tools.ietf.org/html/rfc4648) で定義されたBase64アルゴリズムを使用してエンコードおよびデコードするための静的関数を提供します。
 
 ```js
 import Base64 from "base64";
 ```
 
-Include the module's manifest to use it in a project:
+プロジェクトで使用するには、モジュールのマニフェストを含めます：
 
 ```json
 	"include": [
@@ -33,7 +33,7 @@ Include the module's manifest to use it in a project:
 
 ### `static decode(str)`
 
-The `decode` function takes a `String` encoded in Base64 and returns an `ArrayBuffer` with the decoded bytes.
+`decode` 関数は、Base64でエンコードされた `String` を受け取り、デコードされたバイトを含む `ArrayBuffer` を返します。
 
 ```js
 trace(Base64.decode("aGVsbG8sIHdvcmxk") + "\n");
@@ -42,27 +42,27 @@ trace(Base64.decode("aGVsbG8sIHdvcmxk") + "\n");
 
 ### `static encode(data)`
 
-The `encode` function takes a `String` or buffer and returns an `ArrayBuffer` containing the data with Base64 encoding applied.
+`encode` 関数は `String` またはバッファを受け取り、Base64エンコードが適用されたデータを含む `ArrayBuffer` を返します。
 
 ```js
 trace(Base64.encode("hello, world") + "\n");
 // output: "aGVsbG8sIHdvcmxk"
 ```
 
-> **Note**: When a string is provided, its contents are treated as UTF-8 encoded characters when performing Base64 encoding.
+> **注意**: 文字列が提供された場合、その内容は Base64 エンコードを行う際に UTF-8 エンコードされた文字として扱われます。
 
 <a id="hex"></a>
-## class Hex
+## Hex クラス
 
-> **Note**: Hex encoding and decoding are now supported directly in JavaScript. See the [proposal](https://tc39.es/proposal-arraybuffer-base64/) for details. The Moddable SDK no longer uses the Hex module. The Hex module is still supported for compatibility but it is not recommended for use in new code.
+> **注意**: Hex エンコードおよびデコードは、現在 JavaScript で直接サポートされています。詳細は [提案](https://tc39.es/proposal-arraybuffer-base64/) を参照してください。Moddable SDK はもはや Hex モジュールを使用していません。Hex モジュールは互換性のためにまだサポートされていますが、新しいコードでの使用は推奨されません。
 
-The `Hex` class provides static functions to convert between an `ArrayBuffer` and hexadecimal encoded `String` values.
+`Hex` クラスは、`ArrayBuffer` と16進エンコードされた `String` 値の間で変換するための静的関数を提供します。
 
 ```js
 import Hex from "hex";
 ```
 
-Include the module's manifest to use it in a project:
+プロジェクトで使用するには、モジュールのマニフェストを含めます：
 
 ```json
 	"include": [
@@ -72,20 +72,20 @@ Include the module's manifest to use it in a project:
 
 ### `static toBuffer(string [, separator])`
 
-The `toBuffer` function converts a [hexadecimal](https://en.wikipedia.org/wiki/Hexadecimal) encoded `String`, with optional separator, to an `ArrayBuffer`.
+`toBuffer` 関数は、オプションのセパレータを使用して、[16進数](https://en.wikipedia.org/wiki/Hexadecimal)でエンコードされた `String` を `ArrayBuffer` に変換します。
 
 ```js
 let b0 = Hex.toBuffer("0123456789abcdef");
 let b1 = Hex.toBuffer("01:23:45:67:89:AB:CD:EF", ":");
 ```
 
-The hexadecimal digits may be uppercase or lowercase. If the optional separator argument is provided, it must appear between each pair of hexadecimal digits.
+16進数の数字は大文字でも小文字でもかまいません。オプションのセパレータ引数が提供されている場合、それは各16進数の数字のペアの間に現れる必要があります。
 
-The optional separator must be a single character in the 7-bit ASCII range.
+オプションのセパレータは、7ビットASCII範囲内の1文字でなければなりません。
 
 ### `static toString(buffer [[, separator], hexChars]);`
 
-The `toString` function converts a buffer to a hexadecimal encoded `String`.
+`toString` 関数は、バッファを16進数でエンコードされた `String` に変換します。
 
 ```js
 let buffer = Hex.toBuffer("0123456789abcdef");
@@ -95,27 +95,27 @@ let s1 = Hex.toString(buffer);
 // s1 is 0123456789ABCDEF
 ```
 
-The optional separator must be a single character in the 7-bit ASCII range.
+オプションのセパレータは、7ビットASCII範囲内の1文字でなければなりません。
 
-The optional `hexChars` argument may contain 16 characters to use for the hexadecimal encoding. The characters must be 7-bit ASCII:
+オプションの `hexChars` 引数には、16進数エンコードに使用する16文字を含めることができます。文字は7ビットASCIIでなければなりません：
 
 ```js
 let buffer = Hex.toBuffer("0123456789abcdef");
 let s0 = Hex.toString(buffer, "-", "0123456789abwxyz");
-// s0 is 01-23-45-67-89-ab-wx-yz
+// s0 は 01-23-45-67-89-ab-wx-yz です
 ```
 
 <a id="crc"></a>
-## class CRC8, CRC16
+## CRC8, CRC16クラス
 
-The `CRC8` and `CRC16` classes calculate CRC checksums on data.
+`CRC8` と `CRC16` クラスはデータのCRCチェックサムを計算します。
 
 ```
 import {CRC8} from "crc";
 import {CRC16} from "crc";
 ```
 
-Include the module's manifest to use it in a project:
+モジュールのマニフェストをプロジェクトに含めて使用します：
 
 ```json
 	"include": [
@@ -126,19 +126,19 @@ Include the module's manifest to use it in a project:
 #### `CRC8(polynomial [, initial [, reflectInput [, reflectOutput [, xorOutput]]]])`
 #### `CRC16(polynomial [, initial [, reflectInput [, reflectOutput [, xorOutput]]]])`
 
-The `CRC8` and `CRC16` functions take a number of options used to specify the CRC checksum to calculate.
+`CRC8` と `CRC16` 関数は、計算するCRCチェックサムを指定するためのいくつかのオプションを取ります。
 
-| Parameter | Default | Description |
+| パラメータ | デフォルト | 説明 |
 | :---: | :---: | :--- |
-| `polynomial` | (none) | Polynomial to use (required) |
-| `initial` | `0` | Initial CRC accumulator value (optional) |
-| `reflectInput` | `false` | If `true`, each input byte is reflected (bits used in reverse order) before being used (optional) |
-| `reflectOutput` | `false` | If `true`, each output byte is reflected before being returned. The output reflection is done over the whole CRC value (optional) |
-| `xorOutput` | `0` | Value to XOR to the final CRC value (optional) |
+| `polynomial` | (なし) | 使用する多項式 (必須) |
+| `initial` | `0` | 初期CRCアキュムレータ値 (オプション) |
+| `reflectInput` | `false` | `true` の場合、各入力バイトは使用される前に反転されます (オプション) |
+| `reflectOutput` | `false` | `true` の場合、各出力バイトは返される前に反転されます。出力の反転はCRC値全体に対して行われます (オプション) |
+| `xorOutput` | `0` | 最終CRC値にXORする値 (オプション) |
 
-The `polynomial`, `initial` and `xorOutput` values are 8-bit integers for CRC8 and 16-bit integers for CRC16.
+`polynomial`、`initial`、および `xorOutput` の値は、CRC8の場合は8ビット整数、CRC16の場合は16ビット整数です。
 
-The [crc example](../../examples/data/crc/main.js) demonstrates the definition of the parameters for a number of common CRC checksums:
+[crc example](../../examples/data/crc/main.js) では、一般的なCRCチェックサムのパラメータの定義を示しています：
 
 - `CRC-8`
 - `CRC-8/CDMA2000`
@@ -177,29 +177,29 @@ The [crc example](../../examples/data/crc/main.js) demonstrates the definition o
 
 ### `close()`
 
-The `close` function frees resources associated with the CRC checksum calculation.
+`close` 関数は、CRCチェックサム計算に関連するリソースを解放します。
 
 ### `checksum(buffer)`
 
-The `checksum` function applies the CRC calculation to the data provided in `buffer`. The CRC checksum is returned.
+`checksum` 関数は、`buffer` に提供されたデータにCRC計算を適用します。CRCチェックサムが返されます。
 
-The `buffer` parameter may be a `String` or buffer.
+`buffer` パラメータは `String` またはバッファである可能性があります。
 
-The `checksum` function may be called multiple times. Each time it is called the CRC updated and returned. Call the `reset` function to start a new calculation.
+`checksum` 関数は複数回呼び出すことができます。呼び出されるたびにCRCが更新されて返されます。新しい計算を開始するには `reset` 関数を呼び出します。
 
 ### `reset()`
 
-The `reset` function clears the CRC accumulator to the `initial` value.
+`reset` 関数はCRCアキュムレータを `initial` 値にクリアします。
 
 <a id="qrcode"></a>
-## class QRCode
-The `QRCode` class generates QR Code data from Strings and buffers. The data may then be rendering in various ways. Extensions are provided to [Poco](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/commodetto/qrcode) and [Piu](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/piu/MC/qrcode) to efficiently render QR Codes. The core implementation is the QR Code Generator Library from [Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library).
+## QRCodeクラス
+`QRCode` クラスは、文字列やバッファからQRコードデータを生成します。そのデータはさまざまな方法でレンダリングできます。[Poco](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/commodetto/qrcode) および [Piu](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/piu/MC/qrcode) への拡張が提供されており、効率的にQRコードをレンダリングできます。コア実装は [Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library) のQRコードジェネレータライブラリです。
 
 ```js
 import qrCode from "qrcode";
 ```
 
-Include the module's manifest to use them in a project:
+プロジェクトで使用するには、モジュールのマニフェストを含めます：
 
 ```json
 	"include": [
@@ -207,20 +207,20 @@ Include the module's manifest to use them in a project:
 	]
 ```
 
-For additional details see the article [QR Code module for the Moddable SDK](https://blog.moddable.com/blog/qrcode/).
+詳細については、記事 [Moddable SDKのQRコードモジュール](https://blog.moddable.com/blog/qrcode/) を参照してください。
 
 ### `qrCode(options)`
 
-The `qrCode` function accepts an options object that describes the QR Code to generate. It returns an `ArrayBuffer` where each byte is 0 or 1 for a white or black pixel. The returned buffer has a `size` property that indicate the number of cells in one dimension of the generated QR Code.
+`qrCode` 関数は、生成するQRコードを記述するオプションオブジェクトを受け取ります。この関数は、各バイトが白または黒のピクセルを示す0または1である `ArrayBuffer` を返します。返されるバッファには、生成されたQRコードの一辺のセル数を示す `size` プロパティがあります。
 
-The following properties are supported in the options object:
+オプションオブジェクトでサポートされるプロパティは以下の通りです：
 
-| Property | Description |
+| プロパティ | 説明 |
 | :---: | :--- |
-| `maxVersion` |  A number between 1 and 40 inclusive indicating the maximum version of the generated QR Code. The version number determines the amount of data the QR Code can contain. The implementation uses the minimum version number possible for the size of the data provided. This property is optional and defaults to 40. |
-| `input` |  A `String` or buffer containing the data to encode into the QR Code. This property is required. |
+| `maxVersion` |  生成されるQRコードの最大バージョンを示す1から40までの数値。バージョン番号はQRコードが含むことができるデータ量を決定します。実装は提供されたデータのサイズに対して可能な最小のバージョン番号を使用します。このプロパティはオプションで、デフォルトは40です。 |
+| `input` |  QRコードにエンコードするデータを含む `String` またはバッファ。このプロパティは必須です。 |
 
-The `qrCode` function throws an exception if it detects invalid parameters or that there is not enough memory to generate the QR Code.
+`qrCode` 関数は、無効なパラメータが検出された場合やQRコードを生成するのに十分なメモリがない場合に例外をスローします。
 
 ```js
 const code = qrCode({input: "Welcome to Moddable", maxVersion: 4});
@@ -235,16 +235,16 @@ for (let y = 0; y < = code.size; y++) {
 ```
 
 <a id="text"></a>
-## class TextDecoder and class TextEncoder
+## TextDecoderクラス と TextEncoderクラス
 
-The `TextDecoder` and `TextEncoder` classes implement conversion between JavaScript strings and memory buffers containing UTF-8 data.
+`TextDecoder` と `TextEncoder` クラスは、JavaScriptの文字列とUTF-8データを含むメモリバッファ間の変換を実装します。
 
 ```js
 import TextDecoder from "text/decoder";
 import TextEncoder from "text/encoder";
 ```
 
-Include the modules' manifest to use them in a project:
+これらをプロジェクトで使用するには、モジュールのマニフェストを含めます：
 
 ```json
 	"include": [
@@ -253,21 +253,22 @@ Include the modules' manifest to use them in a project:
 	]
 ```
 
-The `TextDecoder` implements the [TextDecoder class](https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder) as [specified by WHATWG](https://encoding.spec.whatwg.org/#interface-textdecoder). It accepts only UTF-8 input data.
+`TextDecoder` は [WHATWG によって指定された](https://encoding.spec.whatwg.org/#interface-textdecoder) [TextDecoder クラス](https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder) を実装しています。UTF-8入力データのみを受け付けます。
 
-The `TextEncoder` implements the [TextEncoder class](https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder) as [specified by WHATWG](https://encoding.spec.whatwg.org/#interface-textencoder). The implementation includes `encodeInto()`.
+`TextEncoder` は [WHATWG によって指定された](https://encoding.spec.whatwg.org/#interface-textencoder) [TextEncoder クラス](https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder) を実装しています。この実装には `encodeInto()` が含まれています。
 
 <a id="zlib"></a>
-## zlib: class Inflate and class Deflate
+## zlib: Inflateクラス と Deflateクラス
 
-The `Inflate` and `Deflate` classes implement zlib decompression and compression. The JavaScript API follows [the API](http://nodeca.github.io/pako/) defined by the [pako](https://github.com/nodeca/pako) library.
+`Inflate` と `Deflate` クラスはzlibの解凍と圧縮を実装します。JavaScript APIは [pako](https://github.com/nodeca/pako) ライブラリによって定義された [API](http://nodeca.github.io/pako/) に従います。
+```
 
 ```js
 import Inflate from "inflate";
 import Deflate from "deflate";
 ```
 
-Include the modules' manifest to use them in a project:
+プロジェクトでこれらのモジュールを使用するには、モジュールのマニフェストを含めます：
 
 ```json
 	"include": [
@@ -276,20 +277,20 @@ Include the modules' manifest to use them in a project:
 	]
 ```
 
-The [inflate example](../../examples/data/inflate/main.js) demonstrates how to decompress data as a one-shot operation and using the `onData` callback for streaming.
+[inflateの例](../../examples/data/inflate/main.js)は、データをワンショット操作として解凍する方法と、ストリーミングのための`onData`コールバックを使用する方法を示しています。
 
-> **Note**: A significant amount of memory is required for zlib decompression and especially for compression. These libraries may not work on all microcontrollers because of memory constraints.
+> **注意**: zlibの解凍および特に圧縮には大量のメモリが必要です。これらのライブラリは、メモリ制約のためにすべてのマイクロコントローラで動作するわけではありません。
 
 <a id="url"></a>
-## class URL and class URLSearchParams
-The `URL` and `URLSearchParams` classes provide utilities for working with URLs and their search parameters.
+## URLクラス と URLSearchParamsクラス
+`URL`と`URLSearchParams`クラスは、URLおよびその検索パラメータを操作するためのユーティリティを提供します。
 
 ```js
 import URL from "url";
 import {URL, URLSearchParams} from "url";
 ```
 
-Include the module's manifest to use it in a project:
+プロジェクトでこのモジュールを使用するには、モジュールのマニフェストを含めます：
 
 ```json
 	"include": [
@@ -297,8 +298,8 @@ Include the module's manifest to use it in a project:
 	]
 ```
 
-`URL` implements the [URL class](https://developer.mozilla.org/en-US/docs/Web/API/URL) as [specified by WHATWG](https://url.spec.whatwg.org/#url-class). The implementation fully conforms to the standard with two exceptions: [Punycode](https://en.wikipedia.org/wiki/Punycode) and [IDNA](https://www.unicode.org/reports/tr46/) support are unimplemented. These are used primarily for the display and safe handling of user-entered URLs in browsers, which are not generally a concern on embedded systems. With some effort (and increase in code size), the implementation could support both.
+`URL`は[WHATWGによって仕様化された](https://url.spec.whatwg.org/#url-class) [URLクラス](https://developer.mozilla.org/en-US/docs/Web/API/URL)を実装しています。この実装は、2つの例外を除いて標準に完全に準拠しています： [Punycode](https://en.wikipedia.org/wiki/Punycode)および[IDNA](https://www.unicode.org/reports/tr46/)のサポートは未実装です。これらは主にブラウザでのユーザー入力URLの表示と安全な処理のために使用されますが、組み込みシステムでは一般的に問題にはなりません。多少の努力（およびコードサイズの増加）で、実装は両方をサポートすることができます。
 
-`URLSearchParams` implements the [URLSearchParams class](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) as [specified by WHATWG](https://url.spec.whatwg.org/#urlsearchparams).
+`URLSearchParams`は、[WHATWGによって指定された](https://url.spec.whatwg.org/#urlsearchparams) [URLSearchParamsクラス](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams)を実装しています。
 
-[Tests for both](https://github.com/Moddable-OpenSource/moddable/tree/public/tests/modules/data/url) are included in the Moddable SDK. They are based on the tests used to validate these APIs in web browsers.
+[両方のテスト](https://github.com/Moddable-OpenSource/moddable/tree/public/tests/modules/data/url)はModdable SDKに含まれています。これらのAPIをウェブブラウザで検証するために使用されるテストに基づいています。
