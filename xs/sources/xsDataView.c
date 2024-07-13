@@ -623,12 +623,19 @@ void fx_ArrayBuffer_prototype_concat(txMachine* the)
 		slot = mxArgv(i);
 		if (slot->kind == XS_REFERENCE_KIND) {
 			slot = slot->value.reference->next;
-			if (slot && (slot->kind == XS_ARRAY_BUFFER_KIND)) {
-				arrayBuffer = slot;
-				bufferInfo = slot->next;
+			if (slot) {
+				if (slot->kind == XS_ARRAY_BUFFER_KIND) {
+					bufferInfo = slot->next;
+				}
+				else if ((slot->kind == XS_HOST_KIND) && !(slot->flag & XS_HOST_CHUNK_FLAG)) {
+					slot = slot->next;
+					if (slot && (slot->kind == XS_BUFFER_INFO_KIND)) {
+						bufferInfo = slot;
+					}
+				}
 			}
 		}
-		if (arrayBuffer) 
+		if (bufferInfo) 
 			length = fxAddChunkSizes(the, length, bufferInfo->value.bufferInfo.length);
 		else
 			mxTypeError("arguments[%ld] is no ArrayBuffer instance", i);
@@ -643,10 +650,13 @@ void fx_ArrayBuffer_prototype_concat(txMachine* the)
 	address += length;
 	i = 0;
 	while (i < c) {
-		arrayBuffer = mxArgv(i)->value.reference->next;
-		bufferInfo = arrayBuffer->next;
+		slot = mxArgv(i)->value.reference->next;
+		bufferInfo = slot->next;
 		length = bufferInfo->value.bufferInfo.length;
-		c_memcpy(address, arrayBuffer->value.arrayBuffer.address, length);
+		if (slot->kind == XS_ARRAY_BUFFER_KIND)
+			c_memcpy(address, slot->value.arrayBuffer.address, length);
+		else
+			c_memcpy(address, slot->value.host.data, length);
 		address += length;
 		i++;
 	}

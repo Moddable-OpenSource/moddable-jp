@@ -83,6 +83,10 @@ extern void mc_setup(xsMachine *the);
 	uint8_t gSoftReset;
 #endif
 
+#ifndef UART_HW_FIFO_LEN
+	#define UART_HW_FIFO_LEN(USE_UART) UART_FIFO_LEN
+#endif
+
 static xsMachine *gThe;		// the main XS virtual machine running
 
 /*

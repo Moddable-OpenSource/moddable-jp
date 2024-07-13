@@ -224,6 +224,21 @@ INC_DIRS = \
 	$(IDF_PATH)/components/driver/touch_sensor/$(ESP32_SUBCLASS)/include \
  	$(IDF_PATH)/components/tinyusb/additions/include
 
+# paths for prior idf
+INC_DIRS += \
+	$(IDF_PATH)/components/freertos/port/$(ESP_ARCH)/include \
+	$(IDF_PATH)/components/freertos/FreeRTOS-Kernel/portable/$(ESP_ARCH)/include \
+	$(IDF_PATH)/components/freertos/esp_additions/arch/$(ESP_ARCH)/include \
+	$(IDF_PATH)/components/freertos/esp_additions/include/freertos \
+	$(IDF_PATH)/components/freertos \
+	$(IDF_PATH)/components/freertos/include \
+	$(IDF_PATH)/components/freertos/include/freertos \
+	$(IDF_PATH)/components/freertos/port \
+	$(IDF_PATH)/components/freertos/include/esp_additions \
+	$(IDF_PATH)/components/freertos/include/esp_additions/freertos \
+	$(IDF_PATH)/components/freertos/port/$(ESP_ARCH)/include/freertos \
+
+
 XS_OBJ = \
 	$(LIB_DIR)/xsAll.c.o \
 	$(LIB_DIR)/xsAPI.c.o \

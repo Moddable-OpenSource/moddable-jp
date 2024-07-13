@@ -2704,6 +2704,13 @@ void fxClassNodeCode(void* it, void* param)
 	}
 	if (self->symbol)
 		fxCoderAddIndex(param, 0, XS_CODE_CONST_CLOSURE_1, self->symbolScope->firstDeclareNode->index);
+	if (self->instanceInit) {
+		fxNodeDispatchCode(self->instanceInit, param);
+		fxCoderAddIndex(param, 1, XS_CODE_GET_LOCAL_1, prototype);
+		fxCoderAddByte(param, -1, XS_CODE_SET_HOME);
+		fxCoderAddIndex(param, 0, XS_CODE_CONST_CLOSURE_1, declaration->index);
+		fxCoderAddByte(param, -1, XS_CODE_POP);
+	}
 	if (self->constructorInit) {
 		fxCoderAddIndex(param, 1, XS_CODE_GET_LOCAL_1, constructor);
 		fxNodeDispatchCode(self->constructorInit, param);
@@ -2711,13 +2718,6 @@ void fxClassNodeCode(void* it, void* param)
 		fxCoderAddByte(param, -1, XS_CODE_SET_HOME);
 		fxCoderAddByte(param, 1, XS_CODE_CALL);
 		fxCoderAddInteger(param, -2, XS_CODE_RUN_1, 0);
-		fxCoderAddByte(param, -1, XS_CODE_POP);
-	}
-	if (self->instanceInit) {
-		fxNodeDispatchCode(self->instanceInit, param);
-		fxCoderAddIndex(param, 1, XS_CODE_GET_LOCAL_1, prototype);
-		fxCoderAddByte(param, -1, XS_CODE_SET_HOME);
-		fxCoderAddIndex(param, 0, XS_CODE_CONST_CLOSURE_1, declaration->index);
 		fxCoderAddByte(param, -1, XS_CODE_POP);
 	}
 	coder->classNode = former;
