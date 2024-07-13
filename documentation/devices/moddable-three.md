@@ -1,104 +1,104 @@
-# Moddable Three Developer Guide
+# Moddable Three 開発者ガイド
 Copyright 2019-2022 Moddable Tech, Inc.<BR>
-Revised: March 22, 2022
+改訂日： 2022年3月22日
 
-This document provides information about Moddable Three, including details about its pins and other components, how to build and deploy apps, and links to other development resources.
+このドキュメントは、Moddable Threeに関する情報を提供します。ピンやその他のコンポーネントの詳細、アプリのビルドとデプロイ方法、その他の開発リソースへのリンクが含まれています。
 
-## Table of Contents
+## 目次
 
-- [About Moddable Three](#about-moddable-three)
-	- [Components](#components)
-	- [Pinout](#pinout)
-- [SDK and Host Environment Setup](#setup)
-- [Building and Deploying Apps](#building-and-deploying-apps)
-- [Troubleshooting](#troubleshooting)
-- [Development Resources](#development-resources)
-	- [Examples](#examples)
-	- [Documentation](#documentation)
-	- [Support](#support)
-	- [Updates](#updates)
+- [Moddable Three について](#about-moddable-three)
+	- [コンポーネント](#components)
+	- [ピン配置](#pinout)
+- [SDK とホスト環境のセットアップ](#setup)
+- [アプリのビルドとデプロイ](#building-and-deploying-apps)
+- [トラブルシューティング](#troubleshooting)
+- [開発リソース](#development-resources)
+	- [サンプル](#examples)
+	- [ドキュメント](#documentation)
+	- [サポート](#support)
+	- [更新](#updates)
 
 <a id="about-moddable-three"></a>
-## About Moddable Three
+## Moddable Three について
 
 <img src="../assets/devices/moddable-three.png">
 
-Moddable Three is a hardware module that makes it easy for developers to experiment with the Moddable SDK on inexpensive hardware. It is available to purchase on the [Moddable website](http://www.moddable.com/moddable-three).
+Moddable Threeは、開発者が安価なハードウェアでModdable SDKを試すのを容易にするハードウェアモジュールです。[Moddable のウェブサイト](http://www.moddable.com/moddable-three)で購入できます。
 
 <a id="components"></a>
-### Components
+### コンポーネント
 
-The two main components of Moddable Three are the ESP8266 module and ePaper screen. The ESP8266 module includes a Wi-Fi antenna and 4 MB of flash storage memory. The ePaper screen is a 122 x 250 black and white display.
+Moddable Threeの主なコンポーネントは、ESP8266モジュールとePaperスクリーンの2つです。ESP8266モジュールにはWi-Fiアンテナと4 MBのフラッシュストレージメモリが含まれています。ePaperスクリーンは122 x 250の白黒ディスプレイです。
 
 <a id="pinout"></a>
-### Pinout
+### ピン配置
 
 <img src="../assets/devices/moddable-three-pinout.png">
 
 <a id="setup"></a>
-## SDK and Host Environment Setup
+## SDK とホスト環境のセットアップ
 
-To build and run apps on Moddable Three, you'll need to:
+Moddable Threeでアプリをビルドして実行するには、以下の手順が必要です：
 
-1. Install the [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [ESP8266 tools](./esp8266.md)
-3. Follow the instructions in the **Building and Deploying Apps** section below.
+1. [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md) をインストールする
+2. [ESP8266 ツール](./esp8266.md) をインストールする
+3. 以下の **アプリのビルドとデプロイ** セクションの指示に従う
 
 <a id="building-and-deploying-apps"></a>
-## Building and Deploying Apps
+## アプリのビルドとデプロイ
 
-After you've set up your host environment and ESP8266 tools, take the following steps to install an application on your Moddable Three.
+ホスト環境とESP8266ツールをセットアップした後、以下の手順でModdable Threeにアプリケーションをインストールします。
 
-1. Attach your Moddable Three to your computer with a micro USB cable.
+1. Moddable Threeをmicro USBケーブルでコンピュータに接続します。
 
-	Make sure you're using a data sync&#8211;capable cable, not one that is power-only.
+	データ同期が可能なケーブルを使用していることを確認してください。電源供給のみのケーブルは使用しないでください。
 
-3. Build and deploy the app with `mcconfig`.
+3. `mcconfig`を使ってアプリをビルドしてデプロイする。
 
-	`mcconfig` is the command line tool to build and launch Moddable apps on microcontrollers and the simulator. Full documentation of `mcconfig` is available [here](../tools/tools.md).
+`mcconfig`は、マイクロコントローラおよびシミュレータ上でModdableアプリをビルドおよび起動するためのコマンドラインツールです。`mcconfig`の完全なドキュメントは[こちら](../tools/tools.md)にあります。
 
-	Use the platform `-p esp/moddable_three`  with `mcconfig` to build for Moddable Three. For example, to build the [`piu/love-e-ink` example](../../examples/piu/love-e-ink):
+Moddable Three用にビルドするには、`mcconfig`でプラットフォーム`-p esp/moddable_three`を使用します。例えば、[`piu/love-e-ink`のサンプル](../../examples/piu/love-e-ink)をビルドするには：
 
-	```text
+```text
 	cd $MODDABLE/examples/piu/love-e-ink
 	mcconfig -d -m -p esp/moddable_three
-	```
+```
 
-	The [examples readme](../../examples) contains additional information about other commonly used `mcconfig` arguments for screen rotation, Wi-Fi configuration, and more.
+[examples readme](../../examples)には、画面の回転、Wi-Fiの設定など、他の一般的に使用される`mcconfig`引数に関する追加情報が含まれています。
 
-	Use the platform `-p simulator/moddable_three` with `mcconfig` to build for the Moddable Three simulator.
+Moddable Threeシミュレータ用にビルドするには、`mcconfig`でプラットフォーム`-p simulator/moddable_three`を使用します。
 
 <a id="troubleshooting"></a>
-## Troubleshooting
+## トラブルシューティング
 
-See the Troubleshooting section of the [ESP8266 documentation](./esp8266.md) for a list of common issues and how to resolve them.
+一般的な問題とその解決方法については、[ESP8266ドキュメント](./esp8266.md)のトラブルシューティングセクションを参照してください。
 
 <a id="development-resources"></a>
-## Development Resources
+## 開発リソース
 
 <a id="examples"></a>
-### Examples
+### サンプル
 
-The Moddable SDK has over 150 [example apps](../../examples) that demonstrate how to use its many features. Most of these examples run on Moddable Three.
+Moddable SDKには、その多くの機能を示す150以上の[サンプルアプリ](../../examples)があります。これらの例のほとんどはModdable Threeで動作します。
 
-That said, many of the examples that use Commodetto and Piu are designed for colored screens with a faster refresh rate. In addition, not every example is compatible with Moddable Three hardware. For example, the ESP8266 does not have BLE capabilities so BLE examples do not build or run. Some examples are designed to test specific display and touch drivers that are not compatible with the Moddable Three display and give a build error.
+とはいえ、CommodettoやPiuを使用する多くのサンプルは、より高速なリフレッシュレートを持つカラースクリーン用に設計されています。さらに、すべてのサンプルがModdable Threeハードウェアと互換性があるわけではありません。例えば、ESP8266にはBLE機能がないため、BLEの例はビルドも実行もできません。一部の例は、Moddable Threeディスプレイと互換性のない特定のディスプレイおよびタッチドライバをテストするために設計されており、ビルドエラーを引き起こします。
 
 <a id="documentation"></a>
-### Documentation
+### ドキュメント
 
-All the documentation for the Moddable SDK is in the [documentation](../) directory. The **documentation**, **examples**, and **modules** directories share a common structure to make it straightforward to locate information. Some of the highlights include:
+Moddable SDKのすべてのドキュメントは[documentation](../)ディレクトリにあります。**documentation**、**examples**、および**modules**ディレクトリは共通の構造を持っており、情報を簡単に見つけることができます。いくつかのハイライトは以下の通りです：
 
-- The `commodetto` subdirectory, which contains resources related to Commodetto--a bitmap graphics library that provides a 2D graphics API--and Poco, a lightweight rendering engine.
-- The `piu` subdirectory, which contains resources related to Piu, a user interface framework that makes it easier to create complex, responsive layouts.
-- The `networking` subdirectory, which contains networking resources related to network sockets and a variety of standard, secure networking protocols built on sockets including HTTP/HTTPS, WebSockets, DNS, SNTP, and telnet
-- The `pins` subdirectory, which contains resources related to supported hardware protocols (digital, analog, PWM, I2C, etc.). A number of drivers for common off-the-shelf sensors and corresponding example apps are also available.
+- `commodetto`サブディレクトリには、2DグラフィックスAPIを提供するビットマップグラフィックスライブラリであるCommodettoと、軽量なレンダリングエンジンであるPocoに関連するリソースが含まれています。
+- `piu`サブディレクトリには、複雑でレスポンシブなレイアウトを簡単に作成できるようにするユーザーインターフェースフレームワークであるPiuに関連するリソースが含まれています。
+- `networking`サブディレクトリには、ネットワークソケットおよびHTTP/HTTPS、WebSockets、DNS、SNTP、telnetなどのソケット上に構築されたさまざまな標準的で安全なネットワーキングプロトコルに関連するネットワークリソースが含まれています。
+- `pins`サブディレクトリには、サポートされているハードウェアプロトコル（デジタル、アナログ、PWM、I2Cなど）に関連するリソースが含まれています。一般的な市販センサーの多くのドライバと対応する例示アプリも利用可能です。
 
 <a id="support"></a>
-### Support
+### サポート
 
-If you have questions, we recommend you [open an issue](https://github.com/Moddable-OpenSource/moddable/issues). We'll respond as quickly as practical, and other developers can offer help and benefit from the answers to your questions. Many questions have already been answered, so please try searching previous issues before opening a new issue.
+質問がある場合は、[issueを開く](https://github.com/Moddable-OpenSource/moddable/issues)ことをお勧めします。できるだけ早く対応しますし、他の開発者も助けを提供したり、あなたの質問への回答から利益を得ることができます。多くの質問はすでに回答されているので、新しいissueを開く前に以前のissueを検索してみてください。
 
 <a id="updates"></a>
-### Updates
+### 更新情報
 
-The best way to keep up with what we're doing is to follow us on Twitter ([@moddabletech](https://twitter.com/moddabletech)). We post announcements about new posts on [our blog](http://blog.moddable.com/) there, along with other Moddable news.
+私たちの活動を追跡する最良の方法は、Twitterで私たちをフォローすることです ([@moddabletech](https://twitter.com/moddabletech))。新しい投稿に関する発表や、その他のModdableニュースを[私たちのブログ](http://blog.moddable.com/)でお知らせしています。

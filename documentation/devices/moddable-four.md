@@ -1,149 +1,148 @@
-# Moddable Four Developer Guide
-
+# Moddable Four 開発者ガイド
 Copyright 2021-2024 Moddable Tech, Inc.<BR>
-Revised: April 20, 2024
+改訂： 2024年4月20日
 
-This document provides information about Moddable Four, including details about its pins and other components, how to build and deploy apps, and links to other development resources.
+このドキュメントは、Moddable Fourに関する情報を提供します。ピンやその他のコンポーネントの詳細、アプリのビルドとデプロイ方法、その他の開発リソースへのリンクが含まれています。
 
 ## Table of Contents
 
-- [About Moddable Four](#about-moddable-four)
-	- [Components](#components)
-	- [Pinout](#pinout)
-	- [Pin Information](#pin-info)
-- [SDK and Host Environment Setup](#setup)
-- [Building and Deploying Apps](#building-and-deploying-apps)
-- [Using Moddable Four](#moddable-features)
-- [Troubleshooting](#troubleshooting)
-- [Development Resources](#development-resources)
-	- [Simulator](#simulator)
-	- [Examples](#examples)
-	- [Documentation](#documentation)
-	- [Support](#support)
-	- [Updates](#updates)
+- [Moddable Fourについて](#about-moddable-four)
+	- [コンポーネント](#components)
+	- [ピン配置](#pinout)
+	- [ピン情報](#pin-info)
+- [SDKとホスト環境のセットアップ](#setup)
+- [アプリのビルドとデプロイ](#building-and-deploying-apps)
+- [Moddable Fourの使用](#moddable-features)
+- [トラブルシューティング](#troubleshooting)
+- [開発リソース](#development-resources)
+	- [シミュレーター](#simulator)
+	- [サンプル](#examples)
+	- [ドキュメント](#documentation)
+	- [サポート](#support)
+	- [更新](#updates)
 
 <a id="about-moddable-four"></a>
-## About Moddable Four
+## Moddable Fourについて
 
 <img src="../assets/devices/moddable-four.png">
 
-Moddable Four is a low-power, Bluetooth LE development board that makes it easy for developers to experiment with the Moddable SDK. It is available to purchase on the [Moddable website](http://www.moddable.com/purchase).
+Moddable Fourは、低消費電力のBluetooth LE開発ボードで、開発者がModdable SDKを使って実験するのを容易にします。[Moddableのウェブサイト](http://www.moddable.com/purchase)で購入できます。
 
 <a id="components"></a>
-### Components
+### コンポーネント
 
-The two main components of Moddable Four are the nRF52840 module and mirror display. The nRF52840 module includes a BLE antenna, 1 MB Flash, and 256 KB RAM. The Sharp mirror display is a 128x128 black and white display that uses the [`ls013b4dn04` display driver](../drivers/ls013b4dn04/ls013b4dn04.md).
+Moddable Fourの主なコンポーネントは、nRF52840モジュールとミラーディスプレイの2つです。nRF52840モジュールには、BLEアンテナ、1 MBフラッシュ、および256 KB RAMが含まれています。シャープのミラーディスプレイは、[`ls013b4dn04`ディスプレイドライバ](../drivers/ls013b4dn04/ls013b4dn04.md)を使用する128x128の白黒ディスプレイです。
 
-It also includes an integrated LIS3DH accelerometer, jog dial, and CR2032 battery connector.
+また、統合されたLIS3DH加速度計、ジョグダイヤル、およびCR2032バッテリコネクタも含まれています。
 
 <a id="pinout"></a>
-### Pinout
+### ピン配置
 
 <img src="../assets/devices/moddable-four-pinout.png">
 
-**Note:** LCD-PWR / GPIO23 is not for use as a general GPIO. It is used to provide power to a sensor and to the screen.
+**注意:** LCD-PWR / GPIO23は一般的なGPIOとして使用しないでください。これはセンサーと画面に電力を供給するために使用されます。
 
-- Writing `0` to GPIO23 emits 3.3V on LCD-PWR, which also gives power to the screen.
-- Writing `1` to GPIO23 turns off the the pin and the screen.
+- GPIO23に`0`を書き込むと、LCD-PWRに3.3Vが出力され、画面にも電力が供給されます。
+- GPIO23に`1`を書き込むと、ピンと画面の電源がオフになります。
 
 <a id="pin-info"></a>
-### Pin Information
+### ピン情報
 
-#### 16-pin External Header Description
+#### 16ピン外部ヘッダの説明
 
-| Name| Function| Description |
+| 名前 | 機能 | 説明 |
 | :---: | :---: | :--- |
-| LCD-PWR<BR>GPIO23 | Power | GPIO23 is used to turn power on for the screen and sensors connected to this pin. 3.3v |
-| GPIO3<BR>ADC1 | I/O<BR>Analog | Connects to nrf52 GPIO3. ADC Channel 1 |
-| GPIO4<BR>ADC2 | I/O<BR>Analog | Connects to nrf52 GPIO4. ADC Channel 2 |
-| GPIO5<BR>ADC3 | I/O<BR>Analog | Connects to nrf52 GPIO5. ADC Channel 3 |
-| GPIO17 | I/O | Connects to nrf52 GPIO17 |
-| GPIO22 | I/O | Connects to nrf52 GPIO22 |
-| GPIO28<BR>ADC4 | I/O<BR>Analog | Connects to nrf52 GPIO28. ADC Channel 4 |
-| GPIO29<BR>ADC5 | I/O<BR>Analog | Connects to nrf52 GPIO29. ADC Channel 5 |
-| GPIO30<BR>ADC6 | I/O<BR>Analog | Connects to nrf52 GPIO30. ADC Channel 6 |
-| GPIO31<BR>ADC7 | I/O<BR>Analog | Connects to nrf52 GPIO31. ADC Channel 7 |
-| GPIO27<BR>SCL | I/O<BR>I2C | Connects to nrf52 GPIO27<BR>I2C Clock<BR>Accelerometer |
-| GPIO26<BR>SDA | I/O<BR>I2C | Connects to nrf52 GPIO26<BR>I2C Data<BR>Accelerometer |
-| RST | Reset | Reset device |
-| VIN | Power | VIN is a 5V pin that can be used to power Moddable Four. If the board is powered by USB, this pin can be used to provide that 5V power. This is an unregulated pin; VIN is a direct connection to the 5V input sources. Connects to other 5V inputs and AP2112K voltage regulator.
-| GND | GND | Connects to GND |
-| 3.3V | Power | 3.3V input and output. Connects to nRF52 3.3V input and other 3.3V devices. Regulated output power if board is 5V powered via micro USB, VIN external connector or USB. 3.3V can also be provided by the CR2032 coin cell. |
+| LCD-PWR<BR>GPIO23 | 電源 | GPIO23は、このピンに接続された画面とセンサーの電源をオンにするために使用されます。3.3v |
+| GPIO3<BR>ADC1 | I/O<BR>アナログ | nrf52 GPIO3に接続。ADCチャネル1 |
+| GPIO4<BR>ADC2 | I/O<BR>アナログ | nrf52 GPIO4に接続。ADCチャネル2 |
+| GPIO5<BR>ADC3 | I/O<BR>アナログ | nrf52 GPIO5に接続。ADCチャネル3 |
+| GPIO17 | I/O | nrf52 GPIO17に接続 |
+| GPIO22 | I/O | nrf52 GPIO22に接続 |
+| GPIO28<BR>ADC4 | I/O<BR>アナログ | nrf52 GPIO28に接続。ADCチャネル4 |
+| GPIO29<BR>ADC5 | I/O<BR>アナログ | nrf52 GPIO29に接続。ADCチャネル5 |
+| GPIO30<BR>ADC6 | I/O<BR>アナログ | nrf52 GPIO30に接続。ADCチャネル6 |
+| GPIO31<BR>ADC7 | I/O<BR>アナログ | nrf52 GPIO31に接続。ADCチャネル7 |
+| GPIO27<BR>SCL | I/O<BR>I2C | nrf52 GPIO27に接続<BR>I2Cクロック<BR>加速度計 |
+| GPIO26<BR>SDA | I/O<BR>I2C | nrf52 GPIO26に接続<BR>I2Cデータ<BR>加速度計 |
+| RST | リセット | デバイスをリセット |
+| VIN | 電源 | VINはModdable Fourに電力を供給するために使用できる5Vピンです。ボードがUSBで電源供給されている場合、このピンを使用してその5V電力を供給できます。これは未調整のピンであり、VINは5V入力ソースへの直接接続です。他の5V入力およびAP2112K電圧レギュレータに接続します。 |
+| GND | GND | GNDに接続 |
+| 3.3V | 電源 | 3.3V入力および出力。nRF52 3.3V入力および他の3.3Vデバイスに接続。ボードがマイクロUSB、VIN外部コネクタ、またはUSBで5V電源供給されている場合、調整された出力電力。3.3VはCR2032コインセルでも供給可能。 |
 
-#### Power
+#### 電源
 
-Moddable Four is a 3.3V device. 5V power is regulated to 3.3V by a AP2112K-3.3 voltage regulator (see data sheet for specs). Testing of Moddable Four has been with typical 5V 0.5amp USB source power.
+Moddable Fourは3.3Vデバイスです。5V電源はAP2112K-3.3電圧レギュレータによって3.3Vに調整されます（仕様についてはデータシートを参照してください）。Moddable Fourのテストは、一般的な5V 0.5アンペアのUSB電源で行われています。
 
-Power can be supplied to Moddable Four via the following:
+Moddable Fourには以下の方法で電源を供給できます：
 
-* 5V - Micro USB connector
-* 5V - VIN on pin 14 or external header
-* 3.3V - 3.3V on pin 16 of external header
-* 3V - CR2032 battery
+* 5V - Micro USBコネクタ
+* 5V - ピン14または外部ヘッダのVIN
+* 3.3V - 外部ヘッダのピン16の3.3V
+* 3V - CR2032バッテリー
 
-Power provided by the CR2032 battery connector can be turned on and off with the sliding switch.
+CR2032バッテリーコネクタから供給される電源は、スライドスイッチでオンとオフを切り替えることができます。
 
-#### 6-pin JTAG connector
+#### 6ピンJTAGコネクタ
 
-The 6-pin JTAG connector can be used for gdb debugging or flashing a new bootloader onto Moddable Four. Please see the [nrf52 Platform document](./nrf52.md#debugging-native-code) for details.
+6ピンJTAGコネクタは、gdbデバッグや新しいブートローダーをModdable Fourにフラッシュするために使用できます。詳細については、[nrf52プラットフォームドキュメント](./nrf52.md#debugging-native-code)を参照してください。
 
 <a id="setup"></a>
-## SDK and Host Environment Setup
+## SDKとホスト環境のセットアップ
 
-To build and run apps on Moddable Four, you'll need to:
+Moddable Fourでアプリをビルドして実行するには、以下が必要です：
 
-1. Install the [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [nRF5 tools](./nrf52.md)
-3. Follow the instructions in the **Building and Deploying Apps** section below.
+1. [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)をインストールする
+2. [nRF5ツール](./nrf52.md)をインストールする
+3. 以下の**アプリのビルドとデプロイ**セクションの指示に従う
 
 <a id="building-and-deploying-apps"></a>
-### Building and Deploying Apps
+### アプリのビルドとデプロイ
 
-After you've setup your environment and nRF5 tools, take the following steps to install an application on your Moddable Four.
+環境とnRF5ツールをセットアップした後、以下の手順に従ってModdable Fourにアプリケーションをインストールします。
 
-1. Attach your Moddable Four to your computer with a micro USB cable.
+1. Moddable FourをマイクロUSBケーブルでコンピュータに接続します。
 
-	Make sure you're using a data-sync capable cable, not one that is power-only.
+	データ同期が可能なケーブルを使用していることを確認してください。電源供給のみのケーブルは使用しないでください。
 
-2. Put the device into programming mode by double-tapping the RESET button.
+2. RESETボタンをダブルタップしてデバイスをプログラミングモードにします。
 
-	Programming mode is indicated by the LED indicator blinking regularly at boot time. A disk named `MODDABLE4` will also appear on your desktop.
+	プログラミングモードは、起動時にLEDインジケーターが定期的に点滅することで示されます。また、デスクトップに`MODDABLE4`という名前のディスクが表示されます。
 
 	![Moddable Four disk](../assets/devices/moddable-four-M4-disk.png)
 
-	> **Note:** If you do not program your device within a short period, it will reboot to the installed application.
+	> **注意:** 短時間内にデバイスをプログラムしない場合、インストールされたアプリケーションに再起動されます。
 
-3. Build and deploy the app with `mcconfig`.
+3. `mcconfig`を使用してアプリをビルドおよびデプロイします。
 
-	`mcconfig` is the command line tool to build and launch Moddable apps on microcontrollers and the simulator. Full documentation of `mcconfig` is available [here](../tools/tools.md).
+	`mcconfig`は、マイクロコントローラおよびシミュレータ上でModdableアプリをビルドおよび起動するためのコマンドラインツールです。`mcconfig`の完全なドキュメントは[こちら](../tools/tools.md)にあります。
 
-	Use the platform `-p nrf52/moddable_four` with `mcconfig` to build for Moddable Four. Build the [`piu/balls`](../../examples/piu/balls) example:
+	Moddable Four用にビルドするには、`mcconfig`でプラットフォーム`-p nrf52/moddable_four`を使用します。[`piu/balls`](../../examples/piu/balls)のサンプルをビルドします：
 
 	```text
-	cd $MODDABLE/examples/piu/balls
-	mcconfig -d -m -p nrf52/moddable_four
+		cd $MODDABLE/examples/piu/balls
+		mcconfig -d -m -p nrf52/moddable_four
 	```
 
-	The [examples readme](../../examples) contains additional information about other commonly used `mcconfig` arguments for screen rotation and more.
+	[examples readme](../../examples) には、画面の回転などによく使用される他の `mcconfig` 引数に関する追加情報が含まれています。
 
-    Use the platform -p `sim/moddable_four` with `mcconfig` to build for the Moddable Four simulator.
+    `mcconfig` でModdable Fourシミュレータ用にビルドするには、プラットフォーム -p `sim/moddable_four` を使用します。
 
 <a id="moddable-features"></a>
-### Using Moddable Four
+### Moddable Four の使用
 
-The hardware and software in Moddable Four have been carefully designed to work together to support many kinds of applications without additional hardware. The hardware features include:
+Moddable Fourのハードウェアとソフトウェアは、追加のハードウェアなしで多くの種類のアプリケーションをサポートするように慎重に設計されています。ハードウェアの特徴には以下が含まれます：
 
 * LED
-* Back button
-* Jog dial
-* Display power
-* Display dither
-* Display rotation
-* Accelerometer
-* Energy Management
+* バックボタン
+* ジョグダイヤル
+* ディスプレイ電源
+* ディスプレイディザー
+* ディスプレイ回転
+* 加速度計
+* エネルギー管理
 
-#### LED and Back button
-This code snippet shows the use of Moddable Four's' Host object to turn on the LED when the back button is pressed.
+#### LED とバックボタン
+このコードスニペットは、バックボタンが押されたときにLEDを点灯させるためのModdable FourのHostオブジェクトの使用方法を示しています。
 
 ```
 let led = new Host.LED.Default;
@@ -156,7 +155,7 @@ new Host.Button({
 });
 ```
 
-#### Jog Dial
+#### ジョグダイヤル
 
 ```
 new Host.JogDial({
@@ -172,20 +171,20 @@ new Host.JogDial({
 });
 ```
 
-**Note**: The delta values provided by the jog dial respect the screen rotation (see [Display Rotation](#display-rotation)) and so are negated when the screen rotation is 180 degrees.
+**注**: ジョグダイヤルによって提供されるデルタ値は、画面の回転（[ディスプレイ回転](#display-rotation) を参照）を考慮しており、画面の回転が180度の場合には反転されます。
 
-#### Display Power
-To use the Moddable Four display, the LCD power pin must be enabled. In the `moddable_four/setup-target.js` file, the screen is enabled if the `autobacklight` config variable is set:
+#### ディスプレイの電源
+Moddable Fourのディスプレイを使用するには、LCDの電源ピンを有効にする必要があります。`moddable_four/setup-target.js` ファイルでは、`autobacklight` 設定変数が設定されている場合に画面が有効になります：
 
 ```
 if (config.autobacklight)
     Digital.write(config.lcd_power_pin, 0);
 ```
 
-#### Display Dither
-The Sharp memory display in Moddable Four uses the ls013b4dn04 display driver. By default, the display driver is configured to dither images as it converts from 8-bit gray to black and white for the display. The driver uses the [Atkinson dither](https://en.wikipedia.org/wiki/Atkinson_dithering) algorithm which is fast, high quality, and well suited to animation.
+#### ディスプレイのディザリング
+Moddable Fourのシャープメモリーディスプレイはls013b4dn04ディスプレイドライバを使用しています。デフォルトでは、ディスプレイドライバは8ビットグレーから白黒への変換時に画像をディザリングするように設定されています。ドライバは [Atkinson dither](https://en.wikipedia.org/wiki/Atkinson_dithering) アルゴリズムを使用しており、高速で高品質、アニメーションに適しています。
 
-While low, there is some runtime cost to dither. For applications that want to maximize frame rate, minimize computation, reduce code size, and reduce RAM use, dithering may be completely disabled in the driver by setting the appropriate define in the project manifest:
+ディザリングのランタイムコストは低いですが、フレームレートを最大化し、計算を最小限に抑え、コードサイズとRAM使用量を削減したいアプリケーションでは、プロジェクトマニフェストで適切な定義を設定することで、ドライバ内のディザリングを完全に無効にすることができます：
 
 ```
     "defines": {
@@ -194,7 +193,7 @@ While low, there is some runtime cost to dither. For applications that want to m
         }
     },
 ```
-Some applications want dithering enabled on some screens but not others. Those applications will leave dithering enabled in the driver, and use the `dither` property of the driver to turn dithering on and off at runtime.
+一部のアプリケーションでは、特定の画面でディザリングを有効にし、他の画面では無効にしたい場合があります。これらのアプリケーションは、ドライバ内でディザリングを有効にしたままにし、ランタイムでディザリングをオンおよびオフにするためにドライバの `dither` プロパティを使用します。
 
 ```
 screen.dither = true;
@@ -202,10 +201,10 @@ screen.dither = false;
 ```
 
 <a id="display-rotation"></a>
-#### Display Rotation
-The ls013b4dn04 display driver in Moddable Four provides support for 0 and 180 degree rotation. 180 degree rotation is useful when the display is mounted upside down. The default is 0. The rotation may be set at build time or at runtime.
+#### ディスプレイの回転
+Moddable Fourのls013b4dn04ディスプレイドライバは、0度と180度の回転をサポートしています。180度の回転は、ディスプレイが逆さまに取り付けられている場合に便利です。デフォルトは0度です。回転はビルド時または実行時に設定できます。
 
-To set the rotation at build time, include `driverRotation` in the `config` section of the manifest:
+ビルド時に回転を設定するには、マニフェストの`config`セクションに`driverRotation`を含めます：
 
 ```
 	"config": {
@@ -213,15 +212,15 @@ To set the rotation at build time, include `driverRotation` in the `config` sect
 	},
 ```
 
-To set the rotation At runtime, change the `rotation` property of the `screen` global.
+実行時に回転を設定するには、グローバルの`screen`の`rotation`プロパティを変更します。
 
 ```js
 screen.rotation = 180
 ```
 
-Setting the `rotation` at runtime does not immediately update the display. Your application must force an update after setting the rotation.
+実行時に`rotation`を設定しても、ディスプレイはすぐには更新されません。回転を設定した後、アプリケーションは強制的に更新を行う必要があります。
 
-#### Accelerometer
+#### 加速度計
 
 ```
 import Timer from "timer";
@@ -234,88 +233,87 @@ Timer.repeat(() => {
 }, 100);
 ```
 
-**Note**: The accelerometer values respect the screen rotation (see [Display Rotation](#display-rotation)), so `x` and `y` are negated when the screen rotation is 180 degrees.
+**注意**: 加速度計の値は画面の回転（[ディスプレイの回転](#display-rotation)を参照）に従うため、画面の回転が180度の場合、`x`と`y`は反転します。
 
-#### Energy Management
+#### エネルギー管理
 
-Moddable Four is designed to run on coin-cell batteries for long periods of time. The hardware is carefully designed to achieve maximum energy efficiency. Here is the energy used in various operating modes:
+Moddable Fourは、コイン電池で長期間動作するように設計されています。ハードウェアは最大限のエネルギー効率を達成するために慎重に設計されています。以下は、さまざまな動作モードで使用されるエネルギーです：
 
-- Idle mode - 3.7 uA - RAM maintained, waiting for user input, between screens and sensor readings.
-- Deep sleep - 1.85 uA - No software running. Automatically wake after a specified duration. Only retention RAM maintained.
-- Wake on digital - 1.9 uA - Like deep sleep, but also wakes up on state change of digital input
-- Wake on analog - 2.7 uA - Like deep sleep, but also wakes when an analog input crosses a specified threshold
+- アイドルモード - 3.7 uA - RAMが維持され、ユーザー入力を待機中、画面やセンサーの読み取りの間。
+- ディープスリープ - 1.85 uA - ソフトウェアは実行されていません。指定された期間後に自動的にウェイクアップします。保持RAMのみが維持されます。
+- デジタルウェイク - 1.9 uA - ディープスリープと同様ですが、デジタル入力の状態変化でもウェイクアップします。
+- アナログウェイク - 2.7 uA - ディープスリープと同様ですが、アナログ入力が指定された閾値を超えるとウェイクアップします。
 
-There are many energy management APIs available on Moddable Four. These include:
+Moddable Fourには多くのエネルギー管理APIが用意されています。これには以下が含まれます：
 
-- Deep sleep
-- Retention RAM
-- Wake on digital
-- Wake on timer
-- Wake on analog
-- Wake on motion (using accelerometer)
+- ディープスリープ
+- リテンションRAM
+- デジタルウェイク
+- タイマーウェイク
+- アナログウェイク
+- モーションウェイク（加速度計を使用）
 
 <!--
-	should have a readme.md in that directory which describes the examples
+	そのディレクトリには、例を説明するreadme.mdがあるはずです
 -->
 
-See the [nRF52 Low Power Notes](./nRF52-low-power.md) for details. Examples of different sleep and wakeup modes can be found in `$MODDABLE/build/devices/nrf52/examples/sleep`.
+詳細については、[nRF52 Low Power Notes](./nRF52-low-power.md)を参照してください。さまざまなスリープおよびウェイクアップモードの例は、`$MODDABLE/build/devices/nrf52/examples/sleep`にあります。
 
 <a id="troubleshooting"></a>
-## Troubleshooting
+## トラブルシューティング
 
-See the Troubleshooting section of the [nRF52 documentation](./nrf52.md#troubleshooting) for a list of common issues and how to resolve them.
+一般的な問題とその解決方法については、[nRF52 ドキュメント](./nrf52.md#troubleshooting)のトラブルシューティングセクションを参照してください。
 
 <a id="development-resources"></a>
-## Development Resources
+## 開発リソース
 
 <a id="simulator"></a>
-### Simulator
-The Moddable SDK simulator, mcsim, includes a Moddable Four simulator. To use it, use the `sim/moddable_four` platform when building with `mcconfig`:
+### シミュレーター
+Moddable SDKシミュレーター、mcsimにはModdable Fourシミュレーターが含まれています。これを使用するには、`mcconfig` を使用してビルドする際に `sim/moddable_four` プラットフォームを使用します：
 
 ```
 mcconfig -d -m -p sim/moddable_four
 ```
 
-The simulator includes controls for many of the unique hardware features of Moddable Four. Use "Show Controls" and "Hide Controls" in the View menu to toggle their visibility.
+シミュレーターには、Moddable Fourの多くのユニークなハードウェア機能のコントロールが含まれています。表示メニューの「Show Controls」と「Hide Controls」を使用して、それらの表示を切り替えることができます。
 
 <img src="../assets/devices/moddable-four-simulator.png">
 
-You can also use your computer's keyboard to control the jog dial and button:
+また、コンピューターのキーボードを使用してジョグダイヤルとボタンを操作することもできます：
 
-- Jog dial clockwise – up arrow
-- Jog dial counter-clockwise – down arrow
-- Jog dial press – enter
-- Back button – delete
+- ジョグダイヤル時計回り – 上矢印
+- ジョグダイヤル反時計回り – 下矢印
+- ジョグダイヤル押下 – エンター
+- バックボタン – デリート
 
-The Moddable Four simulator renders images in 8-bit grayscale, which matches how Moddable Four hardware renders images off-screen. The display driver in Moddable Four then converts the 8-bit grayscale images to monochrome (1-bit) for display with optional dithering.
+Moddable Fourシミュレーターは、Moddable Fourハードウェアがオフスクリーンで画像をレンダリングする方法に一致する8ビットグレースケールで画像をレンダリングします。Moddable Fourのディスプレイドライバーは、表示のために8ビットグレースケール画像をモノクローム（1ビット）に変換し、オプションでディザリングを行います。
 
 <a id="examples"></a>
-### Examples
+### サンプル
 
-The Moddable SDK has over 150 [example apps](../../examples) that demonstrate how to use its many features. Many of these examples run on Moddable Four.
+Moddable SDKには、その多くの機能を示す150以上の[サンプルアプリ](../../examples)があります。これらの多くのサンプルはModdable Fourで動作します。
 
-Many of the examples that use Commodetto and Piu are designed for colored QVGA screens. While they will run on Moddable Four, the colors will be dithered when rendered and some screens may be cropped. Not every example is compatible with Moddable Four hardware. Some examples are designed to test specific display and touch drivers that are not compatible with the Moddable Four display and give a build error.
+CommodettoとPiuを使用する多くのサンプルは、カラーQVGAスクリーン用に設計されています。これらはModdable Four上でも動作しますが、レンダリング時に色がディザリングされ、一部の画面が切り取られることがあります。すべてのサンプルがModdable Fourハードウェアと互換性があるわけではありません。一部のサンプルは、Moddable Fourディスプレイと互換性のない特定のディスプレイおよびタッチドライバをテストするために設計されており、ビルドエラーが発生します。
 
 <a id="documentation"></a>
-### Documentation
+### ドキュメント
 
-Documentation for the nRF5 device and SDK can be found on the [Nordic Semiconductor Infocenter](https://infocenter.nordicsemi.com/topic/struct_nrf52/struct/nrf52840.html). Of particular interest is the documentation for the Nordic nRF5 SDK v17.0.2, which is available [here](https://infocenter.nordicsemi.com/topic/struct_sdk/struct/sdk_nrf5_latest.html).
+nRF5デバイスとSDKのドキュメントは、[Nordic Semiconductor Infocenter](https://infocenter.nordicsemi.com/topic/struct_nrf52/struct/nrf52840.html)で見つけることができます。特に興味深いのは、Nordic nRF5 SDK v17.0.2のドキュメントで、[こちら](https://infocenter.nordicsemi.com/topic/struct_sdk/struct/sdk_nrf5_latest.html)から入手できます。
 
-Documentation for the Moddable SDK is in the [documentation](../) directory. The **documentation**, **examples**, and **modules** directories share a common structure to make it straightforward to locate information. Some of the highlights include:
+Moddable SDKのドキュメントは[documentation](../)ディレクトリにあります。**documentation**、**examples**、**modules**ディレクトリは共通の構造を持っており、情報を簡単に見つけることができます。以下はそのハイライトの一部です：
 
-- [Using the Moddable SDK with nRF52](./nrf52.md) explains how to get set-up for development, supported devices, and more.
-- [nRF52 Low Power Notes](./nRF52-low-power.md) describes the techniques and APIs to maximize battery life by minimizing power consumption.
-- The `commodetto` [directory](../../examples/commodetto), which contains resources related to Commodetto--a bitmap graphics library that provides a 2D graphics API--and Poco, a lightweight rendering engine.
-- The `piu` [directory](../../examples/piu), which contains resources related to Piu, our user interface framework for creating complex, responsive layouts.
-- The `pins` [directory](../../examples/pins), which contains resources related to supported hardware protocols (digital, analog, PWM, I²C, etc.). A number of drivers for common off-the-shelf sensors and corresponding example apps are also available.
+- [Using the Moddable SDK with nRF52](./nrf52.md)では、開発のためのセットアップ方法、サポートされているデバイスなどについて説明しています。
+- [nRF52 Low Power Notes](./nRF52-low-power.md)では、消費電力を最小限に抑えてバッテリー寿命を最大化するための技術とAPIについて説明しています。
+- `commodetto` [directory](../../examples/commodetto)には、2DグラフィックスAPIを提供するビットマップグラフィックスライブラリであるCommodettoと、軽量レンダリングエンジンであるPocoに関連するリソースが含まれています。
+- `piu` [directory](../../examples/piu)には、複雑でレスポンシブなレイアウトを作成するためのユーザーインターフェースフレームワークであるPiuに関連するリソースが含まれています。
+- `pins` [directory](../../examples/pins)には、サポートされているハードウェアプロトコル（デジタル、アナログ、PWM、I²Cなど）に関連するリソースが含まれています。一般的な市販センサーのドライバと対応するサンプルアプリも多数利用可能です。
 
 <a id="support"></a>
-### Support
+### サポート
 
-If you have questions, we're here to help. If you've encountered a bug, recommend you [open an issue](https://github.com/Moddable-OpenSource/moddable/issues). If you have a question, [start a discussion](https://github.com/Moddable-OpenSource/moddable/discussions) or ask us on our [Gitter](https://gitter.im/embedded-javascript/moddable#). We'll respond as quickly as practical, and other developers can offer help and benefit from the answers to your questions. Many questions have already been answered, so please try searching previous issues and discussions before opening a new one.
+質問がある場合は、私たちがサポートします。バグに遭遇した場合は、[issueを開く](https://github.com/Moddable-OpenSource/moddable/issues)ことをお勧めします。質問がある場合は、[ディスカッションを開始](https://github.com/Moddable-OpenSource/moddable/discussions)するか、[Gitter](https://gitter.im/embedded-javascript/moddable#)で私たちに尋ねてください。できるだけ早く対応し、他の開発者もあなたの質問に対する回答から助けを得ることができます。多くの質問はすでに回答されているので、新しい質問をする前に過去のissueやディスカッションを検索してみてください。
 
 <a id="updates"></a>
-### Updates
+### 更新情報
 
-The best way to keep up with what we're doing is to follow us on Twitter ([@moddabletech](https://twitter.com/moddabletech)). We post announcements about new posts on [our blog](http://blog.moddable.com/) there, along with other Moddable news.
-
+私たちの活動をフォローする最良の方法は、Twitter ([@moddabletech](https://twitter.com/moddabletech)) でフォローすることです。新しい投稿に関するお知らせや、[ブログ](http://blog.moddable.com/)の他のModdableニュースを投稿しています。

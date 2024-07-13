@@ -1,178 +1,178 @@
 # Moddable Two Developer Guide
 Copyright 2019-2024 Moddable Tech, Inc.<BR>
-Revised: April 29, 2024
+改訂： 2024年4月29日
 
-This document provides information about Moddable Two, including details about its pins and other components, how to build and deploy apps, and links to other development resources.
+このドキュメントは、Moddable Twoに関する情報を提供します。ピンやその他のコンポーネントの詳細、アプリのビルドとデプロイ方法、その他の開発リソースへのリンクが含まれています。
 
 ## Table of Contents
 
-- [About Moddable Two](#about-moddable-two)
-	- [Components](#components)
-	- [Pinout](#pinout)
-	- [Pin Information](#pin-info)
-	- [Dimensions](#dimensions)
-- [SDK and Host Environment Setup](#setup)
-- [Building and Deploying Apps](#building-and-deploying-apps)
-- [Troubleshooting](#troubleshooting)
-- [Development Resources](#development-resources)
-	- [Examples](#examples)
-	- [Documentation](#documentation)
-	- [Backlight](#backlight)
-	- [Support](#support)
-	- [Updates](#updates)
+- [Moddable Twoについて](#about-moddable-two)
+	- [コンポーネント](#components)
+	- [ピン配置](#pinout)
+	- [ピン情報](#pin-info)
+	- [寸法](#dimensions)
+- [SDKとホスト環境のセットアップ](#setup)
+- [アプリのビルドとデプロイ](#building-and-deploying-apps)
+- [トラブルシューティング](#troubleshooting)
+- [開発リソース](#development-resources)
+	- [サンプル](#examples)
+	- [ドキュメント](#documentation)
+	- [バックライト](#backlight)
+	- [サポート](#support)
+	- [更新](#updates)
 
 <a id="about-moddable-two"></a>
-## About Moddable Two
+## Moddable Twoについて
 
 <img src="../assets/devices/moddable-two.png">
 
-Moddable Two is a hardware module that makes it easy for developers to experiment with the Moddable SDK on inexpensive hardware. It is available to purchase on the [Moddable website](http://www.moddable.com/moddable-two).
+Moddable Twoは、開発者が安価なハードウェアでModdable SDKを試すのを容易にするハードウェアモジュールです。[Moddableのウェブサイト](http://www.moddable.com/moddable-two)で購入できます。
 
 <a id="components"></a>
-### Components
+### コンポーネント
 
-The two main components of Moddable Two are the ESP32 module and capacitive touch screen. The ESP32 module includes a Wi-Fi/BLE antenna and 4 MB of flash storage memory. The touch screen is a 240 x 320 QVGA IPS display driven by a MIPI Display Serial Interface compatible display controller with an FT6206 capacitive touch controller.
+Moddable Twoの主なコンポーネントは、ESP32モジュールと静電容量式タッチスクリーンの2つです。ESP32モジュールにはWi-Fi/BLEアンテナと4 MBのフラッシュストレージメモリが含まれています。タッチスクリーンは、FT6206静電容量式タッチコントローラを備えたMIPIディスプレイシリアルインターフェース互換のディスプレイコントローラによって駆動される240 x 320 QVGA IPSディスプレイです。
 
 <a id="pinout"></a>
-### Pinout
+### ピン配置
 
 <img src="../assets/devices/moddable-two-pinout.png">
 
-#### Touch panel
+#### タッチパネル
 
-The touch panel uses pins 21 and 22 to connect to the I<sup>2</sup>C bus. You cannot use these pins as GPIO if your app uses the touch panel.
+タッチパネルはピン21と22を使用してI<sup>2</sup>Cバスに接続します。アプリがタッチパネルを使用する場合、これらのピンをGPIOとして使用することはできません。
 
-You can use other I<sup>2</sup>C sensors even if your app uses the touch panel as long as they don't use the same address. The touch panel uses address 0x38 (7-bit address).
+アプリがタッチパネルを使用していても、同じアドレスを使用しない限り、他のI<sup>2</sup>Cセンサーを使用することができます。タッチパネルはアドレス0x38（7ビットアドレス）を使用します。
 
-#### Display
+#### ディスプレイ
 
-The display uses pins 13 and 14 to connect to the SPI bus. You cannot use these pins as GPIO if your app uses the display.
+ディスプレイはピン13と14を使用してSPIバスに接続します。アプリがディスプレイを使用する場合、これらのピンをGPIOとして使用することはできません。
 
-You can use other SPI sensors even if your app uses the display.
+アプリがディスプレイを使用していても、他のSPIセンサーを使用することができます。
 
 <a id="pin-info"></a>
-### Pin Information
+### ピン情報
 
-#### 6-pin Programming Header Description
+#### 6ピンプログラミングヘッダの説明
 
-| Name | Function | Description |
+| 名前 | 機能 | 説明 |
 | :---: | :---: | :--- |
-| RTS | I/O | Connects to auto programming and reset circuit |
-| DTR | I/O | Connects to auto programming and reset circuit |
-| TX | I/O | Connects to ESP32 GPIO1 |
-| RX | I/O | Connects to ESP32 GPIO3 |
-| 5V | PWR | 5V input connects to LM1117-3.3 voltage regulator and 5V pin on 16-pin external connector |
-| GND | GND | Connects to GND |
+| RTS | I/O | 自動プログラミングおよびリセット回路に接続 |
+| DTR | I/O | 自動プログラミングおよびリセット回路に接続 |
+| TX | I/O | ESP32 GPIO1に接続 |
+| RX | I/O | ESP32 GPIO3に接続 |
+| 5V | PWR | 5V入力はLM1117-3.3電圧レギュレータおよび16ピン外部コネクタの5Vピンに接続 |
+| GND | GND | GNDに接続 |
 
-#### 16-pin External Header Description
+#### 16ピン外部ヘッダの説明
 
-| Name| Function| Description |
+| 名前| 機能| 説明 |
 | :---: | :---: | :--- |
-| SDA GP21 | I/O | Connects to ESP32 GPIO21 (standard SDA, no external pull up resistor) |
-| SCL GP22 | I/O | Connects to ESP32 GPIO22 (standard SCL, no external pull up resistor) |
-| GND      | GND | Connects to GND |
-| 3.3V     | I/O | 3.3V input and output. Connects to ESP32 3.3V input and other 3.3V IC's. Regulated output power if board is 5V powered via micro USB, VIN external connector or programming connector. 3.3V is the output of the LM1117-3.3. Output of the LM1117 is conditioned with a 100uf Tantalum capacitor. |
-| GP13     | I/O | Connects to ESP32 GPIO13 (Also MOSI for display) |
-| GP12     | I/O | Connects to ESP32 GPIO12 |
-| GP14     | I/O | Connects to ESP32 GPIO14 |
-| GP32     | I/O | Connects to ESP32 GPIO32 |
-| GP33     | I/O | Connects to ESP32 GPIO33 |
-| GP35     | I/O | Connects to ESP32 GPIO35 |
-| GP27     | I/O | Connects to ESP32 GPIO27 |
-| GP26     | I/O | Connects to ESP32 GPIO26 |
-| VIN      | I/O | VIN is a 5V pin that can be used to power Moddable Two. If the board is powered by one of the other 5V inputs this pin can be used for external 5V power. This is an unregulated pin; VIN is a direct connection to the 5V input sources. Connects to other 5V inputs and LM1117-3.3 voltage regulator. |
-| GP17     | I/O | Connects to ESP32 GPIO17 |
-| GP16     | I/O | Connects to ESP32 GPIO16 |
-| GP0      | I/O | Connects to ESP32 GPIO0 |
+| SDA GP21 | I/O | ESP32 GPIO21に接続（標準SDA、外部プルアップ抵抗なし） |
+| SCL GP22 | I/O | ESP32 GPIO22に接続（標準SCL、外部プルアップ抵抗なし） |
+| GND      | GND | GNDに接続 |
+| 3.3V     | I/O | 3.3V入力および出力。ESP32の3.3V入力および他の3.3V ICに接続。ボードがマイクロUSB、VIN外部コネクタまたはプログラミングコネクタ経由で5V電源供給されている場合、調整された出力電力。3.3VはLM1117-3.3の出力。LM1117の出力は100ufタンタルコンデンサで調整されている。 |
+| GP13     | I/O | ESP32 GPIO13に接続（ディスプレイのMOSIも含む） |
+| GP12     | I/O | ESP32 GPIO12に接続 |
+| GP14     | I/O | ESP32 GPIO14に接続 |
+| GP32     | I/O | ESP32 GPIO32に接続 |
+| GP33     | I/O | ESP32 GPIO33に接続 |
+| GP35     | I/O | ESP32 GPIO35に接続 |
+| GP27     | I/O | ESP32 GPIO27に接続 |
+| GP26     | I/O | ESP32 GPIO26に接続 |
+| VIN      | I/O | VINはModdable Twoに電力を供給するために使用できる5Vピン。他の5V入力のいずれかでボードが電力供給されている場合、このピンは外部5V電源に使用できる。これは調整されていないピンであり、VINは5V入力ソースへの直接接続。その他の5V入力およびLM1117-3.3電圧レギュレータに接続。 |
+| GP17     | I/O | ESP32 GPIO17に接続 |
+| GP16     | I/O | ESP32 GPIO16に接続 |
+| GP0      | I/O | ESP32 GPIO0に接続 |
 
-#### Power
+#### 電源
 
-Moddable Two is a 3.3V device. 5V power is regulated to 3.3V by a LM1117-3.3 voltage regulator (see data sheet for specs). Testing of Moddable Two has been with typical 5V 0.5amp USB source power.
+Moddable Twoは3.3Vデバイスです。5V電源はLM1117-3.3電圧レギュレータによって3.3Vに調整されます（仕様についてはデータシートを参照してください）。Moddable Twoのテストは、一般的な5V 0.5アンペアのUSB電源で行われています。
 
-Power can be supplied to Moddable Two via the following:
+Moddable Twoには以下の方法で電源を供給できます：
 
-* 5V - Micro USB connector
-* 5V - Moddable Programmer connector
-* 5V - VIN on 16 pin external header
-* 3.3V - 3.3V pin external header
+* 5V - Micro USBコネクタ
+* 5V - Moddable Programmerコネクタ
+* 5V - 16ピン外部ヘッダのVIN
+* 3.3V - 3.3Vピン外部ヘッダ
 
 <a id="dimensions"></a>
-### Dimensions
+### 寸法
 
-The complete dimensions of Moddable Two are provided in this [PDF document](../assets/devices/moddable-two-dimensions.pdf). These are helpful when designing a case for Moddable Two.
+Moddable Twoの完全な寸法はこの[PDFドキュメント](../assets/devices/moddable-two-dimensions.pdf)に記載されています。これはModdable Twoのケースを設計する際に役立ちます。
 
 <a id="setup"></a>
-## SDK and Host Environment Setup
+## SDKとホスト環境のセットアップ
 
-To build and run apps on Moddable Two, you'll need to:
+Moddable Twoでアプリをビルドして実行するには、以下の手順が必要です：
 
-1. Install the [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [ESP32 tools](./esp32.md)
-3. Follow the instructions in the **Building and Deploying Apps** section below.
+1. [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)をインストールする
+2. [ESP32ツール](./esp32.md)をインストールする
+3. 以下の**アプリのビルドとデプロイ**セクションの指示に従う
 
 <a id="building-and-deploying-apps"></a>
-## Building and Deploying Apps
+## アプリのビルドとデプロイ
 
-After you've set up your host environment and ESP32 tools, take the following steps to install an application on your Moddable Two.
+ホスト環境とESP32ツールのセットアップが完了したら、以下の手順に従ってModdable Twoにアプリケーションをインストールします。
 
-1. Attach the programmer to your Moddable Two.
+1. プログラマーをModdable Twoに接続します。
 
-	Make sure you have the programmer oriented correctly. The orientation should match the image below.
+	プログラマーの向きが正しいことを確認してください。向きは以下の画像と一致する必要があります。
 
 	<img src="../assets/devices/moddable-two-programmer.jpg">
 
-	**Note**: The USB port on Moddable Two may be used to provide power when operating without the programmer. The USB port is only for powering Moddable Two. It cannot be used to program Moddable Two.
+	**注意**: プログラマーを使用せずに動作させる場合、Moddable TwoのUSBポートを電源供給に使用できます。このUSBポートはModdable Twoに電力を供給するためのものであり、プログラムの書き込みには使用できません。
 
-2. Attach the programmer to your computer with a micro USB cable.
+2. プログラマーをマイクロUSBケーブルでコンピューターに接続します。
 
-	The USB cable must be attached to the programmer, not the power-only USB port on the board. Make sure you're using a data sync&#8211;capable cable, not one that is power-only.
+	USBケーブルはプログラマーに接続する必要があり、ボード上の電源専用USBポートには接続しないでください。データ同期が可能なケーブルを使用し、電源専用のケーブルは使用しないでください。
 
-3. Build and deploy the app with `mcconfig`.
+3. `mcconfig`を使用してアプリをビルドおよびデプロイします。
 
-	`mcconfig` is the command line tool to build and launch Moddable apps on microcontrollers and the simulator. Full documentation of `mcconfig` is available [here](../tools/tools.md).
+	`mcconfig`は、マイクロコントローラーおよびシミュレーター上でModdableアプリをビルドおよび起動するためのコマンドラインツールです。`mcconfig`の完全なドキュメントは[こちら](../tools/tools.md)で確認できます。
 
-	Use the platform `-p esp32/moddable_two`  with `mcconfig` to build for Moddable Two. For example, to build the [`piu/balls` example](../../examples/piu/balls):
+	プラットフォーム `-p esp32/moddable_two` を `mcconfig` と共に使用してModdable Two用にビルドします。例えば、[`piu/balls` のサンプル](../../examples/piu/balls)をビルドするには以下のようにします：
 
 	```text
 	cd $MODDABLE/examples/piu/balls
 	mcconfig -d -m -p esp32/moddable_two
 	```
 
-	The [examples readme](../../examples) contains additional information about other commonly used `mcconfig` arguments for screen rotation, Wi-Fi configuration, and more.
+	[サンプルの readme](../../examples) には、画面の回転、Wi-Fi設定など、他の一般的に使用される `mcconfig` 引数に関する追加情報が含まれています。
 
-	Use the platform `-p simulator/moddable_two` with `mcconfig` to build for the Moddable Two simulator.
+	プラットフォーム `-p simulator/moddable_two` を `mcconfig` と共に使用してModdable Twoシミュレータ用にビルドします。
 
 
 <a id="troubleshooting"></a>
-## Troubleshooting
+## トラブルシューティング
 
-See the Troubleshooting section of the [ESP32 documentation](./esp32.md#troubleshooting) for a list of common issues and how to resolve them.
+一般的な問題とその解決方法については、[ESP32 ドキュメント](./esp32.md#troubleshooting)のトラブルシューティングセクションを参照してください。
 
 <a id="development-resources"></a>
-## Development Resources
+## 開発リソース
 
 <a id="examples"></a>
-### Examples
+### サンプル
 
-The Moddable SDK has over 150 [example apps](../../examples) that demonstrate how to use its many features. The vast majority of these examples run on Moddable Two.
+Moddable SDKには、その多くの機能を使用する方法を示す150以上の[サンプルアプリ](../../examples)があります。これらのサンプルの大部分はModdable Twoで動作します。
 
-That said, not every example is compatible with Moddable Two hardware. For example, some examples are designed to test specific display and touch drivers that are not compatible with the Moddable Two display and give a build error.
+とはいえ、すべてのサンプルがModdable Twoハードウェアと互換性があるわけではありません。例えば、一部のサンプルはModdable Twoのディスプレイと互換性のない特定のディスプレイおよびタッチドライバをテストするために設計されており、ビルドエラーが発生します。
 
 <a id="documentation"></a>
-### Documentation
+### ドキュメント
 
-All the documentation for the Moddable SDK is in the [documentation](../) directory. The **documentation**, **examples**, and **modules** directories share a common structure to make it straightforward to locate information. Some of the highlights include:
+Moddable SDKのすべてのドキュメントは [documentation](../) ディレクトリにあります。**documentation**、**examples**、および **modules** ディレクトリは共通の構造を持っており、情報を簡単に見つけることができます。以下はそのハイライトの一部です：
 
-- The `commodetto` subdirectory, which contains resources related to Commodetto--a bitmap graphics library that provides a 2D graphics API--and Poco, a lightweight rendering engine.
-- The `piu` subdirectory, which contains resources related to Piu, a user interface framework that makes it easier to create complex, responsive layouts.
-- The `networking` subdirectory, which contains networking resources related to BLE, network sockets, and a variety of standard, secure networking protocols built on sockets including HTTP/HTTPS, WebSockets, DNS, SNTP, and telnet.
-- The `pins` subdirectory, which contains resources related to supported hardware protocols (digital, analog, PWM, I2C, etc.). A number of drivers for common off-the-shelf sensors and corresponding example apps are also available.
+- `commodetto` サブディレクトリには、2DグラフィックスAPIを提供するビットマップグラフィックスライブラリであるCommodettoと、軽量レンダリングエンジンであるPocoに関連するリソースが含まれています。
+- `piu` サブディレクトリには、複雑でレスポンシブなレイアウトを簡単に作成できるユーザーインターフェースフレームワークであるPiuに関連するリソースが含まれています。
+- `networking` サブディレクトリには、BLE、ネットワークソケット、およびHTTP/HTTPS、WebSockets、DNS、SNTP、telnetなどのソケット上に構築されたさまざまな標準的で安全なネットワーキングプロトコルに関連するネットワークリソースが含まれています。
+- `pins` サブディレクトリには、サポートされているハードウェアプロトコル（デジタル、アナログ、PWM、I2Cなど）に関連するリソースが含まれています。一般的な市販センサー用のドライバと対応するサンプルアプリも多数用意されています。
 
 <a id="backlight"></a>
 ### Backlight
-The original Moddable Two has an always-on backlight. The second revision has the ability to adjust the backlight brightness in software. Moddable Two units with backlight brightness control are identified by the small `ESP32 r9` printed on the back of the board to the right of the Moddable logo.
+オリジナルのModdable Twoには常時点灯のバックライトがあります。リビジョン2では、ソフトウェアでバックライトの明るさを調整する機能があります。バックライトの明るさ調整機能を持つModdable Twoユニットは、ボードの背面のModdableロゴの右側に小さく印刷された`ESP32 r9`で識別できます。
 
-The backlight control is connected to GPIO 18. There is a constant defined for the backlight GPIO in the host config.
+バックライトの制御はGPIO 18に接続されています。ホストの設定にはバックライトGPIOの定数が定義されています。
 
 ```javascript
 import "config" from "mc/config";
@@ -181,7 +181,7 @@ Digital.write(config.backlight, 1);	// backlight ON
 Digital.write(config.backlight, 0);	// backlight OFF
 ```
 
-The brightness of the backlight may be set at build time in the `config` section of your project manifest. It defaults to 100%.
+バックライトの明るさは、プロジェクトマニフェストの`config`セクションでビルド時に設定できます。デフォルトは100%です。
 
 ```javascript
 "config": {
@@ -189,19 +189,19 @@ The brightness of the backlight may be set at build time in the `config` section
 }
 ```
 
-You can also set the brightness on the command line when building with `mcconfig`. Here it is set to 50%.
+`mcconfig`を使用してビルドする際に、コマンドラインで明るさを設定することもできます。ここでは50%に設定されています。
 
 ```text
 mcconfig -d -m -p esp32/moddable_two brightness=50
 ```
 
-The `setup/target` module for Moddable Two installs a global variable named `backlight` that you can use to adjust the backlight in your code. Here it is set to 80%.
+Moddable Twoの`setup/target`モジュールは、コード内でバックライトを調整するために使用できる`backlight`という名前のグローバル変数をインストールします。ここでは80%に設定されています。
 
 ```javascript
 backlight.write(80);
 ```
 
-The `backlight` global contains an instance of a subclass of `PWM`. If you do not want the `setup/target` to create this `PWM` instance, set the brightness to `"none"` in the `config` section of your project's manifest.
+`backlight` グローバルには `PWM` のサブクラスのインスタンスが含まれています。`setup/target` がこの `PWM` インスタンスを作成しないようにするには、プロジェクトのマニフェストの `config` セクションで明るさを `"none"` に設定します。
 
 ```javascript
 "config": {
@@ -209,14 +209,14 @@ The `backlight` global contains an instance of a subclass of `PWM`. If you do no
 }
 ```
 
-**Note**: Backlight support is present in all builds using the `esp32/moddable_two` build target, however it only works for revision two.
+**注意**: バックライトのサポートは `esp32/moddable_two` ビルドターゲットを使用するすべてのビルドに存在しますが、リビジョン2でのみ動作します。
 
 <a id="support"></a>
-### Support
+### サポート
 
-If you have questions, we recommend you [open an issue](https://github.com/Moddable-OpenSource/moddable/issues). We'll respond as quickly as practical, and other developers can offer help and benefit from the answers to your questions. Many questions have already been answered, so please try searching previous issues before opening a new issue.
+質問がある場合は、[issue を開く](https://github.com/Moddable-OpenSource/moddable/issues) ことをお勧めします。できるだけ早く対応し、他の開発者も助けを提供し、あなたの質問への回答から利益を得ることができます。多くの質問はすでに回答されているので、新しいissueを開く前に以前のissueを検索してみてください。
 
 <a id="updates"></a>
-### Updates
+### 更新情報
 
-The best way to keep up with what we're doing is to follow us on Twitter ([@moddabletech](https://twitter.com/moddabletech)). We post announcements about new posts on [our blog](http://blog.moddable.com/) there, along with other Moddable news.
+私たちの活動をフォローする最良の方法は、Twitter ([@moddabletech](https://twitter.com/moddabletech)) でフォローすることです。新しい投稿に関する発表や、その他のModdableニュースを [ブログ](http://blog.moddable.com/) で投稿しています。

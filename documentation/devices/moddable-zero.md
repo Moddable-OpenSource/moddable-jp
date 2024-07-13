@@ -1,102 +1,102 @@
-# Moddable Zero Developer Guide
+# Moddable Zero 開発者ガイド
 Copyright 2019-2020 Moddable Tech, Inc.<BR>
-Revised: October 21, 2020
+改訂日： 2020年10月21日
 
-This document provides information about Moddable Zero, including details about its pins and other components, how to build and deploy apps, and links to other development resources.
+このドキュメントは、Moddable Zeroに関する情報を提供します。ピンやその他のコンポーネントの詳細、アプリのビルドとデプロイ方法、その他の開発リソースへのリンクが含まれています。
 
-## Table of Contents
+## 目次
 
-- [About Moddable Zero](#about-moddable-zero)
-	- [Components](#components)
-	- [Pinout](#pinout)
-- [SDK and Host Environment Setup](#setup)
-- [Building and Deploying Apps](#building-and-deploying-apps)
-- [Troubleshooting](#troubleshooting)
-- [Development Resources](#development-resources)
-	- [Examples](#examples)
-	- [Documentation](#documentation)
-	- [Support](#support)
-	- [Updates](#updates)
+- [Moddable Zero について](#about-moddable-zero)
+	- [コンポーネント](#components)
+	- [ピン配置](#pinout)
+- [SDK とホスト環境のセットアップ](#setup)
+- [アプリのビルドとデプロイ](#building-and-deploying-apps)
+- [トラブルシューティング](#troubleshooting)
+- [開発リソース](#development-resources)
+	- [サンプル](#examples)
+	- [ドキュメント](#documentation)
+	- [サポート](#support)
+	- [更新](#updates)
 
 <a id="about-moddable-zero"></a>
-## About Moddable Zero
+## Moddable Zero について
 
 <img src="../assets/moddable/moddable-zero-sm.jpg">
 
-Moddable Zero is a hardware module that makes it easy for developers to experiment with the Moddable SDK on inexpensive hardware. Moddable Zero is no longer for sale but continues to be supported. You can follow the [instructions here](../displays/wiring-guide-generic-2.4-spi.md) to build your own Moddable Zero, or purchase its replacement, [Moddable One](./moddable-one.md).
+Moddable Zeroは、開発者が安価なハードウェアでModdable SDKを試すのを容易にするハードウェアモジュールです。Moddable Zeroは販売されていませんが、サポートは継続されています。[こちらの手順](../displays/wiring-guide-generic-2.4-spi.md)に従って自分でModdable Zeroを作成するか、その代替品である [Moddable One](./moddable-one.md) を購入することができます。
 
 <a id="components"></a>
-### Components
+### コンポーネント
 
-The two main components of Moddable Zero are the ESP8266 module and resistive touch screen. The ESP8266 module includes a Wi-Fi antenna and 4 MB of flash storage memory. The touch screen is a 240 x 320 QVGA display with 16-bit pixels driven by an ILI9341 display controller and an XPT2046 resistive touch controller.
+Moddable Zeroの主なコンポーネントは、ESP8266モジュールと抵抗膜式タッチスクリーンの2つです。ESP8266モジュールにはWi-Fiアンテナと4MBのフラッシュストレージメモリが含まれています。タッチスクリーンは、ILI9341ディスプレイコントローラとXPT2046抵抗膜式タッチコントローラによって駆動される、240 x 320 QVGAディスプレイで、16ビットピクセルを持っています。
 
 <a id="pinout"></a>
-### Pinout
+### ピン配置
 
 <img src="../assets/devices/moddable-zero-pinout.png">
 
 <a id="setup"></a>
-## SDK and Host Environment Setup
+## SDKとホスト環境のセットアップ
 
-To build and run apps on Moddable Zero, you'll need to:
+Moddable Zeroでアプリをビルドして実行するには、以下の手順が必要です：
 
-1. Install the [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [ESP8266 tools](./esp8266.md)
-3. Follow the instructions in the **Building and Deploying Apps** section below.
+1. [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)をインストールする
+2. [ESP8266ツール](./esp8266.md)をインストールする
+3. 以下の**アプリのビルドとデプロイ**セクションの指示に従う
 
 <a id="building-and-deploying-apps"></a>
-## Building and Deploying Apps
+## アプリのビルドとデプロイ
 
-After you've set up your host environment, take the following steps to install an application on your Moddable Zero.
+ホスト環境をセットアップした後、以下の手順でModdable Zeroにアプリケーションをインストールします。
 
-1. Attach your Moddable Zero to your computer with a micro USB cable.
+1. Moddable ZeroをマイクロUSBケーブルでコンピュータに接続します。
 
-	Make sure you're using a data sync&#8211;capable cable, not one that is power-only.
+	データ同期対応のケーブルを使用していることを確認してください。電源供給のみのケーブルではありません。
 
-2. Build and deploy the app with `mcconfig`.
+2. `mcconfig`を使用してアプリをビルドおよびデプロイします。
 
-	`mcconfig` is the command line tool to build and launch Moddable apps on microcontrollers and the simulator. Full documentation of `mcconfig` is available [here](../tools/tools.md).
+	`mcconfig`は、マイクロコントローラーおよびシミュレーター上でModdableアプリをビルドおよび起動するためのコマンドラインツールです。`mcconfig`の完全なドキュメントは[こちら](../tools/tools.md)にあります。
 
-	Use the platform `-p esp/moddable_zero`  with `mcconfig` to build for Moddable Zero. For example, to build the [`piu/balls` example](../../examples/piu/balls):
+	Moddable Zero用にビルドするには、`mcconfig`でプラットフォーム`-p esp/moddable_zero`を使用します。例えば、[`piu/balls`のサンプル](../../examples/piu/balls)をビルドするには：
 
 	```
 	cd $MODDABLE/examples/piu/balls
 	mcconfig -d -m -p esp/moddable_zero
 	```
 
-	The [examples readme](../../examples) contains additional information about other commonly used `mcconfig` arguments for screen rotation, Wi-Fi configuration, and more.
+	[サンプルのreadme](../../examples)には、画面の回転、Wi-Fiの設定など、他の一般的に使用される`mcconfig`引数に関する追加情報が含まれています。
 
 <a id="troubleshooting"></a>
-## Troubleshooting
+## トラブルシューティング
 
-See the Troubleshooting section of the [ESP8266 documentation](./esp8266.md) for a list of common issues and how to resolve them.
+一般的な問題とその解決方法については、[ESP8266ドキュメント](./esp8266.md)のトラブルシューティングセクションを参照してください。
 
 <a id="development-resources"></a>
-## Development Resources
+## 開発リソース
 
 <a id="examples"></a>
-### Examples
+### サンプル
 
-The Moddable SDK has over 150 [example apps](../../examples) that demonstrate how to use its many features. The vast majority of these examples run on Moddable Zero.
+Moddable SDKには、その多くの機能を示す150以上の[サンプルアプリ](../../examples)があります。これらのサンプルの大部分はModdable Zeroで動作します。
 
-That said, not every example is compatible with Moddable Zero hardware. For example, the ESP8266 does not have BLE capabilities so BLE examples do not build or run. Some examples are designed to test specific display and touch drivers that are not compatible with the Moddable Zero display and give a build error.
+とはいえ、すべてのサンプルがModdable Zeroハードウェアと互換性があるわけではありません。例えば、ESP8266にはBLE機能がないため、BLEのサンプルはビルドも実行もできません。一部のサンプルは、Moddable Zeroのディスプレイと互換性のない特定のディスプレイやタッチドライバをテストするために設計されており、ビルドエラーが発生します。
 
 <a id="documentation"></a>
-### Documentation
+### ドキュメント {/*documentation*/}
 
-All the documentation for the Moddable SDK is in the [documentation](../) directory. The **documentation**, **examples**, and **modules** directories share a common structure to make it straightforward to locate information. Some of the highlights include:
+Moddable SDKのすべてのドキュメントは[documentation](../)ディレクトリにあります。**documentation**、**examples**、および**modules**ディレクトリは共通の構造を持っており、情報を簡単に見つけることができます。いくつかのハイライトは次のとおりです：
 
-- The `commodetto` subdirectory, which contains resources related to Commodetto--a bitmap graphics library that provides a 2D graphics API--and Poco, a lightweight rendering engine.
-- The `piu` subdirectory, which contains resources related to Piu, a user interface framework that makes it easier to create complex, responsive layouts.
-- The `networking` subdirectory, which contains networking resources related to network sockets and a variety of standard, secure networking protocols built on sockets including HTTP/HTTPS, WebSockets, DNS, SNTP, and telnet
-- The `pins` subdirectory, which contains resources related to supported hardware protocols (digital, analog, PWM, I2C, etc.). A number of drivers for common off-the-shelf sensors and corresponding example apps are also available.
+- `commodetto`サブディレクトリには、2DグラフィックスAPIを提供するビットマップグラフィックスライブラリであるCommodettoと、軽量レンダリングエンジンであるPocoに関連するリソースが含まれています。
+- `piu`サブディレクトリには、複雑でレスポンシブなレイアウトを簡単に作成できるユーザーインターフェースフレームワークであるPiuに関連するリソースが含まれています。
+- `networking`サブディレクトリには、ネットワークソケットおよびHTTP/HTTPS、WebSockets、DNS、SNTP、telnetなどのソケット上に構築されたさまざまな標準的で安全なネットワーキングプロトコルに関連するネットワークリソースが含まれています。
+- `pins`サブディレクトリには、サポートされているハードウェアプロトコル（デジタル、アナログ、PWM、I2Cなど）に関連するリソースが含まれています。一般的な市販センサー用の多くのドライバと対応するサンプルアプリも利用可能です。
 
 <a id="support"></a>
-### Support
+### サポート
 
-If you have questions, we recommend you [open an issue](https://github.com/Moddable-OpenSource/moddable/issues). We'll respond as quickly as practical, and other developers can offer help and benefit from the answers to your questions. Many questions have already been answered, so please try searching previous issues before opening a new issue.
+質問がある場合は、[issueを開く](https://github.com/Moddable-OpenSource/moddable/issues)ことをお勧めします。できるだけ早く対応し、他の開発者も助けを提供し、あなたの質問への回答から利益を得ることができます。多くの質問はすでに回答されているので、新しいissueを開く前に以前のissueを検索してみてください。
 
 <a id="updates"></a>
-### Updates
+### 更新情報
 
-The best way to keep up with what we're doing is to follow us on Twitter ([@moddabletech](https://twitter.com/moddabletech)). We post announcements about new posts on [our blog](http://blog.moddable.com/) there, along with other Moddable news.
+私たちの活動を追跡する最良の方法は、Twitter ([@moddabletech](https://twitter.com/moddabletech))でフォローすることです。新しい投稿に関する発表や、その他のModdableニュースを[私たちのブログ](http://blog.moddable.com/)で公開しています。
