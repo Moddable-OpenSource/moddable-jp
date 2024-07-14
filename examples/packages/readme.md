@@ -101,7 +101,7 @@ import {} from "piu/MC";
 
 ### mod-balls
 
-これは、`mcpack` を使用して [mod](https://www.moddable.com/documentation/xs/mods) をビルドおよび実行するサンプルです。`mcrun` を使用します。このサンプルを実行する前に、modのホストをインストールするために `run-mod` 例を実行する必要があります。
+これは、`mcpack` を使用して [mod](https://www.moddable.com/documentation/xs/mods) をビルドおよび実行するサンプルです。`mcrun` を使用します。このサンプルを実行する前に、modのホストをインストールするために `run-mod` サンプルを実行する必要があります。
 
 mod-ballsは、`package.json` を使用したmodとしてのクラシックな [balls](https://github.com/Moddable-OpenSource/moddable/blob/public/examples/piu/balls/main.js) サンプルです。シミュレータで実行するには、次のコマンドを使用します：
 
