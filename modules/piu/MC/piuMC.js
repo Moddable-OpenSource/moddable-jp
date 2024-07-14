@@ -180,6 +180,7 @@ class View @ "PiuViewDelete" {
 	onDisplayReady() @ "PiuView_onDisplayReady"
 	onIdle() @ "PiuView_onIdle"
 	onMessage() @ "PiuView_onMessage"
+	onQuit() @ "PiuView_onQuit"
 	onTouchBegan(index, x, y, ticks) @ "PiuView_onTouchBegan"
 	onTouchEnded(index, x, y, ticks) @ "PiuView_onTouchEnded"
 	onTouchMoved(index, x, y, ticks) @ "PiuView_onTouchMoved"

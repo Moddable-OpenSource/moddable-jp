@@ -1442,6 +1442,21 @@ void PiuView_onMessage(xsMachine* the)
 	(*self)->idleTicks = 0;
 }
 
+void PiuView_onQuit(xsMachine* the)
+{
+	PiuView* self = PIU(View, xsThis);
+	PiuApplication* application = (*self)->application;
+	if (!application) return;
+	if ((*application)->behavior) {
+		xsVars(2);
+		xsVar(0) = xsReference((*application)->behavior);
+		if (xsFindResult(xsVar(0), xsID_onQuit)) {
+			xsVar(1) = xsReference((*application)->reference);
+			(void)xsCallFunction1(xsResult, xsVar(0), xsVar(1));
+		}
+	}
+}
+
 void PiuView_onTouchBegan(xsMachine* the)
 {
 	PiuView* self = PIU(View, xsThis);
