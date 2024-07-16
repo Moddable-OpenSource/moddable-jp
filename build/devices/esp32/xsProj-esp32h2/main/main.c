@@ -204,6 +204,8 @@ void ESP_put(uint8_t *c, int count) {
 	int sent = 0;
 	while (count > 0) {
 		sent = usb_serial_jtag_write_bytes(c, count, 10);
+		if (sent <= 0)
+			return;
 		c += sent;
 		count -= sent;
 	}
