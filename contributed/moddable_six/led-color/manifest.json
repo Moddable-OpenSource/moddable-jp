@@ -1,0 +1,31 @@
+{
+	"include": [
+		"$(MODDABLE)/examples/manifest_base.json",
+		"$(MODDABLE)/examples/manifest_piu.json"
+	],
+	"modules": {
+		"*": [
+			"./main"
+		]
+	},
+	"config": {
+		"led": {
+			"rainbow": false
+		}
+	},
+	"resources":{
+		"*": [
+			"./assets/color"
+		],
+		"*-alpha": [
+			"./assets/brightness"
+		]
+	},
+	"platforms": {
+		"mac": {
+			"build": {
+				"SIMULATOR": "$(MODDABLE)/build/bin/mac/debug/mcsim.app"
+			}
+		}
+	}
+}
