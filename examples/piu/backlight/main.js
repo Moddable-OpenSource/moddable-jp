@@ -74,8 +74,8 @@ class DimmingBehavior extends Behavior {
 		audio?.enqueue(1, AudioOut.Flush);
 	}
 	adjustBrightness(content) {
-		let fraction = content.first.height / content.height;
-		if (fraction <= 0) fraction = 0.01;		// don't turn off backlight completely
+		const floor = 0.075;
+		let fraction = floor + ((1 - floor) * (content.first.height / content.height));
 		backlight.write(fraction * 100);
 
 		if (undefined === audio)
