@@ -591,7 +591,7 @@ void fxReadSerialBuffer(txSerialTool self, char* buffer, int size)
 			}
 			else if ((offset >= 10) && (dst[-10] == '<') && (dst[-9] == '/') && (dst[-8] == 'x') && (dst[-7] == 's') && (dst[-6] == 'b') && (dst[-5] == 'u') && (dst[-4] == 'g') && (dst[-3] == '>')) {
 				txSerialMachine machine = self->currentMachine;
-				if ((1 == machine->receiveCount) && !self->firstMachine->nextMachine) {	// first command when after transitioning from 0 to 1 machines
+				if (machine && (1 == machine->receiveCount) && !self->firstMachine->nextMachine) {	// first command when after transitioning from 0 to 1 machines
 					if (fxInitializeTarget(self))
 						self->currentMachine->suppress = 1;
 				}

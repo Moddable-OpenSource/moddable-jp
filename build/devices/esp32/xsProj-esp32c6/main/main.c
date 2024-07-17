@@ -204,6 +204,8 @@ void ESP_put(uint8_t *c, int count) {
 	int sent = 0;
 	while (count > 0) {
 		sent = usb_serial_jtag_write_bytes(c, count, 10);
+		if (sent <= 0)
+			return;
 		c += sent;
 		count -= sent;
 	}
@@ -267,7 +269,7 @@ void app_main() {
 
 #if USE_USB
 	xTaskCreate(debug_task, "debug", (768 + XT_STACK_EXTRA) / sizeof(StackType_t), 0, 8, NULL);
-	printf("START USB CONSOLE!!!\n");
+	printf("USB CONNECTED\r\n");
 #else // !USE_USB
 
 	esp_err_t err;
