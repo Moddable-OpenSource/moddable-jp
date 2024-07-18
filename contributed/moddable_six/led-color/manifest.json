@@ -20,12 +20,5 @@
 		"*-alpha": [
 			"./assets/brightness"
 		]
-	},
-	"platforms": {
-		"mac": {
-			"build": {
-				"SIMULATOR": "$(MODDABLE)/build/bin/mac/debug/mcsim.app"
-			}
-		}
 	}
 }
