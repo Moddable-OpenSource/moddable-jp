@@ -1,7 +1,7 @@
 # Moddable Six Developer Guide
 
 Copyright 2024 Moddable Tech, Inc.<BR>
-Revised: July 1, 2024
+Revised: July 18, 2024
 
 This document provides information about Moddable Six, including details about its pins and built-in components, how to build and deploy apps, and links to additional development resources.
 
@@ -60,7 +60,7 @@ The brightness of the display can be adjusted programatically.
 The touch panel uses a GT911 touch controller that supports multi-touch input. The a new touch driver and hardware design enables touch interrupts to increase responsiveness and minimize CPU overhead.
 
 #### Amplified Speaker
-A built-in, amplified speaker allows for audio user-interface feedback, streaming music, and voice prompts. It delivers high quality audio using a low-cost design, reducing the cost of bringing audio feedback to commercial products. 
+A built-in, amplified speaker allows for audio user-interface feedback, streaming music, and voice prompts. It delivers high quality audio using a low-cost design, reducing the cost of bringing audio feedback to commercial products.
 
 #### STEMMA QT / Qwiic / JST SH 1mm Quick Connections
 Moddable Six has a JST SH connector for easy connection of I²C sensors and peripherals. This connector is called STEMMA QT by Adafruit and Qwiic by SparkFun.
@@ -259,7 +259,7 @@ The brightness of the backlight may be set at build time in the `config` section
 You can also set the brightness on the command line when building with `mcconfig`. Here it is set to 50%.
 
 ```text
-mcconfig -d -m -p esp32/moddable_six brightness=50
+mcconfig -d -m -p esp32/moddable_six_cdc brightness=50
 ```
 
 The `setup/target` module for Moddable Six installs a global variable named `backlight` that you can use to adjust the backlight in your code. Here it is set to 80%.
@@ -382,13 +382,13 @@ Moddable Six can communicate with your development computer using either its USB
 
 The Moddable SDK simulator, mcsim, includes a simulator for Moddable Six. The simulator is a valuable tool to quickly develop and debug many parts of your project.
 
-To use the Moddable Six simulaor, specify the `sim/moddable_six` platform when building with `mcconfig`:
+To use the Moddable Six simulator, specify the `sim/moddable_six` platform when building with `mcconfig`:
 
 ```
 mcconfig -d -m -p sim/moddable_six
 ```
 
-The Moddable Six simulator can be used to simulate the following:
+The Moddable Six simulator simulates the following:
 
 - QVGA Display
 - Touch input
@@ -398,18 +398,58 @@ The Moddable Six simulator can be used to simulate the following:
 - Wi-Fi
 - Flash button
 
-The Controls panel in the simulator has a button labeled "Default" which simulates the Flash button on the back of Moddable Six.
-Use "Show Controls" in the View menu to show the Controls panel.
+The Controls panel in the simulator has a button labeled "Default" which simulates the Flash button on the back of Moddable Six. Use "Show Controls" in the View menu to show the Controls panel.
 
 <a id="examples"></a>
 ### Examples
 
-<!-- @@ to do -->
+The Moddable SDK has over 150 [example apps](../../examples) that demonstrate how to use its many features. Most of these examples are compatible with Moddable Six.
+
+A suite of example apps designed for Moddable Six is in
+ the [contributed/moddable_six](../../contributed/moddable_six) directory. These apps demonstrate Moddable Six features including high frame rate animation, audio integration in the UI, touch interactions, and vector graphics. These apps can also be run in the Moddable Six simulator on macOS, Windows, and Linux using the platform `sim/moddable_six` with `mcconfig`.
+
+These apps are great starting points for your own projects. They can be easily adapted to communicate with your hardware, change the UI interactions, or add new features.
+
+#### battery
+
+The [battery](../../contributed/moddable_six/battery) app is a control panel for a home battery system. It uses a simulated battery.
+
+The app includes advanced rendering of battery levels with fluid animations and sophisticated screen-to-screen transitions.
+
+<img width="45%" src="../assets/devices/moddable-six-battery1.png"> <img width="45%" src="../assets/devices/moddable-six-battery2.png">
+
+<img width="45%" src="../assets/devices/moddable-six-battery3.png"> <img width="45%" src="../assets/devices/moddable-six-battery4.png">
+
+
+#### led-color
+
+The [led-color](../../contributed/moddable_six/led-color) app provides a color-picker on display for user to choose the color displayed by the on-board Neopixel.
+
+<img width="45%" src="../assets/devices/moddable-six-led-color1.png"> <img width="45%" src="../assets/devices/moddable-six-led-color2.png">
+
+#### plug-schedule
+
+The [plug-schedule](../../contributed/moddable_six/plug-schedule) app presents an interface for an IoT plug plug.
+
+This is the largest, most comprehensive of the the Moddable Six example apps. It is nearly a complete product. It maintains separate schedules for two smart plugs and includes Wi-Fi configuration, setting the time, and an graphical timezone picker. The mobile-stye UI features smooth, flicker free animations are reinforced with audio feedback.
+
+<img width="45%" src="../assets/devices/moddable-six-smartplug1.png"> <img width="45%" src="../assets/devices/moddable-six-smartplug2.png">
+
+<img width="45%" src="../assets/devices/moddable-six-smartplug3.png"> <img width="45%" src="../assets/devices/moddable-six-smartplug4.png">
+
+
+#### speaking-clock
+
+The [speaking-clock](../../contributed/moddable_six/speaking-clock) app is a word-clock that audibly announces the time every minute.
+
+The voice of the speaking clock is ChatGPT! The voice samples were captured from ChatGPT and built into the app. They are stored in WAVE files so you can easily replace them with any voice you like, even your own.
+
+<img width="45%" src="../assets/devices/speaking-clock.gif">
 
 <a id="debugging"></a>
 ### Debugging
 
-Moddable Six has advanced debugging support for JavaScript, TypeScript, and native code
+Moddable Six has advanced debugging support for JavaScript, TypeScript, and native code.
 
 <a id="advanced-xsbug"></a>
 #### Debugging JavaScript and TypeScript Code
@@ -515,3 +555,4 @@ If you have questions, we recommend you [open a discussion](https://github.com/M
 ### Updates
 
 The best way to keep up-to-date with what we're doing is to follow us on Twitter ([@moddabletech](https://twitter.com/moddabletech)). We post announcements about new posts on [our blog](http://blog.moddable.com/) there, along with other Moddable news. To learn about the latest Moddable SDK releases, subscribe to our [Releases on GitHub](https://github.com/moddable-OpenSource/moddable/releases) by Watching our [repository](https://github.com/Moddable-OpenSource/moddable).
+
