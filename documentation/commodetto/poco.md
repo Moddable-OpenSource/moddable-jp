@@ -658,7 +658,7 @@ The optional `blend` argument applies an additional blend level to all pixels in
 
 ***
 
-#### `fillPattern(bits, x, y, w, h [, sx, sx, sx, sh])`
+#### `fillPattern(bits, x, y, w, h [, sx, sy, sw, sh])`
 
 The `fillPattern` function fills an area by repeatedly drawing all or part of a bitmap with pixels of type `Bitmap.Default`. The bitmap is specified by the `bits` argument. The location of the area to fill is specified by the `x` and `y` arguments, and the dimensions of the area are specified by the `w` and `h` arguments.
 
