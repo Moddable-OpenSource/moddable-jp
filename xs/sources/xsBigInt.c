@@ -1861,7 +1861,8 @@ txBigInt *fxBigInt_udiv(txMachine* the, txBigInt *q, txBigInt *a, txBigInt *b, t
 #ifdef mxMetering
 void fxBigInt_meter(txMachine* the, int n)
 {
-	the->meterIndex += n - 1;
+	n--;
+	the->meterIndex += n * XS_BIGINT_METERING;
 }
 #endif
 

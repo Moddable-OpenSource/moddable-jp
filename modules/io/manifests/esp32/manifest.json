@@ -47,9 +47,28 @@
 				"embedded:io/socket/listener": "$(IO)/socket/lwip/listener"
 			}
 		},
-		"esp32/esp32h2": {
+		"esp32/esp32c3": {
+			"include": [
+				"$(MODDABLE)/examples/manifest_net.json"
+			],
 			"modules": {
-				"embedded:provider/builtin": "$(BUILD)/devices/$(PLATFORM)/targets/$(SUBPLATFORM)/host/provider"
+				"embedded:provider/builtin": "$(BUILD)/devices/$(PLATFORM)/targets/$(SUBPLATFORM)/host/provider",
+
+				"embedded:io/socket/tcp": "$(IO)/socket/lwip/tcp",
+				"embedded:io/socket/udp": "$(IO)/socket/lwip/udp",
+				"embedded:io/socket/listener": "$(IO)/socket/lwip/listener"
+			}
+		},
+		"esp32/esp32c3_cdc": {
+			"include": [
+				"$(MODDABLE)/examples/manifest_net.json"
+			],
+			"modules": {
+				"embedded:provider/builtin": "$(BUILD)/devices/$(PLATFORM)/targets/$(SUBPLATFORM)/host/provider",
+
+				"embedded:io/socket/tcp": "$(IO)/socket/lwip/tcp",
+				"embedded:io/socket/udp": "$(IO)/socket/lwip/udp",
+				"embedded:io/socket/listener": "$(IO)/socket/lwip/listener"
 			}
 		},
 		"esp32/esp32c6": {
@@ -64,7 +83,7 @@
 				"embedded:io/socket/listener": "$(IO)/socket/lwip/listener"
 			}
 		},
-		"esp32/esp32c3": {
+		"esp32/esp32c6_cdc": {
 			"include": [
 				"$(MODDABLE)/examples/manifest_net.json"
 			],
@@ -74,6 +93,16 @@
 				"embedded:io/socket/tcp": "$(IO)/socket/lwip/tcp",
 				"embedded:io/socket/udp": "$(IO)/socket/lwip/udp",
 				"embedded:io/socket/listener": "$(IO)/socket/lwip/listener"
+			}
+		},
+		"esp32/esp32h2": {
+			"modules": {
+				"embedded:provider/builtin": "$(BUILD)/devices/$(PLATFORM)/targets/$(SUBPLATFORM)/host/provider"
+			}
+		},
+		"esp32/esp32h2_cdc": {
+			"modules": {
+				"embedded:provider/builtin": "$(BUILD)/devices/$(PLATFORM)/targets/$(SUBPLATFORM)/host/provider"
 			}
 		},
 		"esp32/*": {

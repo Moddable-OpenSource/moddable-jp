@@ -513,6 +513,17 @@ mxExport char* fxCStackLimit();
 mxExport txID fxGenerateProfileID(void* console);
 mxExport void fxGenerateTag(void* console, txString buffer, txInteger bufferSize, txString path);
 #ifdef mxMetering
+enum {
+	XS_CODE_METERING = 1 << 16,
+	XS_PARSE_CODE_METERING = 1 << 16,
+	XS_REGEXP_METERING = 1 << 16,
+	XS_PARSE_REGEXP_METERING = 1 << 10,
+	XS_BUILTIN_METERING = 1 << 14,
+	XS_STRING_METERING = 1 << 16,
+	XS_BIGINT_METERING = 1 << 16,
+	XS_CHUNK_ALLOCATION_METERING = 1,
+	XS_SLOT_ALLOCATION_METERING = 1 << 8,
+};
 mxExport void fxCheckMeter(void* console);
 mxExport void fxMeterSome(void* console, txU4 count);
 #endif

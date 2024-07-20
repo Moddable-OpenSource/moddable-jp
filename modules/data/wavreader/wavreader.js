@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -66,7 +66,7 @@ class WavReader {
 				buffer[i++] = this.readInt16();
 		}
 		else
-		if (8 == this.bitsPerSample) {
+		if (8 === this.bitsPerSample) {
 			while (count--) {
 				let value = this.readInt8();
 				buffer[i++] = value << 8;		// write Uint8 representation of value into low bits

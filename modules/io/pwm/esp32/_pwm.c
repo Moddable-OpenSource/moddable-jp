@@ -256,7 +256,7 @@ void xs_pwm_destructor_(void *data)
 		t.duty_resolution = gTimers[pwm->timerIndex].resolution;
 		t.freq_hz = gTimers[pwm->timerIndex].hz;
 		t.clk_cfg = LEDC_AUTO_CLK;
-		t.deconfigure = true;
+		t.deconfigure = true;		// introduced in 5.2.1
 
 		err = ledc_timer_config(&t);
 		if (err)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -130,9 +130,15 @@ const X509 = {
 					throw new Error("x509: support named curves only for now");
 				ber = new BER(spk.param);
 				switch (ber.getObjectIdentifier().toString()) {
-					case "1,2,840,10045,3,1,7":
+					case "1,2,840,10045,3,1,7":		// secp256r1
 						return {
 							curve: new Curve("secp256r1"),
+							pub: ECPoint.fromOctetString(spk),
+							algo: spk.algo,
+						};
+					case "1,3,132,0,34":		// secp384r1 http://www.secg.org/sec2-v2.pdf
+						return {
+							curve: new Curve("secp384r1"),
 							pub: ECPoint.fromOctetString(spk),
 							algo: spk.algo,
 						};

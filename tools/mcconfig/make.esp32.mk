@@ -38,7 +38,7 @@ endif
 PROGRAMMING_VID ?= 303a
 PROGRAMMING_PID ?= 1001
 
-EXPECTED_ESP_IDF ?= v5.2.1
+EXPECTED_ESP_IDF ?= v5.2.2
 
 # ESP32_SUBCLASS is to find some include files in IDFv4
 # values include esp32, esp32s3 and esp32s2
@@ -223,6 +223,21 @@ INC_DIRS = \
 	$(IDF_PATH)/components/driver/touch_sensor/include \
 	$(IDF_PATH)/components/driver/touch_sensor/$(ESP32_SUBCLASS)/include \
  	$(IDF_PATH)/components/tinyusb/additions/include
+
+# paths for prior idf
+INC_DIRS += \
+	$(IDF_PATH)/components/freertos/port/$(ESP_ARCH)/include \
+	$(IDF_PATH)/components/freertos/FreeRTOS-Kernel/portable/$(ESP_ARCH)/include \
+	$(IDF_PATH)/components/freertos/esp_additions/arch/$(ESP_ARCH)/include \
+	$(IDF_PATH)/components/freertos/esp_additions/include/freertos \
+	$(IDF_PATH)/components/freertos \
+	$(IDF_PATH)/components/freertos/include \
+	$(IDF_PATH)/components/freertos/include/freertos \
+	$(IDF_PATH)/components/freertos/port \
+	$(IDF_PATH)/components/freertos/include/esp_additions \
+	$(IDF_PATH)/components/freertos/include/esp_additions/freertos \
+	$(IDF_PATH)/components/freertos/port/$(ESP_ARCH)/include/freertos \
+
 
 XS_OBJ = \
 	$(LIB_DIR)/xsAll.c.o \

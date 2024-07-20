@@ -77,7 +77,7 @@ static txBoolean fxToNumericNumberBinary(txMachine* the, txSlot* a, txSlot* b, t
 			goto *bytes[byte]
 	#elif defined(mxMetering)
 		#define mxBreak \
-			the->meterIndex++; \
+			the->meterIndex += XS_CODE_METERING; \
 			goto *bytes[byte]
 	#else
 		#define mxBreak \
@@ -728,7 +728,7 @@ XS_CODE_JUMP:
 		if (gxDoTrace) fxTraceCode(the, stack, byte);
 #endif
 #ifdef mxMetering
-		the->meterIndex++;
+		the->meterIndex += XS_CODE_METERING;
 #endif
 		
 		mxSwitch(byte) {
@@ -2143,7 +2143,7 @@ XS_CODE_JUMP:
 				mxRestoreState;
 				if (flag) {
 #ifdef mxMetering
-					the->meterIndex += 2;
+					the->meterIndex += 2 * XS_CODE_METERING;
 #endif
 					mxStack->kind = XS_AT_KIND;
 					mxStack->value.at.id = XS_NO_ID;
@@ -4313,9 +4313,9 @@ STACK_OVERFLOW:
 void fxBeginMetering(txMachine* the, txBoolean (*callback)(txMachine*, txU4), txU4 interval)
 {
 	the->meterCallback = callback;
-	the->meterCount = interval;
+	the->meterCount = interval << 16;
 	the->meterIndex = 0;
-	the->meterInterval = interval;
+	the->meterInterval = interval << 16;
 }
 
 void fxEndMetering(txMachine* the)
@@ -4330,7 +4330,7 @@ void fxCheckMetering(txMachine* the)
 {
 	txU4 interval = the->meterInterval;
 	the->meterInterval = 0;
-	if ((*the->meterCallback)(the, the->meterIndex)) {
+	if ((*the->meterCallback)(the, the->meterIndex >> 16)) {
 		the->meterCount = the->meterIndex + interval;
 		if (the->meterCount < the->meterIndex) {
 			the->meterIndex = 0;
@@ -5052,7 +5052,7 @@ void fxCheckMeter(void* console)
 void fxMeterSome(void* console, txU4 count)
 {
 	txMachine* the = console;
-	the->meterIndex += count;
+	the->meterIndex += count * XS_PARSE_CODE_METERING;
 }
 #endif
 
