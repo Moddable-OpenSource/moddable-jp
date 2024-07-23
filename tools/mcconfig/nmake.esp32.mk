@@ -211,6 +211,7 @@ INC_DIRS = \
 	-I$(IDF_PATH)\components\esp_app_format\include \
 	-I$(IDF_PATH)\components\esp_adc\include \
 	-I$(IDF_PATH)\components\esp_adc\$(ESP32_SUBCLASS)\include \
+	-I$(IDF_PATH)\components\esp_bootloader_format\include \
 	-I$(IDF_PATH)\components\esp_common\include \
  	-I$(IDF_PATH)\components\$(ESP32_SUBCLASS)\include \
 	-I$(IDF_PATH)\components\$(ESP32_SUBCLASS) \
