@@ -467,7 +467,7 @@ int fuzz(int argc, char* argv[])
 		gxMemoryFail = 0;
 
 		xsMachine* machine = xsCreateMachine(&_creation, "xst_fuzz", NULL);
-		xsBeginMetering(machine, xsAlwaysWithinComputeLimit, 0x7FFFFFFF);
+		xsBeginMetering(machine, xsAlwaysWithinComputeLimit, 0);		// interval/step of zero means "never invoke callback" 
 		{
 		xsBeginHost(machine);
 		{
@@ -614,7 +614,7 @@ int fuzz_oss(const uint8_t *Data, size_t script_size)
 	xsMachine* machine;
 	machine = xsCreateMachine(creation, "xst_fuzz_oss", NULL);
 
-	xsBeginMetering(machine, xsWithinComputeLimit, 1);
+	xsBeginMetering(machine, xsWithinComputeLimit, 65536);
 	{
 		xsBeginHost(machine);
 		{
