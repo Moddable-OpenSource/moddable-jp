@@ -1,38 +1,38 @@
-# DotStar Wiring Guide
+# DotStar 配線ガイド
 Copyright 2018 Moddable Tech, Inc.<BR>
-Revised: December 11, 2018
+改訂： 2018年12月11日
 
 ![Generic SPI Display](images/dotstar.jpg)
 
-## Specs
+## 仕様
 
 | | |
 | :---: | :--- |
-| **Size** | 144 LED strip (5mm x 5mm LEDs)
-| **Type** | ADA102 LED
-| **Interface** | SPI
-| **Drivers** | [dotstar](../../documentation/drivers/dotstar/dotstar.md)
-| **Availability** | [Adafruit DotStar](https://www.adafruit.com/product/2241)
-| **Description** |  Adafruit uses the ADA102 LED's in their DotStar digital LEDs. This allows individual LED control with 2 wire SPI. These LEDs are not strictly a display, but they can be seen as one row of a display. There are options to purchase them in a organized in a rectangular grid, which is like a display.
+| **サイズ** | 144 LED ストリップ (5mm x 5mm LEDs)
+| **タイプ** | ADA102 LED
+| **インターフェース** | SPI
+| **ドライバ** | [dotstar](../../documentation/drivers/dotstar/dotstar.md)
+| **入手可能性** | [Adafruit DotStar](https://www.adafruit.com/product/2241)
+| **説明** | Adafruit は DotStar デジタル LED に ADA102 LED を使用しています。これにより、2 線式 SPI で個々の LED を制御できます。これらの LED は厳密にはディスプレイではありませんが、ディスプレイの 1 行として見ることができます。ディスプレイのように長方形のグリッドに整理されたものを購入するオプションもあります。
 
-## Moddable example code
+## Moddable のサンプルコード
 
-The [dotstar](../../examples/drivers/dotstar/) example works with a 144 LED strip. It scans through an image one row at a time to update the pixels on the DotStar string.
+[dotstar](../../examples/drivers/dotstar/) サンプルは144 LEDストリップで動作します。画像を1行ずつスキャンしてDotStarストリングのピクセルを更新します。
 
 ```
 cd $MODDABLE/examples/drivers/dotstar
 mcconfig -d -m -p esp
 ```
 
-## ESP8266 Pinout
+## ESP8266 ピン配置
 
-**Note:** Dotstar requires 5V data signals so signal lines must be run through a logic converter to boost them to 5V. The [74AHCT125](https://www.adafruit.com/product/1787) or a similar shifter will work.
+**注意:** Dotstarは5Vのデータ信号を必要とするため、信号線をロジックコンバータを通して5Vにブーストする必要があります。[74AHCT125](https://www.adafruit.com/product/1787) または同様のシフターが使用できます。
 
-| Dotstar Display | ESP8266 | ESP8266 Devboard label
+| Dotstar Display | ESP8266 | ESP8266 Devboardラベル |
 | --- | --- | --- |
-| 5V | N/A (connect to 5V supply) |
+| 5V | N/A (5V供給に接続) |
 | GND | GND |
-| CI | GPIO 14/SCLK | D5
-| DI| GPIO 13/MOSI | D7
+| CI | GPIO 14/SCLK | D5 |
+| DI | GPIO 13/MOSI | D7 |
 
-![ESP32 - Generic 2.4"-2.8" wiring](images/dotstar-wiring.png)
+![ESP32 - 汎用 2.4"-2.8" 配線図](images/dotstar-wiring.png)

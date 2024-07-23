@@ -1,34 +1,34 @@
-# Adafruit OLED Display Wiring Guide
+# Adafruit OLED ディスプレイ配線ガイド
 Copyright 2018 Moddable Tech, Inc.<BR>
-Revised: October 23, 2018
+改訂： 2018年10月23日
 
 ![](./images/adafruit-oled.jpg)
 
-## Specs
+## スペック
 
 | | |
 | :---: | :--- |
-| **Part** | Adafruit Product ID: 1431
-| **Size** | 1.5", 128 × 128
-| **Type** | OLED
-| **Interface** | SPI
-| **Drivers** | video [SSD1351](../../documentation/drivers/ssd1351/ssd1351.md), no touch
-| **Availability** | [1.5" OLED Breakout Board](https://www.adafruit.com/product/1431)
-| **Description** | Excellent color, small OLED.
+| **部品** | Adafruit Product ID: 1431
+| **サイズ** | 1.5", 128 × 128
+| **タイプ** | OLED
+| **インターフェース** | SPI
+| **ドライバ** | video [SSD1351](../../documentation/drivers/ssd1351/ssd1351.md), タッチなし
+| **入手可能性** | [1.5" OLED Breakout Board](https://www.adafruit.com/product/1431)
+| **説明** | 優れた色、小型OLED。
 
 
-## Moddable example code
+## Moddableのサンプルコード
 
-The [countdown](../../examples/piu/countdown/) example is good for testing this display. To run a debug build, use the following build command:
+このディスプレイをテストするには、[countdown](../../examples/piu/countdown/) サンプルが適しています。デバッグビルドを実行するには、以下のビルドコマンドを使用します：
 
 ```
 cd $MODDABLE/examples/piu/countdown
 mcconfig -d -m -p esp/adafruit_oled
 ```
 
-## ESP8266 pinout
+## ESP8266 ピン配置
 
-| Adafruit OLED | ESP8266 | ESP8266 Devboard label
+| Adafruit OLED | ESP8266 | ESP8266 開発ボード ラベル
 | --- | --- | --- |
 | GND | GND |
 | VIN | 3.3v |
@@ -39,5 +39,4 @@ mcconfig -d -m -p esp/adafruit_oled
 | SCK | GPIO 14 | (D5)
 | MOSI | GPIO 13 | (D7)
 
-![Generic 2.4"-2.8" wiring illustration](images/adafruit-oled-wiring2.png)
-
+![汎用2.4"-2.8"配線図](images/adafruit-oled-wiring2.png)

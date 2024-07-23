@@ -1,16 +1,16 @@
-# Moddable SDK - Display Guides
+# Moddable SDK - ディスプレイガイド
 Copyright 2019 Moddable Tech, Inc.<BR>
-Revised: June 20, 2019
+改訂： 2019年6月20日
 
 ![Displays](../assets/moddable/displays.jpg)
 
-This folder contains guides to connect a variety of SPI displays to the ESP8266 and ESP32. Each guide contains:
+このフォルダーには、さまざまなSPIディスプレイをESP8266およびESP32に接続するためのガイドが含まれています。各ガイドには以下が含まれます：
 
-- General information about the display
-- Links to the source code for the corresponding display and touch drivers
-- A wiring guide
-- A build command to run an example app to test your wiring
+- ディスプレイに関する一般情報
+- 対応するディスプレイおよびタッチドライバーのソースコードへのリンク
+- 配線ガイド
+- 配線をテストするための例のアプリを実行するビルドコマンド
 
-Video demonstrations of these displays are [on the Moddable website](http://www.moddable.com/display).
+これらのディスプレイのビデオデモンストレーションは[Moddableのウェブサイト](http://www.moddable.com/display)にあります。
 
-> Note: Although the guides in this folder are for the ESP8266 and ESP32, the examples and drivers are platform-independent and will run on any microcontroller the Moddable SDK is ported to.
+> 注: このフォルダーのガイドはESP8266およびESP32用ですが、サンプルやドライバーはプラットフォームに依存せず、Moddable SDKが移植された任意のマイクロコントローラーで動作します。

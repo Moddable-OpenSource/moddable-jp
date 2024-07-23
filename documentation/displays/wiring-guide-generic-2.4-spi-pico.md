@@ -1,40 +1,40 @@
-# Generic 2.4" & 2.8" Displays (Resistive Touch) Wiring Guide - Pico
+# 汎用 2.4インチ & 2.8インチ ディスプレイ (抵抗膜タッチ) 配線ガイド - Pico
 Copyright 2021 Moddable Tech, Inc.<BR>
 Revised: March 4, 2022
 
 ![](./images/spi-touch-display.jpg)
 
-## Specs
+## スペック
 
 | | |
 | :---: | :--- |
-| **Size** | 2.4" & 2.8", 320 x 240
-| **Type** | TFT LCD
-| **Interface** | SPI
-| **Drivers** | video [ILI9341](../../documentation/drivers/ili9341/ili9341.md), touch XPT2046 **(not supported yet)**
-| **Availability** | [Generic SPI Displays on eBay](https://www.ebay.com/sch/i.html?_odkw=spi+display+2.4&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.Xspi+display+2.4+touch.TRS0&_nkw=spi+display+2.4+touch&_sacat=0)
-| **Description** | These inexpensive displays are available on eBay and other resources. <BR><BR>Note: They are available in touch and non-touch versions which appear very similar.
+| **サイズ** | 2.4" & 2.8", 320 x 240
+| **タイプ** | TFT LCD
+| **インターフェース** | SPI
+| **ドライバ** | video [ILI9341](../../documentation/drivers/ili9341/ili9341.md), touch XPT2046 **(not supported yet)**
+| **入手可能性** | [Generic SPI Displays on eBay](https://www.ebay.com/sch/i.html?_odkw=spi+display+2.4&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.Xspi+display+2.4+touch.TRS0&_nkw=spi+display+2.4+touch&_sacat=0)
+| **説明** | これらの安価なディスプレイはeBayや他のリソースで入手可能です。<BR><BR>注意: タッチバージョンと非タッチバージョンがあり、非常に似ています。
 
-> At this time Moddable sample code does not include display SD card support.
+> 現時点のModdableのサンプルコードではSDカードのサポートは含まれていません。
 
-## Moddable example code
+## Moddableのサンプルコード
 
-The [balls](../../examples/piu/balls/) example is good for testing this display.  To run a debug build, use the following build command:
+このディスプレイをテストするには、[drag](../../examples/piu/drag/) サンプルが適しています。デバッグビルドを実行するには、以下のビルドコマンドを使用します：
 
 ```
 cd $MODDABLE/examples/piu/balls
 mcconfig -d -m -p pico/ili9341
 ```
 
-## ili9341 Module pinout
+## ili9341 モジュールのピン配置
 
-This is a typical layout of the ili9341 module.
+これはili9341モジュールの典型的なレイアウトです。
 
 ![](./images/ili9341-pinout.png)
 
-## Raspberry Pi Pico Pinout
+## Raspberry Pi Pico のピン配置
 
-| ILI9341 Display | Pico
+| ILI9341 ディスプレイ | Pico
 | --- | --- |
 | VCC | 3.3V
 | GND | GND
@@ -52,3 +52,4 @@ This is a typical layout of the ili9341 module.
 | T_DO | GPIO 8
 | T_IRQ | GPIO 14
 -->
+```
