@@ -9,30 +9,30 @@ Copyright 2016-2020 Moddable Tech, Inc.<BR>
 ## Table of Contents
 
 * [例](#examples)
-  * [長方形](#rectangle)
-  * [原点](#origin)
-  * [クリップ](#clip)
-  * [モノクロビットマップ](#monochrome-bitmap)
-  * [カラービットマップ](#color-bitmap)
-  * [パターン](#pattern)
-  * [グレービットマップ](#gray-bitmap)
-  * [オフスクリーンビットマップ](#offscreen-bitmap)
-  * [アルファ](#alpha)
-  * [JPEG](#jpeg)
-  * [テキスト](#text)
+	* [長方形](#rectangle)
+	* [原点](#origin)
+	* [クリップ](#clip)
+	* [モノクロビットマップ](#monochrome-bitmap)
+	* [カラービットマップ](#color-bitmap)
+	* [パターン](#pattern)
+	* [グレービットマップ](#gray-bitmap)
+	* [オフスクリーンビットマップ](#offscreen-bitmap)
+	* [アルファ](#alpha)
+	* [JPEG](#jpeg)
+	* [テキスト](#text)
 * [ピクセルフォーマット](#pixel-formats)
-  * [出力ピクセルフォーマット](#destination-pixel-formats)
-  * [ディスプレイピクセルフォーマット](#display-pixel-format)
-  * [入力ビットマップピクセルフォーマット](#source-bitmap-pixel-formats)
-  * [圧縮ピクセルフォーマット](#compressed-pixel-formats)
+	* [出力ピクセルフォーマット](#destination-pixel-formats)
+	* [ディスプレイピクセルフォーマット](#display-pixel-format)
+	* [入力ビットマップピクセルフォーマット](#source-bitmap-pixel-formats)
+	* [圧縮ピクセルフォーマット](#compressed-pixel-formats)
 * [即時モードレンダリング](#immediate-mode-rendering)
 * [回転](#rotation)
 * [JavaScript APIリファレンス](#javascript-api-reference)
-  * [関数](#js-functions)
-  * [プロパティ](#js-properties)
+	* [関数](#js-functions)
+	* [プロパティ](#js-properties)
 * [C APIリファレンス](#c-api-reference)
-  * [データ構造](#c-data-structures)
-  * [関数](#c-functions)
+	* [データ構造](#c-data-structures)
+	* [関数](#c-functions)
 * [その他](#odds-and-ends)
 
 <a id="examples"></a>
@@ -46,23 +46,23 @@ Copyright 2016-2020 Moddable Tech, Inc.<BR>
 
 - 以下のカラー変数が定義されていることを前提としています：
 
-  ```javascript
-  let white = poco.makeColor(255, 255, 255);
-  let black = poco.makeColor(0, 0, 0);
-  let gray = poco.makeColor(128, 128, 128);
-  let red = poco.makeColor(255, 0, 0);
-  let green = poco.makeColor(0, 255, 0);
-  let blue = poco.makeColor(0, 0, 255);
-  ```
+	```javascript
+	let white = poco.makeColor(255, 255, 255);
+	let black = poco.makeColor(0, 0, 0);
+	let gray = poco.makeColor(128, 128, 128);
+	let red = poco.makeColor(255, 0, 0);
+	let green = poco.makeColor(0, 255, 0);
+	let blue = poco.makeColor(0, 0, 255);
+	```
 
 - 描画コマンドが`begin`と`end`の呼び出しの間に実行されることを前提としています。
 
-  ```javascript
-  let poco = new Poco(screen);
-  poco.begin();
-  ...	// 例のコードがここに入ります
-  poco.end();
-  ```
+	```javascript
+	let poco = new Poco(screen);
+	poco.begin();
+	...	// example code here
+	poco.end();
+	```
 
 各例には、コードによってレンダリングされた画像が含まれています。画像は見やすくするために150％に拡大されています。この拡大によって一部のぼやけやジャギーが生じることがありますが、実際の画像にはこれらは含まれません。
 
