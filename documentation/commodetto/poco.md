@@ -297,10 +297,10 @@ poco.drawBitmap(piano, 0, 0);
 ```javascript
 let jpeg = new JPEG(new Resource("piano.jpg"));
 let block;
-while ((block = jpeg.read())) {
-  poco.begin(block.x, block.y, block.width, block.height);
-  poco.drawBitmap(block, block.x, block.y);
-  poco.end();
+while (block = jpeg.read()) {
+	poco.begin(block.x, block.y, block.width, block.height);
+		poco.drawBitmap(block, block.x, block.y);
+	poco.end();
 }
 ```
 
