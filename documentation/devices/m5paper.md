@@ -1,113 +1,113 @@
-# M5Paper Developer Guide
+# M5Paper 開発者ガイド
 Copyright 2021-2022 Moddable Tech, Inc.<BR>
-Revised: March 22, 2022
+改訂： 2022年3月22日
 
-This document provides information about using the M5Paper with the Moddable SDK, including how to build and deploy apps and links to other development resources.
+このドキュメントは、Moddable SDKを使用してM5Paperを使用する方法、アプリのビルドとデプロイ方法、その他の開発リソースへのリンクについての情報を提供します。
 
 <img src="./../assets/devices/m5paper.png" width=300>
 
-## Table of Contents
+## 目次
 
-- [SDK and Host Environment Setup](#setup)
-- [Building and Deploying Apps](#building-and-deploying-apps)
-- [Troubleshooting](#troubleshooting)
-- [Development Resources](#development-resources)
-	- [Port Status](#port-status)
-	- [Display Driver](#display-driver)
-		- [Update Modes](#update-modes)
-		- [Image Filters](#image-filters)
-	- [Examples](#examples)
-	- [Documentation](#documentation)
-	- [Support](#support)
-	- [Updates](#updates)
+- [SDKとホスト環境のセットアップ](#setup)
+- [アプリのビルドとデプロイ](#building-and-deploying-apps)
+- [トラブルシューティング](#troubleshooting)
+- [開発リソース](#development-resources)
+	- [ポートステータス](#port-status)
+	- [ディスプレイドライバ](#display-driver)
+		- [更新モード](#update-modes)
+		- [画像フィルタ](#image-filters)
+	- [サンプル](#examples)
+	- [ドキュメント](#documentation)
+	- [サポート](#support)
+	- [更新](#updates)
 
 <a id="setup"></a>
-## SDK and Host Environment Setup
+## SDKとホスト環境のセットアップ
 
-To build and run apps on M5Paper, you'll need to:
+M5Paperでアプリをビルドして実行するには、以下が必要です：
 
-1. Install the [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [ESP32 tools](./esp32.md)
-3. (macOS users only) Follow the instructions in the **macOS** section below.
-4. Follow the instructions in the **Building and Deploying Apps** section below.
+1. [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)をインストールする
+2. [ESP32ツール](./esp32.md)をインストールする
+3. (macOSユーザーのみ） 以下の**macOS**セクションの指示に従う
+4. 以下の**アプリのビルドとデプロイ**セクションの指示に従う
 
 <a id="macOS"></a>
 ### macOS
 
-The USB driver situation for M5Paper on macOS is a little tricky. You need to:
+macOSでのM5PaperのUSBドライバの状況は少し厄介です。以下の手順を実行してください。
 
-- Run at least macOS Big Sur
-- Install the driver referenced in this [issue](https://github.com/Xinyuan-LilyGO/LilyGo-T-Call-SIM800/issues/139#issuecomment-904390716)
+- macOS Big Sur以降を実行する
+- この[issue](https://github.com/Xinyuan-LilyGO/LilyGo-T-Call-SIM800/issues/139#issuecomment-904390716)で参照されているドライバをインストールする
 
 <a id="building-and-deploying-apps"></a>
-## Building and Deploying Apps
+## アプリのビルドとデプロイ
 
-> There are several example applications in the Moddable SDK that show how to take make best use of the M5Paper. See the [ePaper blog](https://blog.moddable.com/blog/epaper#examples) post for details.
+> Moddable SDKには、M5Paperを最大限に活用する方法を示すいくつかのサンプルアプリケーションがあります。詳細は[ePaperブログ](https://blog.moddable.com/blog/epaper#examples)の投稿を参照してください。
 
-After you've set up your host environment and ESP32 tools, take the following steps to install an application on your M5Paper.
+ホスト環境とESP32ツールをセットアップした後、以下の手順でM5Paperにアプリケーションをインストールします。
 
-1. Attach the M5Paper to your computer with the USB cable that came with the device.
+1. デバイスに付属のUSBケーブルでM5Paperをコンピュータに接続します。
 
-2. Build and deploy the app with `mcconfig`.
+2. `mcconfig`を使用してアプリをビルドおよびデプロイします。
 
-	`mcconfig` is the command line tool to build and launch Moddable apps on microcontrollers and the simulator. Full documentation of `mcconfig` is available [here](../tools/tools.md).
+	`mcconfig`は、マイクロコントローラおよびシミュレータ上でModdableアプリをビルドおよび起動するためのコマンドラインツールです。`mcconfig`の完全なドキュメントは[こちら](../tools/tools.md)で利用できます。
 
-	Use the platform `-p esp32/m5paper`  with `mcconfig` to build for M5Paper. For example, to build the [`epaper-photos` example](../../examples/piu/epaper-photos):
+	`mcconfig`を使用してM5Paper用にビルドするには、プラットフォーム`-p esp32/m5paper`を使用します。例えば、[`epaper-photos`のサンプル](../../examples/piu/epaper-photos)をビルドするには次のようにします。
 
 	```text
 	cd $MODDABLE/examples/piu/epaper-photos
 	mcconfig -d -m -p esp32/m5paper
 	```
 
-	The [examples readme](../../examples) contains additional information about other commonly used `mcconfig` arguments for screen rotation, Wi-Fi configuration, and more.
+	[examples readme](../../examples) には、画面の回転、Wi-Fiの設定など、他の一般的に使用される `mcconfig` 引数に関する追加情報が含まれています。
 
-	Use the platform `-p simulator/m5paper` with `mcconfig` to build for the M5Paper simulator.
+	プラットフォーム `-p simulator/m5paper` を `mcconfig` と共に使用して、M5Paperシミュレータ用にビルドします。
 
 <a id="troubleshooting"></a>
-## Troubleshooting
+## トラブルシューティング
 
-See the Troubleshooting section of the [ESP32 documentation](./esp32.md) for a list of common issues and how to resolve them.
+一般的な問題とその解決方法については、[ESP32ドキュメント](./esp32.md) のトラブルシューティングセクションを参照してください。
 
 <a id="development-resources"></a>
-## Development Resources
+## 開発リソース
 
 <a id="port-status"></a>
-### Port Status
+### ポートステータス
 
-The following are implemented and working:
+以下が実装され、動作しています：
 
-- EPD display driver
-- GT911 touch driver
-- SHT30 temperature/humidity sensor
-- A / B / C buttons
+- EPDディスプレイドライバ
+- GT911タッチドライバ
+- SHT30温度/湿度センサー
+- A / B / Cボタン
 - RTC
 
-> **Note**: The I2C address of the GT911 touch controller floats. The implementation tries both addresses 0x14 and 0x5D. This is handled in host provider's Touch constructor -- not in driver and not in user script. If 0x14 fails, an exception is thrown before it retries at 0x5D. If you encounter this, just hit Go in xsbug.
+> **注意**: GT911タッチコントローラのI2Cアドレスは揺らぎがあります。実装ではアドレス0x14と0x5Dの両方を試みます。これはホストプロバイダのTouchコンストラクタで処理され、ドライバやユーザースクリプトでは処理されません。0x14が失敗すると、0x5Dで再試行する前に例外がスローされます。これに遭遇した場合は、xsbugでGoを押してください。
 
 <a id="display-driver"></a>
 ### Display Driver
 
-The display driver is a [Poco `PixelsOut`](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/commodetto.md#pixelsout-class) implementation. This allows it to use both the [Poco](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/poco.md) graphics APIs and[ Piu](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md) user interface framework from the Moddable SDK.
+ディスプレイドライバーは[Poco `PixelsOut`](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/commodetto.md#pixelsout-class)の実装です。これにより、Moddable SDKの[Poco](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/poco.md)グラフィックスAPIと[Piu](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md)ユーザーインターフェースフレームワークの両方を使用することができます。
 
-While many existing Poco and Piu examples run with the EPD, most are not practical. Because they were designed for a small color LCD with a high refresh rate, their appearance on a big gray display with a low refresh rate is often silly. We need some examples designed for this display.
+多くの既存のPocoおよびPiuの例はEPDで動作しますが、その多くは実用的ではありません。これらは高リフレッシュレートの小型カラーLCD用に設計されているため、低リフレッシュレートの大きなグレーディスプレイでは見た目が滑稽になることが多いです。このディスプレイ用に設計されたいくつかの例が必要です。
 
-The display driver is written entirely in JavaScript. It uses [Ecma-419 IO](https://419.ecma-international.org/#-9-io-class-pattern) APIs for all hardware access. Performance is excellent, often faster than the EPD class built into the native M5Paper library. One reason for this is that Poco can render directly to 4-bit gray pixels, eliminating the need for pixel format conversion. Another reason is that the SPI transfers to the display controller bulk transfer of thousands of pixels at a time, rather than four at a time. This reduces the number of bits transferred by over half.
+ディスプレイドライバーは完全にJavaScriptで書かれています。すべてのハードウェアアクセスに[Ecma-419 IO](https://419.ecma-international.org/#-9-io-class-pattern) APIを使用しています。パフォーマンスは優れており、ネイティブのM5Paperライブラリに組み込まれているEPDクラスよりも高速なことが多いです。その理由の1つは、Pocoが4ビットグレーピクセルに直接レンダリングできるため、ピクセルフォーマットの変換が不要になることです。もう一つの理由は、ディスプレイコントローラーへのSPI転送が一度に数千ピクセルのバルク転送で行われるため、4ピクセルずつ転送する場合に比べて転送されるビット数が半分以上削減されることです。
 
-Memory use is also quite low. There is no frame buffer in ESP32 memory: rendered pixels are sent directly to the display from a 16 line render buffer (about 8 KB).
+メモリ使用量も非常に低いです。ESP32メモリにはフレームバッファがなく、レンダリングされたピクセルは16ラインのレンダーバッファ（約8 KB）から直接ディスプレイに送信されます。
 
-Using the `continue` feature of Poco, it is possible to update several areas of the screen while only refreshing the EPD panel once. This allows for very efficient updates -- the least possible amount of memory is transferred and only one long panel flash occurs. The Piu `balls` example is a good way to see this in action -- only the ball images (not the empty space around them) are transferred to the display and only the rectangle that encloses the four balls flashes on the display panel.
+Pocoの`continue`機能を使用すると、EPDパネルを一度だけリフレッシュしながら画面の複数の領域を更新することが可能です。これにより非常に効率的な更新が可能になります。つまり、転送されるメモリの量が最小限に抑えられ、長いパネルフラッシュが一度だけ発生します。Piuの`balls`のサンプルはこれを実際に見るのに良い方法です。ボールの画像（その周りの空白部分ではなく）のみがディスプレイに転送され、4つのボールを囲む矩形のみがディスプレイパネルでフラッシュします。
 
-The rotation feature of the display controller is supported, allowing no-overhead rotation at 0, 90, 180, and 270 degree rotations.
+ディスプレイコントローラの回転機能がサポートされており、0度、90度、180度、および270度の回転でオーバーヘッドなしの回転が可能です。
 
 <a id="update-modes"></a>
-#### Update Modes
-The display controller supports several different [update modes](https://github.com/phoddie/m5paper/blob/f0b79e0a0579c0dbdb1bb4445dc6acf501403681/targets/m5paper/it8951.js#L82-L93). The optimal mode depends on the content being drawn. The mode may be changed on each frame. The default mode is `GLD16`. To change the mode, call the `config` method of the global `screen` object. For example:
+#### 更新モード
+ディスプレイコントローラは、いくつかの異なる[更新モード](https://github.com/phoddie/m5paper/blob/f0b79e0a0579c0dbdb1bb4445dc6acf501403681/targets/m5paper/it8951.js#L82-L93)をサポートしています。最適なモードは描画されるコンテンツによって異なります。モードは各フレームで変更することができます。デフォルトのモードは`GLD16`です。モードを変更するには、グローバル`screen`オブジェクトの`config`メソッドを呼び出します。例えば：
 
 ```js
 screen.config({updateMode: "A2"});
 ```
 
-You may see artifacts that remain on the screen from previous apps when you install a new app on your device. To get rid of these, it is helpful to draw at least one complete frame in a high-quality mode (e.g. `GC16`) before switching to a faster update mode (e.g. `A2`). The [epaper-flashcards](https://github.com/Moddable-OpenSource/moddable/blob/public/examples/piu/epaper-flashcards/main.js) example does this using a pattern that can be applied to most apps:
+新しいアプリをデバイスにインストールすると、前のアプリから画面に残っているアーティファクトが見えることがあります。これを取り除くためには、高品質モード（例：`GC16`）で少なくとも1フレームを完全に描画してから、より高速な更新モード（例：`A2`）に切り替えることが有効です。[epaper-flashcards](https://github.com/Moddable-OpenSource/moddable/blob/public/examples/piu/epaper-flashcards/main.js)のサンプルでは、ほとんどのアプリに適用できるパターンを使用しています：
 
 ```js
 onDisplaying(application) {
@@ -122,7 +122,7 @@ onFinishedFirstDraw(application, mode) {
 }
 ```
 
-Using this pattern, per-device `firstDrawMode` and `updateMode` settings can be applied in the project's `manifest.json`:
+このパターンを使用すると、デバイスごとの`firstDrawMode`および`updateMode`設定をプロジェクトの`manifest.json`に適用できます：
 
 ```json
 "platforms": {
@@ -136,46 +136,46 @@ Using this pattern, per-device `firstDrawMode` and `updateMode` settings can be 
 ```
 
 <a id="image-filters"></a>
-#### Image Filters
-The display driver supports several different [pixel filters](https://github.com/phoddie/m5paper/blob/4110701c8084c07d7f777a44e17e970ffd18f729/targets/m5paper/it8951.js#L342-L349). These filter adjust the luminance of the pixels. The are useful for optimizing image and applying special effects. The default filter is "none". The filter may be changed on each frame. To change the filter, call the `config` method of the global `screen` object. For example:
+#### 画像フィルター
+ディスプレイドライバーは、いくつかの異なる[ピクセルフィルター](https://github.com/phoddie/m5paper/blob/4110701c8084c07d7f777a44e17e970ffd18f729/targets/m5paper/it8951.js#L342-L349)をサポートしています。これらのフィルターはピクセルの輝度を調整します。画像の最適化や特殊効果の適用に役立ちます。デフォルトのフィルターは「なし」です。フィルターは各フレームごとに変更できます。フィルターを変更するには、グローバルな`screen`オブジェクトの`config`メソッドを呼び出します。例えば：
 
 ```js
 screen.config({filter: "negative"});
 ```
 
-The filters are a `Uint8Array` of 16 values. To set your own filter, instead of using one of the built-in filters:
+フィルターは16個の値を持つ `Uint8Array` です。組み込みフィルターの代わりに独自のフィルターを設定するには、次のようにします：
 
 ```js
 let filter = new Uint8Array(16);
-// code here to initialize filter
+// ここでフィルターを初期化するコード
 screen.config({filter});
 ```
 
 <a id="examples"></a>
-### Examples
+### サンプル
 
-The Moddable SDK has over 150 [example apps](../../examples) that demonstrate how to use its many features. Many of these examples run on M5Paper.
+Moddable SDKには、その多くの機能を使用する方法を示す150以上の[サンプルアプリ](../../examples)があります。これらのサンプルの多くはM5Paperで動作します。
 
-That said, not every example is compatible with M5Paper hardware. For example, some examples are designed to test specific display and touch drivers that are not compatible with the M5Paper display and give a build error.
+とはいえ、すべてのサンプルがM5Paperハードウェアと互換性があるわけではありません。例えば、一部のサンプルはM5Paperディスプレイと互換性のない特定のディスプレイおよびタッチドライバをテストするために設計されており、ビルドエラーが発生します。
 
-There are several example applications in the Moddable SDK that show how to take make best use of the M5Paper. See the [ePaper blog](https://blog.moddable.com/blog/epaper#examples) post for details.
+Moddable SDKには、M5Paperを最大限に活用する方法を示すいくつかのサンプルアプリケーションがあります。詳細については、[ePaperブログ](https://blog.moddable.com/blog/epaper#examples)の投稿を参照してください。
 
 <a id="documentation"></a>
-### Documentation
+### ドキュメント
 
-All the documentation for the Moddable SDK is in the [documentation](../) directory. The **documentation**, **examples**, and **modules** directories share a common structure to make it straightforward to locate information. Some of the highlights include:
+Moddable SDKのすべてのドキュメントは[documentation](../)ディレクトリにあります。**documentation**、**examples**、および**modules**ディレクトリは共通の構造を持っており、情報を簡単に見つけることができます。いくつかのハイライトは次のとおりです：
 
-- The `commodetto` subdirectory, which contains resources related to Commodetto--a bitmap graphics library that provides a 2D graphics API--and Poco, a lightweight rendering engine.
-- The `piu` subdirectory, which contains resources related to Piu, a user interface framework that makes it easier to create complex, responsive layouts.
-- The `networking` subdirectory, which contains networking resources related to BLE, network sockets, and a variety of standard, secure networking protocols built on sockets including HTTP/HTTPS, WebSockets, DNS, SNTP, and telnet.
-- The `pins` subdirectory, which contains resources related to supported hardware protocols (digital, analog, PWM, I2C, etc.). A number of drivers for common off-the-shelf sensors and corresponding example apps are also available.
+- `commodetto` サブディレクトリには、2DグラフィックスAPIを提供するビットマップ グラフィックス ライブラリであるCommodettoと、軽量レンダリング エンジンであるPocoに関連するリソースが含まれています。
+- `piu` サブディレクトリには、複雑で応答性の高いレイアウトを簡単に作成できるようにするユーザー インターフェイス フレームワークであるPiuに関連するリソースが含まれています。
+- `networking` サブディレクトリには、BLE、ネットワーク ソケット、およびHTTP/HTTPS、WebSockets、DNS、SNTP、telnetなどのソケット上に構築されたさまざまな標準の安全なネットワーキング プロトコルに関連するネットワーキング リソースが含まれています。
+- `pins` サブディレクトリには、サポートされているハードウェア プロトコル (デジタル、アナログ、PWM、I2Cなど） に関連するリソースが含まれています。市販の一般的なセンサー用の多数のドライバーと対応するサンプル アプリも利用できます。
 
 <a id="support"></a>
-### Support
+### サポート
 
-If you have questions, we recommend you [open an issue](https://github.com/Moddable-OpenSource/moddable/issues). We'll respond as quickly as practical, and other developers can offer help and benefit from the answers to your questions. Many questions have already been answered, so please try searching previous issues before opening a new issue.
+ご質問がある場合は、[issue を開く](https://github.com/Moddable-OpenSource/moddable/issues) ことをお勧めします。できるだけ早く対応し、他の開発者が支援を提供し、質問への回答から利益を得ることができます。多くの質問にはすでに回答されているため、新しいissueを開く前に以前のissueを検索してみてください。
 
 <a id="updates"></a>
-### Updates
+### 更新情報
 
-The best way to keep up with what we're doing is to follow us on Twitter ([@moddabletech](https://twitter.com/moddabletech)). We post announcements about new posts on [our blog](http://blog.moddable.com/) there, along with other Moddable news.
+私たちの活動をフォローする最良の方法は、Twitter ([@moddabletech](https://twitter.com/moddabletech)) をフォローすることです。新しい投稿に関するお知らせやその他のModdableニュースを[私たちのブログ](http://blog.moddable.com/)で発表しています。
