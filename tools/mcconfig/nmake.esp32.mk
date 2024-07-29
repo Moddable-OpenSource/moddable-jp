@@ -188,6 +188,7 @@ PLATFORM_DIR = $(BUILD_DIR)\devices\esp32
 
 INC_DIRS = \
  	-I$(IDF_PATH)\components \
+ 	-I$(IDF_PATH)\components\app_update\include \
  	-I$(IDF_PATH)\components\bootloader_support\include \
  	-I$(IDF_PATH)\components\bt\include \
 	-I$(IDF_PATH)\components\bt\include\$(ESP32_BT_SUBCLASS)\include \

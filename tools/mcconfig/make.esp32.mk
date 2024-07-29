@@ -131,6 +131,7 @@ endif
 
 INC_DIRS = \
 	$(IDF_PATH)/components \
+	$(IDF_PATH)/components/app_update/include \
 	$(IDF_PATH)/components/bootloader_support/include \
 	$(IDF_PATH)/components/bt/include \
 	$(IDF_PATH)/components/bt/include/$(ESP32_BT_SUBCLASS)/include \
