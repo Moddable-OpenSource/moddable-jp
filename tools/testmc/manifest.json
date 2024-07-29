@@ -1,38 +1,9 @@
 {
-	"build": {
-		"BUILD": "$(MODDABLE)/build",
-		"MODULES": "$(MODDABLE)/modules",
-		"TEST262": "$(MODDABLE)/tools/test262"
-	},
-	"creation": {
-		"static": 65536,
-		"chunk": {
-			"initial": 16384,
-			"incremental": 512
-		},
-		"heap": {
-			"initial": 2048,
-			"incremental": 64
-		},
-		"stack": 384,
-		"keys": {
-			"available": 2048,
-			"name": 127,
-			"symbol": 127
-		},
-		"parser": {
-			"buffer": 9000,
-			"table": 127
-		},
-		"main": "main"
-	},
 	"include": [
-		"$(MODDABLE)/contributed/jsonparser/manifest.json",
-		"$(MODDABLE)/examples/manifest_base.json",
-		"$(MODDABLE)/examples/manifest_net.json",
+		"./manifest_common.json",
 		"$(MODDABLE)/examples/manifest_piu.json",
+		"$(MODDABLE)/contributed/jsonparser/manifest.json",
 		"$(MODULES)/base/deepEqual/manifest.json",
-		"$(MODULES)/base/modules/manifest.json",
 		"$(MODULES)/base/structuredClone/manifest.json",
 		"$(MODULES)/data/base64/manifest.json",
 		"$(MODULES)/data/crc/manifest.json",
@@ -51,18 +22,18 @@
 		"$(MODDABLE)/modules/network/mqtt/manifest.json",
 		"$(MODDABLE)/modules/network/ping/manifest.json",
 		"$(MODDABLE)/modules/network/websocket/manifest.json",
-		"$(MODDABLE)/modules/piu/MC/colorcell/manifest.json"
+		"$(MODDABLE)/modules/piu/MC/colorcell/manifest.json",
+		"$(MODDABLE)/modules/io/files/manifest.json"
 	],
 	"modules": {
 		"*": [
-			"$(TEST262)/_262",
-			"$(TEST262)/harness",
-			"./main",
-			"./hosttest",
 			"./testworker",
 			"./testsharedworker",
 			"./testthrowworker",
 			"$(MODULES)/base/instrumentation/*"
+		],
+		"~": [
+			"$(MODDABLE)/tools/testmc/commodettoChecksumOut-nop"
 		],
 		"commodetto/Bitmap": "$(MODULES)/commodetto/commodettoBitmap",
 		"commodetto/Poco": "$(MODULES)/commodetto/commodettoPoco",
@@ -73,14 +44,9 @@
         "piu/Sound": "$(MODULES)/piu/MC/piuSound"
 	},
 	"preload": [
-		"main",
-		"hosttest",
-		"harness",
 		"commodetto/*",
-		"instrumentation",
 		"piu/Sound"
 	],
-	"strip": [],
 	"config" : {
 		"ble": {
 			"client": {
@@ -91,17 +57,11 @@
 				"timeout": 20000,
 				"deviceName": "testmc Server"
 			}
-		},
-		"startupSound": ""
+		}
 	},
 	"platforms": {
-		"esp": {
-			"error": "testmc is unsupported on esp8266"
-		},
 		"esp32": {
 			"defines": {
-				"XS_TEST": 1,
-				"softreset": 1,
 				"audioOut": {
 					"bitsPerSample": 16,
 					"numChannels": 1,
@@ -118,10 +78,6 @@
 				"$(MODDABLE)/modules/pins/i2s/manifest.json"
 			],
 			"modules": {
-				"~": [
-					"$(BUILD)/devices/esp32/setup/piu",
-					"$(BUILD)/devices/esp32/setup/network"
-				],
 				"*": [
 					"./BLE-server/*"
 				]
@@ -161,8 +117,6 @@
 		},
 		"esp32/moddable_six": {
 			"defines": {
-				"XS_TEST": 1,
-				"softreset": 1,
 				"audioOut": {
 					"bitsPerSample": 16,
 					"numChannels": 1,
@@ -179,10 +133,6 @@
 				"$(MODDABLE)/modules/pins/i2s/manifest.json"
 			],
 			"modules": {
-				"~": [
-					"$(BUILD)/devices/esp32/setup/piu",
-					"$(BUILD)/devices/esp32/setup/network"
-				],
 				"*": [
 					"./BLE-server/*"
 				]
@@ -222,8 +172,6 @@
 		},
 		"esp32/moddable_six_cdc": {
 			"defines": {
-				"XS_TEST": 1,
-				"softreset": 1,
 				"audioOut": {
 					"bitsPerSample": 16,
 					"numChannels": 1,
@@ -240,10 +188,6 @@
 				"$(MODDABLE)/modules/pins/i2s/manifest.json"
 			],
 			"modules": {
-				"~": [
-					"$(BUILD)/devices/esp32/setup/piu",
-					"$(BUILD)/devices/esp32/setup/network"
-				],
 				"*": [
 					"./BLE-server/*"
 				]
@@ -278,64 +222,6 @@
 			 	"invalidPins": [
 					-10,
 					500
-				]
-			}
-		},
-		"lin": {
-			"build": {
-				"SIMULATOR": "$(BUILD)/bin/lin/debug/mcsim"
-			},
-			"include": [
-				"$(MODDABLE)/modules/pins/i2s/manifest.json"
-			],
-			"modules": {
-				"*": [
-					"$(BUILD)/simulators/modules/screen",
-					"$(MODULES)/base/timer/timer",
-					"$(MODULES)/base/timer/lin/*"
-				]
-			}
-		},
-		"mac": {
-			"build": {
-				"SIMULATOR": "$(BUILD)/bin/mac/debug/mcsim.app"
-			},
-			"include": [
-				"$(MODDABLE)/modules/pins/i2s/manifest.json"
-			],
-			"modules": {
-				"*": [
-					"$(BUILD)/simulators/modules/screen",
-					"$(MODULES)/base/time/*",
-					"$(MODULES)/base/time/mac/*",
-					"$(MODULES)/base/timer/*",
-					"$(MODULES)/base/timer/mac/*"
-				]
-			},
-			"defines": {
-				"audioOut": {
-					"bitsPerSample": 16,
-					"numChannels": 1,
-					"sampleRate": 12000,
-					"streams": 2,
-					"queueLength": 4
-				}
-			}
-		},
-		"win": {
-			"build": {
-				"SIMULATOR": "$(BUILD)/bin/win/debug/mcsim.exe"
-			},
-			"include": [
-				"$(MODDABLE)/modules/pins/i2s/manifest.json"
-			],
-			"modules": {
-				"*": [
-					"$(BUILD)/simulators/modules/screen",
-					"$(MODULES)/base/time/*",
-					"$(MODULES)/base/time/win/*",
-					"$(MODULES)/base/timer/*",
-					"$(MODULES)/base/timer/win/*"
 				]
 			}
 		}
