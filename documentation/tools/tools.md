@@ -1,6 +1,6 @@
 # Tools
 Copyright 2017-2024 Moddable Tech, Inc.<BR>
-Revised: January 18, 2024
+Revised: July 29, 2024
 
 ## About this Document
 
@@ -112,7 +112,7 @@ When using **mcconfig** with microcontrollers that use a serial port for JavaScr
 There are a few important differences between `mcrun` and `mcconfig`:
 
 - The manifest used by `mcrun` must not reference any files which build to native code (e.g. `.c` or `.cpp` files) as a mod can only contain JavaScript
-- `mcrun` does not support the `-t` option
+- `mcrun` supports `-t build`` (but not other [target values](#buildtargets)). 
 - `config` properties are available from the `mod/config` module instead of `mc/config` (see the `config` section of the [Manifest](./manifest.md) documentation for more information about `config` properties)
 
 ### Arguments
