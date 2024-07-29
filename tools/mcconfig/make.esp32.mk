@@ -38,7 +38,7 @@ endif
 PROGRAMMING_VID ?= 303a
 PROGRAMMING_PID ?= 1001
 
-EXPECTED_ESP_IDF ?= v5.2.2
+EXPECTED_ESP_IDF ?= v5.3
 
 # ESP32_SUBCLASS is to find some include files in IDFv4
 # values include esp32, esp32s3 and esp32s2
@@ -129,14 +129,7 @@ endif
 
 # 	$(IDF_PATH)/components/driver/deprecated
 
-INC_DIRS = \
-	$(IDF_PATH)/components \
-	$(IDF_PATH)/components/bootloader_support/include \
-	$(IDF_PATH)/components/bt/include \
-	$(IDF_PATH)/components/bt/include/$(ESP32_BT_SUBCLASS)/include \
-	$(IDF_PATH)/components/bt/host/bluedroid/api/include \
-	$(IDF_PATH)/components/bt/host/bluedroid/api/include/api \
-	$(IDF_PATH)/components/esp_adc/include \
+DRIVER_DIRS_OLD = \
 	$(IDF_PATH)/components/driver/dac/include \
 	$(IDF_PATH)/components/driver/gpio/include \
 	$(IDF_PATH)/components/driver/gptimer/include \
@@ -149,10 +142,36 @@ INC_DIRS = \
 	$(IDF_PATH)/components/driver/sdmmc/include \
 	$(IDF_PATH)/components/driver/spi/include \
 	$(IDF_PATH)/components/driver/uart/include \
+	$(IDF_PATH)/components/driver/touch_sensor/include \
+	$(IDF_PATH)/components/driver/touch_sensor/$(ESP32_SUBCLASS)/include \
 	$(IDF_PATH)/components/driver/include \
 	$(IDF_PATH)/components/driver/include/driver \
 	$(IDF_PATH)/components/driver/$(ESP32_SUBCLASS)/include \
-	$(IDF_PATH)/components/driver/$(ESP32_SUBCLASS)/include/driver \
+	$(IDF_PATH)/components/driver/$(ESP32_SUBCLASS)/include/driver
+
+DRIVER_DIRS = \
+	$(IDF_PATH)/components/driver/i2c/include \
+	$(IDF_PATH)/components/esp_driver_dac/include \
+	$(IDF_PATH)/components/esp_driver_gpio/include \
+	$(IDF_PATH)/components/esp_driver_gptimer/include \
+	$(IDF_PATH)/components/esp_driver_i2c/include \
+	$(IDF_PATH)/components/esp_driver_i2s/include \
+	$(IDF_PATH)/components/esp_driver_ledc/include \
+	$(IDF_PATH)/components/esp_driver_mcpwm/include \
+	$(IDF_PATH)/components/esp_driver_pcnt/include \
+	$(IDF_PATH)/components/esp_driver_rmt/include \
+	$(IDF_PATH)/components/esp_driver_sdmmc/include \
+	$(IDF_PATH)/components/esp_driver_spi/include \
+	$(IDF_PATH)/components/esp_driver_uart/include
+
+INC_DIRS = \
+	$(DRIVER_DIRS) \
+	$(IDF_PATH)/components \
+	$(IDF_PATH)/components/bootloader_support/include \
+	$(IDF_PATH)/components/bt/include \
+	$(IDF_PATH)/components/bt/include/$(ESP32_BT_SUBCLASS)/include \
+	$(IDF_PATH)/components/bt/host/bluedroid/api/include \
+	$(IDF_PATH)/components/bt/host/bluedroid/api/include/api \
  	$(IDF_PATH)/components/esp_adc/include \
  	$(IDF_PATH)/components/esp_adc/$(ESP32_SUBCLASS)/include \
 	$(IDF_PATH)/components/esp_app_format/include \
@@ -221,8 +240,6 @@ INC_DIRS = \
 	$(IDF_PATH)/components/spi_flash/include \
 	$(IDF_PATH)/components/tcpip_adapter/include \
 	$(IDF_PATH)/components/tcpip_adapter \
-	$(IDF_PATH)/components/driver/touch_sensor/include \
-	$(IDF_PATH)/components/driver/touch_sensor/$(ESP32_SUBCLASS)/include \
  	$(IDF_PATH)/components/tinyusb/additions/include
 
 # paths for prior idf
