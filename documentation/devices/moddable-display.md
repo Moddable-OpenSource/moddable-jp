@@ -6,14 +6,14 @@ Copyright 2024 Moddable Tech, Inc.<BR>
 
 ## 目次
 
-- [Moddable Displaについて](#about-moddable-display)
+- [Moddable Displayについて](#about-moddable-display)
 - [Moddable Display 1](#display-1)
 - [Moddable Display 2](#display-2)
 - [Moddable Display 3](#display-3)
 - [Moddable Display 4](#display-4)
 
 <a id="about-moddable-display"></a>
-## Moddable Displaについて
+## Moddable Displayについて
 
 <img src="../assets/devices/moddable-display.jpg" width=600>
 

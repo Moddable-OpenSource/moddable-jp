@@ -119,8 +119,8 @@ Moddable Fourでアプリをビルドして実行するには、以下が必要�
 	Moddable Four用にビルドするには、`mcconfig`でプラットフォーム`-p nrf52/moddable_four`を使用します。[`piu/balls`](../../examples/piu/balls)のサンプルをビルドします：
 
 	```text
-		cd $MODDABLE/examples/piu/balls
-		mcconfig -d -m -p nrf52/moddable_four
+	cd $MODDABLE/examples/piu/balls
+	mcconfig -d -m -p nrf52/moddable_four
 	```
 
 	[examples readme](../../examples) には、画面の回転などによく使用される他の `mcconfig` 引数に関する追加情報が含まれています。
