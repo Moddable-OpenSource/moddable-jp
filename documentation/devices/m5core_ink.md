@@ -1,113 +1,113 @@
-# M5Core Ink Developer Guide
+# M5Core Ink 開発者ガイド
 Copyright 2021 Moddable Tech, Inc.<BR>
-Revised: November 2, 2021
+改訂： 2021年11月2日
 
-This document provides information about using the M5Core Ink with the Moddable SDK, including how to build and deploy apps and links to other development resources.
+このドキュメントは、Moddable SDKを使用してM5Core Inkを使用する方法、アプリのビルドとデプロイ方法、その他の開発リソースへのリンクについての情報を提供します。
 
 <img src="./../assets/devices/m5coreink.png" width=250>
 
-## Table of Contents
+## 目次
 
-- [SDK and Host Environment Setup](#setup)
-- [Building and Deploying Apps](#building-and-deploying-apps)
-- [Troubleshooting](#troubleshooting)
-- [Development Resources](#development-resources)
-	- [Port Status](#port-status)
-	- [Display Driver](#display-driver)
-	- [Buttons](#buttons)
+- [SDKとホスト環境のセットアップ](#setup)
+- [アプリのビルドとデプロイ](#building-and-deploying-apps)
+- [トラブルシューティング](#troubleshooting)
+- [開発リソース](#development-resources)
+	- [ポートステータス](#port-status)
+	- [ディスプレイドライバ](#display-driver)
+	- [ボタン](#buttons)
 	- [LED](#led)
-	- [Buzzer](#buzzer)
-	- [Battery Voltage](#battery-voltage)
-	- [Battery Powered Operation](#battery-powered-operation)
-	- [Examples](#examples)
-	- [Documentation](#documentation)
-	- [Support](#support)
-	- [Updates](#updates)
+	- [ブザー](#buzzer)
+	- [バッテリー電圧](#battery-voltage)
+	- [バッテリー駆動の操作](#battery-powered-operation)
+	- [サンプル](#examples)
+	- [ドキュメント](#documentation)
+	- [サポート](#support)
+	- [更新](#updates)
 
 <a id="setup"></a>
-## SDK and Host Environment Setup
+## SDKとホスト環境のセットアップ
 
-To build and run apps on M5Core Ink, you'll need to:
+M5Core Inkでアプリをビルドして実行するには、以下が必要です：
 
-1. Install the [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [ESP32 tools](./esp32.md)
-3. Follow the instructions in the **Building and Deploying Apps** section below.
+1. [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)をインストールする
+2. [ESP32ツール](./esp32.md)をインストールする
+3. 以下の**アプリのビルドとデプロイ**セクションの指示に従う
 
 <a id="building-and-deploying-apps"></a>
-## Building and Deploying Apps
+## アプリのビルドとデプロイ
 
-> There are several example applications in the Moddable SDK that show how to take make best use of the M5Core Ink. See the [ePaper blog](https://blog.moddable.com/blog/epaper#examples) post for details.
+> Moddable SDKには、M5Core Inkを最大限に活用する方法を示すいくつかのサンプルアプリケーションがあります。詳細については、[ePaperブログ](https://blog.moddable.com/blog/epaper#examples)の投稿を参照してください。
 
-After you've set up your host environment and ESP32 tools, take the following steps to install an application on your M5Core Ink.
+ホスト環境とESP32ツールをセットアップした後、以下の手順に従ってM5Core Inkにアプリケーションをインストールします。
 
-1. Attach the M5Core Ink to your computer with the USB cable that came with the device.
+1. デバイスに付属のUSBケーブルを使用して、M5Core Inkをコンピュータに接続します。
 
-2. Build and deploy the app with `mcconfig`.
+2. `mcconfig`を使用してアプリをビルドおよびデプロイします。
 
-	`mcconfig` is the command line tool to build and launch Moddable apps on microcontrollers and the simulator. Full documentation of `mcconfig` is available [here](../tools/tools.md).
+	`mcconfig`は、マイクロコントローラおよびシミュレータ上でModdableアプリをビルドおよび起動するためのコマンドラインツールです。`mcconfig`の完全なドキュメントは[こちら](../tools/tools.md)で利用できます。
 
-	Use the platform `-p esp32/m5core_ink`  with `mcconfig` to build for M5Core Ink. For example, to build the [`epaper-photos` example](../../examples/piu/epaper-photos):
+	`mcconfig`を使用してM5Core Ink用にビルドするには、プラットフォーム`-p esp32/m5core_ink`を使用します。例えば、[`epaper-photos`のサンプル](../../examples/piu/epaper-photos)をビルドするには、次のようにします：
 
 	```text
 	cd $MODDABLE/examples/piu/epaper-photos
 	mcconfig -d -m -p esp32/m5core_ink
 	```
 
-	The [examples readme](../../examples) contains additional information about other commonly used `mcconfig` arguments for screen rotation, Wi-Fi configuration, and more.
+	[サンプルのreadme](../../examples)には、画面の回転、Wi-Fi設定など、他の一般的に使用される`mcconfig`引数に関する追加情報が含まれています。
 
 <a id="troubleshooting"></a>
-## Troubleshooting
+## トラブルシューティング
 
-See the Troubleshooting section of the [ESP32 documentation](./esp32.md) for a list of common issues and how to resolve them.
+一般的な問題とその解決方法については、[ESP32 ドキュメント](./esp32.md)のトラブルシューティングセクションを参照してください。
 
 <a id="development-resources"></a>
-## Development Resources
+## 開発リソース
 
 <a id="port-status"></a>
-### Port Status
+### ポートステータス
 
-The following are implemented and working:
+以下が実装され、動作しています：
 
-- EPD display driver (GDEW0154M09)
+- EPDディスプレイドライバ (GDEW0154M09)
 - RTC (PCF8563 / BM8563)
-- Up / Down / Middle / Power / External buttons
+- 上 / 下 / 中央 / 電源 / 外部ボタン
 - LED
-- Buzzer
-- Battery voltage
+- ブザー
+- バッテリー電圧
 
 <a id="display-driver"></a>
-### Display Driver
+### ディスプレイドライバ
 
-The display driver is a [Poco `PixelsOut`](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/commodetto.md#pixelsout-class) implementation. This allows it to use both the [Poco](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/poco.md) graphics APIs and[ Piu](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md) user interface framework from the Moddable SDK.
+ディスプレイドライバは [Poco `PixelsOut`](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/commodetto.md#pixelsout-class) の実装です。これにより、[Poco](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/poco.md) グラフィックスAPIとModdable SDKの[ Piu](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md) ユーザーインターフェースフレームワークの両方を使用することができます。
 
-The display driver is written entirely in JavaScript. It uses [Ecma-419 IO](https://419.ecma-international.org/#-9-io-class-pattern) APIs for all hardware access. Performance is excellent, often faster than the EPD class built into the native M5Core Ink library.
+ディスプレイドライバは完全にJavaScriptで書かれています。すべてのハードウェアアクセスに [Ecma-419 IO](https://419.ecma-international.org/#-9-io-class-pattern) APIを使用しています。パフォーマンスは非常に優れており、ネイティブのM5Core Inkライブラリに組み込まれているEPDクラスよりも高速なことが多いです。
 
-The display driver implements dithering, which allows many levels of gray to be displayed using only black and white pixels. The default dithering algorithm is the venerable [Atkinson dither](https://twitter.com/phoddie/status/1274054345969950720). To change to Burkes or to disable dithering:
+ディスプレイドライバはディザリングを実装しており、白黒のピクセルのみを使用して多くのグレーレベルを表示することができます。デフォルトのディザリングアルゴリズムは古典的な[Atkinson dither](https://twitter.com/phoddie/status/1274054345969950720)です。Burkesに変更するか、ディザリングを無効にするには次のようにします：
 
 ```js
 screen.dither = "burkes";
 screen.dither = "none"
 ```
 
-Dithering is performed using the new `commodetto/Dither` module.
+ディザリングは新しい `commodetto/Dither` モジュールを使用して実行されます。
 
-To support dithering the driver requires that Poco render at 8-bit gray (256 Gray). The driver also only supports full screen updates as partial updates with dithering show seams. Partial updates could, and probably should, be supported as they could be useful when not using dithering.
+ディザリングをサポートするために、ドライバはPocoが8ビットグレー（256グレー）でレンダリングすることを要求します。また、ドライバはディザリングを使用するとシームが表示されるため、部分更新ではなくフルスクリーン更新のみをサポートします。ディザリングを使用しない場合には部分更新がサポートされるべきであり、実際に有用です。
 
-The driver maintains a back buffer, which is more-or-less necessary because of the way the display controller works. Fortunately the buffer is just 5000 bytes, since it can use 1-bit pixels.
+ディスプレイドライバはバックバッファを維持します。これはディスプレイコントローラの動作方式のため、ほぼ必須です。幸いなことに、バッファは1ビットピクセルを使用できるため、わずか5000バイトです。
 
-The display driver does a full screen refresh on the first draw after instantiation. To disable this, set `refresh` to false.
+ディスプレイドライバはインスタンス化後の最初の描画時にフルスクリーンリフレッシュを行います。これを無効にするには、`refresh` をfalseに設定します。
 
 ```js
 screen.configure({refresh: false});
 ```
 
-The display driver uses partial updates after the first frame. To force a full screen update:
+ディスプレイドライバは最初のフレームの後、部分更新を使用します。フルスクリーン更新を強制するには、次のようにします。
 
 ```js
 screen.configure({refresh: true});
 ```
 
-A partial update may be performed on power-up to avoid an initial full screen flash. To do this, the previous frame must first be redrawn to put it back into the controller's memory. To do that, first draw the previous frame with `previous` set to true, then draw the next frame as usual. The driver resets the value of `previous` to `false` after one frame is drawn.
+初回のフルスクリーンフラッシュを避けるために、電源投入時に部分更新を行うことがあります。このためには、前のフレームをコントローラのメモリに戻すために再描画する必要があります。これを行うには、まず `previous` をtrueに設定して前のフレームを描画し、その後通常通り次のフレームを描画します。ドライバは1フレーム描画後に `previous` の値をfalseにリセットします。
 
 ```js
 screen.configure({previous: true, refresh: false});
@@ -116,12 +116,12 @@ screen.configure({previous: true, refresh: false});
 
 ```
 
-Hardware rotation is not supported. It could be, but given that the display is square it isn't obviously useful. Both Poco and Piu support software rotation at build time, so rotation is available if needed, just not at runtime.
+ハードウェア回転はサポートされていません。サポートすることは可能ですが、ディスプレイが正方形であるため、明らかに有用ではありません。PocoとPiuの両方がビルド時にソフトウェア回転をサポートしているため、必要に応じて回転は可能ですが、実行時には利用できません。
 
 <a id="buttons"></a>
-### Buttons
+### ボタン
 
-All of the buttons are available with callbacks when changed. Here's a basic test that installs callbacks on each.
+すべてのボタンは変更時にコールバックを使用して利用可能です。各ボタンにコールバックをインストールする基本的なテストは次の通りです。
 
 ```js
 for (let name in device.peripheral.button) {
@@ -136,7 +136,7 @@ for (let name in device.peripheral.button) {
 <a id="led"></a>
 ### LED
 
-The green LED at the top of the unit is available:
+ユニットの上部にある緑色のLEDは使用可能です：
 
 ```js
 const led = new device.peripheral.led.Default;
@@ -146,56 +146,56 @@ led.on = 0.5;		// half strength
 ```
 
 <a id="buzzer"></a>
-## Buzzer
+## ブザー
 
-The buzzer is implemented to play tones. As with the M5 Speaker API, sounds are played immediately.
+ブザーは音を鳴らすために実装されています。M5スピーカーAPIと同様に、音は即座に再生されます。
 
-Instantiate the buzzer:
+ブザーをインスタンス化します：
 
 ```js
 const buzzer = new device.peripheral.tone.Default;
 ```
 
-Play a note by name and octave:
+音名とオクターブで音を鳴らします：
 
 ```js
 buzzer.note("C", 4);
 ```
 
-Play a note by name and octave for a fixed duration in milliseconds:
+音名とオクターブでミリ秒単位の固定時間音を鳴らします：
 
 ```js
 buzzer.note("Bb", 4, 500);
 ```
 
-Play a tone by frequency:
+周波数で音を鳴らします：
 
 ```js
 buzzer.tone(262);
 ```
 
-Play a tone by frequency for a fixed duration in milliseconds:
+周波数でミリ秒単位の固定時間音を鳴らします：
 
 ```js
 buzzer.tone(262, 500);
 ```
 
-Mute the buzzer (it automatically unmutes on the next note or tone played):
+ブザーをミュートします（次の音やトーンが再生されると自動的にミュート解除されます）:
 
 ```js
 buzzer.mute();
 ```
 
-Close the buzzer:
+ブザーを閉じます：
 
 ```js
 buzzer.close();
 ```
 
 <a id="battery-voltage"></a>
-### Battery Voltage
+### バッテリー電圧
 
-To get the battery voltage:
+バッテリー電圧を取得するには：
 
 ```js
 const battery = new device.peripheral.battery.Default;
@@ -203,47 +203,47 @@ const voltage = battery.read();
 ```
 
 <a id="battery-powered-operation"></a>
-### Battery Powered Operation
+### バッテリー駆動操作
 
-To operate M5Core Ink on battery power, the power hold line must be set to 1. This is done by default in the `setup/target` module.
+M5Core Inkをバッテリーで動作させるには、パワーホールドラインを1に設定する必要があります。これは`setup/target`モジュールでデフォルトで行われます。
 
 ```js
 power.main.write(1);
 ```
 
-To turn the device off when running on battery power, set the power hold line to 0.
+バッテリーで動作しているときにデバイスをオフにするには、パワーホールドラインを0に設定します。
 
 ```js
 power.main.write(0);
 ```
 
 <a id="examples"></a>
-### Examples
+### サンプル
 
-The Moddable SDK has over 150 [example apps](../../examples) that demonstrate how to use its many features. Many of these examples run on M5Core Ink.
+Moddable SDKには、その多くの機能を使用する方法を示す150以上の[サンプルアプリ](../../examples)があります。これらの多くのサンプルはM5Core Inkで動作します。
 
-That said, not every example is compatible with M5Core Ink hardware. For example, some examples are designed to test specific display and touch drivers that are not compatible with the M5Core Ink display and give a build error.
+とはいえ、すべてのサンプルがM5Core Inkハードウェアと互換性があるわけではありません。例えば、一部のサンプルはM5Core Inkディスプレイと互換性のない特定のディスプレイおよびタッチドライバをテストするために設計されており、ビルドエラーが発生します。
 
-The Moddable SDK Piu examples that do not depend on touch generally seem to work as-is, though some don't look their best on an ePaper display. The display refresh rate on the M5Core Ink is about 3 FPS, so examples like `balls` will not look good.
+タッチに依存しないModdable SDK Piuのサンプルは、一般的にそのまま動作するようですが、いくつかはePaperディスプレイでは見栄えが良くありません。M5Core Inkのディスプレイリフレッシュレートは約3 FPSなので、`balls`のようなサンプルは見栄えが良くありません。
 
-There are several example applications in the Moddable SDK that show how to take make best use of the M5Core Ink. See the [ePaper blog](https://blog.moddable.com/blog/epaper#examples) post for details.
+M5Core Inkを最大限に活用する方法を示すいくつかのサンプルアプリケーションがModdable SDKにあります。詳細については[ePaperブログ](https://blog.moddable.com/blog/epaper#examples)の投稿を参照してください。
 
 <a id="documentation"></a>
-### Documentation
+### ドキュメント
 
-All the documentation for the Moddable SDK is in the [documentation](../) directory. The **documentation**, **examples**, and **modules** directories share a common structure to make it straightforward to locate information. Some of the highlights include:
+Moddable SDKのすべてのドキュメントは [documentation](../) ディレクトリにあります。**documentation**、**examples**、および **modules** ディレクトリは共通の構造を持っており、情報を簡単に見つけることができます。いくつかのハイライトは次のとおりです：
 
-- The `commodetto` subdirectory, which contains resources related to Commodetto--a bitmap graphics library that provides a 2D graphics API--and Poco, a lightweight rendering engine.
-- The `piu` subdirectory, which contains resources related to Piu, a user interface framework that makes it easier to create complex, responsive layouts.
-- The `networking` subdirectory, which contains networking resources related to BLE, network sockets, and a variety of standard, secure networking protocols built on sockets including HTTP/HTTPS, WebSockets, DNS, SNTP, and telnet.
-- The `pins` subdirectory, which contains resources related to supported hardware protocols (digital, analog, PWM, I2C, etc.). A number of drivers for common off-the-shelf sensors and corresponding example apps are also available.
+- `commodetto` サブディレクトリには、2DグラフィックスAPIを提供するビットマップ グラフィックス ライブラリであるCommodettoと、軽量レンダリング エンジンであるPocoに関連するリソースが含まれています。
+- `piu` サブディレクトリには、複雑で応答性の高いレイアウトを簡単に作成できるユーザー インターフェイス フレームワークであるPiuに関連するリソースが含まれています。
+- `networking` サブディレクトリには、BLE、ネットワーク ソケット、およびHTTP/HTTPS、WebSockets、DNS、SNTP、telnetなどのソケット上に構築されたさまざまな標準の安全なネットワーク プロトコルに関連するネットワークリソースが含まれています。
+- `pins` サブディレクトリには、サポートされているハードウェア プロトコル (デジタル、アナログ、PWM、I2Cなど） に関連するリソースが含まれています。一般的な市販センサー用の多くのドライバーと対応するサンプル アプリも利用可能です。
 
 <a id="support"></a>
-### Support
+### サポート
 
-If you have questions, we recommend you [open an issue](https://github.com/Moddable-OpenSource/moddable/issues). We'll respond as quickly as practical, and other developers can offer help and benefit from the answers to your questions. Many questions have already been answered, so please try searching previous issues before opening a new issue.
+質問がある場合は、[issueを開く](https://github.com/Moddable-OpenSource/moddable/issues)ことをお勧めします。できるだけ早く対応しますし、他の開発者も助けを提供したり、あなたの質問への回答から利益を得ることができます。多くの質問はすでに回答されているので、新しいissueを開く前に以前のissueを検索してみてください。
 
 <a id="updates"></a>
-### Updates
+### 更新情報
 
-The best way to keep up with what we're doing is to follow us on Twitter ([@moddabletech](https://twitter.com/moddabletech)). We post announcements about new posts on [our blog](http://blog.moddable.com/) there, along with other Moddable news.
+私たちの活動を追跡する最良の方法は、Twitterでフォローすることです ([@moddabletech](https://twitter.com/moddabletech))。新しい投稿に関する発表や、その他のModdableニュースを[私たちのブログ](http://blog.moddable.com/)で公開しています。

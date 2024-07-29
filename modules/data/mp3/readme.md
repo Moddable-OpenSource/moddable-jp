@@ -1,44 +1,43 @@
-# MP3 Decoder
-Updated: May 15, 2023
+# MP3 デコーダー
+更新日： 2023年5月15日
 
-A JavaScript class for decoding MP3 frames.
+MP3フレームをデコードするためのJavaScriptクラス。
 
-## Reference
+## リファレンス
 ```js
 import MP3 from "mp3/decode";
 ```
 
-The `constructor` takes no arguments.
+`constructor`は引数を取りません。
 
 ```js
 const mp3 = new MP3;
 ```
 
-The `close` method frees all resources. As the MP3 decoder does reserve some memory, it is important to close it when done to release that memory.
+`close`メソッドはすべてのリソースを解放します。MP3デコーダーはメモリを予約するため、使用後はメモリを解放するために閉じることが重要です。
 
 ```js
 mp3.close();
 ```
 
-The `decode` method decodes a single MP3 frame. The output is always mono (this is easy to change if necessary).
+`decode`メソッドは単一のMP3フレームをデコードします。出力は常にモノラルです（必要に応じて簡単に変更できます）。
 
 ```js
 mp3.decode(inputFrame, outputBuffer);
 ```
 
-The `decode` method returns the number of bytes used or 0 if a frame could not be decoded. The number of samples decoded is set on the output buffer as the `samples` property. While `samples` is typically 1152 for MP3, other smaller values can also be present in the bitstream.
+`decode`メソッドは使用されたバイト数を返すか、フレームをデコードできなかった場合は0を返します。デコードされたサンプル数は出力バッファの`samples`プロパティとして設定されます。`samples`は通常MP3では1152ですが、ビットストリームでは他の小さい値も含まれることがあります。
 
-There is a static `scan` method which looks through a buffer to find the start of an MP3 frame and extract information from the header such as bit rate, sample rate, and channel count.
+バッファをスキャンしてMP3フレームの開始位置を見つけ、ビットレート、サンプルレート、チャンネル数などのヘッダー情報を抽出する静的な`scan`メソッドがあります。
 
 ```js
 let found = MP3.scan(buffer, start, end[, info]);
 ```
 
-The return value is `undefined` if no frame could be found, otherwise it is an object. The object has `position` and `length` properties indicating the offset and size of the frame in the input buffer. The `length` value is an estimate and should always be at least as large as the frame. To determine the actual end of the frame, use the return value of the  `decode` method.
+フレームが見つからなかった場合、戻り値は `undefined` です。見つかった場合はオブジェクトが返されます。このオブジェクトには、入力バッファ内のフレームのオフセットとサイズを示す `position` と `length` プロパティがあります。`length` の値は推定値であり、常にフレームのサイズ以上である必要があります。フレームの実際の終了位置を決定するには、`decode` メソッドの戻り値を使用します。
 
-## Acknowledgements
-The MP3 decoder is libmad, specifically the fork by Earle F. Philhower, III that he optimized for ESP8266. While not intended for use on ESP8266 in the Moddable SDK, its memory optimizations are always welcome. The tag used is 12131e9 from the [ESP8266Audio repository](https://github.com/earlephilhower/ESP8266Audio). There have been no changes to the sources beyond a few adjustments for the Moddable SDK build environment. Thank you to Earle for making this excellent work available.
+## 謝辞
+MP3デコーダーはlibmadを使用しており、特にEarle F. Philhower, IIIによるESP8266用に最適化されたものをフォークしています。Moddable SDKではESP8266上での使用を意図していませんが、そのメモリ最適化を受け入れています。使用されているタグは [ESP8266Audio リポジトリ](https://github.com/earlephilhower/ESP8266Audio) の12131e9です。Moddable SDKのビルド環境に合わせた調整を除いて、ソースに変更はありません。この素晴らしい作品を提供してくれたEarleに感謝します。
 
-
-## Licensing
-The libmad MP3 decoder uses the GPL license. Please consider this if incorporating this module into commercial projects.
+## ライセンス
+libmad MP3デコーダーはGPLライセンスを使用しています。このモジュールを商用プロジェクトに組み込む場合は、これを考慮してください。

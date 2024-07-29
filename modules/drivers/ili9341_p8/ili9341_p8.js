@@ -36,7 +36,7 @@ export default class ILI9341 @ "xs_ILI9341p8_destructor" {
 	end() @ "xs_ILI9341p8_end";
 
 	adaptInvalid() {}
-	continue() {}
+	continue() @ "xs_ILI9341p8_continue";
 
 	pixelsToBytes(count) @ "xs_ILI9341p8_pixelsToBytes";
 
@@ -57,6 +57,8 @@ export default class ILI9341 @ "xs_ILI9341p8_destructor" {
 		}
 		return this.command(0xc6, Uint8Array.of(i))
 	}
+	set syncFrames(value) @ "xs_ili9341p8_set_syncFrames";
+	get syncFrames() @ "xs_ili9341p8_get_syncFrames";
 
 	close() @ "xs_ILI9341p8_close";
 	

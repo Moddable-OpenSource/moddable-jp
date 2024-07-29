@@ -64,14 +64,7 @@
 #endif
 
 #if USE_USB
-	#if (USE_USB == 1)
-		#include "sdkconfig.h"
-		#include "tinyusb.h"
-		#include "tusb_cdc_acm.h"
-	#elif (USE_USB == 2)
-		#include "driver/usb_serial_jtag.h"
-		#include "hal/usb_serial_jtag_ll.h"
-	#endif
+	#include "driver/usb_serial_jtag.h"
 #else
 	#include "driver/uart.h"
 
@@ -91,6 +84,10 @@ extern void mc_setup(xsMachine *the);
 
 #if MODDEF_SOFTRESET
 	uint8_t gSoftReset;
+#endif
+
+#ifndef UART_HW_FIFO_LEN
+	#define UART_HW_FIFO_LEN(USE_UART) UART_FIFO_LEN
 #endif
 
 static xsMachine *gThe;		// the main XS virtual machine running
@@ -114,108 +111,19 @@ static xsMachine *gThe;		// the main XS virtual machine running
 	unsigned char gXSBUG[4] = {DEBUG_IP};
 #endif
 
-#if (USE_USB == 1)
-typedef struct {
-    uint8_t     *buf;
-    uint32_t    size_mask;
-    volatile uint32_t read;
-    volatile uint32_t write;
-} fifo_t;
-
-QueueHandle_t usbDbgQueue;
-static uint32_t usbEvtPending = 0;
-static fifo_t rx_fifo;
-static uint8_t *rx_fifo_buffer;
-static uint8_t usb_rx_buf[CONFIG_TINYUSB_CDC_RX_BUFSIZE];
-
-static uint32_t F_length(fifo_t *fifo) {
-	uint32_t tmp = fifo->read;
-	return fifo->write - tmp;
-}
-
-static void F_put(fifo_t *fifo, uint8_t c) {
-	fifo->buf[fifo->write & fifo->size_mask] = c;
-	fifo->write++;
-}
-
-static void F_get(fifo_t *fifo, uint8_t *c) {
-	*c = fifo->buf[fifo->read & fifo->size_mask];
-	fifo->read++;
-}
-
-/*
-void fifo_flush(fifo_t *fifo) {
-	fifo->read = fifo->write;
-}
-*/
-
-uint32_t fifo_length(fifo_t *fifo) {
-	return F_length(fifo);
-}
-
-uint32_t fifo_remain(fifo_t *fifo) {
-	return (fifo->size_mask + 1) - F_length(fifo);
-}
-
-int fifo_get(fifo_t *fifo, uint8_t *c) {
-	if (F_length(fifo) == 0)
-		return -1;
-	F_get(fifo, c);
-	return 0;
-}
-
-int fifo_put(fifo_t *fifo, uint8_t c) {
-	if (0 == (fifo->size_mask - F_length(fifo) + 1))
-{
-printf("fifo_put failed\r\n");
-		return -1;
-}
-	F_put(fifo, c);
-	return 0;
-}
-
-int fifo_init(fifo_t *fifo, uint8_t *buf, uint32_t size) {
-	if (0 == buf)
-		return -1;
-
-	if (! ((0 != size) && (0 == ((size - 1) & size))))
-{
-printf("fifo_init - bad size: %d\r\n", size);
-		return -2;		// bad size - needs to be base 2
-}
-
-	fifo->buf = buf;
-	fifo->size_mask = size - 1;
-	fifo->read = 0;
-	fifo->write = 0;
-
-	return 0;
-}
-
-#endif
-
 #ifdef mxDebug
 static void debug_task(void *pvParameter)
 {
-#if (USE_USB == 2)
-	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 2048, .tx_buffer_size = 64 };
+#if USE_USB
+	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 4096, .tx_buffer_size = 2048 };
 	usb_serial_jtag_driver_install(&cfg);
 #endif
 
 	while (true) {
 
-#if (USE_USB == 1)
-		uint32_t count;
-		if (!fifo_length(&rx_fifo)) {
-			usbEvtPending = 0;
-			xQueueReceive((QueueHandle_t)pvParameter, (void * )&count, portMAX_DELAY);
-		}
-
+#if USE_USB
 		fxReceiveLoop();
-
-#elif (USE_USB == 2)
-		fxReceiveLoop();
-		modDelayMilliseconds(5);
+		modDelayMilliseconds(1);
 
 #else	// !USE_USB
 
@@ -290,155 +198,26 @@ void modLog_transmit(const char *msg)
 	}
 }
 
-#if (USE_USB == 1)
-static uint8_t DTR = 1;
-static uint8_t RTS = 1;
-
-void checkLineState() {
-	uint8_t seq = (DTR ? 1 : 0) + (RTS ? 2 : 0);
-	if (seq == 3) {				// normal run mode
-		;
-	}
-	else if (seq == 2) {		// DTR dropped, RTS asserted
-		esp_restart();
-	}
-	else if (seq == 1) {		// DTR raised, RTS off - programming mode
-		;	// can't get here (we just reset)
-	}
-	else {
-	}
-}
-
-void line_state_callback(int itf, cdcacm_event_t *event) {
-	DTR = event->line_state_changed_data.dtr;
-	RTS = event->line_state_changed_data.rts;
-	printf("[%d] dtr: %d, rts: %d\r\n", modMilliseconds(), DTR, RTS);
-	checkLineState();
-}
-
-void cdc_rx_callback(int itf, cdcacm_event_t *event) {
-    portBASE_TYPE xTaskWoken = 0;
-	size_t space, read;
-	int i;
-
-	space = fifo_remain(&rx_fifo);
-	esp_err_t ret = tinyusb_cdcacm_read(itf, usb_rx_buf, space, &read);
-	if (ESP_OK == ret) {
-		for (i=0; i<read; i++)
-			fifo_put(&rx_fifo, usb_rx_buf[i]);
-	}
-
-	i = 0;
-
-#if mxDebug
-	if (0 == usbEvtPending++) {
-		xQueueSendToBackFromISR(usbDbgQueue, &i, &xTaskWoken);
-		if (xTaskWoken == pdTRUE)
-			portYIELD_FROM_ISR();
-	}
-#endif
-}
-
-void setupDebuggerUSB() {
-	tinyusb_config_t tusb_cfg = {};
-	ESP_ERROR_CHECK(tinyusb_driver_install(&tusb_cfg));
-	tinyusb_config_cdcacm_t acm_cfg = {
-		.usb_dev = TINYUSB_USBDEV_0,
-		.cdc_port = TINYUSB_CDC_ACM_0,
-		.rx_unread_buf_sz = 64,
-		.callback_rx = &cdc_rx_callback,
-		.callback_rx_wanted_char = NULL,
-		.callback_line_state_changed = &line_state_callback,
-		.callback_line_coding_changed = NULL
-	};
-
-	rx_fifo_buffer = c_malloc(1024);
-	fifo_init(&rx_fifo, rx_fifo_buffer, 1024);
-
-#if mxDebug
-	usbDbgQueue = xQueueCreate(8, sizeof(uint32_t));
-	xTaskCreate(debug_task, "debug", 2048, usbDbgQueue, 8, NULL);
-#endif
-
-	ESP_ERROR_CHECK(tusb_cdc_acm_init(&acm_cfg));
-
-	uint32_t count;
-	for (count = 0; count < 100; count++) {
-		if (tud_cdc_connected()) {
-			printf("USB CONNECTED!\r\n");
-			break;
-		}
-		modDelayMilliseconds(50);	// give USB time to come up
-	}
-}
 
 void ESP_put(uint8_t *c, int count) {
-	if (!tud_cdc_connected())
-		return;
-	while (count) {
-		uint32_t amt = count > CONFIG_TINYUSB_CDC_RX_BUFSIZE ? CONFIG_TINYUSB_CDC_RX_BUFSIZE : count;
-		tinyusb_cdcacm_write_queue(TINYUSB_CDC_ACM_0, c, amt);
-		if (ESP_ERR_TIMEOUT == tinyusb_cdcacm_write_flush(TINYUSB_CDC_ACM_0, 50)) {
-			printf("write_flush timeout\n");
-		}
-		c += amt;
-		count -= amt;
-	}
-}
-
-void ESP_putc(int c) {
-	uint8_t ch = c;
-	ESP_put(&ch, 1);
-}
-
-int ESP_getc(void) {
-	uint8_t c;
-
-	if (0 == fifo_get(&rx_fifo, &c))
-		return c;
-	return -1;
-}
-
-uint8_t ESP_setBaud(int baud) {
-	return 0;
-}
-
-#else
-
-#define WRITE_CHUNK 64
-#define FAIL_RETRY	2
-void ESP_put(uint8_t *c, int count) {
-#if (USE_USB == 2)
+#if USE_USB
+	int sent = 0;
 	while (count > 0) {
-		int len = count > WRITE_CHUNK ? WRITE_CHUNK : count;
-		int wrote;
-		int fail = FAIL_RETRY;
-		while ((wrote = usb_serial_jtag_ll_write_txfifo(c, len)) < 1) {
-			if (0 == --fail)
-				goto done;
-			modDelayMilliseconds(1);
-			continue;
-		}
-		usb_serial_jtag_ll_txfifo_flush();
-		c += wrote;
-		count -= wrote;
+		sent = usb_serial_jtag_write_bytes(c, count, 10);
+		if (sent <= 0)
+			return;
+		c += sent;
+		count -= sent;
 	}
-done:
 #else
 	uart_write_bytes(USE_UART, (char *)c, count);
 #endif
 }
 
 void ESP_putc(int c) {
-	uint8_t cx = c;
-#if (USE_USB == 2)
-	int fail = FAIL_RETRY;
-	while (usb_serial_jtag_ll_write_txfifo(&cx, 1) < 1) {
-		if (0 == --fail)
-			break;
-		modDelayMilliseconds(1);
-	}
-    usb_serial_jtag_ll_txfifo_flush();
+	char cx = c;
+#if USE_USB
+	usb_serial_jtag_write_bytes(&cx, 1, 1);
 #else
 	uart_write_bytes(USE_UART, &cx, 1);
 #endif
@@ -447,7 +226,7 @@ void ESP_putc(int c) {
 int ESP_getc(void) {
 	int amt;
 	uint8_t c;
-#if (USE_USB == 2)
+#if USE_USB
 	amt = usb_serial_jtag_read_bytes(&c, 1, 1);
 #else
 	amt = uart_read_bytes(USE_UART, &c, 1, 0);
@@ -456,7 +235,7 @@ int ESP_getc(void) {
 }
 
 uint8_t ESP_isReadable() {
-#if (USE_USB == 2)
+#if USE_USB
 	return true;
 #else
 	size_t s;
@@ -466,14 +245,13 @@ uint8_t ESP_isReadable() {
 }
 
 uint8_t ESP_setBaud(int baud) {
-#if (USE_USB == 2)
+#if USE_USB
 	return 1;
 #else
 	uart_wait_tx_done(USE_UART, 5 * 1000);
 	return ESP_OK == uart_set_baudrate(USE_UART, baud);
 #endif
 }
-#endif
 
 void app_main() {
 	modPrelaunch();
@@ -489,12 +267,9 @@ void app_main() {
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
 #endif
 
-#if (USE_USB == 1)
-	printf("USE TinyUSB\r\n");
-	setupDebuggerUSB();
-#elif (USE_USB == 2)
-    xTaskCreate(debug_task, "debug", (768 + XT_STACK_EXTRA) / sizeof(StackType_t), 0, 8, NULL);
-    printf("START USB CONSOLE!!!\n");
+#if USE_USB
+	xTaskCreate(debug_task, "debug", (768 + XT_STACK_EXTRA) / sizeof(StackType_t), 0, 8, NULL);
+	printf("USB CONNECTED\r\n");
 #else // !USE_USB
 
 	esp_err_t err;

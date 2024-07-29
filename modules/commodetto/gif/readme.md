@@ -1,36 +1,35 @@
-# Animated GIF for Commodetto
+# Commodetto 用アニメーション GIF
 Copyright 2021 Moddable Tech, Inc.<BR>
-Updated: April 11, 2021
+更新日： 2021年4月11日
 
-## Introduction
+## はじめに
 
-The animated GIF image format is popular and possible to implement for microcontrollers. The Commodetto graphics library provides high quality, high performance rendering on microcontrollers for delivering products with smooth animation.
+アニメーションGIF画像形式は人気があり、マイクロコントローラーでも実装可能です。Commodettoグラフィックスライブラリは、スムーズなアニメーションを提供する製品のために、マイクロコントローラー上で高品質、高性能なレンダリングを提供します。
 
-Most GIF implementations for microcontrollers decode directly to the frame buffer to minimize memory use. This works for some animated GIFs, but for others it causes flickering or artifacts. The Commodetto animated GIF decoder takes a different approach: it requires a memory buffer for the full decoded image. This makes it unsuitable when memory is tight. However, for those devices where it works it is able to deliver correct, high performance, flicker free animations. Because the output of the decoder is a Commodetto bitmap it may be composited with other graphical elements using the Poco renderer.
+ほとんどのマイクロコントローラー向けのGIF実装は、メモリ使用量を最小限に抑えるためにフレームバッファに直接デコードします。これは一部のアニメーションGIFには有効ですが、他のものではちらつきやブロックノイズを引き起こすことがあります。CommodettoのアニメーションGIFデコーダーは異なるアプローチを取ります： 完全にデコードされた画像のためのメモリバッファを必要とします。これにより、メモリが厳しい場合には適していません。しかし、動作するデバイスでは、正確で高性能、ちらつきのないアニメーションを提供することができます。デコーダーの出力がCommodettoビットマップであるため、Pocoレンダラーを使用して他のグラフィカル要素と合成することができます。
 
-The Commodetto animated GIF decoder has several special decoding modes to significantly reduce the amount of memory required to decode many animated GIF sequences.
-
-Because of the increased memory requirements, the Commodetto animated GIF decoder is not practical on all microcontrollers. It works very well on an ESP32 (with no external RAM) and Pico (RP2040) for images that are about 200 pixels on a side.
+CommodettoのアニメーションGIFデコーダーには、多くのアニメーションGIFシーケンスをデコードするために必要なメモリ量を大幅に削減するためのいくつかの特別なデコードモードがあります。
+メモリ要件が増加したため、CommodettoのアニメーションGIFデコーダーはすべてのマイクロコントローラーで実用的ではありません。ESP32（外部RAMなし）およびPico（RP2040）では、約200ピクセルの画像に対して非常にうまく機能します。
 
 ## Examples
 
-To use the module, first import it:
+モジュールを使用するには、まずインポートします：
 
 ```js
 import ReadGIF from "commodetto/ReadGIF";
 ```
 
-### Creating an instance
-The module reads the GIF data from a resource. Pass the resource to the constructor:
+### インスタンスの作成
+モジュールはリソースからGIFデータを読み取ります。リソースをコンストラクタに渡します：
 
 ```js
 let reader = new ReadGIF(new Resource("moddable.gif"));
 ```
 
-### Memory use
-ReadGIF needs memory to store the decoding state and memory to store the decoded image. If there is insufficient memory, `ReadGIF` throws an exception.
+### メモリ使用量
+ReadGIFはデコード状態を保存するためのメモリと、デコードされた画像を保存するためのメモリを必要とします。メモリが不足している場合、`ReadGIF` は例外をスローします。
 
-The decoding state is in the application heap. The default configuration of the application heap is too small for this, and must be increased to about 48 KB. You can do this in your project manifest:
+デコード状態はアプリケーションヒープにあります。アプリケーションヒープのデフォルト構成はこれには小さすぎるため、約48 KBに増やす必要があります。プロジェクトマニフェストでこれを行うことができます：
 
 ```json
 	"creation": {
@@ -38,26 +37,28 @@ The decoding state is in the application heap. The default configuration of the 
 	}
 ```
 
-The decoded image is stored in system memory. Check the instrumentation tab in xsbug to see how much system memory is free when calling `ReadGIF`.
+デコードされた画像はシステムメモリに保存されます。`ReadGIF` を呼び出すときにシステムメモリがどれだけ空いているかを確認するには、xsbugの計測タブを確認してください。
 
-### Information about the file
+### ファイルに関する情報
 
-The `width` and `height` properties of the reader instance provide the dimensions of the decoded image.
+リーダーインスタンスの `width` と `height` プロパティは、デコードされた画像のサイズを提供します。
 
-The `duration` property is the total length of the animation in milliseconds. The `frameCount` is the total number of frames in the animation.
+`duration` プロパティはアニメーションの総長さをミリ秒単位で示します。`frameCount` はアニメーションの総フレーム数です。
 
-### Decoding a frame
-To decode an image, call `next`. When the end of the animated frame sequence is reached, the decoder automatically loops back to the start.
+### フレームのデコード
+
+画像をデコードするには、`next` を呼び出します。アニメーションフレームシーケンスの終わりに達すると、デコーダーは自動的に最初に戻ります。
 
 ```js
 reader.next();
 ```
-The `next` function updates the state of the reader to the next frame. The reader itself may be used as a bitmap containing the decoded image. It has other properties useful for rendering the image. The number of the frame last decoded by `next` is available from the `frameNumber` property.
+`next` 関数はリーダーの状態を次のフレームに更新します。リーダー自体はデコードされた画像を含むビットマップとして使用できます。画像をレンダリングするために便利な他のプロパティも持っています。`next` によって最後にデコードされたフレームの番号は `frameNumber` プロパティから取得できます。
 
-> **Note**: The `ready` property of the reader instance is `true` if at least one frame of the GIF is available to draw. When downloading an image, check `reader.ready` to determine when the reader is able to return the first frame.
+> **注意**: リーダーインスタンスの `ready` プロパティは、少なくとも1フレームのGIFが描画可能である場合に `true` になります。画像をダウンロードする際には、`reader.ready` をチェックしてリーダーが最初のフレームを返す準備ができているかどうかを確認してください。
 
-### Drawing a frame
-Calling `next` updates the reader's bitmap with the next frame. Use Poco to draw the bitmap as usual. The following draws the image in the top left corner of the screen.
+### フレームの描画
+
+`next` を呼び出すと、リーダーのビットマップが次のフレームに更新されます。通常通りにビットマップを描画するためにPocoを使用します。以下は、画面の左上隅に画像を描画します。
 
 ```js
 import Poco from "commodetto/Poco";
@@ -67,10 +68,10 @@ poco.drawBitmapWithKeyColor(reader, 0, 0);
 poco.end();
 ```
 
-### Optimizing drawing
-Often the animation does not update the entire frame, but a subset of the pixels. In this case, it is not necessary to update all pixels on the display which can be more efficient. The reader provides the update area on its `frameX`, `frameY`, `frameWidth`, and `frameHeight` properties.
+### 描画の最適化
+多くの場合、アニメーションはフレーム全体ではなく、ピクセルの一部のみを更新します。この場合、ディスプレイ上のすべてのピクセルを更新する必要はなく、より効率的です。リーダーはその `frameX`、`frameY`、`frameWidth`、および `frameHeight` プロパティで更新領域を提供します。
 
-The following example runs an animation continuously at 10 frames per second, using the update area to minimize drawing.
+次の例では、更新領域を使用して描画を最小限に抑えながら、毎秒10フレームでアニメーションを連続的に実行します。
 
 ```js
 Timer.repeat(() => {
@@ -82,15 +83,15 @@ Timer.repeat(() => {
 }, 100);
 ```
 
-### Animation timing
-Each frame in the animated GIF has its own duration. The duration in milliseconds of decoded frame is available on the `frameDuration` property of the reader instance.
+### アニメーションのタイミング
+アニメーションGIFの各フレームにはそれぞれの持続時間があります。デコードされたフレームの持続時間は、リーダーインスタンスの `frameDuration` プロパティでミリ秒単位で取得できます。
 
 ```js
 let frameDuration = reader.frameDuration;
 ```
 
-### Putting it together
-This example shows a typical drawing loop that optimizes the drawing area and applies each frame duration.
+### まとめ
+この例は、描画領域を最適化し、各フレームの持続時間を適用する典型的な描画ループを示しています。
 
 ```js
 const reader = new ReadGIF(new Resource("moddable.gif"));
@@ -105,12 +106,12 @@ Timer.repeat(id => {
 }, 1);
 ```
 
-### Transparency
-Some animated GIF images have transparent regions which are design to allow the background show through. This is used for animations with non-rectangular shapes. The transparency is binary -- either a pixel is fully opaque or fully invisible: there is no alpha blending.
+### 透過性
+一部のアニメーションGIF画像には、背景が透けて見えるように設計された透明な領域があります。これは、非矩形の形状を持つアニメーションに使用されます。透明性は二値的で、ピクセルは完全に不透明か完全に見えないかのどちらかです。アルファブレンディングはありません。
 
-The `transparent` property of the reader instance indicates if the image has transparent pixels.
+リーダーインスタンスの `transparent` プロパティは、画像に透明なピクセルが含まれているかどうかを示します。
 
-To achieve true transparency requires steps. First, the application must fill in the background pixels behind the image. The example below fills the background with red. Second, use `drawBitmapWithKeyColor` to render the image and provide it with the transparent color from the animated GIF. The `drawBitmapWithKeyColor` function is like `drawBitmap` except that it skips over any pixels that match the specified key color.
+真の透過性を実現するにはいくつかのステップが必要です。まず、アプリケーションは画像の背後にある背景ピクセルを塗りつぶす必要があります。以下の例では、背景を赤で塗りつぶしています。次に、`drawBitmapWithKeyColor` を使用して画像をレンダリングし、アニメーションGIFから透明色を提供します。`drawBitmapWithKeyColor` 関数は `drawBitmap` と似ていますが、指定されたキー色と一致するピクセルをスキップします。
 
 ```js
 const red = poco.makeColor(255, 0, 0);
@@ -119,12 +120,13 @@ poco.fillRectangle(red, 0, 0, reader.width, reader.height);
 poco.drawBitmapWithKeyColor(reader, 0, 0, reader.transparentColor);
 ```
 
-Note that the `fillRectangle` call draws behind the animated GIF. Your code can draw anything behind the GIF, such as a pattern or a logo or even another animation. It is safe to use `drawBitmapWithKeyColor`.
+`fillRectangle` 呼び出しがアニメーションGIFの背後に描画されることに注意してください。コードは、パターンやロゴ、さらには別のアニメーションなど、GIFの背後に何でも描画できます。`drawBitmapWithKeyColor` を使用するのは安全です。
 
-### Reducing memory use
-A GIF image contains between 2 and about 16 million colors. Images with many colors must be stored at 16-bits per pixel, which uses quite a bit of memory. The Commodetto GIF decoder is also able to decode GIF images to 8-bit, 4-bit, and 1-bit pixels. The decoder automatically determines the format that uses the least memory while maintaining full color fidelity. Thee bitmap format used may always be drawn using `poco.drawBitmapWithKeyColor`. The format of the bitmap used is available from the `pixelFormat` property of the GIF Reader instance.
+### メモリ使用量の削減
+GIF画像には2色から約1600万色まで含まれています。多くの色を持つ画像は、ピクセルあたり16ビットで保存する必要があり、かなりのメモリを使用します。Commodetto GIFデコーダーは、GIF画像を8ビット、4ビット、および1ビットピクセルにデコードすることもできます。デコーダーは、完全な色忠実度を維持しながら、最も少ないメモリを使用するフォーマットを自動的に決定します。使用されるビットマップフォーマットは常に `poco.drawBitmapWithKeyColor` を使用して描画できます。使用されるビットマップのフォーマットは、GIFリーダーインスタンスの `pixelFormat` プロパティから取得できます。
 
-Some applications may wish to force decoding to a specific format, overriding the automatic format detection. This may generate an image which does not render correctly, but should never crash. To force decoding to a particular format, pass the pixel format to the `ReadGIF` constructor as part of the optional options argument. The following example shows requesting pixels in RGB565 little-endian format:
+
+一部のアプリケーションでは、自動フォーマット検出を無効にして特定のフォーマットにデコードを強制することを希望する場合があります。これにより、正しくレンダリングされない画像が生成されることがありますが、クラッシュすることはありません。特定のフォーマットにデコードを強制するには、オプションの引数の一部としてピクセルフォーマットを `ReadGIF` コンストラクタに渡します。以下の例は、RGB565リトルエンディアンフォーマットでピクセルを要求する方法を示しています：
 
 ```js
 const reader = new ReadGIF(
@@ -135,30 +137,29 @@ const reader = new ReadGIF(
 );
 ```
 
-For force decoding to 1, 4, and 8 bits per pixel use `Bitmap.Monochrome`, `Bitmap.Gray16`, and `Bitmap.CLUT256` respectively.
+1、4、および8ビットパーピクセルにデコードを強制するには、それぞれ `Bitmap.Monochrome`、`Bitmap.Gray16`、および `Bitmap.CLUT256` を使用します。
 
-## Reference
+## リファレンス
 
-The following table describes the properties available on the GIF reader instance. A GIF animation is draw onto a canvas. Each frame of the animation contains an image that updates the canvas. The image may update all of the canvas or only a part of it.
+以下の表は、GIFリーダーインスタンスで利用可能なプロパティを説明しています。GIFアニメーションはキャンバスに描画されます。アニメーションの各フレームには、キャンバスを更新する画像が含まれています。画像はキャンバス全体を更新する場合もあれば、その一部のみを更新する場合もあります。
 
-| Property | Description |
+| プロパティ | 説明 |
 | ---: | :--- |
-| `width` | width of the animation canvas |
-| `height` | height of the animation canvas |
-| `duration` | total duration of the animation in milliseconds |
-| `frameBounds` | a rectangle object containing the update area of the current frame |
-| `frameCount` | total number of frames in the animation |
-| `frameDuration` | duration of the current frame in milliseconds |
-| `frameNumber` | index number of the current frame |
-| `frameX` | horizontal offset into the canvas of the area updated from the previous frame |
-| `frameY` | vertical offset into the canvas of the area updated from the previous frame
-| `frameWidth` | width of the area updated in the current frame |
-| `frameHeight` | height of the area updated in the current frame |
-| `transparent` | `true` if the canvas contains transparent background pixels |
-| `transparentColor` | pixel value used to fill transparent background pixels; undefined if image does not use transparency |
-| `ready` | `true` if the animated GIF reader is able to parse at least one frame; used when downloading GIF images to detect first frame is available  |
+| `width` | アニメーションキャンバスの幅 |
+| `height` | アニメーションキャンバスの高さ |
+| `duration` | アニメーションの総持続時間（ミリ秒） |
+| `frameBounds` | 現在のフレームの更新領域を含む矩形オブジェクト |
+| `frameCount` | アニメーションの総フレーム数 |
+| `frameDuration` | 現在のフレームの持続時間（ミリ秒） |
+| `frameNumber` | 現在のフレームのインデックス番号 |
+| `frameX` | 前のフレームから更新された領域のキャンバス内の水平オフセット |
+| `frameY` | 前のフレームから更新された領域のキャンバス内の垂直オフセット |
+| `frameWidth` | 現在のフレームで更新された領域の幅 |
+| `frameHeight` | 現在のフレームで更新された領域の高さ |
+| `transparent` | キャンバスに透明な背景ピクセルが含まれている場合は `true` |
+| `transparentColor` | 透明な背景ピクセルを埋めるために使用されるピクセル値。画像が透明性を使用していない場合は未定義 |
+| `ready` | アニメーションGIFリーダーが少なくとも1フレームを解析できる場合は `true`。GIF画像をダウンロードする際に最初のフレームが利用可能かどうかを検出するために使用されます |
 
+## 謝辞
 
-## Thank you
-
-The core GIF decoder is [GIF Animator](https://github.com/bitbank2/AnimatedGIF) by [Larry Bank](https://github.com/bitbank2) of [BitBank Software](https://www.bitbanksoftware.com).
+コアのGIFデコーダーは、[BitBank Software](https://www.bitbanksoftware.com) の [Larry Bank](https://github.com/bitbank2) による [GIF Animator](https://github.com/bitbank2/AnimatedGIF) です。
