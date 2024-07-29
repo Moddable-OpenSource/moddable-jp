@@ -203,7 +203,7 @@ function fetch(href, info = {}) {
 				if (length == undefined) {
 					length = body.byteLength;
 					const transferEncoding = headers.get("transfer-encoding");
-					if (transferEncoding.toLowerCase() != "chunked")
+					if (transferEncoding?.toLowerCase() != "chunked")
 						headers.set("content-length", length);
 				}
 			}
