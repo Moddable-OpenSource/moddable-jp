@@ -74,6 +74,10 @@ extern void mc_setup(xsMachine *the);
 	uint8_t gSoftReset;
 #endif
 
+#ifndef UART_HW_FIFO_LEN
+	#define UART_HW_FIFO_LEN(USE_UART) UART_FIFO_LEN
+#endif
+
 static xsMachine *gThe;		// the main XS virtual machine running
 
 /*
@@ -244,8 +248,6 @@ void app_main() {
 	uartConfig.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
 	uartConfig.rx_flow_ctrl_thresh = 120;		// unused. no hardware flow control.
 	uartConfig.source_clk = UART_SCLK_DEFAULT;
-//	uartConfig.use_ref_tick = 0;	 // deprecated in 4.x
-	uartConfig.source_clk = UART_SCLK_APB;
 
 	err = uart_param_config(USE_UART, &uartConfig);
 	if (err)

@@ -218,6 +218,7 @@ INC_DIRS = \
 	-I$(IDF_PATH)\components\esp_eth\include \
 	-I$(IDF_PATH)\components\esp_hw_support\include \
 	-I$(IDF_PATH)\components\esp_hw_support\include\soc \
+ 	-I$(IDF_PATH)\components\esp_lcd\include \
  	-I$(IDF_PATH)\components\esp_netif\include \
  	-I$(IDF_PATH)\components\esp_partition\include \
  	-I$(IDF_PATH)\components\esp_pm\include \
@@ -280,6 +281,19 @@ INC_DIRS = \
 	-I$(IDF_PATH)\components\driver\touch_sensor\$(ESP32_SUBCLASS)\include \
 	-I$(IDF_PATH)\components\vfs\include \
 	-I$(IDF_PATH)\components\tinyusb\additions\include
+
+INC_DIRS = $(INC_DIRS) \
+	-I$(IDF_PATH)\components\freertos\port\$(ESP_ARCH)\include \
+	-I$(IDF_PATH)\components\freertos\FreeRTOS-Kernel\portable\$(ESP_ARCH)\include \
+	-I$(IDF_PATH)\components\freertos\esp_additions\arch\$(ESP_ARCH)\include \
+	-I$(IDF_PATH)\components\freertos\esp_additions\include\freertos \
+	-I$(IDF_PATH)\components\freertos \
+	-I$(IDF_PATH)\components\freertos\include \
+	-I$(IDF_PATH)\components\freertos\include\freertos \
+	-I$(IDF_PATH)\components\freertos\port \
+	-I$(IDF_PATH)\components\freertos\port\$(ESP_ARCH)\include\freertos \
+	-I$(IDF_PATH)\components\freertos\include\esp_additions \
+	-I$(IDF_PATH)\components\freertos\include\esp_additions\freertos
 
 XS_OBJ = \
 	$(LIB_DIR)\xsHost.o \

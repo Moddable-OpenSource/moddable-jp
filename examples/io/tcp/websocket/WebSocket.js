@@ -40,12 +40,13 @@ class WebSocket {
 	#keepalive;
 	
 	constructor(href, protocol) {
-		let options, keepalive;
+		let options, keepalive, headers;
 		if (href instanceof Object) {
 			options = href;
 			href = options.url;
 			protocol = options.protocol;
 			keepalive = options.keepalive; 
+			headers = options.headers; 
 		}
 		if (href) {
 			let url = new URL(href);
@@ -69,8 +70,10 @@ class WebSocket {
 			this.#url = href;
 			if (protocol)
 				this.#protocol = protocol;
-			options = { ...config, host, port, path, protocol }
+			options = { ...config, host, port, path, protocol, headers }
 		}
+		else
+			throw new URIError("no URL");
 		this.#client = new device.network.ws.io({
 			...options,
 			onControl: (opcode, data) => {

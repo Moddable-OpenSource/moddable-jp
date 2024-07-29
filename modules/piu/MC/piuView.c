@@ -1378,9 +1378,9 @@ void PiuView_get_rotation(xsMachine* the)
 void PiuView_get_ticks(xsMachine* the) 
 {
 #if mxPiuSloMo
-	xsResult = xsInteger(modMilliseconds() / 60);
+	xsResult = xsNumber(modMilliseconds() / 60);
 #else
-	xsResult = xsInteger(modMilliseconds());
+	xsResult = xsNumber(modMilliseconds());
 #endif
 }
 
@@ -1440,6 +1440,21 @@ void PiuView_onMessage(xsMachine* the)
 	PiuViewUpdate(self, application);
 	PiuApplicationIdleCheck(application);
 	(*self)->idleTicks = 0;
+}
+
+void PiuView_onQuit(xsMachine* the)
+{
+	PiuView* self = PIU(View, xsThis);
+	PiuApplication* application = (*self)->application;
+	if (!application) return;
+	if ((*application)->behavior) {
+		xsVars(2);
+		xsVar(0) = xsReference((*application)->behavior);
+		if (xsFindResult(xsVar(0), xsID_onQuit)) {
+			xsVar(1) = xsReference((*application)->reference);
+			(void)xsCallFunction1(xsResult, xsVar(0), xsVar(1));
+		}
+	}
 }
 
 void PiuView_onTouchBegan(xsMachine* the)

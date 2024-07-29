@@ -55,8 +55,8 @@ struct sxProfiler {
 	txU8 stop;
 	txU4 interval;
 #ifdef mxMetering
-	txU4 formerMeter;
-	txU4 startMeter;
+	txU8 formerMeter;
+	txU8 startMeter;
 #endif
 	txU4 recordCount;
 	txProfilerRecord** records;
@@ -465,7 +465,7 @@ void fxPrintProfiler(txMachine* the, void* stream)
 	}
 	fprintf(file, "],\"startTime\":%llu,\"endTime\":%llu,", fxTicksToMicroseconds(profiler->start), fxTicksToMicroseconds(profiler->when));
 #ifdef mxMetering
-	fprintf(file, "\"startMeter\":%u,\"endMeter\":%u,", profiler->startMeter, the->meterIndex);
+	fprintf(file, "\"startMeter\":%llu,\"endMeter\":%llu,", profiler->startMeter, the->meterIndex);
 #endif
 	fprintf(file, "\"samples\":[");
 	{
