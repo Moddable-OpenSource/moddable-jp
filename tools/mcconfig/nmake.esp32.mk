@@ -25,7 +25,7 @@ HOST_OS = win
 !ENDIF
 
 !IF "$(EXPECTED_ESP_IDF)"==""
-EXPECTED_ESP_IDF = v5.2.1
+EXPECTED_ESP_IDF = v5.3
 !ENDIF
 
 !IF "$(VERBOSE)"=="1"
@@ -186,13 +186,7 @@ BLD_DIR = $(PROJ_DIR)\build
 
 PLATFORM_DIR = $(BUILD_DIR)\devices\esp32
 
-INC_DIRS = \
- 	-I$(IDF_PATH)\components \
- 	-I$(IDF_PATH)\components\bootloader_support\include \
- 	-I$(IDF_PATH)\components\bt\include \
-	-I$(IDF_PATH)\components\bt\include\$(ESP32_BT_SUBCLASS)\include \
- 	-I$(IDF_PATH)\components\bt\host\bluedroid\api\include \
- 	-I$(IDF_PATH)\components\bt\host\bluedroid\api\include\api \
+DRIVER_DIRS_OLD = \
  	-I$(IDF_PATH)\components\driver\dac\include \
  	-I$(IDF_PATH)\components\driver\gpio\include \
  	-I$(IDF_PATH)\components\driver\gptimer\include \
@@ -207,7 +201,31 @@ INC_DIRS = \
  	-I$(IDF_PATH)\components\driver\include \
 	-I$(IDF_PATH)\components\driver\include\driver \
 	-I$(IDF_PATH)\components\driver\$(ESP32_SUBCLASS)\include \
-	-I$(IDF_PATH)\components\driver\$(ESP32_SUBCLASS)\include\driver \
+	-I$(IDF_PATH)\components\driver\$(ESP32_SUBCLASS)\include\driver
+
+DRIVER_DIRS = \
+ 	-I$(IDF_PATH)\components\driver\i2c\include \
+ 	-I$(IDF_PATH)\components\esp_driver_dac\include \
+ 	-I$(IDF_PATH)\components\esp_driver_gpio\include \
+ 	-I$(IDF_PATH)\components\esp_driver_gptimer\include \
+ 	-I$(IDF_PATH)\components\esp_driver_i2c\include \
+ 	-I$(IDF_PATH)\components\esp_driver_i2s\include \
+ 	-I$(IDF_PATH)\components\esp_driver_ledc\include \
+ 	-I$(IDF_PATH)\components\esp_driver_mcpwm\include \
+ 	-I$(IDF_PATH)\components\esp_driver_pcnt\include \
+ 	-I$(IDF_PATH)\components\esp_driver_rmt\include \
+ 	-I$(IDF_PATH)\components\esp_driver_sdmmc\include \
+ 	-I$(IDF_PATH)\components\esp_driver_spi\include \
+ 	-I$(IDF_PATH)\components\esp_driver_uart\include
+
+INC_DIRS = \
+	$(DRIVER_DIRS) \
+ 	-I$(IDF_PATH)\components \
+ 	-I$(IDF_PATH)\components\bootloader_support\include \
+ 	-I$(IDF_PATH)\components\bt\include \
+	-I$(IDF_PATH)\components\bt\include\$(ESP32_BT_SUBCLASS)\include \
+ 	-I$(IDF_PATH)\components\bt\host\bluedroid\api\include \
+ 	-I$(IDF_PATH)\components\bt\host\bluedroid\api\include\api \
 	-I$(IDF_PATH)\components\esp_app_format\include \
 	-I$(IDF_PATH)\components\esp_adc\include \
 	-I$(IDF_PATH)\components\esp_adc\$(ESP32_SUBCLASS)\include \
