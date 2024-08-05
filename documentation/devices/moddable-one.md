@@ -1,126 +1,125 @@
-# Moddable One Developer Guide
+# Moddable One 開発者ガイド
 Copyright 2019-2022 Moddable Tech, Inc.<BR>
-Revised: March 22, 2022
+改訂日： 2022年3月22日
 
-This document provides information about Moddable One, including details about its pins and other components, how to build and deploy apps, and links to other development resources.
+このドキュメントは、Moddable Oneに関する情報を提供します。ピンやその他のコンポーネントの詳細、アプリのビルドとデプロイ方法、その他の開発リソースへのリンクが含まれています。
 
-## Table of Contents
+## 目次
 
-- [About Moddable One](#about-moddable-one)
-	- [Components](#components)
-	- [Pinout](#pinout)
-- [SDK and Host Environment Setup](#setup)
-- [Building and Deploying Apps](#building-and-deploying-apps)
-- [Troubleshooting](#troubleshooting)
-- [Development Resources](#development-resources)
-	- [Examples](#examples)
-	- [Documentation](#documentation)
-	- [Support](#support)
-	- [Updates](#updates)
+- [Moddable Oneについて](#about-moddable-one)
+	- [コンポーネント](#components)
+	- [ピン配置](#pinout)
+- [SDKとホスト環境のセットアップ](#setup)
+- [アプリのビルドとデプロイ](#building-and-deploying-apps)
+- [トラブルシューティング](#troubleshooting)
+- [開発リソース](#development-resources)
+	- [サンプル](#examples)
+	- [ドキュメント](#documentation)
+	- [サポート](#support)
+	- [更新](#updates)
 
 <a id="about-moddable-one"></a>
-## About Moddable One
+## Moddable Oneについて
 
 <img src="../assets/devices/moddable-one.png">
 
-Moddable One is a hardware module that makes it easy for developers to experiment with the Moddable SDK on inexpensive hardware. It is available to purchase on the [Moddable website](http://www.moddable.com/moddable-one).
+Moddable Oneは、開発者が安価なハードウェアでModdable SDKを試すのを容易にするハードウェアモジュールです。[Moddableのウェブサイト](http://www.moddable.com/moddable-one)で購入できます。
 
 <a id="components"></a>
-### Components
+### コンポーネント
 
-The two main components of Moddable One are the ESP8266 module and capacitive touch screen. The ESP8266 module includes a Wi-Fi antenna and 4 MB of flash storage memory. The touch screen is a 240 x 320 QVGA IPS display driven by a MIPI Display Serial Interface compatible display controller with an FT6206 capacitive touch controller.
+Moddable Oneの主なコンポーネントは、ESP8266モジュールと静電容量式タッチスクリーンの2つです。ESP8266モジュールにはWi-Fiアンテナと4 MBのフラッシュストレージメモリが含まれています。タッチスクリーンは、FT6206静電容量式タッチコントローラを備えたMIPIディスプレイシリアルインターフェース互換のディスプレイコントローラによって駆動される240 x 320 QVGA IPSディスプレイです。
 
 <a id="pinout"></a>
-### Pinout
+### ピン配置
 
 <img src="../assets/devices/moddable-one-pinout.png">
 
 
-#### Touch panel
+#### タッチパネル
 
-The touch panel uses pins 4 and 5 to connect to the I<sup>2</sup>C bus. You cannot use these pins as GPIO if your app uses the touch panel.
+タッチパネルはピン4と5を使用してI<sup>2</sup>Cバスに接続します。アプリがタッチパネルを使用する場合、これらのピンをGPIOとして使用することはできません。
 
-You can use other I<sup>2</sup>C sensors even if your app uses the touch panel as long as they don't use the same address. The touch panel uses address 0x38 (7-bit address).
+アプリがタッチパネルを使用していても、同じアドレスを使用しない限り、他のI<sup>2</sup>Cセンサーを使用することができます。タッチパネルはアドレス0x38（7ビットアドレス）を使用します。
 
-#### Display
+#### ディスプレイ
 
-The display uses pins 13 and 14 to connect to the SPI bus. You cannot use these pins as GPIO if your app uses the display.
+ディスプレイはピン13と14を使用してSPIバスに接続します。アプリがディスプレイを使用する場合、これらのピンをGPIOとして使用することはできません。
 
-You can use other SPI sensors even if your app uses the display.
+アプリがディスプレイを使用していても、他のSPIセンサーを使用することができます。
 
 <a id="setup"></a>
-## SDK and Host Environment Setup
+## SDKとホスト環境のセットアップ
 
-To build and run apps on Moddable One, you'll need to:
+Moddable Oneでアプリをビルドして実行するには、以下の手順が必要です。
 
-1. Install the [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [ESP8266 tools](./esp8266.md)
-3. Follow the instructions in the **Building and Deploying Apps** section below.
+1. [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)をインストールする
+2. [ESP8266ツール](./esp8266.md)をインストールする
+3. 以下の**アプリのビルドとデプロイ**セクションの指示に従う
 
 <a id="building-and-deploying-apps"></a>
-## Building and Deploying Apps
+## アプリのビルドとデプロイ
 
-After you've set up your host environment and ESP8266 tools, take the following steps to install an application on your Moddable One.
+ホスト環境とESP8266ツールをセットアップした後、以下の手順でModdable Oneにアプリケーションをインストールします。
 
-1. Attach the programmer to your Moddable One.
+1. プログラマーをModdable Oneに接続する。
 
-	Make sure you have the programmer oriented correctly. The orientation should match the image below.
+	プログラマーの向きが正しいことを確認してください。向きは以下の画像と一致する必要があります。
 
 	<img src="../assets/devices/moddable-one-programmer.jpg">
 
-	**Note**: The USB port on Moddable One may be used to provide power when operating without the programmer. The USB port is only for powering Moddable One. It cannot be used to program Moddable One.
+	**注意**: Moddable OneのUSBポートは、プログラマーなしで動作する場合に電源を供給するために使用できます。USBポートはModdable Oneのプログラムには使用できません。電源供給のみです。
 
-2. Attach the programmer to your computer with a micro USB cable.
+2. プログラマーをマイクロUSBケーブルでコンピューターに接続する。
 
-	The USB cable must be attached to the programmer, not the power-only USB port on the board. Make sure you're using a data sync&#8211;capable cable, not one that is power-only.
+	USBケーブルはプログラマーに接続する必要があります。ボード上の電源専用USBポートには接続しないでください。データ同期が可能なケーブルを使用していることを確認してください。電源専用のケーブルではありません。
 
-3. Build and deploy the app with `mcconfig`.
+3. `mcconfig`を使用してアプリをビルドおよびデプロイする。
 
-	`mcconfig` is the command line tool to build and launch Moddable apps on microcontrollers and the simulator. Full documentation of `mcconfig` is available [here](../tools/tools.md).
+`mcconfig`は、マイクロコントローラおよびシミュレータ上でModdableアプリをビルドおよび起動するためのコマンドラインツールです。`mcconfig`の完全なドキュメントは[こちら](../tools/tools.md)にあります。
 
-	Use the platform `-p esp/moddable_one`  with `mcconfig` to build for Moddable One. For example, to build the [`piu/balls` example](../../examples/piu/balls):
+Moddable One用にビルドするには、`mcconfig`でプラットフォーム `-p esp/moddable_one` を使用します。例えば、[`piu/balls`の例](../../examples/piu/balls)をビルドするには：
 
-	```text
-	cd $MODDABLE/examples/piu/balls
-	mcconfig -d -m -p esp/moddable_one
-	```
+```text
+cd $MODDABLE/examples/piu/balls
+mcconfig -d -m -p esp/moddable_one
+```
 
-	The [examples readme](../../examples) contains additional information about other commonly used `mcconfig` arguments for screen rotation, Wi-Fi configuration, and more.
+[サンプルのreadme](../../examples)には、画面の回転、Wi-Fi設定など、他の一般的に使用される`mcconfig`引数に関する追加情報が含まれています。
 
-	Use the platform `-p simulator/moddable_one` with `mcconfig` to build for the Moddable One simulator.
+Moddable Oneシミュレータ用にビルドするには、`mcconfig`でプラットフォーム `-p simulator/moddable_one` を使用します。
 
 <a id="troubleshooting"></a>
-## Troubleshooting
+## トラブルシューティング
 
-See the Troubleshooting section of the [ESP8266 documentation](./esp8266.md) for a list of common issues and how to resolve them.
-
+一般的な問題とその解決方法については、[ESP8266ドキュメント](./esp8266.md)のトラブルシューティングセクションを参照してください。
 
 <a id="development-resources"></a>
-## Development Resources
+## 開発リソース
 
 <a id="examples"></a>
-### Examples
+### サンプル
 
-The Moddable SDK has over 150 [example apps](../../examples) that demonstrate how to use its many features. The vast majority of these examples run on Moddable One.
+Moddable SDKには、その多くの機能を使用する方法を示す150以上の[サンプルアプリ](../../examples)があります。これらの例の大部分はModdable Oneで実行されます。
 
-That said, not every example is compatible with Moddable One hardware. For example, the ESP8266 does not have BLE capabilities so BLE examples do not build or run. Some examples are designed to test specific display and touch drivers that are not compatible with the Moddable One display and give a build error.
+とはいえ、すべてのサンプルがModdable Oneハードウェアと互換性があるわけではありません。たとえば、ESP8266にはBLE機能がないため、BLEの例はビルドも実行もできません。一部のサンプルは、Moddable Oneディスプレイと互換性のない特定のディスプレイおよびタッチドライバをテストするために設計されており、ビルドエラーが発生します。
 
 <a id="documentation"></a>
-### Documentation
+### ドキュメント
 
-All the documentation for the Moddable SDK is in the [documentation](../) directory. The **documentation**, **examples**, and **modules** directories share a common structure to make it straightforward to locate information. Some of the highlights include:
+Moddable SDKのすべてのドキュメントは[documentation](../)ディレクトリにあります。**documentation**、**examples**、および**modules**ディレクトリは、情報を簡単に見つけられるように共通の構造を共有しています。いくつかのハイライトを以下に示します：
 
-- The `commodetto` subdirectory, which contains resources related to Commodetto--a bitmap graphics library that provides a 2D graphics API--and Poco, a lightweight rendering engine.
-- The `piu` subdirectory, which contains resources related to Piu, a user interface framework that makes it easier to create complex, responsive layouts.
-- The `networking` subdirectory, which contains networking resources related to network sockets and a variety of standard, secure networking protocols built on sockets including HTTP/HTTPS, WebSockets, DNS, SNTP, and telnet
-- The `pins` subdirectory, which contains resources related to supported hardware protocols (digital, analog, PWM, I2C, etc.). A number of drivers for common off-the-shelf sensors and corresponding example apps are also available.
+- `commodetto`サブディレクトリには、2DグラフィックスAPIを提供するビットマップグラフィックスライブラリであるCommodettoと、軽量レンダリングエンジンであるPocoに関連するリソースが含まれています。
+- `piu`サブディレクトリには、複雑で応答性の高いレイアウトを簡単に作成できるユーザーインターフェースフレームワークであるPiuに関連するリソースが含まれています。
+- `networking`サブディレクトリには、ネットワークソケットおよびHTTP/HTTPS、WebSockets、DNS、SNTP、telnetなどのソケット上に構築されたさまざまな標準の安全なネットワーキングプロトコルに関連するネットワークリソースが含まれています。
+- `pins`サブディレクトリには、サポートされているハードウェアプロトコル（デジタル、アナログ、PWM、I2Cなど）に関連するリソースが含まれています。一般的な市販センサー用の多くのドライバと対応する例示アプリも利用可能です。
 
 <a id="support"></a>
-### Support
+### サポート
 
-If you have questions, we recommend you [open an issue](https://github.com/Moddable-OpenSource/moddable/issues). We'll respond as quickly as practical, and other developers can offer help and benefit from the answers to your questions. Many questions have already been answered, so please try searching previous issues before opening a new issue.
+質問がある場合は、[issueを開く](https://github.com/Moddable-OpenSource/moddable/issues)ことをお勧めします。できるだけ早く対応しますし、他の開発者も助けを提供したり、あなたの質問への回答から利益を得ることができます。多くの質問はすでに回答されているので、新しいissueを開く前に以前のissueを検索してみてください。
 
 <a id="updates"></a>
-### Updates
+### 更新情報
 
-The best way to keep up with what we're doing is to follow us on Twitter ([@moddabletech](https://twitter.com/moddabletech)). We post announcements about new posts on [our blog](http://blog.moddable.com/) there, along with other Moddable news.
+私たちの活動を追跡する最良の方法は、Twitter ([@moddabletech](https://twitter.com/moddabletech)) でフォローすることです。新しい投稿に関するお知らせや、その他のModdableニュースを[私たちのブログ](http://blog.moddable.com/)で投稿しています。

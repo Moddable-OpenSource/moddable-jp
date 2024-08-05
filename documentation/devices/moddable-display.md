@@ -1,12 +1,12 @@
-# Moddable Display Developer Guide
+# Moddable 開発者ガイド
 Copyright 2024 Moddable Tech, Inc.<BR>
-Revised: July 19, 2024
+改訂： 2024年1月9日
 
-This document provides information about the Moddable Display family of products.
+このドキュメントは、Moddable Display製品ファミリーに関する情報を提供します。
 
-## Table of Contents
+## 目次
 
-- [About Moddable Display](#about-moddable-display)
+- [Moddable Displayについて](#about-moddable-display)
 - [Moddable Display 1](#display-1)
 - [Moddable Display 2](#display-2)
 - [Moddable Display 3](#display-3)
@@ -14,38 +14,38 @@ This document provides information about the Moddable Display family of products
 - [Moddable Display 6](#display-6)
 
 <a id="about-moddable-display"></a>
-## About Moddable Display
+## Moddable Displayについて
 
 <img src="../assets/devices/moddable-display.jpg" width=600>
 
-Moddable Display is the beautiful way to bring your latest project from the workbench to the real world. Each Moddable Display wraps an elegant stand around one of our powerful development boards. The sleek design fits right into your home or office. The intriguing, maker-friendly open back makes it easy to incorporate any additional hardware components your project requires.
+Moddable Displayは、最新のプロジェクトを作業台から現実世界に持ち込むための美しい方法です。各Moddable Displayは、強力な開発ボードの1つをエレガントなスタンドで包み込んでいます。洗練されたデザインは、家庭やオフィスにぴったりです。興味をそそる、メーカーフレンドリーなオープンバックは、プロジェクトに必要な追加のハードウェアコンポーネントを簡単に組み込むことができます。
 
-There are five different Moddable Displays, one for each Moddable development board. Moddable Display 6 is built on the Moddable Six development board, for example.
+Moddable Displayは4種類あり、それぞれのModdable開発ボードに対応しています。例えば、Moddable Display 1はModdable One開発ボードを基に構築されています。
 
 <a id="display-1"></a>
 ## Moddable Display 1
 
-Moddable Display 1 is built around the Moddable One development board. See the [Moddable One Developer Guide](./moddable-one.md) for more information about developing with Moddable Display 1.
+Moddable Display 1は、Moddable One開発ボードを中心に構築されています。Moddable Display 1を使用して開発するための詳細については、[Moddable One Developer Guide](./moddable-one.md)を参照してください。
 
-### Building
+### ビルド
 
-To build for Moddable Display 1, use the `esp/moddable_display_1` build target. For example:
+Moddable Display 1用にビルドするには、`esp/moddable_display_1`ビルドターゲットを使用します。例えば：
 
 ```
 mcconfig -d -m -p esp/moddable_display_1
 ```
 
-### Display Rotation
+### ディスプレイの回転
 
-Moddable Display 1 contains a Moddable One development board that is rotated 180 degrees when in portrait orientation. The default build automatically sets the rotation to 180 degrees. To run in landscape orientation, set the rotation to either 90 or 270. To run in touch orientation, set the rotation to 0. 
+Moddable Display 1には、縦向きのときに180度回転するModdable One開発ボードが含まれています。デフォルトのビルドでは、自動的に回転が180度に設定されます。横向きで実行するには、回転を90または270に設定します。タッチオリエンテーションで実行するには、回転を0に設定します。
 
-Rotation may be set on the command line:
+回転はコマンドラインで設定できます：
 
 ```
 mcconfig -d -m -p esp/moddable_display_1 driverRotation=90
 ```
 
-Or in your project's manifest:
+またはプロジェクトのマニフェストで：
 
 ```json
 	"config": {
@@ -53,40 +53,40 @@ Or in your project's manifest:
 	}
 ```
 
-Or at runtime in JavaScript:
+またはJavaScriptで実行時に：
 
 ```js
 screen.rotation = 90;
 ```
 
-Changing the rotation from JavaScript does not immediately update the screen; your project must redraw the screen.
+JavaScriptから回転を変更しても、画面はすぐには更新されません。プロジェクトは画面を再描画する必要があります。
 
-**Note**: The touch input on Moddable Display 1 is automatically rotated when using the Piu user interface framework. When using Commodetto, the project code must apply display rotation.
+**注意**: Piuユーザーインターフェースフレームワークを使用する場合、Moddable Display 1のタッチ入力は自動的に回転します。Commodettoを使用する場合、プロジェクトコードでディスプレイの回転を適用する必要があります。
 
 <a id="display-2"></a>
 ## Moddable Display 2
 
-Moddable Display 2 is built around the Moddable Two development board. See the [Moddable Two Developer Guide](./moddable-two.md) for more information about developing with Moddable Display 2.
+Moddable Display 2はModdable Two開発ボードを中心に構築されています。Moddable Display 2での開発に関する詳細は、[Moddable Two Developer Guide](./moddable-two.md)を参照してください。
 
-### Building
+### ビルド
 
-To build for Moddable Display 2, use the `esp32/moddable_display_2` build target. For example:
+Moddable Display 2用にビルドするには、`esp32/moddable_display_2`ビルドターゲットを使用します。例えば：
 
 ```
 mcconfig -d -m -p esp32/moddable_display_2
 ```
 
-### Display Rotation
+### ディスプレイの回転
 
-Moddable Display 2 contains a Moddable Two development board that is unrotated (0 degrees) when in portrait orientation. To run in landscape orientation, set the rotation to either 90 or 270. To run in touch orientation, set the rotation to 180. 
+Moddable Display 2には、ポートレート（縦向き）時に回転していない（0度）Moddable Two開発ボードが含まれています。ランドスケープ（横向き）で実行するには、回転を90度または270度に設定します。タッチオリエンテーションで実行するには、回転を180度に設定します。
 
-Rotation may be set on the command line:
+回転はコマンドラインで設定できます：
 
 ```
 mcconfig -d -m -p esp32/moddable_display_2 driverRotation=180
 ```
 
-Or in your project's manifest:
+または、プロジェクトのマニフェストで：
 
 ```json
 	"config": {
@@ -94,40 +94,40 @@ Or in your project's manifest:
 	}
 ```
 
-Or at runtime in JavaScript:
+または、JavaScriptで実行時に：
 
 ```js
 screen.rotation = 180;
 ```
 
-Changing the rotation from JavaScript does not immediately update the screen; your project must redraw the screen.
+JavaScriptから回転を変更しても、画面はすぐには更新されません。プロジェクトは画面を再描画する必要があります。
 
-**Note**: The touch input on Moddable Display 2 is automatically rotated when using the Piu user interface framework. When using Commodetto, the project code must apply display rotation.
+**注意**: Piuユーザーインターフェースフレームワークを使用する場合、Moddable Display 2のタッチ入力は自動的に回転します。Commodettoを使用する場合、プロジェクトコードはディスプレイの回転を適用する必要があります。
 
 <a id="display-3"></a>
 ## Moddable Display 3
 
-Moddable Display 3 is built around the Moddable Three development board. See the [Moddable Three Developer Guide](./moddable-three.md) for more information about developing with Moddable Display 3.
+Moddable Display 3はModdable Three開発ボードを中心に構築されています。Moddable Display 3を使用した開発の詳細については、[Moddable Three Developer Guide](./moddable-three.md)を参照してください。
 
-### Building
+### ビルド
 
-To build for Moddable Display 3, use the `esp/moddable_display_3` build target. For example:
+Moddable Display 3用にビルドするには、`esp/moddable_display_3`ビルドターゲットを使用します。例えば：
 
 ```
 mcconfig -d -m -p esp/moddable_display_3
 ```
 
-### Display Rotation
+### ディスプレイの回転
 
-Moddable Display 3 contains a Moddable Three development board that is rotated 180 degrees when in landscape orientation. To run in portrait orientation, set the rotation to either 90 or 270. 
+Moddable Display 3には、横向きのときに180度回転するModdable Three開発ボードが含まれています。縦向きで実行するには、回転を90または270に設定します。
 
-Rotation may be set on the command line:
+回転はコマンドラインで設定できます：
 
 ```
 mcconfig -d -m -p esp/moddable_display_3 rotation=90
 ```
 
-Or in your project's manifest:
+または、プロジェクトのマニフェストで設定できます：
 
 ```json
 	"config": {
@@ -138,27 +138,27 @@ Or in your project's manifest:
 <a id="display-4"></a>
 ## Moddable Display 4
 
-Moddable Display 4 is built around the Moddable Four development board. See the [Moddable Four Developer Guide](./moddable-four.md) for more information about developing with Moddable Display 4.
+Moddable Display 4はModdable Four開発ボードを中心に構築されています。Moddable Display 4を使用した開発の詳細については、[Moddable Four Developer Guide](./moddable-four.md)を参照してください。
 
-### Building
+### ビルド
 
-To build for Moddable Display 4, use the `nrf52/moddable_display_4` build target. For example:
+Moddable Display 4用にビルドするには、`nrf52/moddable_display_4`ビルドターゲットを使用します。例えば：
 
 ```
 mcconfig -d -m -p nrf52/moddable_display_4
 ```
 
-### Display Rotation
+### ディスプレイの回転
 
-Moddable Display 4 contains a Moddable Four development board that is rotated 180 degrees when in portrait orientation. The default build automatically sets the rotation to 180 degrees. You may also run with the rotation set to 0. 
+Moddable Display 4には、縦向きのときに180度回転するModdable Four開発ボードが含まれています。デフォルトのビルドでは、自動的に回転が180度に設定されます。回転を0度に設定して実行することもできます。
 
-Rotation may be set on the command line:
+回転はコマンドラインで設定できます：
 
 ```
 mcconfig -d -m -p nrf52/moddable_display_4 driverRotation=0
 ```
 
-Or in your project's manifest:
+または、プロジェクトのマニフェストで設定できます：
 
 ```json
 	"config": {
@@ -166,14 +166,13 @@ Or in your project's manifest:
 	}
 ```
 
-Or at runtime in JavaScript:
+実行時にJavaScriptで：
 
 ```js
 screen.rotation = 0;
 ```
 
-Changing the rotation from JavaScript does not immediately update the screen; your project must redraw the screen.
-
+JavaScriptから回転を変更しても、画面はすぐには更新されません。プロジェクトは画面を再描画する必要があります。
 
 <a id="display-6"></a>
 ## Moddable Display 6
