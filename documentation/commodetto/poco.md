@@ -788,7 +788,7 @@ Poco C APIは、CommodettoやそのJavaScript APIとは独立して使用する�
 
 ##### `PocoPixel`
 
-`PocoPixel`は整数値です。Commodettoで使用される場合、`CommodettoPixel`としてエイリアスされています。詳細については、[Commodettoドキュメント](./commodetto.md)の	`CommodettoPixel`の説明を参照してください。
+`PocoPixel`は整数値です。Commodettoで使用される場合、`CommodettoPixel`としてエイリアスされています。詳細については、[Commodettoドキュメント](./commodetto.md)の`CommodettoPixel`の説明を参照してください。
 
 ***
 
