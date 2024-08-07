@@ -1,50 +1,50 @@
 # Poco
 Copyright 2016-2020 Moddable Tech, Inc.<BR>
-Revised: November 4, 2020
+改訂： 2020年11月4日
 
-## About This Document
+## このドキュメントについて
 
-This document describes the Poco renderer, starting with a set of examples that introduce many of the main concepts of working with Poco. Following the examples is the reference for Poco, which fully describes each function call.
+このドキュメントは、Pocoレンダラーについて、Pocoを使う上での主要な概念を紹介する一連のサンプルから説明します。サンプルに続いて、Pocoのリファレンスがあり、各関数の呼び出しが完全に説明されています。
 
 ## Table of Contents
 
-* [Examples](#examples)
-	* [Rectangle](#rectangle)
-	* [Origin](#origin)
-	* [Clip](#clip)
-	* [Monochrome Bitmap](#monochrome-bitmap)
-	* [Color Bitmap](#color-bitmap)
-	* [Pattern](#pattern)
-	* [Gray Bitmap](#gray-bitmap)
-	* [Offscreen Bitmap](#offscreen-bitmap)
-	* [Alpha](#alpha)
+* [サンプル](#examples)
+	* [長方形](#rectangle)
+	* [原点](#origin)
+	* [クリップ](#clip)
+	* [モノクロビットマップ](#monochrome-bitmap)
+	* [カラービットマップ](#color-bitmap)
+	* [パターン](#pattern)
+	* [グレービットマップ](#gray-bitmap)
+	* [オフスクリーンビットマップ](#offscreen-bitmap)
+	* [アルファ](#alpha)
 	* [JPEG](#jpeg)
-	* [Text](#text)
-* [Pixel formats](#pixel-formats)
-	* [Destination pixel formats](#destination-pixel-formats)
-	* [Display pixel format](#display-pixel-format)
-	* [Source bitmap pixel formats](#source-bitmap-pixel-formats)
-	* [Compressed pixel formats](#compressed-pixel-formats)
-* [Immediate mode rendering](#immediate-mode-rendering)
-* [Rotation](#rotation)
-* [JavaScript API Reference](#javascript-api-reference)
-	* [Functions](#js-functions)
-	* [Properties](#js-properties)
-* [C API Reference](#c-api-reference)
-	* [Data structures](#c-data-structures)
-	* [Functions](#c-functions)
-* [Odds and Ends](#odds-and-ends)
+	* [テキスト](#text)
+* [ピクセルフォーマット](#pixel-formats)
+	* [出力ピクセルフォーマット](#destination-pixel-formats)
+	* [ディスプレイピクセルフォーマット](#display-pixel-format)
+	* [入力ビットマップピクセルフォーマット](#source-bitmap-pixel-formats)
+	* [圧縮ピクセルフォーマット](#compressed-pixel-formats)
+* [即時モードレンダリング](#immediate-mode-rendering)
+* [回転](#rotation)
+* [JavaScript APIリファレンス](#javascript-api-reference)
+	* [関数](#js-functions)
+	* [プロパティ](#js-properties)
+* [C APIリファレンス](#c-api-reference)
+	* [データ構造](#c-data-structures)
+	* [関数](#c-functions)
+* [その他](#odds-and-ends)
 
 <a id="examples"></a>
-## Examples
+## サンプル
 
-These examples illustrate working with the Poco renderer. They all use the JavaScript API, and they also use asset loaders and other capabilities of Commodetto.
+これらのサンプルはPocoレンダラーを使用する方法を解説しています。すべてのサンプルはJavaScriptAPIを使用し、またCommodettoのアセットローダーやその他の機能も利用しています。
 
-To keep the following examples concise and focused, the code makes several assumptions:
+以下のサンプルを簡潔かつ集中して説明するために、コードではいくつかの前提条件を設定しています。
 
-- The examples assume a `PixelsOut` object in the global variable `screen`.
+- サンプルでは、グローバル変数`screen`に`PixelsOut`オブジェクトがあることを前提としています
 
-- They assume that the following color variables are defined:
+- 以下のカラー変数が定義されていることを前提としています：
 
 	```javascript
 	let white = poco.makeColor(255, 255, 255);
@@ -55,7 +55,7 @@ To keep the following examples concise and focused, the code makes several assum
 	let blue = poco.makeColor(0, 0, 255);
 	```
 
-- They assume that the drawing commands occur between calls to `begin` and `end`.
+- 描画コマンドが`begin`と`end`の呼び出しの間に実行されることを前提としています。
 
 	```javascript
 	let poco = new Poco(screen);
@@ -64,14 +64,14 @@ To keep the following examples concise and focused, the code makes several assum
 	poco.end();
 	```
 
-Each example includes the image rendered by the code. The images are scaled 150% here to make them easier to see; this scaling causes some blurring and introduces some jaggedness that is not in the actual image.
+各サンプルには、コードによってレンダリングされた画像が含まれています。画像は見やすくするために150％に拡大されています。この拡大によって一部のぼやけやジャギーが生じることがありますが、実際の画像にはこれらは含まれません。
 
 ***
 
 <a id="rectangle"></a>
-### Rectangle
+### 長方形
 
-This example fills `screen` with gray pixels, covers the left half with red pixels, and then uses a 50% blending level (128) to draw blue pixels over the middle half of the screen.
+このサンプルでは、`screen`を灰色のピクセルで埋め、左半分を赤色のピクセルで覆い、その後、画面の中央半分に50%のブレンドレベル（128）で青色のピクセルを描画します。
 
 ```javascript
 poco.fillRectangle(gray, 0, 0, poco.width, poco.height);
@@ -84,9 +84,9 @@ poco.blendRectangle(blue, 128, poco.width / 4, 0, poco.width / 2, poco.height);
 ***
 
 <a id="origin"></a>
-### Origin
+### 原点
 
-This example shows how to move the drawing origin. Poco maintains an origin stack that is pushed when the origin changes and popped when `origin` is called with no arguments. Each change to the origin offsets the previous origin. The origin stack is convenient for building container-based user interfaces.
+このサンプルでは、描画の原点を移動する方法を示します。Pocoは、原点が変更されるときにプッシュされ、引数なしで `origin`が呼び出されるとポップされる原点スタックを保持します。各原点の変更では、前の原点からの相対的な移動を行います。原点スタックは、コンテナベースのユーザーインターフェースを構築するのに便利です。
 
 ```javascript
 poco.fillRectangle(gray, 0, 0, poco.width, poco.height);
@@ -115,9 +115,9 @@ poco.origin();
 ***
 
 <a id="clip"></a>
-### Clip
+### クリップ
 
-This example shows how to use the drawing clip. Poco maintains a clip stack that is pushed when the clip changes and popped when `clip` is called with no arguments. Each change intersects the clip with the previous clip. The clip stack is convenient for building container-based user interfaces.
+このサンプルでは、描画のクリップを使用する方法を示します。Pocoは、クリップが変更されるときにプッシュされ、引数なしで`clip`が呼び出されるとポップされるクリップスタックを保持します。各クリップの変更では、前のクリップと交差する領域に描画を制限します。クリップスタックは、コンテナベースのユーザーインターフェースを構築するのに便利です。
 
 ```javascript
 poco.fillRectangle(gray, 0, 0, poco.width, poco.height);
@@ -142,9 +142,9 @@ poco.fillRectangle(black, 34, 0, 2, poco.height);
 ***
 
 <a id="monochrome-bitmap"></a>
-### Monochrome Bitmap
+### モノクロビットマップ
 
-This example draws a monochrome bitmap (in which all pixels are either black or white) of an envelope. It shows how to control the color of the foreground and background pixels, as well as whether each is drawn. The bitmap is stored in a 1-bit BMP file with dimensions of 32 x 23.
+このサンプルでは、ピクセルがすべて黒または白である封筒のモノクロビットマップを描画します。前景および背景ピクセルの色を制御する方法や、それぞれのピクセルが描画されるかどうかを示しています。ビットマップは32 x 23のサイズの1ビットBMPファイルに格納されています。
 
 ```javascript
 poco.fillRectangle(gray, 0, 0, poco.width, poco.height);
@@ -161,9 +161,9 @@ poco.drawMonochrome(envelope, undefined, blue, 74, 55);
 ***
 
 <a id="color-bitmap"></a>
-### Color Bitmap
+### カラービットマップ
 
-This example draws a color bitmap image of a face in two ways using `drawBitmap`: on the left side of the screen, it draws the full image; on the right side, it draws only the eyes and mouth, using the optional source rectangle parameters of `drawBitmap`.
+このサンプルでは、顔のカラービットマップ画像を2つの方法で`drawBitmap`を使用して描画します。画面の左側には全体の画像を描画します。右側には`drawBitmap`のオプション引数のソース矩形パラメーターを使って、目と口だけを描画しています。
 
 ```javascript
 poco.fillRectangle(gray, 0, 0, poco.width, poco.height);
@@ -179,16 +179,17 @@ poco.drawBitmap(image, x + 25, y + 38, 25, 38, 11, 7);   // left eye
 poco.drawBitmap(image, x +  7, y + 40,  7, 40, 10, 6);   // right eye
 poco.drawBitmap(image, x + 15, y + 56, 15, 56, 16, 6);   // mouth
 ```
+
 <img src="../assets/poco/bitmap.png" width="180" height="135"/>
 
 ***
 
 <a id="pattern"></a>
-### Pattern
+### パターン
 
-This examples uses `fillPattern` to draw a single 30-pixel-square pattern in two ways: first the entire pattern is used to fill the screen; then a 7-pixel-square area of the pattern is used to fill the center part of the screen.
+このサンプルでは、`fillPattern`を使用して、30ピクセル四方のパターンを2つの方法で描画します。最初に画面全体をそのパターンで埋め、その後パターンの7ピクセル四方の領域を使用して画面中央部分を埋めます。
 
-Unlike the previous examples, this one does not first call `fillRectangle` to clear the screen, because the first call to `fillPattern` covers all the screen's pixels.
+前のサンプルとは異なり、最初に画面をクリアするために`fillRectangle`を呼び出しません。これは、最初の`fillPattern`の呼び出しで画面のすべてのピクセルが覆われるためです。
 
 ```javascript
 let pattern = parseBMP(new Resource("pattern1.bmp"));
@@ -201,9 +202,9 @@ poco.fillPattern(pattern, 28, 28, 63, 35, 21, 14, 7, 7);
 ***
 
 <a id="gray-bitmap"></a>
-### Gray Bitmap
+### グレービットマップ
 
-This example uses `drawGray` to draw a 16-level gray image in several colors. `drawGray` treats the pixel values as alpha blending levels, blending the specified color with the background.
+このサンプルでは、`drawGray`を使用して16階調のグレー画像を複数の色で描画します。`drawGray`はピクセル値をアルファブレンドレベルとして扱い、指定された色を背景とブレンドします。
 
 ```javascript
 poco.fillRectangle(gray, 0, 0, poco.width, poco.height);
@@ -225,9 +226,9 @@ poco.drawGray(image, red, 70 + 2, 47 + 2);
 ***
 
 <a id="offscreen-bitmap"></a>
-### Offscreen Bitmap
+### オフスクリーンビットマップ
 
-This example uses `BufferOut` to create an offscreen bitmap, fills the bitmap with a series of inset squares, and then uses the offscreen bitmap as a pattern to fill the screen. It uses two instances of `Poco`: the first to draw to the offscreen bitmap and the second to draw to the screen.
+このサンプルでは、`BufferOut`を使用してオフスクリーンビットマップを作成し、一連の内側に向かう四角形でビットマップを埋めます。次に、そのオフスクリーンビットマップをパターンとして使用して画面を埋めます。このサンプルでは、2つの`Poco`インスタンスを使用します。最初のインスタンスはオフスクリーンビットマップに描画し、2番目のインスタンスは画面に描画します。
 
 ```javascript
 import BufferOut from "commodetto/BufferOut";
@@ -252,9 +253,9 @@ poco.fillPattern(offscreen.bitmap, 0, 0, poco.width, poco.height);
 ***
 
 <a id="alpha"></a>
-### Alpha
+### アルファ
 
-This example shows how to draw a bitmap through an alpha mask. The bitmap to draw and the mask are in separate bitmaps, enabling an image to be drawn using more than one alpha mask. The example draws one bitmap through both a circle and a square mask, and also draws the original image and mask.
+このサンプルでは、アルファマスクを使用してビットマップを描画する方法を示します。描画するビットマップとマスクは別々のビットマップとして存在し、1つの画像に対して複数のアルファマスクを使用して描画することができます。このサンプルでは、1つのビットマップをぞれぞれ円形マスクと四角形マスクを通して描画し、さらに元の画像とマスクも描画します。
 
 ```javascript
 poco.fillRectangle(gray, 0, 0, poco.width, poco.height);
@@ -281,7 +282,7 @@ poco.drawMasked(girl, 80, 47, 0, 0,
 <a id="jpeg"></a>
 ### JPEG
 
-These two examples show different methods for working with JPEG images. The first example decompresses the full JPEG into a bitmap in memory and then renders the bitmap to the screen. The call to `trace` shows how to access the bitmap's width and height.
+これらの2つのサンプルでは、JPEG画像を扱う異なる方法を示します。最初のサンプルは、JPEG全体をメモリ内のビットマップに解凍し、次にそのビットマップを画面に描画します。`trace`の呼び出しは、ビットマップの幅と高さにアクセスする方法を示しています。
 
 ```javascript
 import JPEG from "commodetto/readJPEG";
@@ -291,7 +292,7 @@ trace(`width ${piano.width}, height ${piano.height}\n`);
 poco.drawBitmap(piano, 0, 0);
 ```
 
-The second example decodes the JPEG image one block at a time, drawing the block to the screen before decoding the next block. The advantage of this approach is that only a single JPEG block (typically 8 x 8 or 16 x 16 pixels) need be in memory at a time. The disadvantage is that the JPEG image appears to the user one block at a time rather than all at once.
+2つ目のサンプルでは、JPEG画像を1ブロックずつデコードし、次のブロックをデコードする前にそのブロックを画面に描画します。このアプローチの利点は、メモリに必要なのが通常8 x 8または16 x 16ピクセルの単一のJPEGブロックだけで済むことです。欠点は、JPEG画像が一度にすべて表示されるのではなく、ユーザーにはブロックごとに表示されることです。
 
 ```javascript
 let jpeg = new JPEG(new Resource("piano.jpg"));
@@ -303,18 +304,18 @@ while (block = jpeg.read()) {
 }
 ```
 
-When complete, each approach generates the same result.
+どちらの方法でも、最終的には同じ結果が得られます。
 
 <img src="../assets/poco/jpeg.png" width="180" height="135"/>
 
 ***
 
 <a id="text"></a>
-### Text
+### テキスト
 
-Poco supports the BMPFont format for fonts used to rendering text. BMFont is a gray or color font used in games for anti-aliased fonts. A BMFont consists of two files: the font metrics and the font image.
+Pocoはテキスト描画に使用するフォントとしてBMPFont形式をサポートしています。BMFontは、アンチエイリアス処理が施された灰色またはカラーフォントで、主にゲームで使用されます。BMFontはフォントメトリクスとフォント画像の2つのファイルから構成されます。
 
-The following example loads and draws a 36-point Palatino BMFont.
+以下のサンプルでは、36ポイントのPalatino BMFontを読み込み、描画しています。
 
 ```javascript
 import parseBMF from "commodetto/parseBMF";
@@ -331,7 +332,7 @@ poco.drawText("Hello.", palatino36, green, 4, 55);
 
 <img src="../assets/poco/text1.png" width="180" height="135"/>
 
-To truncate text when rendering, provide the optional `width` argument to `drawText` indicating the horizontal space available for the text.
+テキストを描画する際に切り詰めるためには、`drawText`のオプション引数`width`を指定して、テキストに使用できる横幅を設定します。
 
 ```javascript
 poco.fillRectangle(gray, 0, 0, poco.width, poco.height);
@@ -346,7 +347,7 @@ poco.drawText("Hello, world. This is long.", palatino36, green, 2, 45, poco.widt
 
 <img src="../assets/poco/text2.png" width="180" height="135"/>
 
-Text is horizontally and vertically aligned using the `height` property of the font and measuring the width of strings using `getTextWidth`.
+フォントの`height`プロパティを使用してテキストを水平および垂直に配置し、`getTextWidth`を使用して文字列の幅を測定します。
 
 ```javascript
 poco.fillRectangle(gray, 0, 0, poco.width, poco.height);
@@ -373,7 +374,7 @@ poco.drawText("Centered", palatino12, black,
 
 <img src="../assets/poco/text3.png" width="180" height="135"/>
 
-The `drawText` function also accepts a 16-gray-level alpha bitmap in the `color` argument. This bitmap is used to draw fonts that consist of multiple colors. The following example shows drawing Open Sans Bold Italic with both black and white pixels in the glyph images.
+`drawText`関数は、16階調のグレーレベルアルファビットマップを`color`引数に受け取ることもできます。このビットマップを使用して、複数の色で構成されたフォントを描画できます。以下のサンプルでは、Open Sans Bold Italicを黒と白のピクセルで描画しています。
 
 ```javascript
 poco.fillRectangle(green, 0, 0, screen.width, screen.height);
@@ -387,82 +388,82 @@ poco.drawText("Poco", openSans52, openSans52.mask, 0, 5);
 
 <img src="../assets/poco/text4.png" width="180" height="135"/>
 
-The following image is a section of the `OpenSans-BoldItalic-52.bmp` file, which contains the glyph images.
+以下の画像は、`OpenSans-BoldItalic-52.bmp`ファイルの一部で、グリフイメージが含まれています。
 
 <img src="../assets/poco/text_opensans_glyphs.png"/>
 
-This is a section of the `OpenSans-BoldItalic-52-alpha.bmp` file, which contains the alpha channel of the glyph images:
+こちらは、グリフイメージのアルファチャンネルが含まれている`OpenSans-BoldItalic-52-alpha.bmp`ファイルの一部です。
 
 <img src="../assets/poco/text_opensans_mask.png"/>
 
 ***
 
 <a id="pixel-formats"></a>
-## Pixel formats
+## ピクセルフォーマット
 
 <a id="destination-pixel-formats"></a>
-### Destination pixel formats
-Poco renders to the following pixel formats:
+### 出力ピクセルフォーマット
+Pocoは以下のピクセルフォーマットでレンダリングします：
 
-- 16-bit RGB565 little-endian
-- 8-bit RGB332
-- 8-bit gray
-- 4-bit indexed color
-- 4-bit gray
+- 16ビットRGB565リトルエンディアン
+- 8ビットRGB332
+- 8ビットグレー
+- 4ビットインデックスカラー
+- 4ビットグレー
 
-To keep the size of the code deployed to the target device small, Poco is configured at build time to render only one of these pixel formats.
+ターゲットデバイスにデプロイするコードのサイズを小さく保つために、Pocoはビルド時にこれらのピクセルフォーマットのうち1つだけをレンダリングするように設定されます。
 
 <a id="display-pixel-format"></a>
-### Display pixel format
-For displays that require a different output format, the display driver is responsible for converting between a supported rendering format and the hardware required format. For example, many common LCD controllers require 16-bit RGB565 big-endian pixels. The display drivers for these controllers accept Poco rendered 16-bit RGB565 little-endian pixels and convert them to big-endian while transmitting to the LCD controller. Similarly, many displays are monochrome (1-bit). Their display driver accept pixels rendered in 4-bit or 8-bit gray and converts them to 1-bit for the monochrome display.
+### ディスプレイピクセルフォーマット
+異なる出力形式を必要とするディスプレイの場合、ディスプレイドライバーはサポートされているレンダリングフォーマットとハードウェアが要求するフォーマットの間で変換を行います。例えば、多くの一般的なLCDコントローラーは16ビットのRGB565ビッグエンディアンピクセルを必要とします。これらのコントローラー用のディスプレイドライバーは、Pocoがレンダリングした16ビットRGB565リトルエンディアンピクセルを受け取り、LCDコントローラーに送信する際にビッグエンディアンに変換します。同様に、多くのディスプレイはモノクロ（1ビット）です。これらのディスプレイドライバーは4ビットまたは8ビットのグレーでレンダリングされたピクセルを受け取り、モノクロディスプレイ用に1ビットに変換します。
 
 <a id="source-bitmap-pixel-formats"></a>
-### Source bitmap pixel formats
-Poco supports 1-bit monochrome and 4-bit gray bitmaps as sources for rendering to all pixel formats. In addition, the configured destination pixel format is always supported as a source format. For example, when the rendering pixel format is 16-bit RGB565 little-endian, supported source pixel formats are 1-bit monochrome, 4-bit gray, and 16-bit RGB565 little-endian.
+### 入力ビットマップピクセルフォーマット
+Pocoは、すべてのピクセルフォーマットへのレンダリング用ソースとして、1ビットモノクロームおよび4ビットグレービットマップをサポートしています。さらに、設定された出力ピクセルフォーマットも常にソースフォーマットとしてサポートされます。例えば、レンダリングピクセルフォーマットが16ビットRGB565リトルエンディアンの場合、サポートされるソースピクセルフォーマットは1ビットモノクローム、4ビットグレー、および16ビットRGB565リトルエンディアンです。
 
 <a id="compressed-pixel-formats"></a>
-### Compressed pixel formats
-Poco implements support for two compressed pixel formats.
+### 圧縮ピクセルフォーマット
+Pocoは、2つの圧縮ピクセルフォーマットをサポートしています。
 
-The first is a weighted run-length compression of 4-bit gray bitmaps. These are commonly used for anti-aliased fonts and image masks. They use the `CommodettoBitmap` and `PocoBitmap` data structures with the pixel format set to `(kCommodettoBitmapGray16 | kCommodettoBitmapPacked)`.
+1つ目は、4ビットグレービットマップの重み付きランレングス圧縮です。これは、アンチエイリアスフォントやイメージマスクによく使用されます。これらは`CommodettoBitmap`および`PocoBitmap`のデータ構造を使用し、ピクセルフォーマットが`(kCommodettoBitmapGray16 | kCommodettoBitmapPacked)`に設定されています。
 
-The second is a variant of the ColorCell algorithm used to compress full color images. These are not referenced by the `CommodettoBitmap` and `PocoBitmap` data structures, but treated as an image file in the same way as BMP, PNG, and JPEG. ColorCell images use 16-bit RGB565 little-endian pixels and consequently may only be rendered to 16-bit RGB565 little-endian destinations.
+2つ目は、フルカラー画像を圧縮するために使用されるColorCellアルゴリズムの一種です。これらは`CommodettoBitmap`や`PocoBitmap`のデータ構造で参照されることはなく、BMP、PNG、JPEGと同様に画像ファイルとして扱われます。ColorCell画像は16ビットRGB565リトルエンディアンピクセルを使用するため、16ビットRGB565リトルエンディアンの出力先でのみレンダリングされます。
 
 ***
 
 <a id="immediate-mode-rendering"></a>
-## Immediate mode rendering
-By default, Poco is a scanline display list renderer. That means it stores all the drawing commands and then renders them all at once when all drawing commands for a given frame have been queued. When used with a display that has full frame buffers stored in memory accessible to Poco and is double buffered (e.g. has two frame buffers it flips between), scanline display list rendering is less efficient than immediate mode rendering, which executes each drawing command as it is received.
+## 即時モードレンダリング
+デフォルトでは、Pocoはスキャンライン表示リストレンダラーです。つまり、すべての描画コマンドを保存し、指定されたフレームのすべての描画コマンドがキューに入ったときに、それらを一度にレンダリングします。Pocoがアクセス可能なメモリに保存されたフルフレームバッファを持ち、ダブルバッファ（例：2つのフレームバッファを交互に使用する）を持つディスプレイで使用される場合、スキャンライン表示リストレンダリングは、各描画コマンドが受信されるとすぐに実行するイミディエイトモードレンダリングよりも効率が低くなります。
 
-Poco optionally supports immediate mode rendering. To enable this support, define `kPocoFrameBuffer` to 1 when building Poco, and use `PocoDrawingBeginFrameBuffer`/`PocoDrawingEndFrameBuffer` in place of `PocoDrawingBegin`/`PocoDrawingEnd` in the C code. No changes are required to JavaScript code to use immediate mode.
+Pocoはオプションで即時モードレンダリングをサポートしています。このサポートを有効にするには、Pocoをビルドする際に`kPocoFrameBuffer`を1に定義し、Cコード内で`PocoDrawingBegin`/`PocoDrawingEnd`の代わりに`PocoDrawingBeginFrameBuffer`/`PocoDrawingEndFrameBuffer`を使用します。即時モードレンダリングを使用するためにJavaScriptコードの変更は必要ありません。
 
 ***
 
 <a id="rotation"></a>
-## Rotation
-Poco provides support for rendering to a `PixelsOut` at 0, 90, 180, or 270 degree rotations. This support allows use of a display in any orientation, independent of the natural scan order of the hardware.
+## 回転
+Pocoは、`PixelsOut`への描画を0度、90度、180度、または270度の回転でサポートしています。このサポートにより、ハードウェアのスキャン順序に関係なく、任意の向きでディスプレイを使用できます。
 
-The rotation is selected at build time, not run time, by defining `kPocoRotation` to the target rotation (e.g. 90). The default rotation value is 0. The rotation is applied to the coordinates, both destination and source, of all drawing operations. Any assets (e.g. stored bitmaps and fonts) must be rotated prior to being passed to Poco. This is done either manually (e.g. in Photoshop) or automatically (e.g. by the png2bmp tool in the Moddable SDK).
+回転は実行時ではなくビルド時に、`kPocoRotation`をターゲットの回転角度（例：90）に定義することで選択されます。デフォルトの回転値は0です。回転はすべての描画操作の座標、出力先とソースの両方に適用されます。任意のアセット（例：保存されたビットマップやフォント）は、Pocoに渡される前に回転させる必要があります。これは手動（例：Photoshopによって）または自動（例：Moddable SDKのpng2bmpツールによって）で行います。
 
-This approach to rotation allows rendering of rotated output at the same performance level as unrotated images, and without requiring an intermediate bitmap buffer.
+回転に対するこのアプローチは、回転していない画像と同じパフォーマンスレベルで、中間ビットマップバッファを必要とせずに、回転した出力をレンダリングすることができます。
 
 ***
 
 <a id="javascript-api-reference"></a>
-## JavaScript API Reference
+## JavaScript APIリファレンス
 
-Poco is a renderer, a subclass of the Commodetto `Render` class.
+Pocoは、Commodettoの`Render`クラスのサブクラスであるレンダラーです。
 
 ```javascript
 class Poco extends Render
 ```
 
 <a id="js-functions"></a>
-### Functions
+### 関数
 
 #### `constructor(pixelsOut, dictionary)`
 
-Poco extends the `Render` dictionary with the `displayListLength` property, which specifies the size of the display list buffer in bytes. Applications typically use the default display list length. Poco detects when a drawing operation would overflow the display list, ignores the drawing operation, and throws an exception when `end` is called.
+Pocoは`Render`のディクショナリを拡張し、ディスプレイリストバッファのサイズをバイト単位で指定する`displayListLength`プロパティを追加します。アプリケーションは通常、デフォルトのディスプレイリスト長を使用します。Pocoは描画操作がディスプレイリストをオーバーフローしそうになったときに検出し、描画操作を無視し、`end`が呼ばれたときに例外をスローします。
 
 ```javascript
 import Poco from "commodetto/Poco";
@@ -475,22 +476,22 @@ let poco = new Poco(screen, {displayListLength: 4096});
 
 #### `close()`
 
-Frees all memory allocated by Poco. No other functions on the instance may be called after calling `close`.
+Pocoによって割り当てられたすべてのメモリを解放します。`close`を呼び出した後、そのインスタンスの他の関数を呼び出すことはできません。
 
 ***
 
 #### `clip(x, y, width, height)`
 
-Poco maintains a clip rectangle that is applied to all drawing operations.
+Pocoは、すべての描画操作に適用されるクリップ矩形を保持します。
 
-When `begin` is called, the clip rectangle is set to the update area passed to `begin`. Poco maintains a clip stack, eliminating the need for applications to save and restore the current clip. Calling `clip` with four arguments intersects the current clip with the area contained by the arguments; calling it with no arguments pops the clip stack, restoring the previous clip.
+`begin`が呼び出されると、クリップ矩形は`begin`に渡された更新領域に設定されます。Pocoはクリップスタックを保持しているため、アプリケーションが現在のクリップを保存および復元する必要はありません。4つの引数で`clip`を呼び出すと、現在のクリップと引数で指定された領域の交差部分が設定されます。引数なしで呼び出すと、クリップスタックの最後のクリップが削除され、前のクリップが復元されます。
 
 ```javascript
 poco.clip(10, 10, 10, 10);
 poco.clip();
 ```
 
-The clip stack holds several clips, as follows:
+クリップスタックは次のようにいくつかのクリップを保持します：
 
 ```javascript
 poco.begin();			// Clip is entire PixelsOut area
@@ -501,19 +502,19 @@ poco.clip()			// Clip is entire PixelsOut area
 poco.end();
 ```
 
-If the clip stack overflows or underflows, an exception is thrown from `end`. The clip stack must be empty when `end` is called or an exception is thrown.
+クリップスタックがオーバーフローまたはアンダーフローすると、`end`から例外がスローされます。`end`が呼び出されたときにクリップスタックが空でないと、例外がスローされます。
 
-When calling `clip` with four arguments, the return value is `true` if the resulting area contains one or more pixels and `undefined` if the clip area is empty.
+4つの引数でclipを呼び出すと、結果の領域に1ピクセル以上含まれている場合は`true`が返され、クリップ領域が空の場合は`undefined`が返されます。
 
-> **Note:** `clip` and `origin` share the same stack, and so must be popped in the order they were pushed.
+> **注意:** `clip`と`origin`は同じスタックを共有しているため、プッシュされた順序でポップする必要があります。
 
 ***
 
 #### `origin(x, y)`
 
-Poco maintains an origin that is applied to all drawing operations.
+Pocoは、すべての描画操作に適用される原点を保持します。
 
-When `begin` is called, the origin is set to `{x: 0, y: 0}`. Poco maintains an origin stack, eliminating the need for applications to save and restore the current origin. Calling `origin` with two arguments offsets the current origin by the arguments; calling it with no arguments pops the origin stack, restoring the previous origin.
+`begin`が呼び出されると、原点は`{x: 0, y: 0}`に設定されます。Pocoは原点スタックを保持しているため、アプリケーションが現在の原点を保存および復元する必要はありません。2つの引数で`origin`を呼び出すと、現在の原点がその引数分だけオフセットされます。引数なしで呼び出すと、原点スタックの最後の原点が削除され、前の原点が復元されます。
 
 ```javascript
 poco.begin();			// Origin is {x: 0, y: 0}
@@ -524,15 +525,15 @@ poco.origin();			// Origin is {x: 0, y: 0}
 poco.end();
 ```
 
-If the origin stack overflows or underflows, an exception is thrown from `end`. The origin stack must be empty when `end` is called, or an exception will be thrown.
+原点スタックがオーバーフローまたはアンダーフローすると、`end`から例外がスローされます。`end`が呼び出されたときに原点スタックが空でないと、例外がスローされます。
 
-> **Note:** Changing the origin does not change the clip rectangle. Note too that `clip` and `origin` share the same stack, and so must be popped in the order they were pushed.
+> **注意:** 原点を変更してもクリップ矩形は変更されません。また、`clip`と`origin`は同じスタックを共有しているため、プッシュされた順序でポップする必要があります。
 
 ***
 
 #### `makeColor(r, g, b)`
 
-The `makeColor` function takes red, green, and blue values from 0 to 255 and returns the corresponding pixel value. The returned pixel is in the format of the `PixelsOut` instance bound to the `Poco` instance.
+`makeColor`関数は、0から255までの赤、緑、青の値を受け取り、対応するピクセル値を返します。返されるピクセルは、`Poco`インスタンスにバインドされた`PixelsOut`インスタンスのフォーマットに従います。
 
 ```javascript
 let red = poco.makeColor(255, 0, 0);
@@ -543,13 +544,13 @@ let white = poco.makeColor(255, 255, 255);
 let gray = poco.makeColor(127, 127, 127);
 ```
 
-Many rendering functions take a color as an argument. Use `makeColor` to calculate the color to avoid a dependency on the pixel format.
+多くの描画関数は、引数として色を受け取ります。ピクセルフォーマットに依存しないようにするために、色を計算するには`makeColor`を使用します。
 
 ***
 
 #### `fillRectangle(color, x, y, width, height)`
 
-The `fillRectangle` function fills the area specified by the `x`, `y`, `width`, and `height` arguments with the specified color.
+`fillRectangle`関数は、`x`、`y`、`width`、および`height`の引数で指定された領域を指定された色で塗りつぶします。
 
 ```javascript
 poco.fillRectangle(green, 10, 20, 40, 40);
@@ -559,9 +560,9 @@ poco.fillRectangle(green, 10, 20, 40, 40);
 
 #### `blendRectangle(color, blend, x, y, width, height)`
 
-The `blendRectangle` function blends the specified color with the pixels in the area specified by the `x`, `y`, `width`, and `height` arguments. The `blend` argument determines the level of blending, from a value of 0 for transparent to a value of 255 for opaque.
+`blendRectangle`関数は、指定された色を`x`、`y`、`width`、および`height`の引数で指定された領域のピクセルとブレンドします。`blend`引数はブレンドのレベルを決定し、0は透明、255は不透明を意味します。
 
-The following code draws 16 horizontal green lines with increasing opacity.
+以下のコードは、不透明度が増加する16本の水平な緑の線を描画します。 
 
 ```javascript
 let green = poco.makeColor(0, 255, 0);
@@ -573,28 +574,28 @@ for (let blend = 15, y = 0; blend < 256; blend += 16, y += 1)
 
 #### `drawPixel(color, x, y)`
 
-The `drawPixel` function draws a single pixel of the specified color at the location specified by the `x` and `y` arguments.
+`drawPixel`関数は、指定された色のピクセルを`x`および`y`の引数で指定された位置に描画します。
 
 ```javascript
 poco.drawPixel(poco.makeColor(0, 0, 127), 5, 5);
 ```
 
-> **Note:** Making many calls to `drawPixel` in a single frame can quickly fill the display list.
+> **注意:** 1フレームで`drawPixel`を多用すると、ディスプレイリストがすぐに満たされる可能性があります。 
 
 ***
 
 #### `drawBitmap(bits, x, y, sx, sy, sw, sh)`
 
-The `drawBitmap` function draws all or part of a bitmap with pixels of type `Bitmap.Default`. The bitmap is specified by the `bits` argument, and the location to draw the bitmap is specified by the `x` and `y` arguments. The following code draws the entire image at location `{x: 10, y: 5}`.
+`drawBitmap`関数は、ピクセルタイプが`Bitmap.Default`であるビットマップの全部または一部を描画します。ビットマップは`bits`引数で指定され、ビットマップを描画する位置は`x`および`y`引数で指定されます。以下のコードは、画像全体を位置`{x: 10, y: 5}`に描画します。
 
 ```javascript
 let image = parseBMP(new Resource("image.bmp"));
 poco.drawBitmap(image, 10, 5);
 ```
 
-The optional `sx`, `sy`, `sw`, and `sh` arguments specify the area of the bitmap to draw. If they are omitted, the entire bitmap is drawn.
+オプションの`sx`、`sy`、`sw`および`sh`引数は、描画するビットマップの領域を指定します。これらを省略すると、ビットマップ全体が描画されます。
 
-The following code draws the bottom half of the bitmap at location `{x: 0, y: 0}`.
+以下のコードは、ビットマップの下半分を位置`{x: 0, y: 0}`に描画します。
 
 ```javascript
 poco.drawBitmap(image, 0, 0, 0, image.height / 2, image.width, image.height / 2);
@@ -604,9 +605,9 @@ poco.drawBitmap(image, 0, 0, 0, image.height / 2, image.width, image.height / 2)
 
 #### `drawMonochrome(monochrome, fore, back, x, y, sx, sy, sw, sh)`
 
-The `drawMonochrome` function draws all or part of a bitmap with pixels of type `Bitmap.Monochrome`. The bitmap is specified by the `bits` argument, and the location to draw the bitmap is specified by the `x` and `y` arguments.
+`drawMonochrome`関数は、ピクセルタイプが`Bitmap.Monochrome`のビットマップの全部または一部を描画します。ビットマップは`bits`引数で指定され、ビットマップを描画する位置は`x`および`y`引数で指定されます。
 
-The `fore` and `back` arguments specify the foreground and background colors to apply to the black and white pixels of the bitmap. If `fore` is `undefined`, the foreground pixels are not drawn; if `back` is `undefined`, the background pixels are not drawn.
+`fore`および`back`引数は、ビットマップの白黒ピクセルに適用される前景色および背景色を指定します。`fore`が`undefined`の場合、前景ピクセルは描画されません。`back`が`undefined`の場合、背景ピクセルは描画されません。
 
 ```javascript
 let red = poco.makeColor(255, 0, 0);
@@ -619,27 +620,27 @@ poco.drawMonochrome(icon, gray, undefined, 0, 5);  // only foreground pixels in 
 poco.drawMonochrome(icon, undefined, red, 0, 5);  // only background pixels in red
 ```
 
-The optional `sx`, `sy`, `sw`, and `sh` arguments specify the area of the bitmap to draw. If they are omitted, the entire bitmap is drawn.
+オプションの`sx`、`sy`、`sw`および`sh`引数は、描画するビットマップの領域を指定します。これらを省略すると、ビットマップ全体が描画されます。
 
 ***
 
 #### `drawGray(bits, color, x, y, sx, sy, sw, sh[, blend])`
 
-The `drawGray` function draws all or part of a bitmap with pixels of type `Bitmap.Gray16`. The bitmap is specified by the `bits` argument, and the location to draw the bitmap is specified by the `x` and `y` arguments. The pixels of the bitmap are treated as alpha values and are blended with the background. The `color` argument specifies the color to apply when blending.
+`drawGray`関数は、ピクセルタイプが`Bitmap.Gray16`のビットマップの全部または一部を描画します。ビットマップは`bits`引数で指定され、ビットマップを描画する位置は`x`および`y`引数で指定されます。ビットマップのピクセルはアルファ値として扱われ、背景とブレンドされます。`color`引数はブレンド時に適用する色を指定します。
 
-The optional `sx`, `sy`, `sw`, and `sh` arguments specify the area of the bitmap to draw. If they are omitted, the entire bitmap is drawn.
+オプションの`sx`、`sy`、`sw`および`sh`引数は、描画するビットマップの領域を指定します。これらを省略すると、ビットマップ全体が描画されます。
 
-The optional `blend` argument applies an additional blend level to all pixels in the bitmap prior to blending with the background. The `blend` value ranges from 0 for transparent to 255 for opaque.
+オプションの`blend`引数は、背景とブレンドする前に、ビットマップ内のすべてのピクセルに追加のブレンドレベルを適用します。`blend`値は、0が透明で255が不透明です。
 
 ***
 
 #### `drawMasked(bits, x, y, sx, sy, sw, sh, mask, mask_sx, mask_sy[, blend])`
 
-The `drawMasked` function uses two bitmaps--an image and the alpha channel--to alpha-blend the image through the mask onto the destination. The image, specified by the `bits` argument, is in `Bitmap.Default` format. The alpha channel, specified by the `mask` argument, is in `Bitmap.Gray16` format.
+`drawMasked`関数は、画像とアルファチャネルの2つのビットマップを使用して、マスクを通じて画像をアルファブレンドし、目的の位置に合成します。`bits`引数で指定された画像は`Bitmap.Default`フォーマットです。`mask`引数で指定されたアルファチャネルは`Bitmap.Gray16`フォーマットです。
 
-The `x` and `y` arguments specify where to locate the merged image in the output. The `sx`, `sy`, `sw`, and `sh` arguments specify the area of the image to use. The `mask_sx` and `mask_sy` arguments specify the top-left corner of the mask bitmap to use; the dimensions of the mask bitmap area are taken from the `sw` and `sh` arguments.
+`x`と`y`引数は出力の中で合成画像を配置する位置を指定します。`sx`、`sy`、`sw`、および`sh`引数は、使用する画像の領域を指定します。`mask_sx`と`mask_sy`引数は使用するマスクビットマップの左上隅を指定します。マスクビットマップ領域の寸法は`sw`と`sh`引数から取得されます。
 
-The following example draws a button image with an alpha channel. The image and alpha channel are stored in separate files, each previously extracted from a PNG file with an alpha channel.
+以下のサンプルは、アルファチャネルを使用してボタン画像を描画する方法を示しています。画像とアルファチャネルは、それぞれアルファチャネルを持つPNGファイルから抽出され、別々のファイルに保存されています。
 
 ```javascript
 let buttonImage = parseBMP(new Resource("button_image.bmp"));
@@ -648,26 +649,26 @@ poco.drawMasked(buttonImage, 0, 0, 0, 0,
 	buttonImage.width, buttonImage.height, buttonAlpha, 0, 0);
 ```
 
-Storing the alpha channel separately from the image is unusual, and has benefits for resource constrained devices:
+アルファチャネルを画像とは別に保存することは珍しいですが、リソースに制約のあるデバイスでは次のような利点があります：
 
-* The alpha channel image can be 4 bits per pixel, which gives good results at half the size.
-* The image can be rendered with and without an alpha channel.
-* A single mask can be applied to any image, allowing for effects and animations.
+* アルファチャネル画像はピクセルあたり4ビットにすることができ、半分のサイズで良好な結果を得ることができます。
+* 画像はアルファチャネル付きとなしの両方でレンダリングできます。
+* 単一のマスクを任意の画像に適用でき、エフェクトやアニメーションを実現できます。
 
-The optional `blend` argument applies an additional blend level to all pixels in the alpha channel bitmap prior to blending with the background. The `blend` value ranges from 0 for transparent to 255 for opaque.
+オプションの`blend`引数は、背景とブレンドする前にアルファチャネルビットマップのすべてのピクセルに追加のブレンドレベルを適用します。`blend`値は透明の場合は0、不透明の場合は255です。
 
 ***
 
-#### `fillPattern(bits, x, y, w, h [, sx, sx, sx, sh])`
+#### `fillPattern(bits, x, y, w, h [, sx, sy, sw, sh])`
 
-The `fillPattern` function fills an area by repeatedly drawing all or part of a bitmap with pixels of type `Bitmap.Default`. The bitmap is specified by the `bits` argument. The location of the area to fill is specified by the `x` and `y` arguments, and the dimensions of the area are specified by the `w` and `h` arguments.
+`fillPattern`関数は、`Bitmap.Default`タイプのピクセルで構成されるビットマップの全部または一部を繰り返し描画することで、指定された領域を埋めます。ビットマップは `bits`引数で指定されます。塗りつぶす領域の位置は`x`と`y`引数で指定され、その領域の寸法は`w`と`h`引数で指定されます。
 
 ```javascript
 let pattern = parseBMP(new Resource("pattern.bmp"));
 poco.fillPattern(pattern, 10, 10, 90, 90);
 ```
 
-The optional `sx`, `sy`, `sw`, and `sh` arguments specify the area of the bitmap to use. If they are omitted, the entire bitmap is used.
+オプションの`sx`、`sy`、`sw`、および`sh`引数は、ビットマップのどの部分を使用するかを指定します。これらの引数が省略された場合、ビットマップ全体が使用されます。
 
 ```javascript
 poco.fillPattern(pattern, 10, 10, 90, 90, 0, 0, 8, 8);
@@ -677,28 +678,28 @@ poco.fillPattern(pattern, 10, 10, 90, 90, 0, 0, 8, 8);
 
 #### `drawText(text, font, color, x, y[, width])`
 
-The `drawText` function draws the `text` string using the BMFont in the `font` argument. The text is drawn in the color of the `color` argument at the location of the `x` and `y` arguments. Text is drawn using top-left alignment.
+`drawText`関数は、`font`引数に指定されたBMFontを使用して`text`文字列を描画します。テキストは、`color`引数で指定された色で、`x`および`y`引数の位置に描画されます。テキストは左上揃えで描画されます。
 
-The following code draws the string `"Hello, world"` twice: first in the top-left corner of the screen using the Chicago font in black, and then beneath that string using the Palatino 36 font in red.
+次のコードは、`"Hello, world"`という文字列を2回描画します。最初は画面の左上隅にChicagoフォントを使用して黒で描画し、その下にPalatino 36フォントを使用して赤で描画します。
 
 ```javascript
 poco.drawText("Hello, world", chicagoFont, black, 0, 0);
 poco.drawText("Hello, world", palatino36, red, 0, chicagoFont.height);
 ```
 
-If the optional `width` argument is provided, the text is truncated on the right edge when it is too long to fit unclipped in the available width. When truncation occurs, three periods (`...`) are drawn at the end of the string.
+オプションの引数`width`を指定すると、テキストが長すぎて利用可能な幅に収まらない場合、右端で切り詰められます。切り詰めが発生すると、3つのピリオド（`...`）が文字列の末尾に描画されます。
 
-Characters in the text string that are not part of the font are ignored.
+フォントに含まれていない文字列内の文字は無視されます。
 
-To draw full-color text with anti-aliased edges, use a BMFont with a bitmap in `Bitmap.Default` format. In place of the `color` argument, pass a mask bitmap in the `Bitmap.Gray16` format. The mask must be at least as large as the BMFont's glyph atlas. When each glyph is drawn, the pixels in the mask image corresponding to the glyph in the font image are used to alpha-blend each glyph with the destination.
+エッジにアンチエイリアスをかけたフルカラーのテキストを描画するには、`Bitmap.Default`フォーマットのビットマップを持つBMFontを使用します。`color`引数の代わりに、`Bitmap.Gray16`フォーマットのマスクビットマップを渡します。マスクは少なくともBMFontのグリフアトラスと同じ大きさでなければなりません。各グリフが描画されるとき、フォント画像内のグリフに対応するマスク画像内のピクセルが、各グリフを描画先にアルファブレンドするために使用されます。
 
 ***
 
 #### `getTextWidth(text, font)`
 
-The `getTextWidth` function calculates the width in pixels of the `text` string when rendered using `font`.
+`getTextWidth`関数は、`font`を使用してレンダリングされたときの`text`文字列の幅をピクセル単位で計算します。
 
-The following code draws the string `"Hello, world"` horizontally centered at the top of display.
+次のコードは、`"Hello, world"`という文字列をディスプレイの上部に水平中央に配置して描画します。
 
 ```javascript
 let text = "Hello, world";
@@ -706,100 +707,100 @@ let width = poco.getTextWidth(text, palatino36);
 poco.drawText(text, palatino36, green, (pixelsOut.width - width) / 2, 0);
 ```
 
-The height of the font is available in the `font.height` property.
+フォントの高さは`font.height`プロパティで利用できます。
 
-Characters in the text string that are not part of the font are not rendered.
+テキスト文字列内のフォントに含まれていない文字はレンダリングされません。
 
 ***
 
 #### `drawFrame(frame, dictionary, x, y)`
 
-The `drawFrame` function renders the ColorCell compressed image referenced by the `frame` argument at the location specified by the `x` and `y` arguments. The `dictionary` argument is an `Object` that contains width and height properties that indicate the source dimensions of the image.
+`drawFrame`関数は、`frame`引数で参照されるColorCell圧縮画像を、`x`および`y`引数で指定された位置にレンダリングします。`dictionary`引数は、画像のサイズを示す幅と高さのプロパティを含む`Object`です。
 
 ***
 
 <a id="js-properties"></a>
-### Properties
+### プロパティ
 
 #### `height`
 
-The logical height in pixels of the Poco instance after rotation is applied. When rotation is 0 or 180, this is equal to the `PixelsOut` instance's height; when rotation is 90 or 270, it is equal to the `PixelsOut` instance's width.
+回転を適用した後のPocoインスタンスのピクセル単位の論理的な高さ。回転が0または180の場合、これは`PixelsOut`インスタンスの高さに等しくなります。回転が90または270の場合、これは`PixelsOut`インスタンスの幅に等しくなります。
 
 ***
 
 #### `width`
 
-The logical width in pixels of the Poco instance after rotation is applied. When rotation is 0 or 180, this is equal to the `PixelsOut` instance's width; when rotation is 90 or 270, it is equal to the `PixelsOut` instance's height.
+回転を適用した後のPocoインスタンスのピクセル単位の論理的な幅。回転が0または180の場合、これは`PixelsOut`インスタンスの幅と等しくなります。回転が90または270の場合、これは`PixelsOut`インスタンスの高さと等しくなります。
 
 ***
 
 <a id="c-api-reference"></a>
-## C API Reference
+## C APIリファレンス
 
-The Poco C API is a low-level rendering engine. It is based on a display list, meaning that all drawing calls are queued to a list prior to rendering. A display list enables the renderer to generate as little as a single scanline of fully composed output at a time, minimizing memory use by eliminating the need for a frame buffer in the memory of the application processor.
+Poco C APIは低レベルのレンダリングエンジンです。これはディスプレイリストに基づいており、すべての描画呼び出しはレンダリング前にリストにキューイングされることを意味します。ディスプレイリストを使用することで、レンダラーは一度に1スキャンライン分の完全な出力を生成すればよいので、アプリケーションプロセッサのメモリ内にフレームバッファを必要せず、メモリ使用量を最小限に抑えられます。
 
-The Poco C API may be used independently of Commodetto and its JavaScript API. It makes no allocations and almost no external calls (only to `memcpy`), relying on the caller to provide memory.
+Poco C APIは、CommodettoやそのJavaScript APIとは独立して使用することができます。メモリ割り当ては行わず、ほとんど外部呼び出しも行わず（`memcpy`への呼び出しのみ）、呼び出し元のメモリ提供に依存します。
 
 <a id="c-data-structures"></a>
-### Data Structures
+### データ構造
 
 <a id="poco-record"></a>
 ##### `PocoRecord`
 
-`PocoRecord` maintains state for Poco. Many of the fields are private to the implementation and should not be accessed directly by users of the library. The `PocoRecord` data structure should be initialized to 0, and the same `PocoRecord` structure must be passed to all Poco function calls.
+`PocoRecord`はPocoの状態を保持します。多くのフィールドはプライベート実装であり、ライブラリのユーザーが直接アクセスしてはいけません。`PocoRecord`データ構造は0に初期化する必要があり、すべてのPoco関数呼び出しに対して同じ`PocoRecord`構造体を渡す必要があります。
 
-The following fields in `PocoRecord` are public and can be accessed by users of the library. Poco expects these fields to be initialized by the users of the library before the first call to Poco is made.
+次の`PocoRecord`のフィールドはパブリックであり、ライブラリのユーザーがアクセスできます。Pocoは最初の呼び出しが行われる前に、ライブラリのユーザによってこれらのフィールドが初期化されることを期待しています。
 
-| Field | Description |
+| フィールド | 説明 |
 | :---: | :--- |
-| `width` | width of output in pixels
-| `height` | height of output in pixels
-| `displayList` | pointer to start of memory for display list
-| `displayListEnd` | pointer to end of memory for display list
-| `pixelsLength` | size in bytes of pixels array
+| `width` | ピクセル単位の出力の幅
+| `height` | ピクセル単位の出力の高さ
+| `displayList` | ディスプレイリストのメモリ開始位置へのポインタ
+| `displayListEnd` | ディスプレイリストのメモリ終了位置へのポインタ
+| `pixelsLength` | バイト単位のピクセル配列のサイズ
 
-The following fields are available to read from the `PocoRecord` structure between calls to `PocoDrawingBegin` and `PocoDrawingEnd`:
+次のフィールドは`PocoDrawingBegin`と`PocoDrawingEnd`の呼び出しの間に `PocoRecord`構造体から読み取ることができます：
 
-| Field | Description |
+| フィールド | 説明 |
 | :---: | :--- |
-| `xOrigin` | *x* coordinate of drawing origin
-| `yOrigin` | *y* coordinate of drawing origin
-| `x` | *x* coordinate of drawing clip
-| `y` | *y* coordinate of drawing clip
-| `w` | width of drawing clip
-| `h` | height of drawing clip
-| `xMax` | right coordinate of drawing clip, `x + w`
-| `yMax` | bottom coordinate of drawing clip, `y + h`
+| `xOrigin` | 描画の原点の*x*座標
+| `yOrigin` | 描画の原点の*y*座標
+| `x` | 描画クリップの*x*座標
+| `y` | 描画クリップの*y*座標
+| `w` | 描画クリップの幅
+| `h` | 描画クリップの高さ
+| `xMax` | 描画クリップの右側の座標、`x + w`
+| `yMax` | 描画クリップの下側の座標、`y + h`
 
 ***
 
 ##### `PocoCoordinate`
 
-`PocoCoordinate` is a signed integer value. When used in Commodetto, it is aliased to `CommodettoCoordinate`. See the description of `CommodettoCoordinate` in the [Commodetto documentation](./commodetto.md) for additional information.
+`PocoCoordinate`は符号付き整数値です。Commodettoで使用される場合、`CommodettoCoordinate`としてエイリアスされています。詳細については、[Commodettoドキュメント](./commodetto.md)の`CommodettoCoordinate`の説明を参照してください。
 
 ***
 
 ##### `PocoDimension`
 
-`PocoDimension` is an unsigned integer value. When used in Commodetto, it is aliased to `CommodettoDimension`. See the description of `CommodettoDimension` in the [Commodetto documentation](./commodetto.md) for additional information.
+`PocoDimension`は符号なし整数値です。Commodettoで使用される場合、`CommodettoDimension`としてエイリアスされています。詳細については、[Commodettoドキュメント](./commodetto.md)の`CommodettoDimension`の説明を参照してください。
 
 ***
 
 ##### `PocoPixel`
 
-`PocoPixel` is an integer value. When used in Commodetto, it is aliased to `CommodettoPixel`. See the description of `CommodettoPixel` in the [Commodetto documentation](./commodetto.md) for additional information.
+`PocoPixel`は整数値です。Commodettoで使用される場合、`CommodettoPixel`としてエイリアスされています。詳細については、[Commodettoドキュメント](./commodetto.md)の`CommodettoPixel`の説明を参照してください。
 
 ***
 
 ##### `PocoBitmapFormat`
 
-`PocoBitmapFormat` is an integer value. When used in Commodetto, it is aliased to `CommodettoBitmapFormat`. See the description of `CommodettoBitmapFormat` in the [Commodetto documentation](./commodetto.md) for additional information.
+`PocoBitmapFormat`は整数値です。Commodettoで使用される場合、`CommodettoBitmapFormat`としてエイリアスされています。詳細については、[Commodettoドキュメント](./commodetto.md)の`CommodettoBitmapFormat`の説明を参照してください。
 
 ***
 
 ##### `PocoRectangle`
 
-`PocoRectangle` defines the area enclosed by a rectangle, with the top-left coordinate and the dimensions.
+`PocoRectangle`は矩形で囲まれた領域を定義し、左上の座標と寸法を指定します。
 
 ```c
 typedef struct {
@@ -814,7 +815,7 @@ typedef struct {
 
 ##### `PocoBitmap`
 
-The `PocoBitmap` structure contains the width and height of the bitmap in pixels, the format of the pixels in the bitmap, and a pointer to the pixel data.
+`PocoBitmap`構造体には、ビットマップのピクセル単位の幅と高さ、ビットマップ内のピクセルフォーマット、およびピクセルデータへのポインタが含まれています。
 
 ```c
 typedef struct PocoBitmapRecord {
@@ -825,16 +826,16 @@ typedef struct PocoBitmapRecord {
 } PocoBitmapRecord, *PocoBitmap;
 ```
 
-The pixels are organized left to right, top to bottom, with no padding between rows. There is no `rowBytes` or `stride` field in `PocoBitmap`.
+ピクセルは左から右、上から下へと並んでおり、行間にパディングはありません。`PocoBitmap`には`rowBytes`や`stride`フィールドはありません。
 
-> **Note:** Unlike `CommodettoBitmap`, `PocoBitmap` does not have an option to store an offset in place of the pixels pointer.
+> **注意:** `CommodettoBitmap`と異なり、`PocoBitmap`にはピクセルポインタの代わりにオフセットを格納するオプションはありません。
 
 ***
 
 <a id="c-functions"></a>
-### Functions
+### 関数
 
-Before calls to Poco can be made, a `PocoRecord` structure must be allocated and initialized. See [`PocoRecord`](#poco-record) for details.
+Pocoの呼び出しを行う前に、`PocoRecord`構造体を確保して初期化する必要があります。詳細は[`PocoRecord`](#poco-record)を参照してください。
 
 ##### `PocoMakeColor`
 
@@ -842,9 +843,9 @@ Before calls to Poco can be made, a `PocoRecord` structure must be allocated and
 PocoPixel PocoMakeColor(Poco poco, uint8_t r, uint8_t g, uint8_t b);
 ```
 
-`PocoMakeColor` takes red, green, and blue values from 0 to 255 and returns a `PocoPixel` value. The returned pixel value can be used as a color argument in some rendering calls.
+`PocoMakeColor`は0から255までの赤、緑、および青の値を受け取り、`PocoPixel`値を返します。返されるピクセル値は、いくつかのレンダリング呼び出しで色引数として使用できます。
 
-> **Note:** In the current implementation the poco parameter is unused because Poco is always built with support for only a single output pixel format.
+> **注意:** 現在の実装では、Pocoは常に単一の出力ピクセルフォーマットをサポートしてビルドされるため、pocoパラメータは使用されません。
 
 ***
 
@@ -855,9 +856,9 @@ void PocoDrawingBegin(Poco poco, PocoCoordinate x, PocoCoordinate y,
 	PocoDimension w, PocoDimension h);
 ```
 
-`PocoDrawingBegin` begins the rendering process for an update area of pixels bounded by the `x`, `y`, `w`, and `h` parameters. Calls to draw can only be made between calls to `PocoDrawingBegin` and `PocoDrawingEnd`.
+`PocoDrawingBegin`は、`x`、`y`、`w`、`h`パラメータで囲まれたピクセルの更新エリアに対するレンダリングプロセスを開始します。描画の呼び出しは`PocoDrawingBegin`と `PocoDrawingEnd`の間でのみ行うことができます。
 
-> **Important:** The caller of `PocoDrawingBegin` is responsible for ensuring that the drawing calls cover all pixels in the update area. Poco does not maintain the previous frame. Any pixels that are not drawn will contain unpredictable values.
+> **重要:** `PocoDrawingBegin`の呼び出し元は、描画呼び出しが更新エリア内のすべてのピクセルをカバーすることを確認する責任があります。Pocoは前のフレームを保持しません。描画されないピクセルには予測不可能な値を含むことになります。
 
 ***
 
@@ -871,15 +872,15 @@ typedef void (*PocoRenderedPixelsReceiver)(PocoPixel *pixels,
 	int byteCount, void *refCon);
 ```
 
-`PocoDrawingEnd` renders the drawing commands added to the display list since the call to `PocoDrawingBegin`.
+`PocoDrawingEnd`は、`PocoDrawingBegin`の呼び出し以降にディスプレイリストに追加された描画コマンドをレンダリングします。
 
-The caller of `PocoDrawingEnd` provides a buffer for the rendered pixels in the `pixels` and `byteLength` arguments. Poco renders as many rows of pixels as possible into the buffer and then calls the `pixelReceiver` function to output the pixels. The buffer need be only large enough to hold a single row of pixels. A buffer that can hold several rows of pixels reduces rendering overhead.
+`PocoDrawingEnd`の呼び出し元は、レンダリングされたピクセルのバッファを`pixels`と`byteLength`引数で提供します。Pocoはバッファにできるだけ多くのピクセル行をレンダリングし、その後`pixelReceiver`関数を呼び出してピクセルを出力します。バッファは単一のピクセル行を保持するのに十分なサイズであればよく、複数行のピクセルを保持できるバッファを使用するとレンダリングのオーバーヘッドが減少します。
 
-If an error occurs, adding commands to the display list as the result of drawing calls or in the execution of `PocoDrawingEnd`, `PocoDrawingEnd` returns a nonzero result:
+描画呼び出しの結果や`PocoDrawingEnd`の実行中にコマンドを表示リストに追加してエラーが発生した場合、`PocoDrawingEnd`は0以外の結果を返します：
 
-* 1 -- display list overflow
-* 2 -- clip and origin stack overflow
-* 3 -- clip and origin stack underflow or out-of-sequence pop
+* 1 -- ディスプレイリストのオーバーフロー
+* 2 -- クリップおよび原点スタックのオーバーフロー
+* 3 -- クリップおよび原点スタックのアンダーフロー、または順序外のポップ
 
 ***
 
@@ -890,7 +891,7 @@ void PocoRectangleFill(Poco poco, PocoPixel color, uint8_t blend,
 	PocoCoordinate x, PocoCoordinate y, PocoDimension w, PocoDimension h);
 ```
 
-`PocoRectangleFill` fills the area defined by the `x`, `y`, `w`, and `h` arguments as specified by `color`. If the level specified by `blend` is `kPocoOpaque` (255), the color is drawn over with the background without blending; for other blending levels the color is blended proportionally with the background.
+`PocoRectangleFill`は、`x`、`y`、`w`、`h`引数で定義された領域を指定された `color`で塗りつぶします。`blend`で指定されたレベルが`kPocoOpaque`（255）の場合、色はブレンドされずに背景に上書きされます。他のブレンドレベルの場合、色は背景と比率に応じてブレンドされます。
 
 ***
 
@@ -901,7 +902,7 @@ void PocoPixelDraw(Poco poco, PocoPixel color,
 		PocoCoordinate x, PocoCoordinate y);
 ```
 
-`PocoPixelDraw` renders a single pixel at the location specified by `x` and `y` in the specified color.
+`PocoPixelDraw`は、指定された`x`と`y`の位置に指定された色で単一のピクセルを描画します。
 
 ***
 
@@ -914,7 +915,7 @@ PocoCommand PocoBitmapDraw(Poco poco, PocoBitmap bits,
 			PocoDimension sw, PocoDimension sh);
 ```
 
-`PocoBitmapDraw` renders all or part of the bitmap `bits`, of type `kCommodettoBitmapDefault`, at the location specified by `x` and `y`. The `sx`, `sy`, `sw`, and `sh` arguments define the area of the bitmap to render.
+`PocoBitmapDraw`は、`x`と`y`で指定された位置に、`kCommodettoBitmapDefault`型のビットマップである`bits`の全体または一部を描画します。`sx`、`sy`、`sw`、`sh`の引数は、描画するビットマップの領域を定義します。
 
 ***
 
@@ -928,13 +929,13 @@ void PocoMonochromeBitmapDraw(Poco poco, PocoBitmap bits,
 		PocoDimension sw, PocoDimension sh);
 ```
 
-`PocoMonochromeBitmapDraw` renders all or part of bitmap `bits` of type `kCommodettoBitmapMonochrome` at the location specified by `x` and `y`. The `sx`, `sy`, `sw`, and `sh` arguments define the area of the bitmap to render. The `mode` argument determines which pixels are drawn:
+`PocoMonochromeBitmapDraw`は、`x`と`y`で指定された位置に、`kCommodettoBitmapMonochrome`型のビットマップである`bits`の全体または一部を描画します。`sx`、`sy`、`sw`、`sh`の引数は、描画するビットマップの領域を定義します。`mode`引数は、どのピクセルを描画するかを決定します：
 
-* `kPocoMonochromeForeground` -- Only foreground pixels are drawn (1 pixels in the bitmap).
-* `kPocoMonochromeBackground` -- Only background pixels are drawn (0 pixels in the bitmap).
-* `kPocoMonochromeForeAndBackground` -- Both foreground and background pixels are drawn.
+* `kPocoMonochromeForeground` -- 前景ピクセル（ビットマップ内の値が1のピクセル）のみを描画します。
+* `kPocoMonochromeBackground` -- 背景ピクセル（ビットマップ内の値が0のピクセル）のみを描画します。
+* `kPocoMonochromeForeAndBackground` -- 前景および背景ピクセルの両方を描画します。
 
-The `fgColor` and `bgColor` arguments specify the colors to use to render the foreground and background pixels.
+`fgColor`と`bgColor`引数は、前景と背景ピクセルの描画に使用する色を指定します。
 
 ##### `PocoGrayBitmapDraw`
 
@@ -946,7 +947,7 @@ void PocoGrayBitmapDraw(Poco poco, PocoBitmap bits,
 		PocoDimension sw, PocoDimension sh);
 ```
 
-`PocoGrayBitmapDraw` renders all or part of bitmap `bits`, of type `kCommodettoBitmapGray16`, at the location specified by `x` and `y`. The `sx`, `sy`, `sw`, and `sh` arguments define the area of the bitmap to render. The pixels of the bitmap are treated as alpha blending levels and are used to blend the `color` argument with the background pixels. The `blend` argument is applied to the blend level of each pixel, with values ranging from 0 for transparent to 255 for opaque.
+`PocoGrayBitmapDraw`は、`x`と`y`で指定された位置に、`kCommodettoBitmapGray16`型のビットマップである`bits`の全体または一部を描画します。`sx`、`sy`、`sw`、`sh`の引数は、描画するビットマップの領域を定義します。ビットマップのピクセルはアルファブレンドレベルとして扱われ、`color`引数の色と背景ピクセルとがブレンドされます。`blend`引数は各ピクセルのブレンドレベルに適用され、値は0が透明で255が不透明です。
 
 ***
 
@@ -960,7 +961,7 @@ void PocoBitmapDrawMasked(Poco poco, PocoBitmap bits, uint8_t blend,
 		PocoBitmap mask, PocoDimension mask_sx, PocoDimension mask_sy);
 ```
 
-`PocoBitmapDrawMasked` renders the pixels of bitmap `bits`, of type `kCommodettoBitmapDefault`, enclosed by `sx`, `sy`, `sw`, and `sh` at the location specified by `x` and `y`. The pixels are drawn using the corresponding pixels of the bitmap `mask`, of type `kCommodettoBitmapGray16`, enclosed by `mask_x`, `mask_y`, `sw`, and `sh` as alpha blending levels. The `blend` argument is applied to the blend level of each pixel, with values ranging from 0 for transparent to 255 for opaque.
+`PocoBitmapDrawMasked`は、`x`と`y`で指定された位置に、`kCommodettoBitmapDefault`型のビットマップである`bits`の、`sx`、`sy`、`sw`、`sh`で囲まれたピクセルを描画します。ピクセルは`kCommodettoBitmapGray16`型のビットマップである`mask`の、`mask_sx`、`mask_sy`,`sw`、`sh`で囲まれた対応するピクセルを、アルファブレンディングレベルとして描画します。`blend`引数は各ピクセルのブレンドレベルに適用され、値は0が透明で255が不透明です。
 
 ***
 
@@ -974,7 +975,7 @@ void PocoBitmapPattern(Poco poco, PocoBitmap bits,
 		PocoDimension sw, PocoDimension sh);
 ```
 
-`PocoBitmapPattern ` fills the area enclosed by the `x`, `y`, `w`, and `h` arguments with repeating copies of the area of the bitmap `bits` enclosed by the `sx`, `sy`, `sw`, and `sh` arguments. The bitmap must be of type `kCommodettoBitmapDefault`.
+`PocoBitmapPattern`は、`x`、`y`、`w`、`h`引数で囲まれた領域を、`sx`、`sy`、`sw`、`sh`引数で囲まれたビットマップ`bits`の領域の繰り返しコピーで塗りつぶします。ビットマップは`kCommodettoBitmapDefault`型でなければなりません。
 
 ***
 
@@ -987,7 +988,7 @@ void PocoDrawFrame(Poco poco,
 	PocoDimension w, PocoDimension h);
 ```
 
-`PocoDrawFrame` renders a compressed image stored in the Moddable variant of the ColorCell algorithm. The image to render is pointed to by the `data` argument with a byte count specified by the `dataSize` argument. The image is rendered at the location specified by the `x` and `y` arguments. The source dimensions (unclipped size) of the compressed image are given by the `w` and `h` arguments.
+`PocoDrawFrame`は、ModdableのColorCellアルゴリズムの一種で保存された圧縮画像をレンダリングします。レンダリングする画像は`data`引数で示され、バイト数は`dataSize`引数で指定されます。画像は、`x`および`y`引数で指定された位置にレンダリングされます。圧縮画像のソース寸法（クリップされていないサイズ）は、`w`および`h`引数によって与えられます。
 
 ***
 
@@ -998,7 +999,7 @@ void PocoClipPush(Poco poco, PocoCoordinate x, PocoCoordinate y,
 		 PocoDimension w, PocoDimension h);
 ```
 
-`PocoClipPush` pushes the current clip area on the stack and then replaces the current clip with the intersection of the current clip and the area enclosed by the `x`, `y`, `w`, and `h` arguments.
+`PocoClipPush`は現在のクリップ領域をスタックにプッシュし、その後、現在のクリップと`x`、`y`、`w`、`h`引数で囲まれた領域が交差する領域で現在のクリップを置き換えます。
 
 ***
 
@@ -1008,7 +1009,7 @@ void PocoClipPush(Poco poco, PocoCoordinate x, PocoCoordinate y,
 void PocoClipPop(Poco poco);
 ```
 
-`PocoClipPop` pops the clip from the stack and replaces the current clip with the popped value.
+`PocoClipPop`はスタックからクリップをポップし、現在のクリップをポップした値で置き換えます。
 
 ***
 
@@ -1018,7 +1019,7 @@ void PocoClipPop(Poco poco);
 void PocoOriginPush(Poco poco, PocoCoordinate x, PocoCoordinate y);
 ```
 
-`PocoOriginPush` pushes the current origin on the stack and then offsets the current origin by the `x` and `y` arguments.
+`PocoOriginPush`は現在の原点をスタックにプッシュし、その後、`x`および`y`引数で現在の原点をオフセットします。
 
 ***
 
@@ -1028,7 +1029,7 @@ void PocoOriginPush(Poco poco, PocoCoordinate x, PocoCoordinate y);
 void PocoOriginPop(Poco poco);
 ```
 
-`PocoOriginPop` pops the origin from the stack and replaces the current origin with the popped value.
+`PocoOriginPop`は原点をスタックからポップし、現在の原点をポップした値で置き換えます。
 
 ***
 
@@ -1040,17 +1041,17 @@ void PocoDrawingBeginFrameBuffer(Poco poco, PocoCoordinate x, PocoCoordinate y,
 	PocoPixel *pixels, int16_t rowBytes);
 ```
 
-`PocoDrawingBeginFrameBuffer ` begins the immediate mode rendering process for an update area of pixels bounded by the `x`, `y`, `w`, and `h` parameters. The `pixels` parameter points to the first scanline of output pixels. The `rowBytes` parameters is the stride in bytes between each scanline.
+`PocoDrawingBeginFrameBuffer`は、`x`、`y`、`w`、`h`パラメータによって囲まれたピクセルの更新領域に対して、即時モードレンダリング処理を開始します。`pixels`パラメータは出力ピクセルの最初のスキャンラインを指します。`rowBytes`パラメータは、各スキャンライン間のバイト単位のストライドです。
 
 ***
 
 ##### `PocoDrawingEndFrameBuffer`
 
 ```c
-int PocoDrawingEndFrameBuffer(Poco poco;
+int PocoDrawingEndFrameBuffer(Poco poco;)
 ```
 
-`PocoDrawingEndFrameBuffer ` indicates that all drawing is complete for the current frame.
+`PocoDrawingEndFrameBuffer`は、現在のフレームに対するすべての描画が完了したことを示します。
 
 ***
 
@@ -1067,23 +1068,23 @@ typedef void (*PocoRenderExternal)(Poco poco, uint8_t *data,
 	PocoPixel *dst, PocoDimension w, PocoDimension h, uint8_t xphase);
 ```
 
-`PocoDrawExternal` installs a custom rendering element into the current Poco display list. The `data` argument points to a block of data of `dataSize` bytes in length that describes the drawing operation. This data is copied into the Poco display list, and so should be as compact as possible. The bounds of the drawing operation are defined by the `x`, `y`, `w`, and `h` arguments. The `doDrawExternal` callback function is called to render the custom element, one or more scanlines at a time.
+`PocoDrawExternal`はカスタムレンダリング要素を現在のPocoディスプレイリストにインストールします。`data`引数は、描画操作を定義する`dataSize`バイト長のデータブロックを指します。このデータはPocoディスプレイリストにコピーされるので、できるだけコンパクトである必要があります。描画操作の境界は`x`、`y`、`w`、`h`引数で定義されます。`doDrawExternal`コールバック関数は呼び出されると、一度に1つまたは複数のスキャンラインでカスタム要素を描画します。
 
-Poco does not perform clipping or rotation on the rendering operation. These must be applied by the code that creates the rendering data and/or the rendering callback function.
+Pocoは、レンダリング操作でクリッピングや回転を行いません。これらは、レンダリングデータを作成するコードおよび/またはレンダリングコールバック関数で適用する必要があります。
 
-When drawing to pixel formats with multiple pixels per byte, `xphase` indicates the pixel where drawing begins. For example, for a pixel format that uses 4-bits per pixel, xphase is 0 for the first pixel in the byte and 1 for the second.
+複数のピクセルが1バイトに格納されているピクセルフォーマットで描画する場合、`xphase`は描画が開始されるピクセルを示します。例えば、1ピクセルあたり4ビットを使用するピクセルフォーマットでは、xphaseはバイト内の最初のピクセルに対しては0、2番目のピクセルに対しては1になります。
 
-> **Note**: Implementing custom rendering elements is an advanced technique that requires familiarity with the implementation of the Poco rendering engine.
+> **注意**: カスタムレンダリング要素の実装は高度なテクニックであり、Pocoレンダリングエンジンの実装に精通している必要があります。
 
 ***
 
 <a id="odds-and-ends"></a>
-## Odds and Ends
+## その他
 
-### Relationship to Commodetto
+### Commodettoとの関連性
 
-The C API of Poco may be used independently from Commodetto. Poco is the first renderer integrated into Commodetto. Poco runs on all hardware capable of supporting Commodetto--in particular the XS JavaScript engine. The Poco C API can also run on considerably less powerful hardware than Commodetto.
+PocoのC APIはCommodettoから独立して使用することができます。PocoはCommodettoに統合された最初のレンダラーです。PocoはCommodettoをサポートするすべてのハードウェア、特にXS JavaScriptエンジンで動作します。PocoのC APIはCommodettoと比較して、かなり性能の低いハードウェアでも動作します。
 
-### About the Name "Poco"
+### 「Poco」という名前について
 
-The word *poco* is a term used in music meaning "a little."
+*poco*は音楽用語で「少し」を意味します。
