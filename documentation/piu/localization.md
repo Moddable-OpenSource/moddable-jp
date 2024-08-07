@@ -1,10 +1,10 @@
-# Localization
+# ローカライゼーション
 Copyright 2017 Moddable Tech, Inc.<BR>
-Revised: March 3, 2017
+改訂： 2017年3月3日
 
-## Dictionaries
+## 辞書
 
-When using JavaScript, the most obvious format to localize strings is a dictionary. Applications use common keys to access localized strings.
+JavaScriptを使用する場合、文字列をローカライズする最も明白な形式は辞書です。アプリケーションは共通のキーを使用してローカライズされた文字列にアクセスします。
 
 	var en = {
 		"I love you": "I love you",
@@ -21,13 +21,13 @@ When using JavaScript, the most obvious format to localize strings is a dictiona
 		return language[it];
 	}
 
-It is not always possible to use the English string as the key, because of homonyms, contexts, etc. However, when it is possible, it is recommended: the code is easier to read and obvious redundancies are avoided.
+同音異義語や文脈などの理由で、英語の文字列をキーとして使用することが常に可能であるとは限りません。しかし、可能な場合はそれを推奨します。コードが読みやすくなり、明らかな冗長性が避けられます。
 
-The trivial examples here above are used to compare solutions here under. Of course real applications use dictionaries with thousands of entries, small and large keys and values, so multiply accordingly.
+ここに示した簡単な例は、以下の解決策を比較するために使用されています。もちろん、実際のアプリケーションは何千ものエントリ、小さなキーと大きなキー、値を持つ辞書を使用するため、状況に応じて掛け合わせてください。
 
-## JSON Files
+## JSONファイル
 
-Since usually applications need only one language at a time, dictionaries can be JSON files, loaded and unloaded when the user selects a language.
+通常、アプリケーションは一度に1つの言語のみを必要とするため、辞書はJSONファイルにすることができ、ユーザーが言語を選択するときにロードおよびアンロードされます。
 
 #### en.json
 
@@ -37,25 +37,25 @@ Since usually applications need only one language at a time, dictionaries can be
 
 	{"I love you":"Je t'aime","Me neither":"Moi non plus"}
 
-Storing JSON files in ROM is a waste since all dictionaries have to define all keys. For instance here above the keys `I love you` and `Me neither` are repeated in the English and French dictionaries.
+JSONファイルをROMに保存するのは無駄です。なぜなら、すべての辞書がすべてのキーを定義しなければならないからです。例えば、上記の例では、`I love you`と`Me neither`のキーが英語とフランス語の辞書で繰り返されています。
 
-ROM|Size
+ROM|サイズ
 :---|---:
-en.json|53 bytes
-fr.json|54 bytes
+en.json|53バイト
+fr.json|54バイト
 
-Loading JSON files uses a lot of RAM. Firstly the keys populate the XS symbols table. Secondly a dictionary allocales one slots for itseft, one slot by entry and one chunk by string.
+JSONファイルを読み込むと大量のRAMを使用します。まず、キーがXSシンボルテーブルに登録されます。次に、辞書は自身のために1つのスロット、エントリごとに1つのスロット、文字列ごとに1つのチャンクを割り当てます。
 
-RAM|Size
+RAM|サイズ
 :---|---:
-symbols|64 bytes
-en.json|80 bytes
-fr.json|84 bytes
+シンボル|64バイト
+en.json|80バイト
+fr.json|84バイト
 
 
-## JavaScript Modules
+## JavaScriptモジュール
 
-Instead of JSON files, dictionaries could be JavaScript modules that XS can compile, link and preload in ROM.
+JSONファイルの代わりに、辞書をXSがコンパイル、リンク、ROMにプリロードできるJavaScriptモジュールにすることができます。
 
 #### en.js
 
@@ -65,19 +65,19 @@ Instead of JSON files, dictionaries could be JavaScript modules that XS can comp
 
 	export default {"I love you":"Je t'aime","Me neither":"Moi non plus"}
 
-That would avoid redundant keys in ROM and would use no RAM. However the process would still populate the XS symbols table with keys, use six slots by dictionary for the module, export and object, and use one slot by entry.
+これにより、ROM内の冗長なキーを避け、RAMを使用しません。ただし、このプロセスでもキーでXSシンボルテーブルを埋め、モジュール、エクスポート、オブジェクトごとに辞書に6つのスロットを使用し、エントリごとに1つのスロットを使用します。
 
 ROM|Size
 :---|---:
-symbols|64 bytes
-en.js|160 bytes
-fr.js|164 bytes
+symbols|64 バイト
+en.js|160 バイト
+fr.js|164 バイト
 
-Moreover, since XS has no special case for such objects, the time to lookup a string in ROM would be significant for dictionaries with a lot of entries.
+さらに、XSにはそのようなオブジェクトに対する特別な処理がないため、多くのエントリを持つ辞書においてROM内の文字列を検索する時間はかなりのものになります。
 
-## Strings Tables
+## 文字列テーブル
 
-The first optimization is to use strings tables instead of JSON files or JavaScript modules. Each table begins with the length of the table followed by the offsets of the strings in the table. All numbers are little-endian 32-bit integers.
+最初の最適化は、JSONファイルやJavaScriptモジュールの代わりに文字列テーブルを使用することです。各テーブルはテーブルの長さとテーブル内の文字列のオフセットから始まります。すべての数値はリトルエンディアンの32ビット整数です。
 
 #### locals.en.mhr
 
@@ -87,20 +87,20 @@ The first optimization is to use strings tables instead of JSON files or JavaScr
 
 	2 12 22 Je t'aime Moi non plus
 
-Like most resources in Moddable applications, strings tables are never loaded into RAM. XS allows to use read-only strings, so JavaScript strings can refer to the strings in the strings tables themselves.
+Moddableアプリケーションのほとんどのリソースと同様に、文字列テーブルはRAMにロードされることはありません。XSは読み取り専用の文字列を使用できるため、JavaScriptの文字列は文字列テーブル内の文字列を参照することができます。
 
 ROM|Size
 :---|---:
-locals.en.mhr|34 bytes
-locals.fr.mhr|35 bytes
+locals.en.mhr|34 バイト
+locals.fr.mhr|35 バイト
 
-A tool can generate the strings table from the JSON files. Applications can get strings from the tables thru a host function.
+ツールはJSONファイルから文字列テーブルを生成できます。アプリケーションはホスト関数を通じてテーブルから文字列を取得できます。
 
-## Strings Indexes
+## 文字列インデックス
 
-Now something is of course necessary to map keys to indexes into the tables, so `I love you` maps to `0`, `Me neither ` maps to `1`, etc.
+もちろん、キーをインデックスにマッピングするための何かが必要です。例えば、`I love you` は `0` に、`Me neither` は `1` にマッピングされます。
 
-Again a dictionary could be used, at least there would be only one dictionary for all languages.
+再び辞書を使用することができますが、少なくともすべての言語に対して1つの辞書だけが必要です。
 
 	var locals = {
 		"I love you": 0,
@@ -113,88 +113,81 @@ Again a dictionary could be used, at least there would be only one dictionary fo
 		return language.get(locals[it]);
 	}
 
-But such a dictionary would have the already mentioned drawbacks: populating the XS symbols table and taking time to lookup an index.
+しかし、そのような辞書には前述の欠点があります。つまり、XSシンボルテーブルを埋めることと、インデックスを検索するのに時間がかかることです。
 
-## Minimal Perfect Hashing
+## 最小完全ハッシュ法
 
-When all keys and results are known, a perfect hash function can map keys into results without collisions. A practical solution is to use two hash functions and an intermediary table. The first hash function maps keys into seeds. The second hash function uses the seeds to maps keys into results. The seeds table can be sparse, but both the seeds and results tables contain only one entry by result. Finding the seeds take some time but is done by a tool at build time.
+すべてのキーと結果が既知の場合、完全ハッシュ関数はキーを衝突なしに結果にマッピングできます。実用的な解決策は、2つのハッシュ関数と中間テーブルを使用することです。最初のハッシュ関数はキーをシードにマッピングします。2番目のハッシュ関数はシードを使用してキーを結果にマッピングします。シードテーブルは疎である可能性がありますが、シードと結果のテーブルにはそれぞれ1つのエントリしか含まれません。シードを見つけるのには時間がかかりますが、ビルド時にツールによって行われます。
 
-Here are some references:
+ここにいくつかの参考資料があります：
 
-- [CMPH](http://cmph.sourceforge.net/index.html): a C library with a lot of algorithms and explanations.
-- [Steve Hanov's blog](http://stevehanov.ca/blog/index.php?id=119): a detailed presentation of the practical solution in PHP.
-- [mixu/perfect](https://github.com/mixu/perfect): a node.js port.
+- [CMPH](http://cmph.sourceforge.net/index.html): 多くのアルゴリズムと説明が含まれているCライブラリ。
+- [Steve Hanov's blog](http://stevehanov.ca/blog/index.php?id=119): PHPでの実用的な解決策の詳細なプレゼンテーション。
+- [mixu/perfect](https://github.com/mixu/perfect): node.jsのポート。
 
-Here the results are indexes into the strings tables. So the results table does not need to be stored, the results table is only used to reorder the strings tables.
+ここでの結果は文字列テーブルへのインデックスです。したがって、結果テーブルを保存する必要はなく、結果テーブルは文字列テーブルを並べ替えるためにのみ使用されます。
 
-Only the seeds table needs to be stored. Negative seeds signal that the second hash function can be skipped, the index is the absolute of the seed minus one.
+保存する必要があるのはシードテーブルだけです。負のシードは、2番目のハッシュ関数をスキップできることを示し、インデックスはシードから1を引いた絶対値です。
 
 #### locals.mhi (release)
-
 	2 -2 -1
 
-The keys themselves do not need to be stored if applications use only valid keys. For the sake of debugging invalid keys, a debug table can also be generated. The debug table contains the keys ordered by the results table. When a key is mapped into an index, the debug table can be used to check if the key matches. The debug table is appended to the seeds table.
+アプリケーションが有効なキーのみを使用する場合、キー自体を保存する必要はありません。無効なキーのデバッグのために、デバッグテーブルも生成できます。デバッグテーブルには、結果テーブルによって並べ替えられたキーが含まれています。キーがインデックスにマッピングされると、デバッグテーブルを使用してキーが一致するかどうかを確認できます。デバッグテーブルはシードテーブルに追加されます。
 
 #### locals.mhi (debug)
 
 	2 -2 -1 2 24 35 I love you Me neither
 
-With this technique:
+この技術を使用すると：
 
-- Tables are in ROM, but are smaller than JavaScript modules.
-- Localization does not populate the XS symbols table.
-- Lookups are significantly faster, independently of the size of the dictionaries.
+- テーブルはROMにありますが、JavaScriptモジュールよりも小さくなります。
+- ローカライゼーションはXSシンボルテーブルを埋めません。
+- 辞書のサイズに関係なく、ルックアップは大幅に高速です。
 
-ROM|Size
+ROM|サイズ
 :---|---:
-locals.mhi (release)|12 bytes
-locals.mhi (debug)|46 bytes
+locals.mhi (release)|12バイト
+locals.mhi (debug)|46バイト
 
 ## mclocal
 
-**mclocal** is a command line tool that generates strings tables and seeds table from JSON files.
+**mclocal**は、JSONファイルから文字列テーブルとシードテーブルを生成するコマンドラインツールです。
 
-For instance
+例えば
 
 	mclocal en.json fr.json
 
-will generate the `locals.en.mhr`, `locals.fr.mhr` and `locals.mhi` here above.
+は、上記の`locals.en.mhr`、`locals.fr.mhr`および`locals.mhi`を生成します。
 
-**mclocal** unions the keys from all the JSON files and reports missing keys in the JSON files.
+**mclocal**は、すべてのJSONファイルからキーを統合し、JSONファイル内の欠落キーを報告します。
 
-By convention, **mcconfig** will generate a make file with a rule to call **mclocal** for all JSON files in a `strings` directory.
+慣例により、**mcconfig**は、`strings`ディレクトリ内のすべてのJSONファイルに対して**mclocal**を呼び出すルールを持つmakefileを生成します。
 
-### Arguments
+### 引数
 
 	mclocal file+ [-d] [-o directory] [-r name]
 
-- `file+`: one or more JSON files.
-- `-d`: to generate the debug table.
-- `-o directory`: the output directory. Defaults to the current directory.
-- `-r name`: the name of the output file. Defaults to `locals`.
-
+- `file+`: 1つ以上のJSONファイル。
+- `-d`: デバッグテーブルを生成する。
+- `-o directory`: 出力ディレクトリ。デフォルトは現在のディレクトリです。
+- `-r name`: 出力ファイルの名前。デフォルトは`locals`です。
 
 ## Locals
 
-Piu defines a class, `Locals`, to get localized strings and to switch languages.
+Piuは、ローカライズされた文字列を取得し、言語を切り替えるためのクラス `Locals` を定義します。
 
 	var locals = new Locals;
 
-The constructor takes two arguments, `name` and `language`. The defaults are `locals` and `en`. Resources are accessed by combining `name`, `language` and the `.mhi` or `.mhr` extensions.
+コンストラクタは2つの引数 `name` と `language` を取ります。デフォルトは `locals` と `en` です。リソースは `name`、`language`、および `.mhi` または `.mhr` 拡張子を組み合わせてアクセスされます。
 
-Applications switch the language with an accessor.
+アプリケーションはアクセサを使用して言語を切り替えます。
 
 	var what = locals.get("I love you"); // what == "I love you"
 	locals.language = "fr";
 	var quoi = locals.get("I love you");	 // quoi == "Je t'aime"
 
-For convenience, applications can define a global function to localize strings.
+便利なように、アプリケーションは文字列をローカライズするためのグローバル関数を定義できます。
 
 	global.localize = function(it) {
 		return locals.get(it);
 	}
-
-
-
-
-
