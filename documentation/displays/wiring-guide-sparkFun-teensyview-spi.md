@@ -13,7 +13,7 @@ Copyright 2018 Moddable Tech, Inc.<BR>
 | **タイプ** | OLED、モノクロ
 |**インターフェース** | SPI
 |**ドライバ** | video [SSD1306](../../documentation/drivers/ssd1306/ssd1306.md)、タッチなし
-|**入手可能性** | [SparkfunのTeensyView](https://www.sparkfun.com/products/14048)
+|**入手先** | [SparkfunのTeensyView](https://www.sparkfun.com/products/14048)
 |**説明** | 非常に小型のモノクロOLEDディスプレイ。Moddableは[標準](https://learn.sparkfun.com/tutorials/teensyview-hookup-guide)モードで設定されたTeensyViewを使用します。
 
 ## Moddableのサンプルコード

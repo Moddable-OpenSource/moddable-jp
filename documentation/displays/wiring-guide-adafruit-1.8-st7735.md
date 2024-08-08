@@ -13,7 +13,7 @@ Copyright 2018 Moddable Tech, Inc.<BR>
 | **タイプ** | TFT LCD
 | **インターフェース** | SPI
 | **ドライバ** | video [ST7735](../../documentation/drivers/st7735/st7735.md), タッチなし
-| **入手可能性** | [Adafruit 1.8" カラー TFT LCD ディスプレイ](https://www.adafruit.com/product/358)<BR>[HiLetgo 1.8" ST7735R](https://www.amazon.com/gp/product/B00LSG51MM/)
+| **入手先** | [Adafruit 1.8" カラー TFT LCD ディスプレイ](https://www.adafruit.com/product/358)<BR>[HiLetgo 1.8" ST7735R](https://www.amazon.com/gp/product/B00LSG51MM/)
 | **説明** | カラフルで明るいディスプレイ、4線式SPI。
 
 

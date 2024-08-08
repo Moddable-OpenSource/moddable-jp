@@ -13,7 +13,7 @@ Copyright 2018 Moddable Tech, Inc.<BR>
 | **タイプ** | LCD, モノクローム
 | **インターフェース** | SPI
 | **ドライバー** | ビデオ [ls013b4dn04](../../documentation/drivers/ls013b4dn04/ls013b4dn04.md), タッチなし
-| **入手可能性** |  [Adafruitのシャープメモリモノクロームディスプレイ](https://www.adafruit.com/product/3502)<BR>[Digi-Keyのシャープメモリ反射ディスプレイ](https://www.digikey.com/product-detail/en/1393/1528-1183-ND/5353643)<BR>[Sparkfunのシャープメモリ反射ディスプレイ](https://www.sparkfun.com/products/retired/13192)
+| **入手先** |  [Adafruitのシャープメモリモノクロームディスプレイ](https://www.adafruit.com/product/3502)<BR>[Digi-Keyのシャープメモリ反射ディスプレイ](https://www.digikey.com/product-detail/en/1393/1528-1183-ND/5353643)<BR>[Sparkfunのシャープメモリ反射ディスプレイ](https://www.sparkfun.com/products/retired/13192)
 | **説明** | これらの興味深いディスプレイは、eInkの超低消費電力とLCDの高速リフレッシュレートを兼ね備えています。[古い96 x 96バージョン](https://www.adafruit.com/product/1393)は、アクティブピクセルが反射する鏡のようなディスプレイを持っています。
 
 ## Moddable サンプルコード

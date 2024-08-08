@@ -14,7 +14,7 @@ Copyright 2018 Moddable Tech, Inc.<BR>
 | **タイプ** | TFT LCD
 | **インターフェース** | SPI
 | **ドライバ** | video [ILI9341](../../documentation/drivers/ili9341/ili9341.md), touch FT6206
-| **入手可能性** | [2.8" BuyDisplay CTP display](http://www.buydisplay.com/default/2-8-inch-tft-touch-shield-for-arduino-w-capacitive-touch-screen-module)
+| **入手先** | [2.8" BuyDisplay CTP display](http://www.buydisplay.com/default/2-8-inch-tft-touch-shield-for-arduino-w-capacitive-touch-screen-module)
 | **説明** | このBuyDisplayスクリーンは高度に設定可能で、さまざまなタッチ・モジュール、主電源電圧、接続タイプで注文できます。このサンプルは3.3V CTPバージョンです。
 
 ## 設定

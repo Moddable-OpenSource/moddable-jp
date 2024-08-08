@@ -12,7 +12,7 @@ Copyright 2018 Moddable Tech, Inc.<BR>
 | **タイプ** | ADA102 LED
 | **インターフェース** | SPI
 | **ドライバ** | [dotstar](../../documentation/drivers/dotstar/dotstar.md)
-| **入手可能性** | [Adafruit DotStar](https://www.adafruit.com/product/2241)
+| **入手先** | [Adafruit DotStar](https://www.adafruit.com/product/2241)
 | **説明** | Adafruit は DotStar デジタル LED に ADA102 LED を使用しています。これにより、2 線式 SPI で個々の LED を制御できます。これらの LED は厳密にはディスプレイではありませんが、ディスプレイの 1 行として見ることができます。ディスプレイのように長方形のグリッドに整理されたものを購入するオプションもあります。
 
 ## Moddable のサンプルコード

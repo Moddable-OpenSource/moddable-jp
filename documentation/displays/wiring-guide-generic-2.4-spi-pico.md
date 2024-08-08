@@ -12,7 +12,7 @@ Revised: March 4, 2022
 | **タイプ** | TFT LCD
 | **インターフェース** | SPI
 | **ドライバ** | video [ILI9341](../../documentation/drivers/ili9341/ili9341.md), touch XPT2046 **(not supported yet)**
-| **入手可能性** | [Generic SPI Displays on eBay](https://www.ebay.com/sch/i.html?_odkw=spi+display+2.4&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.Xspi+display+2.4+touch.TRS0&_nkw=spi+display+2.4+touch&_sacat=0)
+| **入手先** | [Generic SPI Displays on eBay](https://www.ebay.com/sch/i.html?_odkw=spi+display+2.4&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.Xspi+display+2.4+touch.TRS0&_nkw=spi+display+2.4+touch&_sacat=0)
 | **説明** | これらの安価なディスプレイはeBayや他のリソースで入手可能です。<BR><BR>注意: タッチバージョンと非タッチバージョンがあり、非常に似ています。
 
 > 現時点のModdableのサンプルコードではSDカードのサポートは含まれていません。

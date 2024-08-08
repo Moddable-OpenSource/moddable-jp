@@ -12,7 +12,7 @@ Copyright 2018 Moddable Tech, Inc.<BR>
 | **タイプ** | TFT LCD
 | **インターフェース** | SPI
 | **ドライバ** | video [ST7735](../../documentation/drivers/st7735/st7735.md), タッチなし
-| **入手可能性** | [eBayでの汎用1.44インチSPIディスプレイ](https://www.ebay.com/sch/i.html?_odkw=spi+display&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.Xspi+display+1.44%22.TRS1&_nkw=spi+display+1.44%22&_sacat=0)
+| **入手先** | [eBayでの汎用1.44インチSPIディスプレイ](https://www.ebay.com/sch/i.html?_odkw=spi+display&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.Xspi+display+1.44%22.TRS1&_nkw=spi+display+1.44%22&_sacat=0)
 | **説明** | これらの安価なディスプレイはeBayやその他のリソースで入手可能です。
 
 ## Moddableのサンプルコード

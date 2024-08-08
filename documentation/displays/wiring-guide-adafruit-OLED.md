@@ -13,7 +13,7 @@ Copyright 2018 Moddable Tech, Inc.<BR>
 | **タイプ** | OLED
 | **インターフェース** | SPI
 | **ドライバ** | video [SSD1351](../../documentation/drivers/ssd1351/ssd1351.md), タッチなし
-| **入手可能性** | [1.5" OLED Breakout Board](https://www.adafruit.com/product/1431)
+| **入手先** | [1.5" OLED Breakout Board](https://www.adafruit.com/product/1431)
 | **説明** | 優れた色、小型OLED。
 
 

@@ -13,7 +13,7 @@ Copyright 2018 Moddable Tech, Inc.<BR>
 | **タイプ** | カラー反射 LCD (バックライトなし)
 | **インターフェース** | SPI
 | **ドライバ** | video [lpm013m126a](../../documentation/drivers/lpm013m126a/lpm013m126a.md), タッチなし
-| **入手可能性** | [1.28" Switch Science Color reflective LCD](https://translate.google.com/translate?hl=en&sl=ja&tl=en&u=https%3A%2F%2Fwww.switch-science.com%2Fcatalog%2F2874%2F)
+| **入手先** | [1.28" Switch Science Color reflective LCD](https://translate.google.com/translate?hl=en&sl=ja&tl=en&u=https%3A%2F%2Fwww.switch-science.com%2Fcatalog%2F2874%2F)
 | **説明** | Moddable はこのディスプレイを東京で購入しました。[ここに](https://translate.googleusercontent.com/translate_c?depth=1&hl=en&rurl=translate.google.com&sl=ja&sp=nmt4&tl=en&u=https://www.switch-science.com/catalog/2858/&usg=ALkJrhijtlYZnC4qJ2sRkLE3mkVZujVU1w)このディスプレイに関する情報があります。
 
 ## Moddable のサンプルコード
