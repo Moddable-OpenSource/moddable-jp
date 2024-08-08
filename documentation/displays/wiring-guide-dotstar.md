@@ -28,7 +28,7 @@ mcconfig -d -m -p esp
 
 **注意:** Dotstarは5Vのデータ信号を必要とするため、信号線をロジックコンバータを通して5Vにブーストする必要があります。[74AHCT125](https://www.adafruit.com/product/1787) または同様のシフターが使用できます。
 
-| Dotstar Display | ESP8266 | ESP8266 Devboardラベル |
+| Dotstar Display | ESP8266 | ESP8266 開発ボードラベル |
 | --- | --- | --- |
 | 5V | N/A (5V供給に接続) |
 | GND | GND |
