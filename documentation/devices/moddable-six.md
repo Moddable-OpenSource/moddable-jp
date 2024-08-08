@@ -22,6 +22,7 @@ Copyright 2024 Moddable Tech, Inc.<BR>
 	- [バックライト](#backlight)
 	- [動的フレームレート制御](#frame-rate-control)
 	- [ティアリング効果](#tearing-effect)
+	- [アンプ付きオーディオ](#amplified-audio)
 	- [STEMMA QT / Qwiic / JST SH 1mmクイックコネクタ](#quick-connector)
 	- [NeoPixel](#neopixel)
 	- [USB](#usb)
@@ -300,7 +301,7 @@ screen.syncFrames = false;
 ディスプレイコントローラのティアリング効果出力はESP32-S3のGPIO 47に接続されています。これはILI9341_P8ディスプレイドライバによって管理されているため、ディスプレイドライバを使用している場合はコードで使用しないでください。
 
 <a id="amplified-audio"></a>
-#### 増幅されたオーディオ
+#### アンプ付きオーディオ
 
 サンプル： [somafm](https://github.com/Moddable-OpenSource/moddable/tree/public/contributed/somafm)
 [resource-stream](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/pins/audioout/resource-stream)
