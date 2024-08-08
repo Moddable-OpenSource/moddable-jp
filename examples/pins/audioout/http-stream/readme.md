@@ -1,20 +1,20 @@
-# Audio Streamers
+# オーディオストリーマー
 Copyright 2022-2023 Moddable Tech, Inc.<BR>
-Revised: March 13, 2023
+改訂: 2023年3月13日
 
-The `WavStream` and `SBCStream` classes plays audio streams delivered over HTTP. The `WavStream` class plays uncompressed WAV audio files and `Audio/L16`; the `SBCStream` class plays [SBC compressed](https://en.wikipedia.org/wiki/SBC_%28codec%29) audio. SBC is a low-complexity format used primarily by Bluetooth. Its relatively high quality and simple decoder make it well suited for microcontrollers.
+`WavStream` クラスと `SBCStream` クラスは、HTTP 経由で配信されるオーディオストリームを再生します。`WavStream` クラスは非圧縮の WAV オーディオファイルと `Audio/L16` を再生し、`SBCStream` クラスは [SBC 圧縮](https://en.wikipedia.org/wiki/SBC_%28codec%29) オーディオを再生します。SBC は主に Bluetooth で使用される低複雑度のフォーマットです。その比較的高品質でシンプルなデコーダーは、マイクロコントローラーに非常に適しています。
 
-The `WavStream` and `SBCStream` classes share a common API but have separate implementations. They uses the following modules:
+`WavStream` クラスと `SBCStream` クラスは共通の API を共有していますが、実装は別々です。これらは以下のモジュールを使用します：
 
-- `HTTPClient` from ECMA-419 2nd Edition (draft). The API design of the HTTP request makes buffering of streaming data very straightforward.
-- `AudioOut` class for audio playback
-- `WavReader` class to parse the header of the received WAV file (`WavStream` only)
+- ECMA-419 第2版（ドラフト）の `HTTPClient`。HTTP リクエストの API 設計により、ストリーミングデータのバッファリングが非常に簡単になります。
+- オーディオ再生用の `AudioOut` クラス
+- 受信した WAV ファイルのヘッダーを解析する `WavReader` クラス（`WavStream` のみ）
 
-The API itself follows the ECMA-419 style as much as possible, including passing in the full HTTP configuration (with any necessary constructors) and all callbacks.
+API 自体は可能な限り ECMA-419 スタイルに従っており、完全な HTTP 構成（必要なコンストラクタを含む）とすべてのコールバックを渡します。
 
-The `AudioOut` instance is provided by the calling script, which also specifies the stream index to use for playback. This leaves the remaining streams available for other audio (including additional instances of `WavStream` and `SBCStream`).
+`AudioOut` インスタンスは呼び出しスクリプトによって提供され、再生に使用するストリームインデックスも指定されます。これにより、残りのストリームは他のオーディオ（追加の `WavStream` や `SBCStream` インスタンスを含む）に利用可能なままになります。
 
-The following is a simple example of using `WavStream` to play a stream.
+以下は、`WavStream` を使用してストリームを再生する簡単な例です。
 
 ```js
 const audio = new AudioOut({});
@@ -31,58 +31,58 @@ new WavStream({
 audio.start();
 ```
 
-To stream SBC instead, change the constructor from `WavStream` to `SBCStream` and update the `path` property for the SBC audio stream.
+代わりに SBC をストリームするには、コンストラクタを `WavStream` から `SBCStream` に変更し、SBC オーディオストリームの `path` プロパティを更新します。
 
-The streamer API provides several callbacks to manage the streaming session, including notification of streaming stalls and playback completion. The callbacks are documented below as part of the options object of the constructor.
+ストリーマー API は、ストリーミングセッションを管理するためのいくつかのコールバックを提供しており、ストリーミングの停止や再生完了の通知を含みます。コールバックは、コンストラクタのオプションオブジェクトの一部として以下に記載されています。
 
-The streamers try to keep one second of audio buffers queued with the audio output. Once one second of audio is buffered, playback begins. Should the buffered bytes drop to 0, playback stops until one second of audio is again buffered.
+ストリーマーは、オーディオ出力に1秒分のオーディオバッファをキューに入れるようにします。1秒分のオーディオがバッファされると、再生が始まります。バッファされたバイトが0になると、再生は再び1秒分のオーディオがバッファされるまで停止します。
 
-The `HTTPClient` does not yet implement `TLS`. When it does, `WavStream` and `SBCStream` will support streaming over HTTPS.
+`HTTPClient` はまだ `TLS` を実装していません。実装されると、`WavStream` と `SBCStream` は HTTPS 経由のストリーミングをサポートします。
 
-### `Audio/L16` Streams
-Uncompressed audio streams are the data portion of a WAVE file with the sample rate and channel count specified in the MIME type. These are useful for live-streaming of uncompressed audio, and is also used for live transcoding of compressed data to lightweight clients. It is specified by [RFC 2586](https://datatracker.ietf.org/doc/html/rfc2586). The data is delivered in network byte order (big-endian) and the WavStreamer converts it to little-endian for playback.
+### `Audio/L16` ストリーム
+非圧縮オーディオストリームは、サンプルレートとチャンネル数がMIMEタイプで指定されたWAVEファイルのデータ部分です。これらは非圧縮オーディオのライブストリーミングに便利で、圧縮データを軽量クライアントにライブトランスコードするためにも使用されます。これは[RFC 2586](https://datatracker.ietf.org/doc/html/rfc2586)によって指定されています。データはネットワークバイトオーダー（ビッグエンディアン）で配信され、WavStreamerがそれをリトルエンディアンに変換して再生します。
 
-The following command line allows ffmpeg to be used as simple server for testing Audio/L16 streaming:
+次のコマンドラインは、ffmpegを使用してAudio/L16ストリーミングのテスト用の簡単なサーバーとして使用する方法を示しています：
 
 ```
 ffmpeg -i bflatmajor.wav -listen 1 -content_type "audio/L16;rate=11025&channels=1" -f s16be -ar 11025 -acodec -ac 1 pcm_s16be http://127.0.0.1:8080
 ```
 
-### SBC streams
-SBC audio files are a sequence of SBC audio frames without a header or additional framing. The following command line uses ffmpeg to generate an SBC audio file that may be delivered from any HTTP server.
+### SBC ストリーム
+SBCオーディオファイルは、ヘッダーや追加のフレーミングなしでSBCオーディオフレームのシーケンスです。次のコマンドラインは、任意のHTTPサーバーから配信できるSBCオーディオファイルを生成するためにffmpegを使用します。
 
 ```
 ffmpeg -i bflatmajor.wav -ac 1 -ar 16000 -b:a 32k ~/bflatmajor.sbc
 ```
 
-### Stereo Streams
-`WavStream` accepts stereo data and converts mixes it to mono for playback. This is provided for compatibility with existing audio sources as it is clearly not an optimal use of network bandwidth.
+### ステレオストリーム
+`WavStream`はステレオデータを受け取り、再生のためにモノラルに変換します。これは既存のオーディオソースとの互換性のために提供されていますが、ネットワーク帯域幅の最適な使用方法ではありません。
 
-`SBCStream` rejects stereo data.
+`SBCStream`はステレオデータを拒否します。
 
-### Underflow (stalls)
-Streaming stalls are inevitable. When the streamers run out of audio to play, they enter a "not ready" state. If an `onReady` callbacks is provided, it is called with `false` to indicate that audio playback is paused. The streamers do not stop the audio channel when stalled as this would stop all audio streams. Instead, when stalled, the streamer does not queue any buffers to the audio instance until it has accumulated at least one full second of audio for playback. The script may stop playback when stalled, if it wants to control when audio playback resumes.
+### アンダーフロー（停止）
+ストリーミングの停止は避けられません。ストリーマーが再生するオーディオがなくなると、「準備ができていない」状態になります。`onReady`コールバックが提供されている場合、オーディオ再生が一時停止していることを示すために`false`が渡されます。ストリーマーは停止してもオーディオチャンネルを停止しません。これはすべてのオーディオストリームが停止してしまうためです。代わりに、停止中は再生のために少なくとも1秒分のオーディオを蓄積するまで、オーディオインスタンスにバッファをキューに入れません。スクリプトは、再生が停止したときに再生を停止し、オーディオ再生が再開するタイミングを制御することができます。
 
-## API reference
+## APIリファレンス
 
 ### `constructor(options)`
 
-The options object may contain the following properties. The `http`, `host`, `path`, and `audio.out` properties are required.
+オプションオブジェクトには以下のプロパティを含めることができます。`http`、`host`、`path`、および`audio.out`プロパティは必須です。
 
-- `http` - the HTTP client configuration. This usually comes from the host provider at `device.network.http`
-- `host` - the HTTP host to connect to stream from
-- `port` - the remote port to connect to
-- `path` - the path of the HTTP resource to stream
-- `request` - an optional object that can contain additional [HTTP request](../../../../documentation/network/network.md#http-request) options such as `method`, `headers`, `body` etc. These options will be passed directly to the HTTP client. If not specified, default options will be used.
-- `audio.out` - the audio output instance to play the audio on
-- `audio.stream` - the stream number of the audio output to use to play the audio. Defaults to `0`.
-- `waveHeaderBytes` - the number of bytes to buffer before parsing the WAV header. Defaults to `512` (only supported by `WavStream`)
-- `bufferDuration` - the duration in milliseconds of audio to buffer during playback. Playback starts when this target is reached. Defaults to `1000` milliseconds.
-- `onPlayed(buffer)` - callback function invoked after the audio output is done with an audio buffer. The audio is uncompressed for `WavStream` and SBC compressed for `SBCStream`. This callback is useful for calculating the RMS of uncompressed audio that is playing.
-- `onReady(ready)` - callback function invoked with `true` when there is enough audio buffered to be able to begin playback and `false` when there is an audio buffer underflow that causes playback to pause
-- `onError(e)` - callback function invoked on a fatal error, such as the remote endpoint disconnecting
-- `onDone()` - callback function invoked the complete stream has been successfully played
+- `http` - HTTPクライアントの設定。通常、これはホストプロバイダから `device.network.http` によって提供されます
+- `host` - ストリームを接続するHTTPホスト
+- `port` - 接続するリモートポート
+- `path` - ストリームするHTTPリソースのパス
+- `request` - 追加の[HTTPリクエスト](../../../../documentation/network/network.md#http-request)オプション（`method`、`headers`、`body`など）を含むことができるオプションのオブジェクト。これらのオプションはHTTPクライアントに直接渡されます。指定されていない場合、デフォルトのオプションが使用されます。
+- `audio.out` - オーディオを再生するためのオーディオ出力インスタンス
+- `audio.stream` - オーディオを再生するために使用するオーディオ出力のストリーム番号。デフォルトは `0`。
+- `waveHeaderBytes` - WAVヘッダーを解析する前にバッファするバイト数。デフォルトは `512`（`WavStream` のみサポート）
+- `bufferDuration` - 再生中にバッファするオーディオの持続時間（ミリ秒）。この目標に達したときに再生が開始されます。デフォルトは `1000` ミリ秒。
+- `onPlayed(buffer)` - オーディオ出力がオーディオバッファを処理した後に呼び出されるコールバック関数。`WavStream` の場合はオーディオが非圧縮され、`SBCStream` の場合はSBC圧縮されます。このコールバックは、再生中の非圧縮オーディオのRMSを計算するのに役立ちます。
+- `onReady(ready)` - 再生を開始するのに十分なオーディオがバッファされたときに `true` で呼び出され、オーディオバッファのアンダーフローが発生して再生が一時停止したときに `false` で呼び出されるコールバック関数
+- `onError(e)` - リモートエンドポイントの切断などの致命的なエラーが発生したときに呼び出されるコールバック関数
+- `onDone()` - 完全なストリームが正常に再生されたときに呼び出されるコールバック関数
 
 ### `close()`
 
-Stops playback on the specified stream and frees all resources.
+指定されたストリームの再生を停止し、すべてのリソースを解放します。
