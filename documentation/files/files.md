@@ -1,6 +1,6 @@
 # Files
 Copyright 2017-2024 Moddable Tech, Inc.<BR>
-Revised: August 1, 2024
+Revised: August 9, 2024
 
 ## Table of Contents
 
@@ -356,7 +356,7 @@ On ESP32, the SPIFFS file system is mounted at a specified path and all files/di
 ```JSON
 "defines": {
 	"file":{
-		"root": "#/myroot"
+		"root": "/myroot/"
 	}
 }
 ```
@@ -412,7 +412,7 @@ By default, the FAT32 file system is mounted at `/mod`. To change the default ro
 ```JSON
 "defines": {
 	"file":{
-		"root": "#/myroot"
+		"root": "/myroot/"
 	}
 }
 ```
