@@ -141,7 +141,7 @@ To build and run apps on Moddable Six, you'll need to:
 
 After you've set up your host environment and ESP32 tools, take the following steps to install an application on your Moddable Six.
 
-Moddable Six has both a USB port and serial programmer port. You can program and debug with xsbug over either port. The serial programmer port requires a Moddable Programmer or other to serial adapter.
+Moddable Six has both a USB port and serial programmer port. You can program and debug with xsbug over either port. The serial programmer port requires a Moddable Programmer or other USB to serial adapter.
 
 <a id="install-over-usb"></a>
 To use the USB port:
@@ -423,7 +423,7 @@ The app includes advanced rendering of battery levels with fluid animations and 
 
 #### led-color
 
-The [led-color](../../contributed/moddable_six/led-color) app provides a color-picker on display for user to choose the color displayed by the on-board Neopixel.
+The [led-color](../../contributed/moddable_six/led-color) app provides a color-picker on display for the user to choose the color displayed by the on-board Neopixel.
 
 <img width="45%" src="../assets/devices/moddable-six-led-color1.png"> <img width="45%" src="../assets/devices/moddable-six-led-color2.png">
 

@@ -4313,9 +4313,9 @@ STACK_OVERFLOW:
 void fxBeginMetering(txMachine* the, txBoolean (*callback)(txMachine*, txU4), txU4 interval)
 {
 	the->meterCallback = callback;
-	the->meterCount = interval << 16;
+	the->meterCount = ((txU8)interval) << 16;
 	the->meterIndex = 0;
-	the->meterInterval = interval << 16;
+	the->meterInterval = ((txU8)interval) << 16;
 }
 
 void fxEndMetering(txMachine* the)

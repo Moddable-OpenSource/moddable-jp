@@ -598,7 +598,7 @@ void fx_Object_defineProperty(txMachine* the)
 	if ((mxArgc < 3) || (mxArgv(2)->kind != XS_REFERENCE_KIND))
 		mxTypeError("invalid descriptor");
 	mask = fxDescriptorToSlot(the, mxArgv(2));
-	if(!mxBehaviorDefineOwnProperty(the, mxArgv(0)->value.reference, at->value.at.id, at->value.at.index, mxArgv(2), mask))
+	if (!mxBehaviorDefineOwnProperty(the, mxArgv(0)->value.reference, at->value.at.id, at->value.at.index, mxArgv(2), mask))
 		mxTypeError("invalid descriptor");
 	*mxResult = *mxArgv(0);
 }
