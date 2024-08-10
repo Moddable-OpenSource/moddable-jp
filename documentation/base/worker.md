@@ -21,14 +21,18 @@ Web Workersに精通している方は、このドキュメントを読んで、
 ## Worker クラス
 スクリプトは `Worker` クラスをインポートして、新しいワーカーを作成できるようにします。
 
-	import Worker from "worker";
+```js
+import Worker from "worker";
+```
 
 > **注意**: ワーカーの仮想マシンのメモリは、グローバルシステムメモリから割り当てられます。
 
 ### ワーカーの起動
 ワーカーを起動するには、`Worker` クラスのインスタンスを作成し、ワーカーが実行を開始するときに呼び出すモジュールの名前を渡します。次の例では、ワーカー開始時に実行されるモジュールは `simpleworker` です。
 
-	let aWorker = new Worker("simpleworker");
+```js
+let aWorker = new Worker("simpleworker");
+```
 
 `Worker` コンストラクタの呼び出しは、指定されたモジュールの実行が完了した後にのみ戻ります。このステップでワーカーモジュールが例外を生成した場合、例外が伝播されるため、`new Worker` の呼び出しが例外をスローします。この動作は、新しいワーカー仮想マシンの初期化が完了するまで、呼び出し元の仮想マシンがブロックされることを意味します。したがって、新しくインスタンス化された仮想マシンで実行される操作は比較的短時間であるべきです。
 
@@ -59,59 +63,69 @@ let aWorker = new Worker("simpleworker", {
 ### ワーカーからのメッセージ受信
 ワーカーインスタンスには、ワーカーからのすべてのメッセージを受信する`onmessage`関数があります。これは通常、ワーカーが構築された直後に割り当てられます。
 
-```
-	aWorker.onmessage = function(message) {
-		trace(message, "\n");
-	}
+```js
+aWorker.onmessage = function(message) {
+	trace(message, "\n");
+}
 ```
 
 別のアプローチとして、`onmessage`関数を含む`Worker`のサブクラスを作成する方法があります。これにより、メモリ使用量が少なくなり、若干高速に実行されます。
 
-
-```
-	class MyWorker extends Worker {
-		onmessage(message) {
-			trace(message, "\n");
-		}
+```js
+class MyWorker extends Worker {
+	onmessage(message) {
+		trace(message, "\n");
 	}
-	...
-	let aWorker = new MyWorker("simpleworker");
+}
+...
+let aWorker = new MyWorker("simpleworker");
 ```
 
 ### ワーカーの終了
 ワーカーをインスタンス化するスクリプトは、ワーカーを終了させることができます。
 
-	aWorker.terminate();
+```js
+aWorker.terminate();
+```
 
 ワーカーが終了すると、そのワーカーインスタンスに対してこれ以上呼び出しを行うべきではありません。終了したワーカーにメッセージを送信しようとすると、例外が発生します。
 
 ### ワーカースクリプトの起動
 Workerコンストラクタが呼び出されると、指定されたパス（前述の例では`simpleworker`）のモジュールがロードされ、実行されます。ワーカー自体は通常、2つのタスクを実行します。1つ目は初期化で、2つ目はメッセージを受信する関数のインストールです。受信関数はグローバルオブジェクト`self`にインストールされ、`onmessage`という名前が付けられます。
 
-	let count = 1;
-	let state = INITIALIZED;
+```js
+let count = 1;
+let state = INITIALIZED;
 
-	self.onmessage = function (message) {
-		trace(message, "\n");
-	}
+self.onmessage = function (message) {
+	trace(message, "\n");
+}
+```
 
 ### ワーカースクリプトからのメッセージ送信
 ワーカースクリプトから送信されるメッセージは、ワーカースクリプトに送信されるメッセージと同様に、JavaScriptオブジェクトまたは`ArrayBuffer`である場合があります。メッセージはグローバルオブジェクト`self`の`postMessage`関数を使用して送信されます。
 ```
 
-	self.postMessage({hello: "from  worker", counter: count++});
+```js
+self.postMessage({hello: "from  worker", counter: count++});
 ```
 
 ### ワーカースクリプトの自己終了
 ワーカースクリプトは、グローバルオブジェクト `self` に対して `close` を呼び出すことで自己終了します。これは、インスタンス化スクリプトがワーカーインスタンスに対して `terminate` を呼び出すのと同等です。
 
-	self.close()
+
+```js
+self.close()
+```
 
 ### APIリファレンス
 #### constructor(modulePath[, dictionary])
 `Worker` コンストラクタは、新しいワーカーインスタンスを初期化するために使用されるモジュールへのパスを取ります。
 
-	let aWorker = new Worker("simpleworker");
+
+```js
+let aWorker = new Worker("simpleworker");
+```
 
 オプションの辞書には、新しいワーカーの作成プロパティが含まれています。辞書が提供されない場合、デフォルトのパラメータが使用されます。これらのデフォルトはホストランタイムによって異なるため、常にメモリ構成を提供することをお勧めします。作成プロパティはマニフェストの `creation` セクションと同じです。詳細については、[マニフェストのドキュメント](../tools/manifest.md#creation)を参照してください。
 
@@ -133,16 +147,22 @@ let aWorker = new Worker("simpleworker", {
 #### terminate()
 `terminate` 関数は、ワーカーインスタンスの実行を即座に終了し、ワーカーが所有するすべてのリソースを解放します。
 
-	aWorker.terminate();
+
+```js
+aWorker.terminate();
+```
 
 ワーカーが終了した後は、それに対してさらに呼び出しを行うべきではありません。
 
 #### postMessage(msg)
 `postMessage` 関数は、ワーカーへの配信メッセージをキューに入れます。メッセージはJSONでサポートされているもの、バイナリバッファ (`TypedArray`, `ArrayBuffer`, `SharedArrayBuffer`, `DataView`) および [XS Marshalling](../xs/XS%20Marshalling.md) でサポートされているその他のものを使用できます。
 
-	aWorker.postMessage("hello");
-	aWorker.postMessage({msg: "hello", when: Date.now()});
-	aWorker.postMessage(new ArrayBuffer(8));
+
+```js
+aWorker.postMessage("hello");
+aWorker.postMessage({msg: "hello", when: Date.now()});
+aWorker.postMessage(new ArrayBuffer(8));
+```
 
 メッセージは送信された順序で配信されます。
 
@@ -151,9 +171,12 @@ let aWorker = new Worker("simpleworker", {
 #### onmessage property
 workerの `onmessage` プロパティには、workerからのメッセージを受信する関数が含まれています。
 
-	aWorker.onmessage = function(msg) {
-		trace(msg, "\n");
-	}
+
+```js
+aWorker.onmessage = function(msg) {
+	trace(msg, "\n");
+}
+```
 
 ## Shared Workers
 `SharedWorker` クラスは、共有仮想マシンを操作するためのAPIです。この実装は、いくつかの違いがあるウェブの [Shared Workers](https://html.spec.whatwg.org/multipage/workers.html#shared-workers-introduction) APIに基づいています。違いには以下があります：
@@ -164,7 +187,10 @@ workerの `onmessage` プロパティには、workerからのメッセージを�
 ## SharedWorkerクラス
 スクリプトは `SharedWorker` クラスをインポートして共有workerに接続し、現在インスタンス化されていない場合は共有workerを作成します。
 
-	import {SharedWorker} from "worker";
+
+```js
+import {SharedWorker} from "worker";
+```
 
 **注意**: サンプルとドキュメントが必要です。
 

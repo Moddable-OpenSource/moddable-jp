@@ -13,15 +13,17 @@ Copyright 2019-2023 Moddable Tech, Inc.<BR>
 ## モジュールのプリロードを指定する
 プロジェクトのビルドマニフェスト（通常は `manifest.json` という名前のファイル）は、[多くの他のオプション](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md)と共にインクルードするモジュールをリストアップします。マニフェストの任意の部分には、プリロードモジュールのリストがあります。
 
-	"modules": {
-		"*": [
-			"./main",
-			"$(MODULES)/network/http/*"
-		]
-	},
-	"preload": [
-		"http"
+```json
+"modules": {
+	"*": [
+		"./main",
+		"$(MODULES)/network/http/*"
 	]
+},
+"preload": [
+	"http"
+]
+```
 
 この例では、`http` ネットワークプロトコルモジュールがプリロードされますが、`main` モジュールはプリロードされません。便宜上、Moddable SDKのほとんどの例では `main` モジュールをプリロードしていませんが、少し手を加えれば可能です。その方法の詳細は以下に記述されています。
 

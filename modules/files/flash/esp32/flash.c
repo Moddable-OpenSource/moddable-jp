@@ -23,6 +23,7 @@
 #include "mc.xs.h"			// for xsID_ values
 
 #include "esp_partition.h"
+#include "app_update/include/esp_ota_ops.h"
 #include "spi_flash_mmap.h"
 
 struct modFlashRecord {

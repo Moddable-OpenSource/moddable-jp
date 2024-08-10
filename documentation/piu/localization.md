@@ -6,20 +6,22 @@ Copyright 2017 Moddable Tech, Inc.<BR>
 
 JavaScriptを使用する場合、文字列をローカライズする最も明白な形式は辞書です。アプリケーションは共通のキーを使用してローカライズされた文字列にアクセスします。
 
-	var en = {
-		"I love you": "I love you",
-		"Me neither": "Me neither",
-	};
+```js
+var en = {
+	"I love you": "I love you",
+	"Me neither": "Me neither",
+};
 
-	var fr = {
-		"I love you": "Je t'aime",
-		"Me neither": "Moi non plus",
-	};
+var fr = {
+	"I love you": "Je t'aime",
+	"Me neither": "Moi non plus",
+};
 
-	var language = fr;
-	function localize(it) {
-		return language[it];
-	}
+var language = fr;
+function localize(it) {
+	return language[it];
+}
+```
 
 同音異義語や文脈などの理由で、英語の文字列をキーとして使用することが常に可能であるとは限りません。しかし、可能な場合はそれを推奨します。コードが読みやすくなり、明らかな冗長性が避けられます。
 
@@ -31,11 +33,15 @@ JavaScriptを使用する場合、文字列をローカライズする最も明�
 
 #### en.json
 
-	{"I love you":"I love you","Me neither":"Me neither"}
+```json
+{"I love you":"I love you","Me neither":"Me neither"}
+```
 
 #### fr.json
 
-	{"I love you":"Je t'aime","Me neither":"Moi non plus"}
+```json
+{"I love you":"Je t'aime","Me neither":"Moi non plus"}
+```
 
 JSONファイルをROMに保存するのは無駄です。なぜなら、すべての辞書がすべてのキーを定義しなければならないからです。例えば、上記の例では、`I love you`と`Me neither`のキーが英語とフランス語の辞書で繰り返されています。
 
@@ -59,11 +65,15 @@ JSONファイルの代わりに、辞書をXSがコンパイル、リンク、RO
 
 #### en.js
 
-	export default {"I love you":"I love you","Me neither":"Me neither"}
+```js
+export default {"I love you":"I love you","Me neither":"Me neither"}
+```
 
 #### fr.js
 
-	export default {"I love you":"Je t'aime","Me neither":"Moi non plus"}
+```js
+export default {"I love you":"Je t'aime","Me neither":"Moi non plus"}
+```
 
 これにより、ROM内の冗長なキーを避け、RAMを使用しません。ただし、このプロセスでもキーでXSシンボルテーブルを埋め、モジュール、エクスポート、オブジェクトごとに辞書に6つのスロットを使用し、エントリごとに1つのスロットを使用します。
 
@@ -102,16 +112,18 @@ locals.fr.mhr|35 バイト
 
 再び辞書を使用することができますが、少なくともすべての言語に対して1つの辞書だけが必要です。
 
-	var locals = {
-		"I love you": 0,
-    	"Me neither": 1,
-	};
-	var en = new StringTable("locals.en.mhr");
-	var fr = new StringTable("locals.fr.mhr");
-	var language = fr;
-	function localize(it) {
-		return language.get(locals[it]);
-	}
+```js
+var locals = {
+	"I love you": 0,
+	"Me neither": 1,
+};
+var en = new StringTable("locals.en.mhr");
+var fr = new StringTable("locals.fr.mhr");
+var language = fr;
+function localize(it) {
+	return language.get(locals[it]);
+}
+```
 
 しかし、そのような辞書には前述の欠点があります。つまり、XSシンボルテーブルを埋めることと、インデックスを検索するのに時間がかかることです。
 
@@ -176,18 +188,24 @@ locals.mhi (debug)|46バイト
 
 Piuは、ローカライズされた文字列を取得し、言語を切り替えるためのクラス `Locals` を定義します。
 
-	var locals = new Locals;
+```js
+var locals = new Locals;
+```
 
 コンストラクタは2つの引数 `name` と `language` を取ります。デフォルトは `locals` と `en` です。リソースは `name`、`language`、および `.mhi` または `.mhr` 拡張子を組み合わせてアクセスされます。
 
 アプリケーションはアクセサを使用して言語を切り替えます。
 
+```js
 	var what = locals.get("I love you"); // what == "I love you"
 	locals.language = "fr";
 	var quoi = locals.get("I love you");	 // quoi == "Je t'aime"
+```
 
 便利なように、アプリケーションは文字列をローカライズするためのグローバル関数を定義できます。
 
-	global.localize = function(it) {
-		return locals.get(it);
-	}
+```js
+global.localize = function(it) {
+	return locals.get(it);
+}
+```

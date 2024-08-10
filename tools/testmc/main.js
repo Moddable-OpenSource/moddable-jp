@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021  Moddable Tech, Inc.
+ * Copyright (c) 2018-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Tools.
  * 
@@ -195,7 +195,7 @@ class HostBuffer @ "xs_hostbuffer_destructor" {
 	constructor() @ "xs_hostbuffer"
 }
 
-class TestBehavior extends Behavior {
+class TestBehavior extends (globalThis.Behavior ?? Object) {
 	constructor() {
 		super();
 

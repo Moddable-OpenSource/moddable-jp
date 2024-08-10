@@ -1323,15 +1323,21 @@ void fxWriteResult(FILE* file, txResult* result, int c)
 		i++;
 	}
 	if (result->file.flag < 0) {
-		char* p = result->path + result->file.offset;
+		char buffer[16];
+		char *p = result->path + result->file.offset, *q;
 		fprintf(file, "- %s: \"", result->path);
-		while ((c = *p++)) {
-			if (c == '\\')
-				fprintf(file, "\\\\");
-			else if (c == '"')
-				fprintf(file, "\\\"");
+		while (((p = mxStringByteDecode(p, &c))) && (c != C_EOF)) {
+			q = buffer;
+			if ((c == '\\') || (c == '"')) {
+				q = fxUTF8Encode(q, '\\');
+				q = fxUTF8Encode(q, c);
+			}
+			else if ((0xD800 <= c) && (c <= 0xDFFF))
+				q = fxUTF8Encode(q, 0xFFFD);
 			else
-				fprintf(file, "%c", c);
+				q = fxUTF8Encode(q, c);
+			*q = 0;
+			fprintf(file, "%s", buffer);
 		}
 		fprintf(file, "\"\n");
 	}

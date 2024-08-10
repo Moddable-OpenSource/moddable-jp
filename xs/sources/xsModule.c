@@ -2848,24 +2848,42 @@ void fx_Compartment(txMachine* the)
 			mxPushUndefined(); // moduleMapHook;
 			
 			mxPushSlot(mxArgv(0));
-			if (mxHasID(fxID(the, "loadHook"))) {
+			if (mxHasID(fxID(the, "importHook"))) {
 				mxPushSlot(mxArgv(0));
-				mxGetID(fxID(the, "loadHook"));
+				mxGetID(fxID(the, "importHook"));
 				if (!fxIsCallable(the, the->stack))
-					mxTypeError("options.loadHook is no function");
+					mxTypeError("options.importHook is no function");
 			}
-			else
-				mxPushUndefined();
+			else {
+				mxPushSlot(mxArgv(0));
+				if (mxHasID(fxID(the, "loadHook"))) {
+					mxPushSlot(mxArgv(0));
+					mxGetID(fxID(the, "loadHook"));
+					if (!fxIsCallable(the, the->stack))
+						mxTypeError("options.loadHook is no function");
+				}
+				else
+					mxPushUndefined();
+			}
 				
 			mxPushSlot(mxArgv(0));
-			if (mxHasID(fxID(the, "loadNowHook"))) {
+			if (mxHasID(fxID(the, "importNowHook"))) {
 				mxPushSlot(mxArgv(0));
-				mxGetID(fxID(the, "loadNowHook"));
+				mxGetID(fxID(the, "importNowHook"));
 				if (!fxIsCallable(the, the->stack))
-					mxTypeError("options.loadNowHook is no function");
+					mxTypeError("options.importNowHook is no function");
 			}
-			else
-				mxPushUndefined();
+			else {
+				mxPushSlot(mxArgv(0));
+				if (mxHasID(fxID(the, "loadNowHook"))) {
+					mxPushSlot(mxArgv(0));
+					mxGetID(fxID(the, "loadNowHook"));
+					if (!fxIsCallable(the, the->stack))
+						mxTypeError("options.loadNowHook is no function");
+				}
+				else
+					mxPushUndefined();
+			}
 			
 			mxPushUndefined(); // importMetaHook;
 		}

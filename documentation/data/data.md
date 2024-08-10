@@ -26,9 +26,9 @@ import Base64 from "base64";
 プロジェクトで使用するには、モジュールのマニフェストを含めます：
 
 ```json
-	"include": [
-		"$(MODULES)/data/base64/manifest.json"
-	]
+"include": [
+	"$(MODULES)/data/base64/manifest.json"
+]
 ```
 
 ### `static decode(str)`
@@ -65,9 +65,9 @@ import Hex from "hex";
 プロジェクトで使用するには、モジュールのマニフェストを含めます：
 
 ```json
-	"include": [
-		"$(MODULES)/data/hex/manifest.json"
-	]
+"include": [
+	"$(MODULES)/data/hex/manifest.json"
+]
 ```
 
 ### `static toBuffer(string [, separator])`
@@ -110,7 +110,7 @@ let s0 = Hex.toString(buffer, "-", "0123456789abwxyz");
 
 `CRC8` と `CRC16` クラスはデータのCRCチェックサムを計算します。
 
-```
+```js
 import {CRC8} from "crc";
 import {CRC16} from "crc";
 ```
@@ -118,9 +118,9 @@ import {CRC16} from "crc";
 モジュールのマニフェストをプロジェクトに含めて使用します：
 
 ```json
-	"include": [
-		"$(MODULES)/data/crc/manifest.json"
-	]
+"include": [
+	"$(MODULES)/data/crc/manifest.json"
+]
 ```
 
 #### `CRC8(polynomial [, initial [, reflectInput [, reflectOutput [, xorOutput]]]])`
@@ -202,9 +202,9 @@ import qrCode from "qrcode";
 プロジェクトで使用するには、モジュールのマニフェストを含めます：
 
 ```json
-	"include": [
-		"$(MODULES)/data/qrcode/manifest.json"
-	]
+"include": [
+	"$(MODULES)/data/qrcode/manifest.json"
+]
 ```
 
 詳細については、記事 [Moddable SDKのQRコードモジュール](https://blog.moddable.com/blog/qrcode/) を参照してください。
@@ -247,10 +247,10 @@ import TextEncoder from "text/encoder";
 これらをプロジェクトで使用するには、モジュールのマニフェストを含めます：
 
 ```json
-	"include": [
-		"$(MODULES)/data/text/decoder/manifest.json",
-		"$(MODULES)/data/text/encoder/manifest.json"
-	]
+"include": [
+	"$(MODULES)/data/text/decoder/manifest.json",
+	"$(MODULES)/data/text/encoder/manifest.json"
+]
 ```
 
 `TextDecoder` は [WHATWG によって指定された](https://encoding.spec.whatwg.org/#interface-textdecoder) [TextDecoder クラス](https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder) を実装しています。UTF-8入力データのみを受け付けます。
@@ -271,10 +271,10 @@ import Deflate from "deflate";
 プロジェクトでこれらのモジュールを使用するには、モジュールのマニフェストを含めます：
 
 ```json
-	"include": [
-		"$(MODULES)/data/zlib/manifest_deflate.json",
-		"$(MODULES)/data/zlib/manifest_inflate.json"
-	]
+"include": [
+	"$(MODULES)/data/zlib/manifest_deflate.json",
+	"$(MODULES)/data/zlib/manifest_inflate.json"
+]
 ```
 
 [inflateの例](../../examples/data/inflate/main.js)は、データをワンショット操作として解凍する方法と、ストリーミングのための`onData`コールバックを使用する方法を示しています。
@@ -293,9 +293,9 @@ import {URL, URLSearchParams} from "url";
 プロジェクトでこのモジュールを使用するには、モジュールのマニフェストを含めます：
 
 ```json
-	"include": [
-		"$(MODULES)/data/url/manifest.json"
-	]
+"include": [
+	"$(MODULES)/data/url/manifest.json"
+]
 ```
 
 `URL`は[WHATWGによって仕様化された](https://url.spec.whatwg.org/#url-class) [URLクラス](https://developer.mozilla.org/en-US/docs/Web/API/URL)を実装しています。この実装は、2つの例外を除いて標準に完全に準拠しています： [Punycode](https://en.wikipedia.org/wiki/Punycode)および[IDNA](https://www.unicode.org/reports/tr46/)のサポートは未実装です。これらは主にブラウザでのユーザー入力URLの表示と安全な処理のために使用されますが、組み込みシステムでは一般的に問題にはなりません。多少の努力（およびコードサイズの増加）で、実装は両方をサポートすることができます。

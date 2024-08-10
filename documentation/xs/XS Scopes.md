@@ -172,7 +172,7 @@ Several byte codes move the current scope pointer down and up when entering and 
 
 #### Source code
 
-```
+```js
 {
 	let x = 0;
 	{
@@ -211,7 +211,7 @@ Let us start with something simple.
 
 #### Source code
 
-```
+```js
 let x = 0;
 let y = 1;
 const f = function(z) {
@@ -372,7 +372,7 @@ Let us call `f(2)`.
 Here is a typical example of closure.
 
 #### Source code
-```
+```js
 let counter = 0;
 const decrement = function() {
   counter--;
@@ -456,7 +456,7 @@ Here is the example in the document quoted here above.
 
 #### Source code
 
-```
+```js
 function f(x) {
 	const xx = x**2;
 	return function(y) {
@@ -544,7 +544,7 @@ When suspending and resuming the execution of a generator, XS stores and retriev
 Closures in such stack slots will be alive as long as the generator instance itself is alive.
 
 #### Source code
-```
+```js
 let index = 0;
 const infinite = function*() {
 	for (;;) {

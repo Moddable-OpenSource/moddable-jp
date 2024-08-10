@@ -157,14 +157,14 @@ xsbug-logはxsbugの代替品です。グラフィカルユーザーインター
 
 xsbug-logはNode.jsで実装されています。使用するには、まず依存関係をインストールする必要があります：
 
-```
+```shell
 cd $MODDABLE/tools/xsbug-log
 npm install
 ```
 
 `mcconfig`でxsbug-logを使用するには、コマンドラインで`-d`の代わりに`-dl`（デバッグログ用）を使用します。
 
-```
+```shell
 mcconfig -dl -m -p esp32/moddable_two
 ```
 

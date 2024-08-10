@@ -165,10 +165,6 @@ static int gADC1_caliCount = 0;
 
 #endif
 
-#ifndef ADC_ATTEN_DB_12
-	#define ADC_ATTEN_DB_12 ADC_ATTEN_DB_11
-#endif
-
 void xs_analog_constructor_(xsMachine *the)
 {
 	Analog analog;

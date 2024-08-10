@@ -879,9 +879,9 @@ void espInitInstrumentation(txMachine *the)
 		.on_alarm = timer_group0_isr
 	};
 
-	gIdles[0] = xTaskGetIdleTaskHandleForCPU(0);
+	gIdles[0] = xTaskGetIdleTaskHandleForCore(0);
 #if kTargetCPUCount > 1
-	gIdles[1] = xTaskGetIdleTaskHandleForCPU(1);
+	gIdles[1] = xTaskGetIdleTaskHandleForCore(1);
 #endif
 
 	if (!gLoadTimer) {
@@ -941,9 +941,9 @@ bool IRAM_ATTR timer_group0_isr(gptimer_handle_t timer, const gptimer_alarm_even
 //    timer_group_clr_intr_status_in_isr(TIMER_GROUP_0, TIMER_0);
 //    timer_group_enable_alarm_in_isr(TIMER_GROUP_0, TIMER_0);
 
-	gCPUCounts[0 + (xTaskGetCurrentTaskHandleForCPU(0) == gIdles[0])] += 1;
+	gCPUCounts[0 + (xTaskGetCurrentTaskHandleForCore(0) == gIdles[0])] += 1;
 #if kTargetCPUCount > 1
-	gCPUCounts[2 + (xTaskGetCurrentTaskHandleForCPU(1) == gIdles[1])] += 1;
+	gCPUCounts[2 + (xTaskGetCurrentTaskHandleForCore(1) == gIdles[1])] += 1;
 #endif
 
 	gCPUTime += 1250;

@@ -84,14 +84,14 @@ IO Streamsモジュールは、ストリームを使用したECMA-419センサ�
 
 ビルドするには：
 
-```
+```shell
 cd /path/to/streams/examples/button
 mcconfig -d -m -p esp32/moddable_two_io
 ```
 
 LEDの状態が変わるときにコンソール出力はありません。状態の変化を見るためには、LED自体を監視する必要があります。
 
-### touch {#examples}
+### touch
 
 `sensorstream.js`によってエクスポートされるミックスインのおかげで、`embedded:sensor/Touch/FT6x06`の`Touch`クラスは`ReadableStream`のサブクラスになります。
 
@@ -99,7 +99,7 @@ LEDの状態が変わるときにコンソール出力はありません。状�
 
 ビルドするには：
 
-```
+```shell
 cd /path/to/streams/examples/touch
 mcconfig -d -m -p esp32/moddable_two_io
 ```
@@ -110,14 +110,14 @@ mcconfig -d -m -p esp32/moddable_two_io
 
 ビルドするには：
 
-```
+```shell
 cd /path/to/streams/examples/fetch
 mcconfig -d -m -p esp32/moddable_two_io ssid=<SSID> password=<PASSWORD>
 ```
 
 fetchの例はシミュレータでも実行できます：
 
-```
+```shell
 mcconfig -d -m
 ```
 
@@ -128,7 +128,7 @@ mcconfig -d -m
 
 テストを実行するには、XSテストツールである[xst](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/xs/xst.md)をビルドする必要があります。その後：
 
-```
+```shell
 cd /path/to/streams/wpt
 ./iterate.sh
 ```

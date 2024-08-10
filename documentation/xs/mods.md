@@ -85,13 +85,13 @@ modは、Moddable SDKの `mcrun` コマンドラインツールを使用して�
 
 上記の例のmodをビルドして実行するには、modのディレクトリを現在の作業ディレクトリに設定し、次のように `mcrun` を実行します：
 
-```
+```shell
 mcrun -d -m
 ```
 
 成功したビルドの出力は次のようになります：
 
-```
+```shell
 > mcrun -d -m
 # copy message.txt
 # xsc mod.xsb
@@ -104,7 +104,7 @@ mcrun -d -m
 
 `mcrun` を使用して、`-p` オプションでターゲットプラットフォームを指定することにより、マイクロコントローラにmodをビルドしてインストールすることができます。
 
-```
+```shell
 mcrun -d -m -p esp32/moddable_two
 ```
 
@@ -121,7 +121,7 @@ modがインストールされると、`mcrun` は自動的にマイクロコン
 #### マニフェスト
 Moddable SDKで一般的に使用されるマニフェスト、例えば [`manifest_base.json`](https://github.com/Moddable-OpenSource/moddable/blob/public/examples/manifest_base.json) は、modのサポートには追加のコードが必要なため、modのサポートを有効にしていません。実際にmodを使用するプロジェクトのみがそのコードを含めるべきです。modを有効にするには、プロジェクトのマニフェストの `defines` セクションに `XS_MODS` を追加します。
 
-```
+```json
 "defines": {
 	"XS_MODS": 1
 },
@@ -136,9 +136,9 @@ import Modules from "modules";
 
 プロジェクトマニフェストに `Modules` モジュールのマニフェストを追加します：
 
-```
+```json
 "include": [
-	$(MODULES)/base/modules/manifest.json
+	"$(MODULES)/base/modules/manifest.json"
 ]
 ```
 
@@ -206,7 +206,7 @@ JavaScript言語の動的な性質は、JavaScriptエンジンが仮想マシン
 
 しかし、modsはホストに現れない多くのプロパティ名を含むコードを含むことができるため、より多くのシンボルを作成する可能性があります。これに対応するために、プロジェクトはマニフェストの`"creation"`セクションでランタイムキーアレイの初期長を調整することができます。
 
-```
+```json
 "creation": {
 	"keys": {
 		"initial": 128,
@@ -226,13 +226,13 @@ XSリンカーは、プロジェクトのモジュールのバイトコードを
 
 modホストは、XSリンカーに自動削除を行わせる代わりに、マニフェストを使用して利用可能な言語機能を制御することができます。最も簡単なアプローチは、すべての言語機能を保持することです。フラッシュストレージの逼迫がないプロジェクトにとっては、これは実行可能なオプションです。プロジェクトマニフェストに空のstrip配列を持つ`strip`オブジェクトを追加します：
 
-```
+```json
 "strip": []
 ```
 
 modホストは、選択した機能を明示的に削除することによって、フラッシュストレージのサイズを減らすことができます。これは、削除するコンストラクタと関数を命名することによって行われます。次のstrip配列は、`eval`、MapとSet、Atomics、SharedArrayBuffer、RegExp、およびProxyなど、制約のあるマイクロコントローラでめったに使用されない機能を削除します。
 
-```
+```json
 "strip": [
 	"Atomics",
 	"eval",
