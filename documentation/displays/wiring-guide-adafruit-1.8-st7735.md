@@ -1,34 +1,34 @@
-# Adafruit 1.8" ST7735 Wiring Guide
+# Adafruit 1.8" ST7735 配線ガイド
 Copyright 2018 Moddable Tech, Inc.<BR>
-Revised: December 10, 2018
+改訂： 2018年12月10日
 
 ![Generic SPI Display](images/adafruit-st7735-1.8.jpg)
 
-## Specs
+## 仕様
 
 | | |
 | :---: | :--- |
-| **Part** | Adafruit Product ID: 2088
-| **Size** | 1.8", 128 × 160
-| **Type** | TFT LCD
-| **Interface** | SPI
-| **Drivers** | video [ST7735](../../documentation/drivers/st7735/st7735.md), no touch
-| **Availability** | [Adafruit 1.8" Color TFT LCD Display](https://www.adafruit.com/product/358)<BR>[HiLetgo 1.8" ST7735R](https://www.amazon.com/gp/product/B00LSG51MM/)
-| **Description** | Colorful, bright display wtih 4-wire SPI.
+| **部品** | Adafruit 製品ID: 2088
+| **サイズ** | 1.8", 128 × 160
+| **タイプ** | TFT LCD
+| **インターフェース** | SPI
+| **ドライバ** | video [ST7735](../../documentation/drivers/st7735/st7735.md), タッチなし
+| **入手先** | [Adafruit 1.8" カラー TFT LCD ディスプレイ](https://www.adafruit.com/product/358)<BR>[HiLetgo 1.8" ST7735R](https://www.amazon.com/gp/product/B00LSG51MM/)
+| **説明** | カラフルで明るいディスプレイ、4線式SPI。
 
 
-## Moddable example code
+## Moddableのサンプルコード
 
-The [balls](../../examples/piu/balls/) example is good for testing this display.  To run a debug build, use the following build command:
+このディスプレイをテストするには、[balls](../../examples/piu/balls/) サンプルが適しています。デバッグビルドを実行するには、以下のビルドコマンドを使用します：
 
 ```
 cd $MODDABLE/examples/piu/balls
 mcconfig -d -m -p esp/adafruit_st7735
 ```
 
-## ESP8266 Pinout
+## ESP8266 ピン配置
 
-| Adafruit 1.8" TFT | ESP8266 | ESP8266 Devboard label
+| Adafruit 1.8" TFT | ESP8266 | ESP8266 開発ボードラベル
 | --- | --- | --- |
 | LITE | 3.3v |
 | MISO | GPIO 12 | (D6)
@@ -40,5 +40,4 @@ mcconfig -d -m -p esp/adafruit_st7735
 | VCC| 3.3v |
 | GND | GND |
 
-![Generic 2.4"-2.8" wiring illustration](images/adafruit-st7735-1.8-wiring.png)
-
+![汎用2.4"-2.8"配線図](images/adafruit-st7735-1.8-wiring.png)

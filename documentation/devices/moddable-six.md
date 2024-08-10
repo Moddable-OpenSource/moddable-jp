@@ -1,160 +1,160 @@
-# Moddable Six Developer Guide
+# Moddable Six 開発者ガイド
 
 Copyright 2024 Moddable Tech, Inc.<BR>
-Revised: July 18, 2024
+改訂日： 2024年7月18日
 
-This document provides information about Moddable Six, including details about its pins and built-in components, how to build and deploy apps, and links to additional development resources.
+このドキュメントは、Moddable Sixに関する情報を提供します。ピンや内蔵コンポーネントの詳細、アプリのビルドとデプロイ方法、追加の開発リソースへのリンクが含まれています。
 
-## Table of Contents
+## 目次
 
-- [About Moddable Six](#about-moddable-six)
-	- [Components](#components)
-	- [Pinout](#pinout)
-	- [Pin Information](#pin-info)
-	- [Dimensions](#dimensions)
-- [Moddable SDK and Host Environment Setup](#setup)
-- [Building and Deploying Apps](#building-and-deploying-apps)
-	- [Using the USB port](#install-over-usb)
-	- [Using a serial programmer](#install-over-serial)
-- [Using Moddable Six](#moddable-features)
-	- [8 MB PSRAM Memory](#additional-memory)
-	- [Dual-Core ESP32-S3 CPU](#dual-core)
-	- [Backlight](#backlight)
-	- [Dynamic Frame Rate Control](#frame-rate-control)
-	- [Tearing Effect](#tearing-effect)
-	- [Amplified Audio](#amplified-audio)
-	- [STEMMA QT / Qwiic / JST SH 1mm Quick Connector](#quick-connector)
+- [Moddable Sixについて](#about-moddable-six)
+	- [コンポーネント](#components)
+	- [ピン配置](#pinout)
+	- [ピン情報](#pin-info)
+	- [寸法](#dimensions)
+- [Moddable SDKとホスト環境のセットアップ](#setup)
+- [アプリのビルドとデプロイ](#building-and-deploying-apps)
+	- [USBポートを使用する](#install-over-usb)
+	- [シリアルプログラマを使用する](#install-over-serial)
+- [Moddable Sixの使用](#moddable-features)
+	- [8 MB PSRAMメモリ](#additional-memory)
+	- [デュアルコアESP32-S3 CPU](#dual-core)
+	- [バックライト](#backlight)
+	- [動的フレームレート制御](#frame-rate-control)
+	- [ティアリング効果](#tearing-effect)
+	- [アンプ付きオーディオ](#amplified-audio)
+	- [STEMMA QT / Qwiic / JST SH 1mmクイックコネクタ](#quick-connector)
 	- [NeoPixel](#neopixel)
 	- [USB](#usb)
-	- [Touch Panel](#touch-panel)
-	- [Flash Button](#flash-button)
-- [Troubleshooting](#troubleshooting)
-- [Development Resources](#development-resources)
-	- [Simulator](#simulator)
-	- [Examples](#examples)
-	- [Debugging](#debugging)
-		- [Debugging JavaScript and TypeScript Code](#advanced-xsbug)
-		- [Debugging Native Code](#debug-native)
-	- [Documentation](#documentation)
-	- [Support](#support)
-	- [Updates](#updates)
+	- [タッチパネル](#touch-panel)
+	- [フラッシュボタン](#flash-button)
+- [トラブルシューティング](#troubleshooting)
+- [開発リソース](#development-resources)
+	- [シミュレータ](#simulator)
+	- [サンプル](#examples)
+	- [デバッグ](#debugging)
+		- [JavaScriptとTypeScriptコードのデバッグ](#advanced-xsbug)
+		- [ネイティブコードのデバッグ](#debug-native)
+	- [ドキュメント](#documentation)
+	- [サポート](#support)
+	- [アップデート](#updates)
 
 <a id="about-moddable-six"></a>
-## About Moddable Six
+## Moddable Sixについて
 
 <a id="components"></a>
-### Components
+### コンポーネント
 
 #### ESP32-S3 MCU
-The Moddable Six is powered by a dual-core ESP32-S3. JavaScript code can take full advantage of the two CPU cores using standard Web Workers.
+Moddable SixはデュアルコアのESP32-S3によって動作されます。JavaScriptコードは標準のWeb Workersを使用して、2つのCPUコアをフルに活用できます。
 
-#### PSRAM and Flash Storage
-The ESP32-S3 module has an expansive 8 MB of flash storage memory and 8 MB PSRAM for a total of 8.5 MB RAM. Both the PSRAM and flash are connected by an 8-bit bus for maximum throughput (at least twice as fast as Moddable Two).
+#### PSRAMとフラッシュストレージ
+ESP32-S3モジュールには、広大な8 MBのフラッシュストレージメモリと8 MBのPSRAMがあり、合計で8.5 MBのRAMを持っています。PSRAMとフラッシュはどちらも8ビットバスで接続されており、最大のスループットを実現します（Moddable Twoの少なくとも2倍の速度）。
 
-#### Beautiful, Fast, and Responsive screen
-The screen is 240 x 320 QVGA IPS display driven by a 8-bit wide parallel data bus. Display throughput is at least 4x faster than anything we've had before, thanks to a new hardware design and a new parallel display driver.
+#### 美しく、速く、応答性の高い画面
+画面は240 x 320 QVGA IPSディスプレイで、8ビット幅の並列データバスによって駆動されます。新しいハードウェア設計と新しい並列ディスプレイドライバのおかげで、ディスプレイスループットはこれまでの少なくとも4倍の速さです。
 
-The brightness of the display can be adjusted programatically.
+ディスプレイの明るさはプログラムで調整可能です。
 
-#### Responsive Multi-Touch
-The touch panel uses a GT911 touch controller that supports multi-touch input. The a new touch driver and hardware design enables touch interrupts to increase responsiveness and minimize CPU overhead.
+#### 応答性の高いマルチタッチ
+タッチパネルはGT911タッチコントローラを使用しており、マルチタッチ入力をサポートしています。新しいタッチドライバとハードウェア設計により、タッチ割り込みが可能になり、応答性が向上し、CPUの負荷が最小限に抑えられます。
 
-#### Amplified Speaker
-A built-in, amplified speaker allows for audio user-interface feedback, streaming music, and voice prompts. It delivers high quality audio using a low-cost design, reducing the cost of bringing audio feedback to commercial products.
+#### アンプ付きスピーカー
+内蔵のアンプ付きスピーカーは、オーディオユーザーインターフェースのフィードバック、音楽のストリーミング、および音声プロンプトを可能にします。低コストの設計で高品質のオーディオを提供し、商用製品にオーディオフィードバックを導入するコストを削減します。
 
-#### STEMMA QT / Qwiic / JST SH 1mm Quick Connections
-Moddable Six has a JST SH connector for easy connection of I²C sensors and peripherals. This connector is called STEMMA QT by Adafruit and Qwiic by SparkFun.
+#### STEMMA QT / Qwiic / JST SH 1mm クイック接続
+Moddable Sixには、I²Cセンサーや周辺機器を簡単に接続するためのJST SHコネクタがあります。このコネクタはAdafruitではSTEMMA QT、SparkFunではQwiicと呼ばれています。
 
 #### NeoPixel
-There is a NeoPixel onboard, a multi-color LED which can be used as an expressive status indicator. The NeoPixel data on the expansion header and used to control a strand of many NeoPixels.
+オンボードにはNeoPixelがあり、これは多色LEDで、表現力豊かなステータスインジケータとして使用できます。拡張ヘッダ上のNeoPixelデータを使用して、多くのNeoPixelのストランドを制御できます。
 
 #### USB
-Moddable Six enables programming and JavaScript debugging over the USB port. Debugging native code using GDB is supported over USB. The TinyUSB software stack can also be used.
+Moddable SixはUSBポートを介してプログラミングとJavaScriptデバッグを可能にします。GDBを使用したネイティブコードのデバッグもUSB経由でサポートされています。TinyUSBソフトウェアスタックも使用できます。
 
 <a id="pinout"></a>
-### Pinout
+### ピン配置
 
 <img src="../assets/devices/moddable-six-pinout.png">
 
 <a id="pin-info"></a>
-### Pin Information
+### ピン情報
 
-#### 6-pin Programming Header Description
+#### 6ピンプログラミングヘッダの説明
 
-| Name | Function | Description |
+| 名前 | 機能 | 説明 |
 | :---: | :---: | :--- |
-| RTS | I/O | Connects to auto programming and reset circuit |
-| DTR | I/O | Connects to auto programming and reset circuit |
-| TX | I/O | Connects to ESP32-S3 GPIO 43 |
-| RX | I/O | Connects to ESP32-S3 GPIO 44 |
-| 5V | PWR | 5V input connects to LM1117-3.3 voltage regulator and 5V pin on 16-pin external connector |
-| GND | GND | Connects to GND |
+| RTS | I/O | 自動プログラミングおよびリセット回路に接続 |
+| DTR | I/O | 自動プログラミングおよびリセット回路に接続 |
+| TX | I/O | ESP32-S3 GPIO 43に接続 |
+| RX | I/O | ESP32-S3 GPIO 44に接続 |
+| 5V | PWR | 5V入力はLM1117-3.3電圧レギュレータおよび16ピン外部コネクタの5Vピンに接続 |
+| GND | GND | GNDに接続 |
 
-#### 16-pin External Header Description
+#### 16ピン外部ヘッダーの説明
 
-| Name| Function| Description |
+| 名前| 機能| 説明 |
 | :---: | :---: | :--- |
-| SDA&nbsp;IO4 | I/O | Connects to ESP32-S3 GPIO 4 (standard SDA, no external pull up resistor) |
-| SCL&nbsp;IO5 | I/O | Connects to ESP32-S3 GPIO 5 (standard SCL, no external pull up resistor) |
-| GND     | GND | Connects to GND |
-| 3.3V    | I/O | 3.3V input and output. Connects to ESP32-S3 3.3V input and other 3.3V IC's. Regulated output power if board is 5V powered via micro USB, VIN external connector or programming connector. 3.3V is the output of the LM1117-3.3. Output of the LM1117 is conditioned with a 100uf Tantalum capacitor. |
-| IO0     | I/O | Connects to ESP32-S3 GPIO 0. Pressing the Flash button on the device grounds this pin. It is also used in the auto-programming circuitry. |
-| IO16    | I/O | Connects to ESP32-S3 GPIO 16, Analog |
-| IO1     | I/O | Connects to ESP32-S3 GPIO 1, Analog |
-| IO2     | I/O | Connects to ESP32-S3 GPIO 2 |
-| IO3     | I/O | Connects to ESP32-S3 GPIO 3, Analog |
-| IO19    | I/O | Connects to ESP32-S3 GPIO 19, USB D- |
-| IO20    | I/O | Connects to ESP32-S3 GPIO 20, USB D+, Analog |
-| AUD&nbsp;IO45 | I/O | Connects to ESP32-S3 GPIO 45, Audio signal |
-| IO17    | I/O | Connects to ESP32-S3 GPIO 17, Analog |
-| VIN 5V  | I/O | VIN is a 5V pin that can be used to power  Moddable Six. If the board is powered by one of the other 5V inputs this pin can be used for external 5V power. This is an unregulated pin; VIN is a direct connection to the 5V input sources. Connects to other 5V inputs and LM1117-3.3 voltage regulator. |
-| RGB&nbsp;IO48    | I/O | Connects to ESP32-S3 GPIO 48, NeoPixel |
-| IO15    | I/O | Connects to ESP32-S3 GPIO 15, Analog |
+| SDA&nbsp;IO4 | I/O | ESP32-S3 GPIO 4に接続（標準SDA、外部プルアップ抵抗なし） |
+| SCL&nbsp;IO5 | I/O | ESP32-S3 GPIO 5に接続（標準SCL、外部プルアップ抵抗なし） |
+| GND     | GND | GNDに接続 |
+| 3.3V    | I/O | 3.3V入力および出力。ESP32-S3の3.3V入力および他の3.3V ICに接続。ボードがマイクロUSB、VIN外部コネクタ、またはプログラミングコネクタ経由で5Vで電源供給されている場合、調整された出力電力。3.3VはLM1117-3.3の出力。LM1117の出力は100ufタンタルコンデンサで調整されています。 |
+| IO0     | I/O | ESP32-S3 GPIO 0に接続。デバイスのフラッシュボタンを押すとこのピンが接地されます。また、自動プログラミング回路にも使用されます。 |
+| IO16    | I/O | ESP32-S3 GPIO 16に接続、アナログ |
+| IO1     | I/O | ESP32-S3 GPIO 1に接続、アナログ |
+| IO2     | I/O | ESP32-S3 GPIO 2に接続 |
+| IO3     | I/O | ESP32-S3 GPIO 3に接続、アナログ |
+| IO19    | I/O | ESP32-S3 GPIO 19に接続、USB D- |
+| IO20    | I/O | ESP32-S3 GPIO 20に接続、USB D+、アナログ |
+| AUD&nbsp;IO45 | I/O | ESP32-S3 GPIO 45に接続、オーディオ信号 |
+| IO17    | I/O | ESP32-S3 GPIO 17に接続、アナログ |
+| VIN 5V  | I/O | VINはModdable Sixに電力を供給するために使用できる5Vピンです。他の5V入力のいずれかでボードが電源供給されている場合、このピンは外部5V電源に使用できます。これは未調整のピンです。VINは5V入力ソースへの直接接続です。他の5V入力およびLM1117-3.3電圧レギュレータに接続。 |
+| RGB&nbsp;IO48    | I/O | ESP32-S3 GPIO 48に接続、NeoPixel |
+| IO15    | I/O | ESP32-S3 GPIO 15に接続、アナログ |
 
-#### Power
+#### 電源
 
-Moddable Six is a 3.3V device. 5V power is regulated to 3.3V by a LM1117-3.3 voltage regulator (see data sheet for specs). Testing of Moddable Six has been with typical 5V 0.5amp USB source power.
+Moddable Sixは3.3Vデバイスです。5V電源はLM1117-3.3電圧レギュレータによって3.3Vに調整されます（仕様についてはデータシートを参照してください）。Moddable Sixのテストは、典型的な5V 0.5アンペアのUSB電源で行われました。
 
-Power can be supplied to Moddable Six via the following:
+Moddable Sixには以下の方法で電源を供給できます：
 
-* 5V - Micro USB connector
-* 5V - Moddable Programmer connector
-* 5V - VIN on 16 pin external header
-* 3.3V - 3.3V pin external header
+* 5V - Micro USBコネクタ
+* 5V - Moddable Programmerコネクタ
+* 5V - 16ピン外部ヘッダのVIN
+* 3.3V - 3.3Vピン外部ヘッダ
 
 <a id="dimensions"></a>
-### Dimensions
+### 寸法
 
-The complete dimensions of Moddable Six are provided in this [PDF document](../assets/devices/moddable-six-dimensions.pdf). These are helpful when mounting Moddable Six in a product enclosure and designing a case for Moddable Six.
+Moddable Sixの完全な寸法はこの[PDFドキュメント](../assets/devices/moddable-six-dimensions.pdf)に記載されています。これは、Moddable Sixを製品筐体に取り付けたり、Moddable Six用のケースを設計する際に役立ちます。
 
 <a id="setup"></a>
-## Moddable SDK and Host Environment Setup
+## Moddable SDKとホスト環境のセットアップ
 
-To build and run apps on Moddable Six, you'll need to:
+Moddable Sixでアプリをビルドして実行するには、以下の手順が必要です：
 
-1. Install the [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)
-2. Install [ESP32 tools](./esp32.md)
-3. Follow the instructions in the **Building and Deploying Apps** section below.
+1. [Moddable SDK](./../Moddable%20SDK%20-%20Getting%20Started.md)をインストールする
+2. [ESP32ツール](./esp32.md)をインストールする
+3. 以下の**アプリのビルドとデプロイ**セクションの指示に従う
 
 <a id="building-and-deploying-apps"></a>
-## Building and Deploying Apps
+## アプリのビルドとデプロイ
 
-After you've set up your host environment and ESP32 tools, take the following steps to install an application on your Moddable Six.
+ホスト環境とESP32ツールのセットアップが完了したら、以下の手順に従ってModdable Sixにアプリケーションをインストールします。
 
-Moddable Six has both a USB port and serial programmer port. You can program and debug with xsbug over either port. The serial programmer port requires a Moddable Programmer or other USB to serial adapter.
+Moddable SixにはUSBポートとシリアルプログラマーポートの両方があります。どちらのポートでもxsbugを使用してプログラムおよびデバッグできます。シリアルプログラマーポートを使用するには、Moddable Programmerまたは他のUSB-シリアルアダプタが必要です。
 
 <a id="install-over-usb"></a>
-To use the USB port:
+USBポートを使用するには：
 
-1. Connect a USB cable to the USB connector on Moddable Six
+1. USBケーブルをModdable SixのUSBコネクタに接続します
 
-2. Use the platform `-p esp32/moddable_six_cdc`
+2. プラットフォームとして `-p esp32/moddable_six_cdc` を使用します
 
-3. Build and deploy the app with `mcconfig`
+3. `mcconfig` を使用してアプリをビルドおよびデプロイします
 
-	`mcconfig` is the command line tool to build and launch Moddable apps on microcontrollers and the simulator. Full documentation of `mcconfig` is available [here](../tools/tools.md).
+	`mcconfig` は、マイクロコントローラおよびシミュレータ上でModdableアプリをビルドおよび起動するためのコマンドラインツールです。`mcconfig` の完全なドキュメントは[こちら](../tools/tools.md)にあります。
 
-	Use the platform `-p esp32/moddable_six_cdc`  with `mcconfig` to build for Moddable Six using the USB port. For example, to build the [`piu/balls` example](../../examples/piu/balls):
+	USBポートを使用してModdable Six用にビルドするには、`mcconfig` でプラットフォーム `-p esp32/moddable_six_cdc` を使用します。例えば、[`piu/balls` のサンプル](../../examples/piu/balls)をビルドするには：
 
 	```text
 	cd $MODDABLE/examples/piu/balls
@@ -162,42 +162,43 @@ To use the USB port:
 	```
 
 <a id="install-over-serial"></a>
-Alternately, to connect with a serial programmer:
+また、シリアルプログラマを使用して接続するには：
 
-1. Attach the programmer to the serial connector on Moddable Six
+1. プログラマをModdable Sixのシリアルコネクタに接続します
 
-	Make sure you have the programmer oriented correctly. The orientation should match the image below.
+	プログラマの向きが正しいことを確認してください。向きは以下の画像と一致する必要があります。
 
 	![image](https://gist.github.com/assets/6822704/c605ef5b-0b80-46a2-a87c-1cab80b59deb)
 
-2. Attach the programmer to your computer with a micro USB cable
+2. プログラマをマイクロUSBケーブルでコンピュータに接続します
 
-	Make sure you're using a data sync&#8211;capable cable, not one that is power-only.
+	データ同期が可能なケーブルを使用していることを確認してください。電源供給のみのケーブルではありません。
 
-3. Build and deploy the app with `mcconfig`.
+3. `mcconfig`を使用してアプリをビルドしてデプロイします。
 
-	`mcconfig` is the command line tool to build and launch Moddable apps on microcontrollers and the simulator. Full documentation of `mcconfig` is available [here](../tools/tools.md).
+	`mcconfig`は、マイクロコントローラおよびシミュレータ上でModdableアプリをビルドおよび起動するためのコマンドラインツールです。`mcconfig`の完全なドキュメントは[こちら](../tools/tools.md)にあります。
 
-	Use the platform `-p esp32/moddable_six`  with `mcconfig` to build for Moddable Six using the Moddable Programmer. For example, to build the [`piu/balls` example](../../examples/piu/balls):
+	Moddable Programmerを使用してModdable Six用にビルドするには、`mcconfig`でプラットフォーム`-p esp32/moddable_six`を使用します。例えば、[`piu/balls`のサンプル](../../examples/piu/balls)をビルドするには：
 
 	```text
 	cd $MODDABLE/examples/piu/balls
 	mcconfig -d -m -p esp32/moddable_six
 	```
 
-The [examples readme](../../examples) contains additional information about commonly used `mcconfig` arguments for screen rotation, Wi-Fi configuration, and more.
+[examples readme](../../examples)には、画面の回転、Wi-Fi設定など、よく使用される`mcconfig`引数に関する追加情報が含まれています。
 
-Use the platform `-p sim/moddable_six` with `mcconfig` to build for the Moddable Six simulator.
+
+プラットフォーム `-p sim/moddable_six` を使用して、Moddable Sixシミュレータ用に `mcconfig` をビルドします。
 
 <a id="moddable-features"></a>
-## Using Moddable Six
-Moddable Six packs a large number of hardware features into a deceptively simple package. This section introduces what you need to know for your software to use all that hardware.
+## Moddable Six の使用
+Moddable Sixは、シンプルなパッケージに多くのハードウェア機能を詰め込んでいます。このセクションでは、ソフトウェアがそのすべてのハードウェアを使用するために知っておくべきことを紹介します。
 
 <a id="additional-memory"></a>
-#### 8 MB PSRAM Memory
-The ESP32-S3 in Moddable Six has about 512 KB of internal memory and another 8 MB of external PSRAM. The PSRAM is connected via a high-speed 8-bit bus, but it is still slower than the internal 512 KB of RAM.
+#### 8 MB PSRAM メモリ
+Moddable SixのESP32-S3には約512 KBの内部メモリと、さらに8 MBの外部PSRAMがあります。PSRAMは高速な8ビットバスを介して接続されていますが、それでも内部の512 KBのRAMよりは遅いです。
 
-The default JavaScript virtual machine for Moddable Six is 162 KB with an 8 KB stack, a 77 KB slot heap, and a 77 MB chunk heap. This is enough memory for many projects and ensures that all the JavaScript virtual machine memory is allocated in the fast internal memory. You can make a virtual machine that uses much more memory, over 8 MB. To do this, add a `"creation"` section to your project's `manifest.json`. Here's an example that creates a 4 MB virtual machine with a 32 KB stack, 2032 KB slot heap, and 2032 KB chunk heap:
+Moddable SixのデフォルトのJavaScript仮想マシンは、162 KBのメモリ、8 KBのスタック、77 KBのスロットヒープ、および77 MBのチャンクヒープを持っています。これは多くのプロジェクトに十分なメモリであり、すべてのJavaScript仮想マシンメモリが高速な内部メモリに割り当てられることを保証します。8 MBを超えるメモリを使用する仮想マシンを作成することもできます。そのためには、プロジェクトの `manifest.json` に `"creation"` セクションを追加します。以下は、32 KBのスタック、2032 KBのスロットヒープ、および2032 KBのチャンクヒープを持つ4 MBの仮想マシンを作成する例です：
 
 ```json
 "creation": {
@@ -214,32 +215,33 @@ The default JavaScript virtual machine for Moddable Six is 162 KB with an 8 KB s
 }
 ```
 
-The `"chunk"` values are in units of bytes while the`"stack"` and `"heap"` values are in units of  "slots" (each slot is 16 bytes on ESP32-S3). See the [manifest documentation](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md#creation) for more information on the `"creation"`.
+`"chunk"`の値はバイト単位であり、`"stack"`と`"heap"`の値は「スロット」単位です（ESP32-S3では各スロットは16バイトです）。`"creation"`に関する詳細は[マニフェストドキュメント](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/manifest.md#creation)を参照してください。
 
-Another way to take advantage of all that memory is to divide your project into multiple independent Web Workers. That's discussed in the next section.
+すべてのメモリを活用するもう1つの方法は、プロジェクトを複数の独立したWeb Workerに分割することです。それについては次のセクションで説明します。
 
 <a id="dual-core"></a>
-#### Dual-Core ESP32-S3 CPU
-The Moddable SDK makes it easy to take advantage of the two CPU cores in the ESP32-S3. The standard Web Worker API allows you to run scripts in parallel on the two cores. For example, one worker might be used for the user interface, another for network communications, and a third for processing sensor readings. This separation ensures that the user interface remains responsive by avoiding any blocking from other work taking place. It can also help to organize code and minimize interactions between different parts of a project's code.
+#### デュアルコアESP32-S3 CPU
+Moddable SDKは、ESP32-S3の2つのCPUコアを活用するのを簡単にします。標準のWeb Worker APIを使用すると、2つのコアでスクリプトを並行して実行できます。例えば、1つのワーカーはユーザーインターフェース用、もう1つはネットワーク通信用、そして3つ目はセンサーの読み取り処理用に使用することができます。この分離により、他の作業が行われている間にブロックされることを避けて、ユーザーインターフェースが応答性を保つことができます。また、コードを整理し、プロジェクトの異なる部分の相互作用を最小限に抑えるのにも役立ちます。
 
-Each Web Worker is an independent JavaScript virtual machine. Each Worker runs in a separate FreeRTOS task which allows them to run in parallel on the dual-core ESP32-S3. Workers communicate by sending messages or `SharedArrayBuffer` objects.
 
-The 8 MB PSRAM on Moddable Six can contain about 40 virtual machines using the default creation configuration of 177 KB.
+各Web Workerは独立したJavaScript仮想マシンです。各Workerは別々のFreeRTOSタスクで実行され、デュアルコアESP32-S3上で並行して実行できます。Workersはメッセージや`SharedArrayBuffer`オブジェクトを送信することで通信します。
 
-To learn more about Web Workers in the Moddable SDK, read an the [documentation](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/base/worker.md) and try running [an example](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/base/worker).
+Moddable Sixの8 MB PSRAMは、デフォルトの作成構成である177 KBを使用して約40の仮想マシンを含むことができます。
 
-#### Beautiful, Fast and Responsive screen
+Moddable SDKのWeb Workersについて詳しく知るには、[ドキュメント](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/base/worker.md)を読み、[サンプル](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/base/worker)を実行してみてください。
 
-The touch screen is a 240 x 320 QVGA IPS display driven by a 8 bit wide parallel data bus with a GT911 capacitive touch controller.
+#### 美しく、速く、応答性の高い画面
+
+タッチスクリーンは、GT911静電容量式タッチコントローラーを備えた8ビット幅の並列データバスで駆動される240 x 320 QVGA IPSディスプレイです。
 
 <a id="backlight"></a>
-#### Backlight
+#### バックライト
 
-Example: [backlight](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/piu/backlight)
+サンプル： [backlight](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/piu/backlight)
 
-Moddable Six has a backlight that can be adjusted in software.
+Moddable Sixには、ソフトウェアで調整可能なバックライトがあります。
 
-The backlight control is connected to GPIO 14. There is a constant defined for the backlight GPIO in the host `config`.
+バックライト制御はGPIO 14に接続されています。ホストの`config`にはバックライトGPIOの定数が定義されています。
 
 ```js
 import "config" from "mc/config";
@@ -248,7 +250,7 @@ Digital.write(config.backlight, 1); // backlight ON
 Digital.write(config.backlight, 0); // backlight OFF
 ```
 
-The brightness of the backlight may be set at build time in the `config` section of your project manifest. The default is 100%.
+バックライトの明るさは、プロジェクトマニフェストの`config`セクションでビルド時に設定できます。デフォルトは100%です。
 
 ```js
 "config": {
@@ -256,19 +258,19 @@ The brightness of the backlight may be set at build time in the `config` section
 }
 ```
 
-You can also set the brightness on the command line when building with `mcconfig`. Here it is set to 50%.
+`mcconfig`を使用してビルドする際に、コマンドラインで明るさを設定することもできます。ここでは50%に設定されています。
 
 ```text
 mcconfig -d -m -p esp32/moddable_six_cdc brightness=50
 ```
 
-The `setup/target` module for Moddable Six installs a global variable named `backlight` that you can use to adjust the backlight in your code. Here it is set to 80%.
+Moddable Sixの`setup/target`モジュールは、コード内でバックライトを調整するために使用できる`backlight`という名前のグローバル変数をインストールします。ここでは80%に設定されています。
 
 ```js
 backlight.write(80);
 ```
 
-The `backlight` global contains an instance of a subclass of `PWM`. If you do not want this to be created automatically, set the brightness to `"none"` in the `config` section of your project's manifest.
+`backlight`グローバルには`PWM`のサブクラスのインスタンスが含まれています。これが自動的に作成されるのを望まない場合は、プロジェクトのマニフェストの`config`セクションで明るさを`"none"`に設定します。
 
 ```js
 "config": {
@@ -277,55 +279,55 @@ The `backlight` global contains an instance of a subclass of `PWM`. If you do no
 ```
 
 <a id="frame-rate-control"></a>
-#### Dynamic Frame Rate Control
+#### 動的フレームレート制御
 
-The screen on Moddable Six can operate at refresh rates between 30 and 100 frames per second. The default is 50 FPS. The frame rate can be adjusted by your project code:
+Moddable Sixの画面は、1秒間に30から100フレームのリフレッシュレートで動作できます。デフォルトは50 FPSです。フレームレートはプロジェクトコードで調整できます。
 
 ```js
 screen.frameRate = 75;
 ```
 
-The optimal hardware refresh rate for the display depends on the animation design and how quickly the ESP32-S3 inside Moddable Six is able to render the frames.
+ディスプレイの最適なハードウェアリフレッシュレートは、アニメーションのデザインと、Moddable Six内のESP32-S3がフレームをどれだけ速くレンダリングできるかに依存します。
 
 <a id="tearing-effect"></a>
-#### Tearing Effect
+#### テアリング効果
 
-The display controller in Moddable Six has a "tearing effect" output. This is used to eliminate visible tearing on screen by synchronizing the refresh of the screen with the hardware refresh. This provides a much more stable display and smoother animation. However, if the frames cannot be rendered quickly enough, they will still tear. In that case, either use the frame rate control to reduce the rendering frame rate or optimize the animations. In some cases it may be preferable to disable use of the tearing effect pin. This can be done in your project's script:
+Moddable Sixのディスプレイコントローラーには「テアリング効果」出力があります。これは、画面のリフレッシュをハードウェアリフレッシュと同期させることで、画面上の目に見えるテアリングを排除するために使用されます。これにより、はるかに安定したディスプレイとスムーズなアニメーションが提供されます。しかし、フレームが十分に速くレンダリングできない場合、それでもテアリングが発生します。その場合は、フレームレート制御を使用してレンダリングフレームレートを下げるか、アニメーションを最適化してください。場合によっては、テアリング効果ピンの使用を無効にする方が望ましいこともあります。これはプロジェクトのスクリプトで行うことができます。
 
 ```js
 screen.syncFrames = false;
 ```
 
-The tearing effect output of the display controller is connected to GPIO 47 of the ESP32-S3. It is managed by the ILI9341_P8 display driver, and so should not be used by your code if you are using the display driver.
+ディスプレイコントローラのティアリング効果出力はESP32-S3のGPIO 47に接続されています。これはILI9341_P8ディスプレイドライバによって管理されているため、ディスプレイドライバを使用している場合はコードで使用しないでください。
 
 <a id="amplified-audio"></a>
-#### Amplified Audio
+#### アンプ付きオーディオ
 
-Examples: [somafm](https://github.com/Moddable-OpenSource/moddable/tree/public/contributed/somafm)
+サンプル： [somafm](https://github.com/Moddable-OpenSource/moddable/tree/public/contributed/somafm)
 [resource-stream](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/pins/audioout/resource-stream)
 [mp3-resource-stream](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/pins/audioout/mp3-resource-stream)
 
-Moddable Six plays audio using [PDM](https://en.wikipedia.org/wiki/Pulse-density_modulation) through a [PAM8302A](https://www.diodes.com/part/view/PAM8302A?BackID=8156) amplifier.
+Moddable Sixは[PDM](https://en.wikipedia.org/wiki/Pulse-density_modulation)を使用して[PAM8302A](https://www.diodes.com/part/view/PAM8302A?BackID=8156)アンプを通じてオーディオを再生します。
 
-The audio signal is output on GPIO 45. Pin IO45 can also be found on the expansion header. The signal on IO45 is the unfiltered, unamplified PDM output directly from the ESP32-S3. This may be used to drive your own external filter, amplifier, and speaker. The output of the amplifier goes only to the onboard speaker, not to Pin IO45. If your project does not play audio, PIN IO45 is available to use as a GPIO.
+オーディオ信号はGPIO 45から出力されます。ピンIO45は拡張ヘッダにもあります。IO45の信号はESP32-S3から直接出力されるフィルタなし、増幅なしのPDM出力です。これを使用して独自の外部フィルタ、アンプ、およびスピーカーを駆動することができます。アンプの出力はオンボードスピーカーのみに行き、ピンIO45には行きません。プロジェクトがオーディオを再生しない場合、PIN IO45はGPIOとして使用可能です。
 
-GPIO 46 enables the PAM8302A amplifier connected to the onboard speaker. Power to the amplifier is automatically applied when audio is playing. When no audio is playing, the amplifier is turned off.
+GPIO 46は、オンボードスピーカーに接続されたPAM8302Aアンプを有効にします。オーディオが再生されているときにアンプに電力が自動的に供給されます。オーディオが再生されていないときは、アンプはオフになります。
 
 <a id="quick-connector"></a>
-#### STEMMA QT / Qwiic / JST SH 1mm Quick Connector
+#### STEMMA QT / Qwiic / JST SH 1mm クイックコネクタ
 
-Moddable Six has a JST SH 1mm connector, commonly referred to as [Qwiic](https://www.sparkfun.com/qwiic) or [STEMMA QT](https://learn.adafruit.com/introducing-adafruit-stemma-qt/what-is-stemma-qt), that is used to easily connect sensors and peripherals using the I²C protocol. It uses GPIO 4 for SDA and GPIO 5 for SCL.
+Moddable Sixには、I²Cプロトコルを使用してセンサーや周辺機器を簡単に接続するために使用される、一般に[Qwiic](https://www.sparkfun.com/qwiic)または[STEMMA QT](https://learn.adafruit.com/introducing-adafruit-stemma-qt/what-is-stemma-qt)と呼ばれるJST SH 1mmコネクタがあります。SDAにはGPIO 4、SCLにはGPIO 5を使用します。
 
 <img width="405" src="../assets/devices/moddable-six-qwiic.jpg">
 
 <a id="neopixel"></a>
 #### NeoPixel
 
-Example: [neopixel](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/drivers/neopixel)
+サンプル： [neopixel](https://github.com/Moddable-OpenSource/moddable/tree/public/examples/drivers/neopixel)
 
-There is a NeoPixel on the main board which is controlled using GPIO 48.
+メインボードには、GPIO 48を使用して制御されるNeoPixelがあります。
 
-Moddable Six can color cycle the NeoPixel while running by enabling the `rainbow` option in the led config. To use the NeoPixel in your application or to use pin IO48 as a GPIO, set the `rainbow` configuration option in your project manifest to `false`.
+Moddable Sixは、LED設定で`rainbow`オプションを有効にすることで、実行中にNeoPixelの色を循環させることができます。アプリケーションでNeoPixelを使用するか、GPIOとしてピンIO48を使用するには、プロジェクトマニフェストで`rainbow`設定オプションを`false`に設定します。
 
 ```js
 "config": {
@@ -335,31 +337,31 @@ Moddable Six can color cycle the NeoPixel while running by enabling the `rainbow
 }
 ```
 
-A NeoPixel strip can be connected to pin RGB IO48 on the expansion header.
+NeoPixelストリップは、拡張ヘッダーのピンRGB IO48に接続できます。
 
 <img width="405" src="../assets/devices/moddable-six-external-neopixel.jpg">
 
-> Note: Please provide external 5V power to your NeoPixel strip. With 3.3V power, the NeoPixel strip may not work correctly. For short NeoPixel strips, you can use the `VIN 5V` pin when Moddable Six is powered by a 5V supply.
+> 注: NeoPixelストリップには外部の5V電源を供給してください。3.3V電源では、NeoPixelストリップが正しく動作しない場合があります。短いNeoPixelストリップの場合、Moddable Sixが5V電源で動作しているときに`VIN 5V`ピンを使用できます。
 
 <a id="usb"></a>
 #### USB
 
-The USB port is connected to GPIO 19 and GPIO 20. This port can be used to program and debug Moddable Six. For more information on USB on the ESP32 family see the [USB section of our ESP32 documentation](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/devices/esp32.md#using_usb).
+USBポートはGPIO 19とGPIO 20に接続されています。このポートはModdable Sixのプログラムおよびデバッグに使用できます。ESP32ファミリーのUSBに関する詳細は、[ESP32ドキュメントのUSBセクション](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/devices/esp32.md#using_usb)を参照してください。
 
-If your project does not use USB and you are not building with the target `esp32/moddable_six_cdc` you can use IO19 and IO20 on the expansion header as GPIOs.
+プロジェクトでUSBを使用せず、ターゲット`esp32/moddable_six_cdc`でビルドしていない場合、拡張ヘッダーのIO19およびIO20をGPIOとして使用できます。
 
 <a id="touch-panel"></a>
-#### Touch Panel
-The touch panel uses a GT911 touch controller connected to the I²C bus on GPIO 4 and GPIO 5. It uses I²C address `0x14` or `0x5D`.
+#### タッチパネル
+タッチパネルは、GPIO 4およびGPIO 5のI²Cバスに接続されたGT911タッチコントローラーを使用します。I²Cアドレスは`0x14`または`0x5D`です。
 
-The GT911 touch controller interrupt is connected to GPIO 38. The GT911 touch driver uses the interrupt to detect touch events, making the touch panel more responsive and eliminating the need to continuously poll for touch events.
+GT911タッチコントローラーの割り込みはGPIO 38に接続されています。GT911タッチドライバーはこの割り込みを使用してタッチイベントを検出し、タッチパネルの応答性を向上させ、タッチイベントを継続的にポーリングする必要をなくします。
 
-You cannot use IO4 and IO5 as GPIOs if your project uses the touch panel. You can use these pins with other I²C devices even if your project uses the touch panel as long as those devices don't use I²C addresses `0x14` or `0x5D`.
+プロジェクトでタッチパネルを使用する場合、IO4およびIO5をGPIOとして使用することはできません。ただし、これらのピンを他のI²Cデバイスと一緒に使用することは可能です。そのデバイスがI²Cアドレス `0x14` または `0x5D` を使用しない限り、タッチパネルと一緒に使用できます。
 
 <a id="flash-button"></a>
-#### Flash Button
+#### フラッシュボタン
 
-The flash button on the back of Moddable Six may be used as an input to your project. It is connected to GPIO0 and may be accessed using Digital Input APIs. However, it is recommended to use the global `Host` object to access it instead, as this is a bit simpler, portable to other devices, and works in the Moddable Six simulator. Here's an example:
+Moddable Sixの背面にあるフラッシュボタンは、プロジェクトの入力として使用できます。これはGPIO0に接続されており、デジタル入力APIを使用してアクセスできます。ただし、グローバルな `Host` オブジェクトを使用してアクセスすることをお勧めします。これは少し簡単で、他のデバイスに移植可能であり、Moddable Sixシミュレーターでも動作するためです。以下はその例です：
 
 ```js
 new Host.Button.Default({
@@ -370,51 +372,50 @@ new Host.Button.Default({
 ```
 
 <a id="troubleshooting"></a>
-## Troubleshooting
+## トラブルシューティング
 
-Moddable Six can communicate with your development computer using either its USB or Serial connector. If you are using the USB connector, build using the `esp32/moddable_six_cdc` platform. If you are using the Serial connector, build using the `esp32/moddable_six` platform.
+Moddable Sixは、USBまたはシリアルコネクタを使用して開発用コンピュータと通信できます。USBコネクタを使用する場合は、`esp32/moddable_six_cdc` プラットフォームを使用してビルドします。シリアルコネクタを使用する場合は、`esp32/moddable_six` プラットフォームを使用してビルドします。
 
 <a id="development-resources"></a>
-## Development Resources
+## 開発リソース
 
 <a id="simulator"></a>
-### Simulator
+### シミュレーター
 
-The Moddable SDK simulator, mcsim, includes a simulator for Moddable Six. The simulator is a valuable tool to quickly develop and debug many parts of your project.
+Moddable SDKのシミュレーター、mcsimにはModdable Sixのシミュレーターが含まれています。このシミュレーターは、プロジェクトの多くの部分を迅速に開発およびデバッグするための貴重なツールです。
 
-To use the Moddable Six simulator, specify the `sim/moddable_six` platform when building with `mcconfig`:
+Moddable Sixシミュレーターを使用するには、`mcconfig`でビルドする際に`sim/moddable_six`プラットフォームを指定します：
 
 ```
 mcconfig -d -m -p sim/moddable_six
 ```
 
-The Moddable Six simulator simulates the following:
+Moddable Sixシミュレーターは以下をシミュレートします：
 
-- QVGA Display
-- Touch input
-- Audio playback
+- QVGAディスプレイ
+- タッチ入力
+- オーディオ再生
 - NeoPixel LED
 - Web Workers
 - Wi-Fi
-- Flash button
+- フラッシュボタン
 
-The Controls panel in the simulator has a button labeled "Default" which simulates the Flash button on the back of Moddable Six. Use "Show Controls" in the View menu to show the Controls panel.
+シミュレーターのコントロールパネルには、「Default」とラベル付けされたボタンがあり、これはModdable Sixの背面にあるフラッシュボタンをシミュレートします。コントロールパネルを表示するには、ビュー メニューの「Show Controls」を使用します。
 
 <a id="examples"></a>
-### Examples
+### サンプル
 
-The Moddable SDK has over 150 [example apps](../../examples) that demonstrate how to use its many features. Most of these examples are compatible with Moddable Six.
+Moddable SDKには、その多くの機能を使用する方法を示す150以上の[サンプルアプリ](../../examples)があります。これらのサンプルのほとんどはModdable Sixと互換性があります。
 
-A suite of example apps designed for Moddable Six is in
- the [contributed/moddable_six](../../contributed/moddable_six) directory. These apps demonstrate Moddable Six features including high frame rate animation, audio integration in the UI, touch interactions, and vector graphics. These apps can also be run in the Moddable Six simulator on macOS, Windows, and Linux using the platform `sim/moddable_six` with `mcconfig`.
+Moddable Six用に設計された一連のサンプルアプリは、[contributed/moddable_six](../../contributed/moddable_six)ディレクトリにあります。これらのアプリは、高フレームレートのアニメーション、UIへのオーディオ統合、タッチインタラクション、ベクターグラフィックスなど、Moddable Sixの機能を示しています。これらのアプリは、`mcconfig`を使用して`sim/moddable_six`プラットフォームでmacOS、Windows、およびLinux上のModdable Sixシミュレーターでも実行できます。
 
-These apps are great starting points for your own projects. They can be easily adapted to communicate with your hardware, change the UI interactions, or add new features.
+これらのアプリは、あなた自身のプロジェクトの出発点として最適です。ハードウェアとの通信、UIのインタラクションの変更、新機能の追加などに簡単に適応できます。
 
 #### battery
 
-The [battery](../../contributed/moddable_six/battery) app is a control panel for a home battery system. It uses a simulated battery.
+[battery](../../contributed/moddable_six/battery) アプリは、家庭用バッテリーシステムのコントロールパネルです。シミュレートされたバッテリーを使用します。
 
-The app includes advanced rendering of battery levels with fluid animations and sophisticated screen-to-screen transitions.
+このアプリには、流体アニメーションと高度な画面間の遷移を伴うバッテリーレベルの高度なレンダリングが含まれています。
 
 <img width="45%" src="../assets/devices/moddable-six-battery1.png"> <img width="45%" src="../assets/devices/moddable-six-battery2.png">
 
@@ -423,15 +424,15 @@ The app includes advanced rendering of battery levels with fluid animations and 
 
 #### led-color
 
-The [led-color](../../contributed/moddable_six/led-color) app provides a color-picker on display for the user to choose the color displayed by the on-board Neopixel.
+[led-color](../../contributed/moddable_six/led-color) アプリは、オンボードのNeopixelによって表示される色をユーザーが選択するためのカラーピッカーを提供します。
 
 <img width="45%" src="../assets/devices/moddable-six-led-color1.png"> <img width="45%" src="../assets/devices/moddable-six-led-color2.png">
 
 #### plug-schedule
 
-The [plug-schedule](../../contributed/moddable_six/plug-schedule) app presents an interface for an IoT plug plug.
+[plug-schedule](../../contributed/moddable_six/plug-schedule) アプリは、IoTプラグのインターフェースを提供します。
 
-This is the largest, most comprehensive of the the Moddable Six example apps. It is nearly a complete product. It maintains separate schedules for two smart plugs and includes Wi-Fi configuration, setting the time, and an graphical timezone picker. The mobile-stye UI features smooth, flicker free animations are reinforced with audio feedback.
+これは、Moddable Sixの例の中で最大かつ最も包括的なアプリです。ほぼ完全な製品に近いです。2つのスマートプラグのための個別のスケジュールを維持し、Wi-Fi設定、時間設定、グラフィカルなタイムゾーンピッカーを含みます。モバイルスタイルのUIは、スムーズでちらつきのないアニメーションを特徴とし、音声フィードバックで強化されています。
 
 <img width="45%" src="../assets/devices/moddable-six-smartplug1.png"> <img width="45%" src="../assets/devices/moddable-six-smartplug2.png">
 
@@ -440,44 +441,44 @@ This is the largest, most comprehensive of the the Moddable Six example apps. It
 
 #### speaking-clock
 
-The [speaking-clock](../../contributed/moddable_six/speaking-clock) app is a word-clock that audibly announces the time every minute.
+[speaking-clock](../../contributed/moddable_six/speaking-clock) アプリは、毎分時間を音声で知らせるワードクロックです。
 
-The voice of the speaking clock is ChatGPT! The voice samples were captured from ChatGPT and built into the app. They are stored in WAVE files so you can easily replace them with any voice you like, even your own.
+speaking clockの声はChatGPTです！音声サンプルはChatGPTから取得され、アプリに組み込まれています。これらはWAVEファイルに保存されているため、好きな声、例えば自分の声に簡単に置き換えることができます。
 
 <img width="45%" src="../assets/devices/speaking-clock.gif">
 
 <a id="debugging"></a>
-### Debugging
+### デバッグ
 
-Moddable Six has advanced debugging support for JavaScript, TypeScript, and native code.
+Moddable Sixは、JavaScript、TypeScript、およびネイティブコードの高度なデバッグサポートを提供します。
 
 <a id="advanced-xsbug"></a>
-#### Debugging JavaScript and TypeScript Code
+#### JavaScriptおよびTypeScriptコードのデバッグ
 
-The xsbug debugger included in the Moddable SDK is used to debug both JavaScript and TypeScript code. The [xsbug documentation](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/xs/xsbug.md) explains the fundamentals. There's nothing special to do to debug TypeScript: xsbug support source maps, so TypeScript debugging works automatically. xsbug supports debugging multiple JavaScript virtual machines at the same time, so you can debug Web Workers too.
+Moddable SDKに含まれるxsbugデバッガーは、JavaScriptおよびTypeScriptコードのデバッグに使用されます。[xsbugのドキュメント](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/xs/xsbug.md)には基本が説明されています。TypeScriptをデバッグするために特別なことをする必要はありません。xsbugはソースマップをサポートしているため、TypeScriptのデバッグは自動的に機能します。xsbugは複数のJavaScript仮想マシンを同時にデバッグすることをサポートしているため、Web Workersもデバッグできます。
 
-Once you are comfortable with the basics of xsbug, check out these blog posts to learn about advanced debugging features built into xsbug.
+xsbugの基本に慣れたら、以下のブログ投稿をチェックして、xsbugに組み込まれている高度なデバッグ機能について学んでください。
 
-- [Conditional breakpoints](https://moddable.com/blog/conditional-breakpoints/)
-- [Function breakpoints](https://www.moddable.com/blog/function-breakpoints/)
-- [Tracepoints](https://www.moddable.com/blog/tracepoints/)
+- [条件付きブレークポイント](https://moddable.com/blog/conditional-breakpoints/)
+- [関数ブレークポイント](https://www.moddable.com/blog/function-breakpoints/)
+- [トレースポイント](https://www.moddable.com/blog/tracepoints/)
 
 <a id="debug-native"></a>
-#### Debugging Native Code
+#### ネイティブコードのデバッグ
 
-Debugging native code on Moddable Six uses the GDB debugger.
+Moddable Sixでネイティブコードをデバッグするには、GDBデバッガを使用します。
 
-[GDB](https://www.gnu.org/software/gdb/documentation/) is the GNU debugger widely used on Unix-like build hosts to debug native code. GDB is included in the Espressif Toolchain downloaded during the [SDK and Host Environment Setup](#setup) step.
+[GDB](https://www.gnu.org/software/gdb/documentation/)は、Unix系のビルドホストで広く使用されているGNUデバッガです。GDBは、[SDKおよびホスト環境のセットアップ](#setup)のステップでダウンロードされたEspressifツールチェーンに含まれています。
 
-GDB communicates with Moddable Six over the USB port.
+GDBはUSBポートを介してModdable Sixと通信します。
 
-> **Note**: GDB is an extremely powerful tool that takes some time to learn. GDB support on the ESP32-S3 has some limitations that make using it more challenging, such as supporting only two hardware breakpoints.
+> **注意**: GDBは非常に強力なツールで、習得には時間がかかります。ESP32-S3でのGDBサポートにはいくつかの制限があり、使用が難しい場合があります。例えば、ハードウェアブレークポイントが2つしかサポートされていないなどです。
 
-##### GDB Setup
+##### GDBのセットアップ
 
-1. OpenOCD allows GDB to communicate with the ESP32-S3. If you followed the instructions from Espressif to set up the ESP-IDF, you should already have OpenOCD set-up. See the Espressif documentation for instructions to [confirm that OpenOCD is installed](https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-guides/jtag-debugging/#jtag-debugging-setup-openocd).
+1. OpenOCDはGDBがESP32-S3と通信するのを可能にします。Espressifの指示に従ってESP-IDFをセットアップした場合、すでにOpenOCDがセットアップされているはずです。OpenOCDがインストールされていることを確認する手順については、Espressifのドキュメントを参照してください。[OpenOCDのインストールを確認する](https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-guides/jtag-debugging/#jtag-debugging-setup-openocd)。
 
-2. Create a GDB startup command text file `.gdbinit` in your `$HOME` directory with the following contents:
+2. あなたの `$HOME` ディレクトリに以下の内容で `.gdbinit` というGDBスタートアップコマンドテキストファイルを作成します：
 
 ```
 target extended-remote :3333
@@ -489,47 +490,47 @@ thb app_main
 c
 ```
 
-> Note: you may already have a `.gdbinit` in your `$HOME` directory. If so, you may want to move it aside or rename it.
+> 注意: すでに `$HOME` ディレクトリに `.gdbinit` が存在する場合があります。その場合は、別の場所に移動するか、名前を変更することをお勧めします。
 
-##### Debugging with GDB
+##### GDBを使ったデバッグ
 
-1. Build the app that contains the native code you plan to debug. For this example, we build the [SomaFM example](https://github.com/Moddable-OpenSource/moddable/tree/public/contributed/somafm):
+1. デバッグする予定のネイティブコードを含むアプリをビルドします。この例では、[SomaFMの例](https://github.com/Moddable-OpenSource/moddable/tree/public/contributed/somafm)をビルドします：
 
 ```
 cd $MODDABLE/contributed/somafm
 mcconfig -d -m -p esp32/moddable_six ssid="YOU WI-FI ACCESS POINT" password="YOUR WI-FI PASSWORD"
 ```
 
-> **Note**: To use GDB, connect Moddable Six to your computer using the USB port on Moddable Six, not the serial port. GDB is only supported over the USB port. If you want to use xsbug at the same time as GDB, you can also connect the serial port to your computer using a Moddable Programmer.
+> **注意**: GDBを使用するには、Moddable SixをModdable SixのUSBポートを使用してコンピュータに接続します。シリアルポートではなくUSBポートでのみGDBがサポートされています。GDBと同時にxsbugを使用したい場合は、Moddable Programmerを使用してシリアルポートをコンピュータに接続することもできます。
 
-2. In a new Terminal window, start OpenOCD
+2. 新しいターミナルウィンドウでOpenOCDを開始します
 
 ```
 openocd -f board/esp32s3-builtin.cfg
 ```
 
-3. In a Terminal window, navigate to the `bin/` directory for your application.
+3. ターミナルウィンドウで、アプリケーションの `bin/` ディレクトリに移動します。
 
 ```
 cd $MODDABLE/build/bin/esp32/moddable_six/debug/somafm
 ```
 
-4. Launch GDB
+4. GDBを起動します
 
 ```
 xtensa-esp32s3-elf-gdb
 ```
 
-Some startup information will scroll by and the application will stop in `app_main()`:
+いくつかの起動情報がスクロールされ、アプリケーションは `app_main()` で停止します：
 
 ```
 Thread 2 "main" hit Temporary breakpoint 1, app_main () at /Users/mkellner/moddable/build/tmp/esp32/moddable_six_cdc/debug/somafm/xsProj-esp32s3/main/main.c:477
 477		void app_main() {
 ```
 
-5. Use GDB
+5. GDBを使用します
 
-	At this point, you can use GDB as you normally would, setting breakpoints, inspecting variables, memory or registers, etc.
+	この時点で、通常通りにGDBを使用して、ブレークポイントの設定、変数、メモリ、レジスタの検査などができます。
 
 ```
 (gdb) break xs_audioout
@@ -537,22 +538,23 @@ Thread 2 "main" hit Temporary breakpoint 1, app_main () at /Users/mkellner/modda
 ```
 
 <a id="documentation"></a>
-### Documentation
+### ドキュメント
 
-All the documentation for the Moddable SDK is in the [documentation](../) directory. The **documentation**, **examples**, and **modules** directories share a common structure to make it straightforward to locate information. Some of the highlights include:
+Moddable SDKのすべてのドキュメントは [documentation](../) ディレクトリにあります。**documentation**、**examples**、および **modules** ディレクトリは共通の構造を持っており、情報を簡単に見つけることができます。主なハイライトは以下の通りです：
 
-- The `commodetto` subdirectory, which contains resources related to Commodetto--a bitmap graphics library that provides a 2D graphics API--and Poco, a lightweight rendering engine.
-- The `piu` subdirectory, which contains resources related to Piu, a user interface framework that makes it easier to create complex, responsive layouts.
-- The `networking` subdirectory, which contains networking resources related to BLE, network sockets, and a variety of standard, secure networking protocols built on sockets including HTTP/HTTPS, MQTT, WebSockets, DNS, SNTP, and telnet.
-- The `io` subdirectory, which contains resources related to supported hardware protocols (digital, analog, PWM, I²C, etc.) using ECMA-419. A number of drivers for common off-the-shelf sensors and corresponding example apps are also available.
+- `commodetto` サブディレクトリには、2DグラフィックスAPIを提供するビットマップグラフィックスライブラリであるCommodettoと、軽量レンダリングエンジンであるPocoに関連するリソースが含まれています。
+- `piu` サブディレクトリには、複雑でレスポンシブなレイアウトを簡単に作成できるユーザーインターフェースフレームワークであるPiuに関連するリソースが含まれています。
+- `networking` サブディレクトリには、BLE、ネットワークソケット、およびHTTP/HTTPS、MQTT、WebSockets、DNS、SNTP、telnetを含むソケット上に構築されたさまざまな標準的で安全なネットワーキングプロトコルに関連するネットワークリソースが含まれています。
+- `io` サブディレクトリには、ECMA-419を使用したサポートされているハードウェアプロトコル（デジタル、アナログ、PWM、I²Cなど）に関連するリソースが含まれています。一般的な市販センサー用のドライバと対応するサンプルアプリも多数利用可能です。
 
 <a id="Support"></a>
-### Support
+### サポート
 
-If you have questions, we recommend you [open a discussion](https://github.com/Moddable-OpenSource/moddable/discussions). We'll respond as quickly as practical, and other developers can offer help and benefit from the answers to your questions. Many questions have already been answered, so please try searching previous discussions and issues before opening a new one.
+質問がある場合は、[ディスカッションを開く](https://github.com/Moddable-OpenSource/moddable/discussions)ことをお勧めします。できるだけ早く対応しますし、他の開発者も助けてくれたり、あなたの質問に対する回答から利益を得ることができます。多くの質問はすでに回答されているので、新しい質問をする前に過去のディスカッションや問題を検索してみてください。
 
 <a id="Updates"></a>
-### Updates
+### 更新情報
 
-The best way to keep up-to-date with what we're doing is to follow us on Twitter ([@moddabletech](https://twitter.com/moddabletech)). We post announcements about new posts on [our blog](http://blog.moddable.com/) there, along with other Moddable news. To learn about the latest Moddable SDK releases, subscribe to our [Releases on GitHub](https://github.com/moddable-OpenSource/moddable/releases) by Watching our [repository](https://github.com/Moddable-OpenSource/moddable).
+私たちの最新情報を把握する最良の方法は、Twitter ([@moddabletech](https://twitter.com/moddabletech)) をフォローすることです。新しいブログ投稿やその他のModdableニュースについての発表を行っています。最新のModdable SDKリリースについて知るには、[GitHubのリリース](https://github.com/moddable-OpenSource/moddable/releases)を購読し、[リポジトリ](https://github.com/Moddable-OpenSource/moddable)をウォッチすることをお勧めします。
+
 

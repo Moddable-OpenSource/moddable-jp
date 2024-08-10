@@ -1,32 +1,32 @@
-# Generic 1.44" Display Wiring Guide
+# 汎用 1.44インチ ディスプレイ配線ガイド
 Copyright 2018 Moddable Tech, Inc.<BR>
-Revised: December 10, 2018
+改訂： 2018年12月10日
 
 ![Generic SPI Display](images/generic-1.44-display.jpg)
 
-## Specs
+## 仕様
 
 | | |
 | :---: | :--- |
-| **Size** | 1.44", 128 x 128
-| **Type** | TFT LCD
-| **Interface** | SPI
-| **Drivers** | video [ST7735](../../documentation/drivers/st7735/st7735.md), no touch
-| **Availability** | [Generic 1.44" SPI Displays on eBay](https://www.ebay.com/sch/i.html?_odkw=spi+display&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.Xspi+display+1.44%22.TRS1&_nkw=spi+display+1.44%22&_sacat=0)
-| **Description** | These inexpensive displays are available on eBay and other resources.
+| **サイズ** | 1.44インチ, 128 x 128
+| **タイプ** | TFT LCD
+| **インターフェース** | SPI
+| **ドライバ** | video [ST7735](../../documentation/drivers/st7735/st7735.md), タッチなし
+| **入手先** | [eBayでの汎用1.44インチSPIディスプレイ](https://www.ebay.com/sch/i.html?_odkw=spi+display&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.Xspi+display+1.44%22.TRS1&_nkw=spi+display+1.44%22&_sacat=0)
+| **説明** | これらの安価なディスプレイはeBayやその他のリソースで入手可能です。
 
-## Moddable example code
+## Moddableのサンプルコード
 
-The [balls](../../examples/piu/balls/) example is good for testing this display.  To run a debug build, use the following build command:
+このディスプレイをテストするには、[balls](../../examples/piu/balls/) サンプルが適しています。デバッグビルドを実行するには、以下のビルドコマンドを使用します：
 
 ```
 cd $MODDABLE/examples/piu/balls
 mcconfig -d -m -p esp/generic_square
 ```
 
-## ESP8266 Pinout
+## ESP8266 ピン配置
 
-| 1.44" Display | ESP8266 | ESP8266 Devboard label
+| 1.44インチ ディスプレイ | ESP8266 | ESP8266 開発ボードラベル
 | --- | --- | --- |
 | VCC | 3.3V |
 | GND | GND |
@@ -37,5 +37,4 @@ mcconfig -d -m -p esp/generic_square
 | SCK | GPIO 14 | (D5)
 | LED | 3.3V |
 
-![Generic 2.4"-2.8" wiring illustration](images/esp-generic-1.44-display.jpg)
-
+![汎用 2.4"-2.8" 配線図](images/esp-generic-1.44-display.jpg)

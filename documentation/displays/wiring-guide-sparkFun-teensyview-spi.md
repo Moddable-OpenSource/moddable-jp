@@ -1,33 +1,33 @@
-# SparkFun TeensyView Wiring Guide
+# SparkFun TeensyView 配線ガイド
 Copyright 2018 Moddable Tech, Inc.<BR>
-Revised: October 23, 2018
+改訂： 2018年10月23日
 
 ![TeensyView](images/teensyview.jpg)
 
-## Specs
+## 仕様
 
 | | |
 | :---: | :--- |
-| **Part** | Sparkfun - LCD-14048
-| **Size** | 128 x 32
-| **Type** | OLED, Monochrome
-|**Interface** | SPI
-|**Drivers** | video [SSD1306](../../documentation/drivers/ssd1306/ssd1306.md), no touch
-|**Availability** | [TeensyView on Sparkfun](https://www.sparkfun.com/products/14048)
-|**Description** | Very small monochrome, OLED display. Moddable uses the TeensyView configured in [standard](https://learn.sparkfun.com/tutorials/teensyview-hookup-guide) mode.
+| **部品** | Sparkfun - LCD-14048
+| **サイズ** | 128 x 32
+| **タイプ** | OLED、モノクロ
+|**インターフェース** | SPI
+|**ドライバ** | video [SSD1306](../../documentation/drivers/ssd1306/ssd1306.md)、タッチなし
+|**入手先** | [SparkfunのTeensyView](https://www.sparkfun.com/products/14048)
+|**説明** | 非常に小型のモノクロOLEDディスプレイ。Moddableは[標準](https://learn.sparkfun.com/tutorials/teensyview-hookup-guide)モードで設定されたTeensyViewを使用します。
 
-## Moddable example code
+## Moddableのサンプルコード
 
-The [balls](../../examples/piu/balls/) example is good for testing this display. To run a debug build, use the following build command:
+このディスプレイをテストするには、[balls](../../examples/piu/balls/)のサンプルが適しています。デバッグビルドを実行するには、以下のビルドコマンドを使用します：
 
 ```
 cd $MODDABLE/examples/piu/balls
 mcconfig -d -m -p esp/teensyview
 ```
 
-## ESP8266 pinout
+## ESP8266 ピン配置
 
-| TeensyView Display | ESP8266 | ESP8266 Devboard label
+| TeensyView ディスプレイ | ESP8266 | ESP8266 開発ボードラベル
 | --- | --- | --- |
 | GND | GND |
 | 5 | GPIO 2 | (D4)
@@ -37,6 +37,4 @@ mcconfig -d -m -p esp/teensyview
 | 15 | GPIO 0 | (D3)
 | 3v | 3.3V |
 
-![Generic SPI Display](images/teensyview-wiring.jpg)
-
-
+![汎用SPIディスプレイ](images/teensyview-wiring.jpg)
