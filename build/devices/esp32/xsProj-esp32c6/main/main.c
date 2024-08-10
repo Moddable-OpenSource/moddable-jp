@@ -112,21 +112,23 @@ static xsMachine *gThe;		// the main XS virtual machine running
 #endif
 
 #ifdef mxDebug
+
+#if USE_USB
 static void debug_task(void *pvParameter)
 {
-#if USE_USB
 	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 4096, .tx_buffer_size = 2048 };
 	usb_serial_jtag_driver_install(&cfg);
-#endif
 
 	while (true) {
-
-#if USE_USB
 		fxReceiveLoop();
 		modDelayMilliseconds(1);
+	}
+}
 
-#else	// !USE_USB
-
+#else
+static void debug_task(void *pvParameter)
+{
+	while (true) {
 		uart_event_t event;
 
 		if (!xQueueReceive((QueueHandle_t)pvParameter, (void * )&event, portMAX_DELAY))
@@ -134,9 +136,9 @@ static void debug_task(void *pvParameter)
 
 		if (UART_DATA == event.type)
 			fxReceiveLoop();
-#endif	// !USE_USB
 	}
 }
+#endif
 #endif
 
 void loop_task(void *pvParameter)
@@ -268,12 +270,14 @@ void app_main() {
 #endif
 
 #if USE_USB
+#ifdef mxDebug
 	xTaskCreate(debug_task, "debug", (768 + XT_STACK_EXTRA) / sizeof(StackType_t), 0, 8, NULL);
 	printf("USB CONNECTED\r\n");
+#endif
 #else // !USE_USB
-
 	esp_err_t err;
 	uart_config_t uartConfig = {0};
+
 #ifdef mxDebug
 	uartConfig.baud_rate = DEBUGGER_SPEED;
 #else

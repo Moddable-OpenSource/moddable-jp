@@ -146,7 +146,7 @@ export class MakeFile extends FILE {
 		const outputConfigDirectory = tool.outputPath + tool.slash + "tmp" + tool.slash + "esp32" + tool.slash + (tool.subplatform ?? "") + tool.slash + (tool.debug ? "debug" : (tool.instrument ? "instrument" : "release")) + tool.slash + tool.environment.NAME + tool.slash + "xsProj-" + ESP32_SUBCLASS;
 		tool.createDirectory(outputConfigDirectory);
 
-		let PARTITIONS_FILE = tool.environment.PARTITIONS_FILE;
+		let PARTITIONS_FILE = tool.environment.PARTITIONS_FILE ?? tool.environment.PARTITIONS_FILE_FOR_TARGET;
 		if (!PARTITIONS_FILE) {
 			const PROJ_DIR_TEMPLATE = `${tool.buildPath}/devices/esp32/xsProj-${tool.environment.ESP32_SUBCLASS}`;
 			PARTITIONS_FILE = `${PROJ_DIR_TEMPLATE}/partitions.csv`

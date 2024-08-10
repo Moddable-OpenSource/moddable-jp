@@ -1,6 +1,6 @@
 # ツール
 Copyright 2017-2024 Moddable Tech, Inc.<BR>
-改訂： 2024年1月18日
+改訂： 2024年7月29日
 
 ## このドキュメントについて
 
@@ -112,7 +112,7 @@ mcconfig [manifest] [-d] [-f format] [-i] [-m] [-o directory] [-p platform] [-r 
 `mcrun`と`mcconfig`の間にはいくつか重要な違いがあります：
 
 - `mcrun`によって使用されるマニフェストは、modがJavaScriptのみを含むことができるため、ネイティブコードにビルドされるファイル（例：`.c`や`.cpp`ファイル）を参照してはいけません
-- `mcrun`は`-t`オプションをサポートしていません
+- `mcrun`は`-t build`オプションをサポートしています(しかし他の[ビルドターゲット](#buildtargets)は未対応です)
 - `config`プロパティは`mc/config`の代わりに`mod/config`モジュールから利用可能です（`config`プロパティについての詳細は[マニフェスト](./manifest.md)のドキュメントの`config`セクションを参照してください）
 
 ### 引数
@@ -140,7 +140,7 @@ let bitmap = parseBMP(new Resource("balls-color.bmp"));
 
 ### 引数
 
-```text
+```shell
 mcrez files... [-o output] [-r name] [-p platform]
 ```
 
@@ -177,7 +177,7 @@ png2bmp balls.png -o ~/Desktop -f gray256 -r 90
 
 ### 引数
 
-```text
+```shell
 png2bmp file.png [-a] [-c] [f format] [-o directory] [-r rotation]
 ```
 
@@ -196,7 +196,7 @@ png2bmp file.png [-a] [-c] [f format] [-o directory] [-r rotation]
 
 `-c`オプションを使用すると、**xsc**はホスト関数やホストオブジェクトを参照する`@`構文を受け入れます。例えば：
 
-```c
+```js
 class Point @ "Point_destructor" {
 	constructor(x, y) @ "Point_constructor"
 	moveBy(x, y) @ "Point_moveBy"
@@ -213,7 +213,7 @@ class Point @ "Point_destructor" {
 
 ### 引数
 
-```text
+```shell
 xsc file [-c] [-d] [-e] [-o directory] [-p] [-r name] [-t directory]
 ```
 
@@ -237,7 +237,7 @@ xsc file [-c] [-d] [-e] [-o directory] [-p] [-r name] [-t directory]
 
 ### 引数
 
-```text
+```shell
 xsl files... [-a name] [-b directory] [-c creation] [-o directory] [-p modules]... [u url]
 ```
 
@@ -304,7 +304,7 @@ tech.moddable.countdown
 
 ### 引数
 
-```text
+```shell
 mcbundle [manifest] [-d] [-m] [-o directory]
 ```
 
@@ -320,7 +320,7 @@ mcbundle [manifest] [-d] [-m] [-o directory]
 
 ### 引数
 
-```text
+```shell
 mchex file -a address [-n name] [-o directory]
 ```
 

@@ -7,26 +7,36 @@ Copyright 2017-2022 Moddable Tech, Inc.<BR>
 
 Digestクラスは、さまざまなアルゴリズムを使用して暗号ハッシュを作成します。
 
-	import {Digest} from "crypt";
+
+```js
+import {Digest} from "crypt";
+```
 
 ### MD5ハッシュ
 
-	let digest = new Digest("MD5");
-	digest.write("hello, world);
-	trace(`MD5 Hash: ${digest.close()}\n`);
+
+```js
+let digest = new Digest("MD5");
+digest.write("hello, world);
+trace(`MD5 Hash: ${digest.close()}\n`);
+```
 
 ### SHA1ハッシュ
 
-	let digest = new Digest("SHA1");
-	digest.write("hello,");
-	digest.write(" world");
-	trace(`SHA1 Hash: ${digest.close()}\n`);
+```js
+let digest = new Digest("SHA1");
+digest.write("hello,");
+digest.write(" world");
+trace(`SHA1 Hash: ${digest.close()}\n`);
+```
 
 ### new Digest(type)
 
 `Digest`コンストラクタは、計算するハッシュのタイプのみを引数として受け取ります。
 
-	let digest = new Digest("SHA1");
+```js
+let digest = new Digest("SHA1");
+```
 
 次のハッシュ関数がサポートされています：
 
@@ -41,8 +51,10 @@ Digestクラスは、さまざまなアルゴリズムを使用して暗号ハ�
 
 `write`関数は、計算中のハッシュにメッセージを追加します。メッセージの長さに制限はありません。`write`のメッセージ引数は`String`または`ArrayBuffer`である可能性があります。`write`関数は、特定のダイジェスト計算に対して複数回呼び出すことができます。
 
-	digest.write("123");
-	digest.write("456");
+```js
+digest.write("123");
+digest.write("456");
+```
 
 ### close()
 
@@ -65,7 +77,9 @@ BlockCipher、StreamCipher、およびModeクラスを文書化する必要が�
 
 `Transform`クラスは、証明書データの一般的な変換を行う静的メソッドを含んでいます。
 
-	import Transform from "crypt/transform";
+```js
+import Transform from "crypt/transform";
+```
 
 可能な限り、データの変換は実行時に行うべきではありません。なぜなら、追加の時間とメモリを使用するからです。代わりに、データはターゲットデバイスに最適な形式で保存されるべきです。これらの変換関数は、デバイスプロビジョニングフローなど、実行時に変換を行う必要がある状況のために提供されています。
 

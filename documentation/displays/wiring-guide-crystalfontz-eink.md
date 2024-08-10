@@ -1,24 +1,24 @@
-# Crystalfontz ePaper Display Wiring Guide
+# Crystalfontz ePaper ディスプレイ配線ガイド
 Copyright 2018 Moddable Tech, Inc.<BR>
 Revised: October 23, 2018
 
 ![](./images/eink-display.jpeg)
 
-## Specs
+## スペック
 
 | | |
 | :---: | :--- |
-| **Part** | CFAP128296C0-0290 ([datasheet](https://www.crystalfontz.com/products/document/3660/CFAP128296C0-0290DatasheetReleaseDate2017-08-14.pdf))
-| **Size**  | 2.9" 128x296
-| **Type** | EPD (Electronic Paper Displays)
-| **Interface** | SPI
-| **Drivers** | video [destm32s](../../documentation/drivers/destm32s/destm32s.md), no touch
-| **Availability** | [128x296 ePaper Display](https://www.crystalfontz.com/product/cfap128296c00290-128x296-epaper-display-eink)
-| **Description** | This is a TFT active matrix electrophoretic display (ePaper/E-Ink) with 1-bit white/black full display capabilities.<BR><BR>One benefit of this display is very low power consumption. The only time you need to provide power to this ePaper module is while updating the display. Once the image is displayed you can remove the power source and the display will continue to display the image appropriately.<BR><BR>We used the destm32s adaptor board to interface with the display. See: Crystalfontz part CFAP128296C0-E1-1 on the [display product](https://www.crystalfontz.com/product/cfap128296c00290-128x296-epaper-display-eink) page.
+| **部品** | CFAP128296C0-0290 ([datasheet](https://www.crystalfontz.com/products/document/3660/CFAP128296C0-0290DatasheetReleaseDate2017-08-14.pdf))
+| **サイズ**  | 2.9" 128x296
+| **タイプ** | EPD (Electronic Paper Displays)
+| **インターフェース** | SPI
+| **ドライバ** | video [destm32s](../../documentation/drivers/destm32s/destm32s.md), no touch
+| **入手先** | [128x296 ePaper Display](https://www.crystalfontz.com/product/cfap128296c00290-128x296-epaper-display-eink)
+| **説明** | これは1ビットの白/黒フルディスプレイ機能を持つTFTアクティブマトリックス電気泳動ディスプレイ（ePaper/E-Ink）です。<BR><BR>このディスプレイの利点の一つは非常に低い消費電力です。このePaperモジュールに電力を供給する必要があるのはディスプレイを更新している間だけです。一度画像が表示されると、電源を取り外してもディスプレイは適切に画像を表示し続けます。<BR><BR>ディスプレイとのインターフェースにはdestm32sアダプターボードを使用しました。詳細は[ディスプレイ製品](https://www.crystalfontz.com/product/cfap128296c00290-128x296-epaper-display-eink)ページのCrystalfontz部品CFAP128296C0-E1-1を参照してください。
 
-## Moddable example code
+## Moddableのサンプルコード
 
-The [love-e-ink](../../examples/piu/love-e-ink/) example is good for testing this display. To run a debug build, use the following build command:
+このディスプレイをテストするには、[love-e-ink](../../examples/piu/love-e-ink/) のサンプルが適しています。デバッグビルドを実行するには、次のビルドコマンドを使用します：
 
 ```
 cd $MODDABLE/examples/piu/love-e-ink/
@@ -27,7 +27,7 @@ mcconfig -d -m -p esp/crystalfontz_monochrome_epaper -r 270
 
 ## ESP8266 pinout
 
-| eInk Display | ESP8266 | ESP8266 Devboard label
+| eInk Display | ESP8266 | ESP8266 開発ボードラベル
 | --- | --- | --- |
 | 3 - GND | GND |
 | 5 - 3.3v | 3.3v |
@@ -39,6 +39,4 @@ mcconfig -d -m -p esp/crystalfontz_monochrome_epaper -r 270
 | 18 - Reset | 3.3v |
 | 19 - BUSSEL | GND |
 
-
-![Generic 2.4"-2.8" wiring illustration](images/eink+adaptor+esp-wiring.png)
-
+![汎用 2.4"-2.8" 配線図](images/eink+adaptor+esp-wiring.png)

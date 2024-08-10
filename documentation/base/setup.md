@@ -18,10 +18,12 @@ Copyright 2017-2023 Moddable Tech, Inc.<BR>
 
 セットアップ関数は、セットアップが完了したときに呼び出す `done` 関数という単一の引数を受け取ります。`done` 関数は、ネットワーク接続の確立などの非同期操作を実行するために使用されます。
 
-	export default function (done) {
-		setupOperation();
-		done();
-	}
+```js
+export default function (done) {
+	setupOperation();
+	done();
+}
+```
 
 ## プリロード
 
