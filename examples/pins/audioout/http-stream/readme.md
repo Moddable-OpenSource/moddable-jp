@@ -47,7 +47,7 @@ ffmpeg -i bflatmajor.wav -listen 1 -content_type "audio/L16;rate=11025&channels=
 ```
 
 ### SBC ストリーム
-SBCオーディオファイルは、ヘッダーや追加のフレーミングなしでSBCオーディオフレームのシーケンスです。次のコマンドラインは、任意のHTTPサーバーから配信できるSBCオーディオファイルを生成するためにffmpegを使用します。
+SBCオーディオファイルは、ヘッダーや追加のフレームの無い、SBCオーディオフレームの系列です。次のコマンドラインは、任意のHTTPサーバーから配信できるSBCオーディオファイルを生成するためにffmpegを使用します。
 
 ```
 ffmpeg -i bflatmajor.wav -ac 1 -ar 16000 -b:a 32k ~/bflatmajor.sbc
