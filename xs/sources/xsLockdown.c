@@ -196,6 +196,9 @@ void fx_lockdown(txMachine* the)
 	
 	mxHardenBuiltInCall; mxPush(mxCompartmentGlobal); mxHardenBuiltInRun;
 	
+	mxHardenBuiltInCall; mxPushSlot(harden); mxHardenBuiltInRun;
+	mxHardenBuiltInCall; mxPushSlot(mxFunction); mxHardenBuiltInRun;
+	
 	mxFunctionInstanceCode(mxThrowTypeErrorFunction.value.reference)->ID = XS_NO_ID; 
 	mxFunctionInstanceHome(mxThrowTypeErrorFunction.value.reference)->value.home.object = NULL;
 
