@@ -4328,7 +4328,7 @@ void fxEndMetering(txMachine* the)
 
 void fxCheckMetering(txMachine* the)
 {
-	txU4 interval = the->meterInterval;
+	txU8 interval = the->meterInterval;
 	the->meterInterval = 0;
 	if ((*the->meterCallback)(the, the->meterIndex >> 16)) {
 		the->meterCount = the->meterIndex + interval;
