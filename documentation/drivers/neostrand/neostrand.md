@@ -1,41 +1,42 @@
 # NeoStrand driver
 Copyright 2018 Moddable Tech, Inc.
 
-The NeoStrand driver is a subclass of the [NeoPixel](http://blog.moddable.com/blog/neopixels/) driver to add an effects engine for dynamic color displays with strings or strips of NeoPixel (WS2811/WS2812-like) LEDs.
+NeoStrandドライバは、NeoPixel (WS2811/WS2812のような） LEDのストリングやストリップで動的なカラーディスプレイのためのエフェクトエンジンを追加するための[NeoPixel](http://blog.moddable.com/blog/neopixels/)ドライバのサブクラスです。
 
-Terminology:
+用語：
 
-* A **strand** is a strip of NeoPixels.
-* An **effect** is a group of settings and an action function which makes a change to state of the NeoPixel strip or takes some other action.
-* A **scheme** is a set of effects that are applied to the strip.
+* **ストランド**は、NeoPixelのストリップです。
+* **エフェクト**は、NeoPixelストリップの状態を変更するか、他のアクションを実行する設定とアクション関数のグループです。
+* **スキーム**は、ストリップに適用されるエフェクトのセットです。
 
-## Adding NeoStrand to a Project
+## プロジェクトにNeoStrandを追加する
 
-To add the NeoStrand functionality to a project, add the path to the module in your **manifest.json**.
+NeoStrand機能をプロジェクトに追加するには、**manifest.json**にモジュールのパスを追加します。
 
 	"modules": {
 		"*": [
-			/* other modules here */
+			/* 他のモジュールはこちら */
 			"$(MODDABLE)/modules/drivers/neostrand/*",
        ],
     },
 
-### Using NeoStrand
+### NeoStrandの使用
 
-Import the NeoStrand class:
+NeoStrandクラスをインポートします：
 
 ```js
 import NeoStrand from "neostrand";
 ```
 
-NeoStrand is subclass of NeoPixel, so we use the same constructor dictionary to set the length, pin connected to the Data signal on the LED strip, and order of the pixels.
+NeoStrandはNeoPixelのサブクラスなので、LEDストリップのデータ信号に接続されたピンの長さ、ピン、およびピクセルの順序を設定するために同じコンストラクタ辞書を使用します。
 
 ```js
 const strand = new NeoStrand({length: 50, pin: 22, order: "RGB"});
 ```
 
-> Note: if you notice flicker, you may have to adjust the timing for your strip. Check your specification sheet. The durations are in 50ns increments. **NeoPixel** has been extended to allow custom timings.
+> 注: ちらつきが発生する場合は、ストリップのタイミングを調整する必要があるかもしれません。仕様書を確認してください。期間は50ns単位です。**NeoPixel**はカスタムタイミングを許可するように拡張されています。
 >
+
 ```
 const Timing_WS2811 = {
     mark:  { level0: 1, duration0: 800,  level1: 0, duration1: 450, },
@@ -48,16 +49,16 @@ const strand = new NeoStrand({length: 50, pin: 22, order: "RGB",
 
 &nbsp;
 
-> Note: You may want to tone down your lights during development so you don't blind yourself.
+> 注: 開発中に目を傷めないように、ライトの明るさを抑えることをお勧めします。
 >
 > ```js
 > strand.brightness = 10;
 > ```
-> This diminishes your color range, so use with care. The default brightness is *64* and maximum is 255.
+> これにより色の範囲が減少するため、注意して使用してください。デフォルトの明るさは*64*で、最大は255です。
 
-### Schemes
+### スキーム
 
-A scheme is a set of effects to apply to a strand. A scheme has one or more effects applied in the specified order. Setting the new scheme takes effect immediately, even if the strand is already running.
+スキームは、ストランドに適用するエフェクトのセットです。スキームには、指定された順序で1つ以上のエフェクトが適用されます。新しいスキームを設定すると、ストランドがすでに実行中であっても即座に効果が現れます。
 
 ```js
 let schemes = [];
@@ -70,75 +71,73 @@ strand.setScheme(schemes[0]);
 strand.start(50);
 ```
 
-The parameter sent to `start` defines the delay between updates of the effects. It is the number of milliseconds between calls to the effect function. Reducing the number may cause some effects to render more smoothly at the expense of CPU load. If it is set too high, long strands may not fully update or update incorrectly.
+`start`に送信されるパラメータは、エフェクトの更新間隔を定義します。これは、エフェクト関数の呼び出し間のミリ秒数です。数値を減らすと、CPU負荷の代わりに一部のエフェクトがよりスムーズにレンダリングされる場合があります。数値が高すぎると、長いストランドが完全に更新されないか、正しく更新されない可能性があります。
+### エフェクトの辞書
 
-### Effect Dictionary
-
-Effect parameters are specified in a dictionary.
+エフェクトのパラメータは辞書で指定されます。
 
 ```js
 let marqueeDictionary = { strand, start: 0, end: (strand.length / 2) };
 ```
-The dictionary must contain the strand. `start` and `end` define a span of pixels to be influenced by the effect. Use `Object.assign` to copy the dictionary if you want to make effect variants.
+辞書にはストランドが含まれている必要があります。`start`と`end`は、エフェクトの影響を受けるピクセルの範囲を定義します。エフェクトのバリエーションを作成したい場合は、`Object.assign`を使用して辞書をコピーします。
 
 ```js
 let marqee2 = Object.assign({}, marqueeDictionary,
 		{ start: (strand.length / 2) + 1, end: strand.length, reverse: 1 });
 ```
 
-A scheme can contain more than one effect.
+スキームには複数のエフェクトを含めることができます。
 
 ```js
 schemes.push( [ new NeoStrand.Marquee( marqueeDictionary ),
                 new NeoStrand.Marquee( marquee2 ) ]);
 ```
 
-### Control
+### コントロール
 
-You can start and stop the scheme at any time. The strand state will remain. You may want to set all LEDs to 0 after stopping the scheme.
-
+スキームはいつでも開始および停止できます。ストランドの状態は保持されます。スキームを停止した後、すべてのLEDを0に設定することをお勧めします。
 ```js
 strand.stop();
 strand.fill(strand.makeRGB(0, 0, 0));
 strand.update();
 ```
 
-### Effects
+### エフェクト
 
-Effects are what make up a scheme. They usually cause one or more of the LEDs to change state over time. However, since the effect action function is JavaScript, you can do just about anything - trigger GPIOs, play a sound, fire a cannon.
+エフェクトはスキームを構成する要素です。通常、エフェクトは時間の経過とともに1つ以上のLEDの状態を変化させます。しかし、エフェクトのアクション関数はJavaScriptであるため、GPIOのトリガー、音の再生、大砲の発射など、ほぼ何でも行うことができます。
 
-Effects are subclassed from `NeoStrandEffect` and take a dictionary of configuration parameters. The configuration dictionary _must_ contain the `strand` to which this effect will be applied.
+エフェクトは `NeoStrandEffect` からサブクラス化され、設定パラメータの辞書を受け取ります。設定辞書には、このエフェクトが適用される `strand` を含める必要があります。
 
 ```js
     let baseDictionary = { strand, start: 0, end: strand.length, loop: 1 };
 ```
-There are a number of common parameters that are used in almost every effect. Effects may also specify their own parameters.
+ほとんどのエフェクトで使用される一般的なパラメータがいくつかあります。エフェクトは独自のパラメータを指定することもできます。
 
-A [list of built-in effects](#builtin) can be found later in this document.
+[ビルトインのエフェクトの一覧](#builtin) はこのドキュメントの後に出てきます。
 
-#### Common Effect Parameters
+#### 共通エフェクトパラメータ
 
-| Parameter | default | range | description |
+| パラメータ | デフォルト値 | 範囲 | 説明 |
 |---|---|---|---|
-strand | (none) | | The NeoStrand to which this effect applied
-start | `0` | [0..strand.length] | The index of the first pixel of effect
-end | `strand.length` | [0..strand.length] | The index of the last pixel of effect
-size | `strand.length` | [0..strand.length] | The length of one hue cycle, in pixels
-duration | `1000` | | The duration of one complete cycle of the effect, in ms
-reverse | `0` | [0, 1] | Set to 1 to run the effect in reverse, i.e. run the timeline of the effect backwards
-loop | `1` | [0, 1] | Set to 1 to loop the effect
+strand | (なし) | | このエフェクトが適用されるNeoStrand
+start | `0` | [0..strand.length] | エフェクトの最初のピクセルのインデックス
+end | `strand.length` | [0..strand.length] | エフェクトの最後のピクセルのインデックス
+size | `strand.length` | [0..strand.length] | 1つの色相サイクルの長さ（ピクセル単位）
+duration | `1000` | | エフェクトの1つの完全なサイクルの期間（ミリ秒単位）
+reverse | `0` | [0, 1] | エフェクトを逆方向に実行するには1に設定します。つまり、エフェクトのタイムラインを逆に実行します
+loop | `1` | [0, 1] | エフェクトをループさせるには1に設定します
 
-`start` and `end` define the span of pixels that this effect will operate on. `duration` is the length of one cycle of the effect.
+`start` と `end` は、このエフェクトが操作するピクセルの範囲を定義します。`duration` はエフェクトの1サイクルの長さです。
 
-When one cycle of the effect is complete, the effect will restart if the `loop` parameter is set to `1`.
+エフェクトの1サイクルが完了すると、`loop` パラメータが `1` に設定されている場合、エフェクトは再起動します。
 
-If loop is `0` the effect's `onComplete()` function will be called.
+ループが `0` の場合、エフェクトの `onComplete()` 関数が呼び出されます。
 
-`reverse` will reverse the effect, starting at the end state, and finishing with the begin state.
+`reverse`は、終了状態から開始状態に戻る効果を持ちます。
 
-### Custom Effects
+### カスタムエフェクト
 
-An effect is a subclassed from the **NeoStrandEffect** class. The constructor sets parameters from the supplied dictionary. The `activate` method sets up a [`timeline`](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md#timeline-object). In the example below, the `effectValue` varys from 0 to `effect.dur` and is called when the value changes.
+エフェクトは**NeoStrandEffect**クラスからサブクラス化されています。コンストラクタは提供された辞書からパラメータを設定します。`activate`メソッドは[`timeline`](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md#timeline-object)を設定します。以下の例では、`effectValue`は0から`effect.dur`まで変化し、その値が変わると呼び出されます。
 
 ```js
 class MyEffect extends NeoStrandEffect {
@@ -155,25 +154,25 @@ activate(effect) {
 set effectValue(value) {
     for (let i=this.start; i<this.end; i++) {
     	//
-    	// For each pixel in the segment, perform the pixel operations
-    	// value will be in the range [ 0, effect.dur ] or whatever
-    	// range the effect specifies when it creates the timeline
-    	// in activate().
+    	// 各セグメントのピクセルに対して、ピクセル操作を実行します
+    	// valueは[ 0, effect.dur ]の範囲内になります。または、
+    	// activate()でタイムラインを作成するときにエフェクトが指定する
+    	// 任意の範囲になります。
     	// ...
     }
 }
 ```
 
-Use the custom effect by creating an instance with the desired parameters and including it in an array sent to the `changeScheme` function:
+カスタムエフェクトは、希望するパラメータでインスタンスを作成し、それを`changeScheme`関数に送信する配列に含めることで使用します。
 
 ```js
 strand.setScheme( [ new MyEffect(strand) ] );
 ```
 
 <a id="builtin"></a>
-## Built-in Effects
+## ビルトインエフェクト
 
-The following effects are built-in:
+以下のエフェクトがビルトインされています。
 
 * [Marquee](#marquee)
 * [Hue Span](#huespan)
@@ -186,135 +185,131 @@ The following effects are built-in:
 <a id="marquee"></a>
 ### Marquee
 
-The `Marquee` effect is the common ant-march lighting effect.
+`Marquee`エフェクトは一般的なアリの行進のような照明効果です。
 
-A `sizeA` and `sizeB` parameters define the pattern. For example { sizeA: 1, sizeB: 3 } will produce the repeating pattern:  [ A, B, B, B, A, B, B, B, A ... ]
+`sizeA` と `sizeB` パラメータはパターンを定義します。例えば、{ sizeA: 1, sizeB: 3 } は繰り返しパターンを生成します：[A, B, B, B, A, B, B, B, A ...]
 
-| Parameter | default | range | description |
+| パラメータ | デフォルト値 | 範囲 | 説明 |
 |---|---|---|---|
-strand | (none) | | The NeoStrand to which this effect applied
-start | `0` | [0..strand.length] | The index of the first pixel of effect
-end | `strand.length` | [0..strand.length] | The index of the last pixel of effect
-size | `strand.length` | [0..strand.length] | The length of one hue cycle, in pixels
-duration | 1000 | | time of one complete cycle of the pattern, in ms
-reverse | `0` | [0, 1] | Set to 1 to run the effect in reverse, i.e. run the timeline of the effect backwards
-loop | `1` | [0, 1] | Set to 1 to loop the effect
-sizeA | 1 | [1..strand.length] | number of pixels in the A part of pattern
-sizeB | 3 | [1..strand.length] | number of pixels in the B part of pattern
-rgbA | { r: 0, g: 0, b: 0x13 } | | RGB A color elements
-rgbB | { r:0xff, g:0xff, b:0xff } | | RGB B color elements
-
+strand | (なし) | | このエフェクトが適用される NeoStrand
+start | `0` | [0..strand.length] | エフェクトの最初のピクセルのインデックス
+end | `strand.length` | [0..strand.length] | エフェクトの最後のピクセルのインデックス
+size | `strand.length` | [0..strand.length] | 1つの色相サイクルの長さ（ピクセル単位）
+duration | 1000 | | パターンの1つの完全なサイクルの時間（ミリ秒単位）
+reverse | `0` | [0, 1] | エフェクトを逆に実行するには1に設定します。つまり、エフェクトのタイムラインを逆に実行します
+loop | `1` | [0, 1] | エフェクトをループさせるには1に設定します
+sizeA | 1 | [1..strand.length] | パターンのA部分のピクセル数
+sizeB | 3 | [1..strand.length] | パターンのB部分のピクセル数
+rgbA | { r: 0, g: 0, b: 0x13 } | | RGB A カラー要素
+rgbB | { r:0xff, g:0xff, b:0xff } | | RGB B カラー要素
 
 <a id="huespan"></a>
 ### Hue Span
 
-The `HueSpan` effect is a smooth fade between colors. Like a color-wheel, it cycles through the hue in HSV color space.
+`HueSpan`エフェクトは、色の間をスムーズにフェードする効果です。カラーホイールのように、HSVカラースペースの色相を循環します。
 
-
-| Parameter | default | range | description |
+| パラメータ | デフォルト値 | 範囲 | 説明 |
 |---|---|---|---|
-strand | (none) | | The NeoStrand to which this effect is applied
-start | `0` | [0..strand.length] | The index of the first pixel of effect
-end | `strand.length` | [0..strand.length] | The index of the last pixel of effect
-size | `strand.length` | [0..strand.length] | The length of one hue cycle, in pixels
-duration | 1000 | | time of one complete cycle of the color wheel, in ms
-reverse | `0` | [0, 1] | Set to 1 to run the effect in reverse, i.e. run the timeline of the effect backwards
-loop | `1` | [0, 1] | Set to 1 to loop the effect
-speed | 1.0 | | speed multiplier
-position | 0 | [0..1] | starting HSV hue position
-saturation | 1.0 | [0..1] | HSV saturation
-value | 1.0 | [0..1] | HSV value
-
+strand | (なし) | | このエフェクトが適用されるNeoStrand
+start | `0` | [0..strand.length] | エフェクトの最初のピクセルのインデックス
+end | `strand.length` | [0..strand.length] | エフェクトの最後のピクセルのインデックス
+size | `strand.length` | [0..strand.length] | 1つの色相サイクルの長さ（ピクセル単位）
+duration | 1000 | | カラーホイールの1つの完全なサイクルの時間（ミリ秒単位）
+reverse | `0` | [0, 1] | エフェクトを逆方向に実行するには1に設定します。つまり、エフェクトのタイムラインを逆方向に実行します
+loop | `1` | [0, 1] | エフェクトをループさせるには1に設定します
+speed | 1.0 | | スピードの倍率
+position | 0 | [0..1] | 開始時のHSV色相位置
+saturation | 1.0 | [0..1] | HSV彩度
+value | 1.0 | [0..1] | HSV明度
 
 <a id="sine"></a>
 ### Sine
 
-The `Sine` effect varys a color component in a sine wave fashion.
+`Sine`エフェクトは、色のコンポーネントを正弦波のように変化させます。
 
 `value` = y = (sin(_t_) + pos) * amplitude
 
-| Parameter | default | range | description |
+| パラメータ | デフォルト値 | 範囲 | 説明 |
 |---|---|---|---|
-strand | (none) | | The NeoStrand to which this effect is applied
-start | `0` | [0..strand.length] | The index of the first pixel of effect
-end | `strand.length` | [0..strand.length] | The index of the last pixel of effect
-size | `strand.length` | [0..strand.length] | The length of one hue cycle, in pixels
-duration | 1000 | | time of one complete sine cycle, in ms
-reverse | `0` | [0, 1] | Set to 1 to run the effect in reverse, i.e. run the timeline of the effect backwards
-loop | `1` | [0, 1] | Set to 1 to loop the effect
-speed | 1.0 | | speed multiplier
-loop | 1 | [0, 1] | loop the effect
-position | 0 | [0..1] | starting x position
-vary | "b" | ["r","g","b",<br>"h","s","v"] | color component to vary
-value | 1.0 | [0..1] | HSV value
+strand | (なし) | | このエフェクトが適用されるNeoStrand
+start | `0` | [0..strand.length] | エフェクトの最初のピクセルのインデックス
+end | `strand.length` | [0..strand.length] | エフェクトの最後のピクセルのインデックス
+size | `strand.length` | [0..strand.length] | 1つの色相サイクルの長さ（ピクセル単位）
+duration | 1000 | | 1つの完全なサイン波サイクルの時間（ミリ秒単位）
+reverse | `0` | [0, 1] | エフェクトを逆方向に実行するには1に設定
+loop | `1` | [0, 1] | エフェクトをループさせるには1に設定
+speed | 1.0 | | 速度の倍率
+loop | 1 | [0, 1] | エフェクトをループ
+position | 0 | [0..1] | 開始位置（x座標）
+vary | "b" | ["r","g","b",<br>"h","s","v"] | 変化させる色成分
+value | 1.0 | [0..1] | HSV値
 
 
 
 <a id="pulse"></a>
 ### Pulse
 
-The `Pulse` effect sets `size` number of pixels at a location and then moves it toward either (or both) ends. The `mode` parameter specifies whether to add, subtract or set the pixels' RGB values.
+`Pulse`エフェクトは、指定された位置に`size`個のピクセルを設定し、それを一方または両方の端に向かって移動させます。`mode`パラメータは、ピクセルのRGB値を追加、減算、または設定するかどうかを指定します。
 
-| Parameter | default | range | description |
+| パラメータ | デフォルト値 | 範囲 | 説明 |
 |---|---|---|---|
-strand | (none) | | The NeoStrand to which this effect is applied
-start | `0` | [0..strand.length] | The index of the first pixel of effect
-end | `strand.length` | [0..strand.length] | The index of the last pixel of effect
-size | `strand.length` | [0..strand.length] | The length of one hue cycle, in pixels
-duration | 3000 | | time of one pulse cycle, in ms
-reverse | `0` | [0, 1] | Set to 1 to run the effect in reverse, i.e. run the timeline of the effect backwards
-loop | `1` | [0, 1] | Set to 1 to loop the effect
-position | "random" | [-strand.length..strand.length] | index of the pulse starting pixel<br>negative numbers are off-strand and okay<br>"random" picks a random starting location
-mode | 1 | [-1, 0, 1] | **1** to add, **-1** to subtract, or **0** set the pixel color
-fade | 0.2 | [0..1] | how quickly tails fade
-rgb | { r: 0x80, g: 0x80, b: 0x80 } | | RGB color elements
+strand | (なし) | | このエフェクトが適用される NeoStrand
+start | `0` | [0..strand.length] | エフェクトの最初のピクセルのインデックス
+end | `strand.length` | [0..strand.length] | エフェクトの最後のピクセルのインデックス
+size | `strand.length` | [0..strand.length] | 1つの色相サイクルの長さ（ピクセル単位）
+duration | 3000 | | 1つのパルスサイクルの時間（ミリ秒）
+reverse | `0` | [0, 1] | エフェクトを逆に実行するには1に設定します。つまり、エフェクトのタイムラインを逆に実行します
+loop | `1` | [0, 1] | エフェクトをループさせるには1に設定します
+position | "random" | [-strand.length..strand.length] | パルス開始ピクセルのインデックス<br>負の数はストランド外でも問題ありません<br>"random"はランダムな開始位置を選びます
+mode | 1 | [-1, 0, 1] | **1** は追加、**-1** は減算、**0** はピクセルカラーを設定
+fade | 0.2 | [0..1] | 末尾がどれだけ早くフェードするか
+rgb | { r: 0x80, g: 0x80, b: 0x80 } | | RGBカラー要素
 
 
 <a id="pattern"></a>
-### Pattern
+### パターン
 
-The `Pattern` sets a fixed RGB pattern of pixels.
+`Pattern` はピクセルの固定RGBパターンを設定します。
 
-| Parameter | default | range | description |
+| パラメータ | デフォルト値 | 範囲 | 説明 |
 |---|---|---|---|
-strand | (none) | | The NeoStrand to which this effect is applied
-start | 0 | [0..strand.length] | index of first pixel of effect
-end | strand.length | [0..strand.length] | index of last pixel of effect
-pattern | [ 0x130000, 0x131313 ] | | array of RGB colors
-mode | 1 | [-1, 0, 1] | **1** to add, **-1** to subtract, or **0** set the pixel color
+strand | (なし) | | このエフェクトが適用されるNeoStrand
+start | 0 | [0..strand.length] | エフェクトの最初のピクセルのインデックス
+end | strand.length | [0..strand.length] | エフェクトの最後のピクセルのインデックス
+pattern | [ 0x130000, 0x131313 ] | | RGBカラーの配列
+mode | 1 | [-1, 0, 1] | ピクセルの色を追加するには**1**、減算するには**-1**、設定するには**0**
 
 <a id="dim"></a>
 ### Dim
 
-The `Dim` effect reduces the color for each pixel in the span over over the `duration`. For example, if a pixel is fully on (ie. 0xFFFFFF) it will gradually decrease to fully off when `duration` ms elapses.
+`Dim`エフェクトは、`duration`の間にスパン内の各ピクセルの色を減少させます。例えば、ピクセルが完全にオン（つまり0xFFFFFF）の場合、`duration`ミリ秒が経過すると徐々に完全にオフになります。
 
-| Parameter | default | range | description |
+| パラメータ | デフォルト値 | 範囲 | 説明 |
 |---|---|---|---|
-strand | (none) | | The NeoStrand to which this effect is applied
-start | 0 | [0..strand.length] | index of first pixel of effect
-end | strand.length | [0..strand.length] | index of last pixel of effect
-duration | 1000 | | time to reduce a full-brightness pixel to off, in ms
+strand | (なし) | | このエフェクトが適用されるNeoStrand
+start | 0 | [0..strand.length] | エフェクトの最初のピクセルのインデックス
+end | strand.length | [0..strand.length] | エフェクトの最後のピクセルのインデックス
+duration | 1000 | | 明るさ最大のピクセルをオフにする時間（ミリ秒）
 
 
-## Making a custom effect
+## カスタムエフェクトの作成
 
-To make your own effect, pick an existing one that most closely matches your vision and go from there.
+自分のエフェクトを作成するには、自分のビジョンに最も近い既存のエフェクトを選び、そこから始めます。
 
-Let's make a random color effect. It will set `size` pixels to a random color, change colors every `duration` ms.
+ランダムカラーエフェクトを作成しましょう。これは `size` ピクセルをランダムな色に設定し、`duration` ミリ秒ごとに色を変更します。
 
 <a id="Random"></a>
 
-| Parameter | default | range | description |
+| パラメータ | デフォルト値 | 範囲 | 説明 |
 |---|---|---|---|
-strand | (none) | | The NeoStrand to which this effect is applied
-start | 0 | [0..strand.length] | index of first pixel of effect
-end | strand.length | [0..strand.length] | index of last pixel of effect
-duration | 1000 | | length time between color changes, in ms
-size | 5 | [0..strand.length] | size of each color
-max | 127 | [0..255] | maximium value of random RGB component
+strand | (なし) | | このエフェクトが適用される NeoStrand
+start | 0 | [0..strand.length] | エフェクトの最初のピクセルのインデックス
+end | strand.length | [0..strand.length] | エフェクトの最後のピクセルのインデックス
+duration | 1000 | | 色の変更間隔の長さ（ミリ秒）
+size | 5 | [0..strand.length] | 各色のサイズ
+max | 127 | [0..255] | ランダムなRGB成分の最大値
 
-Using *Pattern* as a starting point, we'll change the class name and constructor, set up the timeline in `activate` and provide a setter for the changing `effectValue`. The `loopPrepare` function will be called before a looping effect starts or restarts.
-
+*Pattern* を出発点として、クラス名とコンストラクタを変更し、`activate` でタイムラインを設定し、変化する `effectValue` のセッターを提供します。ループエフェクトが開始または再開される前に `loopPrepare` 関数が呼び出されます。
 
 ```js
 class RandomColor extends NeoStrandEffect {
@@ -344,19 +339,18 @@ class RandomColor extends NeoStrandEffect {
         }
     }
 }
-
 ```
 
-Then create and add the effect your scheme list and give it a try.
+次に、エフェクトをスキームリストに追加して試してみてください。
 
 ```js
 let randomColorScheme = [ new RandomColor({ strand }) ];
 manySchemes.push( randomColorScheme );
 ```
 
-## Timing
+## タイミング
 
-Timing specifications for the various driver chips of the LEDs are included for reference below.
+LEDのさまざまなドライバーチップのタイミング仕様は、以下の参考資料に含まれています。
 
 ```js
 const Timing_WS2812B = {
