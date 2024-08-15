@@ -26,8 +26,8 @@ class AudioIn  {
 	#wav;
 	#reader;
 
-	constructor() {
-		this.#wav = new Resource("sim.wav");		
+	constructor(options) {
+		this.#wav = new Resource(config.audioInWave ?? "sim.wav");		
 		this.#reader = new WavReader(this.#wav);
 	}
 	close() {
