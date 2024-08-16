@@ -1,7 +1,7 @@
 # Moddable Six Developer Guide
 
 Copyright 2024 Moddable Tech, Inc.<BR>
-Revised: July 18, 2024
+Revised: August 16, 2024
 
 This document provides information about Moddable Six, including details about its pins and built-in components, how to build and deploy apps, and links to additional development resources.
 
@@ -168,7 +168,7 @@ Alternately, to connect with a serial programmer:
 
 	Make sure you have the programmer oriented correctly. The orientation should match the image below.
 
-	![image](https://gist.github.com/assets/6822704/c605ef5b-0b80-46a2-a87c-1cab80b59deb)
+	<img width="50%" src="../assets/devices/moddable-six-programmer.png">
 
 2. Attach the programmer to your computer with a micro USB cable
 
