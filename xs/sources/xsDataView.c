@@ -1741,8 +1741,9 @@ void fx_TypedArray_prototype_byteLength_get(txMachine* the)
 	txSlot* dispatch = instance->next;
 	txSlot* view = dispatch->next;
 	txSlot* buffer = view->next;
+	txU2 shift = dispatch->value.typedArray.dispatch->shift;
 	mxResult->kind = XS_INTEGER_KIND;
-	mxResult->value.integer = fxGetDataViewSize(the, view, buffer);
+	mxResult->value.integer = fxGetDataViewSize(the, view, buffer) & ~((1 << shift) - 1);
 }
 
 void fx_TypedArray_prototype_byteOffset_get(txMachine* the)
