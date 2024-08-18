@@ -1,28 +1,28 @@
-# Moddable SDK - Piu Examples
+# Moddable SDK - Piuサンプル
 
 Copyright 2021 Moddable Tech, Inc.<BR>
-Revised: November 4, 2021
+改訂： 2021年11月4日
 
-These examples demonstrate how to use features of the [Piu user interface framework](../../documentation/piu/piu.md). Piu is an object-based framework that makes it easier to create complex, responsive layouts.
+これらのサンプルは、[Piuユーザーインターフェースフレームワーク](../../documentation/piu/piu.md)の機能を使用する方法を示しています。Piuはオブジェクトベースのフレームワークで、複雑でレスポンシブなレイアウトを簡単に作成できるようにします。
 
-Most of the examples are designed for a QVGA (320x240) screen, but many feature responsive layouts that work on a variety of screen sizes. All of the examples in this folder run on the desktop simulator with the exception of the `backlight`, `epaper-travel-time`, `one-line`, and `one-line-keyboard` examples.
+ほとんどのサンプルはQVGA（320x240）画面用に設計されていますが、多くのサンプルはさまざまな画面サイズで動作するレスポンシブレイアウトを特徴としています。このフォルダー内のすべてのサンプルは、`backlight`、`epaper-travel-time`、`one-line`、および`one-line-keyboard`のサンプルを除いてデスクトップシミュレーターで実行されます。
 
-This document provides a brief description of each example and a preview of each app running on the desktop simulator. If you are looking for an example that demonstrates how to use a specific feature, see the list below. Keep in mind that this list provides only a few recommendations and is not a complete list of examples that use each feature.
+このドキュメントは、各サンプルの簡単な説明とデスクトップシミュレーターで実行されている各アプリのプレビューを提供します。特定の機能を使用する方法を示すサンプルを探している場合は、以下のリストを参照してください。このリストはあくまでいくつかの推奨事項を提供するものであり、各機能を使用するサンプルの完全なリストではないことに注意してください。
 
-- **Images:** <a href="#images">`images`</a>, <a href="#balls">`balls`</a>, <a href="#neon-light">`neon-light`</a>
-- **Text:** <a href="#text">`text`</a>, <a href="#cards">`cards`</a>, <a href="#localization">`localization`</a>
-- **Animation:** <a href="#easing-equations">`easing-equations`</a>, <a href="#transitions">`transitions`</a>, <a href="#timeline">`timeline`</a>
-- **Touch input:** <a href="#drag">`drag`</a>, <a href="#keyboard">`keyboard`</a>, <a href="#map-puzzle">`map-puzzle`</a>
-- **Scrolling content:** <a href="#scroller">`scroller`</a>, <a href="#list">`list`</a>
-- **Networking:** <a href="#wifi-config">`wifi-config`</a>, <a href="#weather-and-mini-weather">`weather` and `mini-weather`</a>, <a href="#one-line-and-one-line-keyboard">`one-line` and `one-line-keyboard`</a>
+- **画像:** <a href="#images">`images`</a>, <a href="#balls">`balls`</a>, <a href="#neon-light">`neon-light`</a>
+- **テキスト:** <a href="#text">`text`</a>, <a href="#cards">`cards`</a>, <a href="#localization">`localization`</a>
+- **アニメーション:** <a href="#easing-equations">`easing-equations`</a>, <a href="#transitions">`transitions`</a>, <a href="#timeline">`timeline`</a>
+- **タッチ入力:** <a href="#drag">`drag`</a>, <a href="#keyboard">`keyboard`</a>, <a href="#map-puzzle">`map-puzzle`</a>
+- **スクロールコンテンツ:** <a href="#scroller">`scroller`</a>, <a href="#list">`list`</a>
+- **ネットワーキング:** <a href="#wifi-config">`wifi-config`</a>, <a href="#weather-and-mini-weather">`weather` and `mini-weather`</a>, <a href="#one-line-and-one-line-keyboard">`one-line` and `one-line-keyboard`</a>
 
 ***
 
 ### `backlight`
 
-The `backlight` example allows you to adjust the backlight brightness on Moddable Two.
+`backlight`のサンプルでは、Moddable Twoのバックライトの明るさを調整することができます。
 
-> For more information about the backlight, see the **Backlight** section of the [Moddable Two documentation](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/devices/moddable-two.md#backlight).
+> バックライトの詳細については、[Moddable Twoのドキュメント](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/devices/moddable-two.md#backlight)の**バックライト**セクションを参照してください。
 
 ***
 
@@ -30,7 +30,7 @@ The `backlight` example allows you to adjust the backlight brightness on Moddabl
 
 ![](http://www.moddable.com/assets/piu-gifs/balls.gif)
 
-The `balls` example shows a full frame rate animation of bouncing balls on the screen. It is not designed for a specific screen size so it is useful for testing displays.
+`balls`のサンプルでは、画面上で跳ねるボールのフルフレームレートアニメーションを表示します。特定の画面サイズに合わせて設計されていないため、ディスプレイのテストに役立ちます。
 
 ***
 
@@ -38,7 +38,7 @@ The `balls` example shows a full frame rate animation of bouncing balls on the s
 
 ![](http://www.moddable.com/assets/piu-gifs/bars.gif)
 
-The `bars` example renders black and white images and uses the Piu `Port` object to draw bars. It also shows how to use the `Timeline` and `Transition` objects, which are two distinct ways of creating animations.
+`bars`のサンプルでは、白黒画像をレンダリングし、Piuの`Port`オブジェクトを使用してバーを描画します。また、アニメーションを作成する2つの異なる方法である`Timeline`オブジェクトと`Transition`オブジェクトの使用方法も示しています。
 
 ***
 
@@ -46,7 +46,7 @@ The `bars` example renders black and white images and uses the Piu `Port` object
 
 ![](http://www.moddable.com/assets/piu-gifs/cards.gif)
 
-The `cards` example uses the Piu `Timeline` object to animate Moddable employees' business cards.
+`cards`のサンプルでは、Piuの`Timeline`オブジェクトを使用してModdableの従業員の名刺をアニメーション化します。
 
 ***
 
@@ -60,9 +60,9 @@ The `cards` example uses the Piu `Timeline` object to animate Moddable employees
 
 ![](http://www.moddable.com/assets/piu-gifs/color-picker.gif)
 
-The `color-picker` example provides a simple user interface for selecting a color. Drag the picker around the colored image to select a color. The selected color is displayed in the header bar.
+`color-picker`のサンプルは、色を選択するためのシンプルなユーザーインターフェースを提供します。カラフルな画像の上でピッカーをドラッグして色を選択します。選択された色はヘッダーバーに表示されます。
 
-> For more information about the color picker implementation, see our blog post [A Color Picker for Microcontrollers](https://blog.moddable.com/blog/colorpicker/).
+> カラーピッカーの実装に関する詳細は、ブログ記事 [A Color Picker for Microcontrollers](https://blog.moddable.com/blog/colorpicker/) を参照してください。
 
 ***
 
@@ -70,15 +70,15 @@ The `color-picker` example provides a simple user interface for selecting a colo
 
 ![](http://www.moddable.com/assets/piu-gifs/countdown.gif)
 
-The `countdown` example counts down to a date specified in the code.  The numbers and text subtly fade between different colors.
+`countdown`のサンプルは、コードで指定された日付までのカウントダウンを行います。数字とテキストは異なる色にかすかにフェードします。
 
 ***
 
-### `drag` and `drag-color`
+### `drag` と `drag-color`
 
 ![](http://www.moddable.com/assets/piu-gifs/drag.gif) ![](http://www.moddable.com/assets/piu-gifs/drag-color.gif)
 
-The `drag` and `drag-color` examples are great for testing touch on displays. You can move the objects by touching them and dragging across the screen. Multitouch is supported.
+`drag`と`drag-color`のサンプルは、ディスプレイ上のタッチをテストするのに最適です。オブジェクトをタッチして画面上をドラッグすることで移動できます。マルチタッチもサポートされています。
 
 ***
 
@@ -86,7 +86,7 @@ The `drag` and `drag-color` examples are great for testing touch on displays. Yo
 
 ![](http://www.moddable.com/assets/piu-gifs/easing-equations.gif)
 
-The `easing-equations` example demonstrates the use of the easing equations built into the Moddable SDK along with the Piu `Timeline` object for creating animations. Easing equations are useful for creating smooth, natural-looking animations.
+`easing-equations`のサンプルは、Moddable SDKに組み込まれているイージング方程式と、アニメーションを作成するためのPiu `Timeline`オブジェクトの使用を示しています。イージング方程式は、滑らかで自然な見た目のアニメーションを作成するのに役立ちます。
 
 ***
 
@@ -94,9 +94,9 @@ The `easing-equations` example demonstrates the use of the easing equations buil
 
 <img src="https://www.moddable.com/assets/piu-gifs/epaper-flashcards.gif" width=250>
 
-The `epaper-flashcards` example shows a sequence of flash cards. The answer is displayed when tapped. A swipe left or swipe right moves to the previous or next card.
+`epaper-flashcards`のサンプルは、一連のフラッシュカードを表示します。タップすると答えが表示されます。左にスワイプまたは右にスワイプすると、前のカードまたは次のカードに移動します。
 
-> For more information about this example and ePaper displays, see our blog post [Getting the Most from ePaper Displays](https://blog.moddable.com/blog/epaper).
+> このサンプルとePaperディスプレイの詳細については、ブログ記事[Getting the Most from ePaper Displays](https://blog.moddable.com/blog/epaper)をご覧ください。
 
 ***
 
@@ -104,17 +104,17 @@ The `epaper-flashcards` example shows a sequence of flash cards. The answer is d
 
 <img src="http://www.moddable.com/assets/piu-gifs/epaper-photos.gif" width=180>
 
-The `epaper-photos` example displays a slideshow of photographs.
+`epaper-photos`のサンプルは、写真のスライドショーを表示します。
 
-> For more information about this example and ePaper displays, see our blog post [Getting the Most from ePaper Displays](https://blog.moddable.com/blog/epaper).
+> このサンプルとePaperディスプレイの詳細については、ブログ記事[Getting the Most from ePaper Displays](https://blog.moddable.com/blog/epaper)をご覧ください。
 
 ***
 
 ### `epaper-travel-time`
 
-The `epaper-epaper-travel-time` example displays the travel time between your home and work. It uses the Google Maps Web API to determine the current travel time.
+`epaper-epaper-travel-time`のサンプルは、自宅と職場の間の移動時間を表示します。現在の移動時間を決定するためにGoogle Maps Web APIを使用します。
 
-> For more information about this example and ePaper displays, see our blog post [Getting the Most from ePaper Displays](https://blog.moddable.com/blog/epaper).
+> このサンプルとePaperディスプレイの詳細については、私たちのブログ記事[Getting the Most from ePaper Displays](https://blog.moddable.com/blog/epaper)をご覧ください。
 
 ***
 
@@ -122,9 +122,9 @@ The `epaper-epaper-travel-time` example displays the travel time between your ho
 
 <img src="https://www.moddable.com/assets/piu-gifs/hardware-rotation.png" width=180>
 
-The `hardware-rotation` example rotates the image and text on the display every three seconds. This example is only compatible with display controllers that support hardware rotation.
+`hardware-rotation`のサンプルは、ディスプレイ上の画像とテキストを3秒ごとに回転させます。このサンプルは、ハードウェア回転をサポートするディスプレイコントローラーと互換性があります。
 
-> For more information about hardware rotation, see our blog post [Run-time Display Rotation](https://blog.moddable.com/blog/rotate/).
+> ハードウェア回転の詳細については、私たちのブログ記事[Run-time Display Rotation](https://blog.moddable.com/blog/rotate/)をご覧ください。
 
 ***
 
@@ -132,7 +132,7 @@ The `hardware-rotation` example rotates the image and text on the display every 
 
 ![](http://www.moddable.com/assets/piu-gifs/heartrate.gif)
 
-The `heartrate` example generates a random number each second and displays it as part of a sample UI for a heartrate monitor.
+`heartrate`のサンプルは、毎秒ランダムな数値を生成し、それを心拍数モニターのサンプルUIの一部として表示します。
 
 ***
 
@@ -140,11 +140,11 @@ The `heartrate` example generates a random number each second and displays it as
 
 ![](http://www.moddable.com/assets/piu-gifs/horizontal-expanding-keyboard.gif)
 
-The `horizontal-expanding-keyboard` example demonstrates the use of the expanding keyboard module to create an on-screen keyboard for a touch screen. The horizontal expanding keyboard is designed to make touch input easier on 320x240 displays..
+`horizontal-expanding-keyboard`のサンプルは、拡張キーボードモジュールを使用してタッチスクリーン用のオンスクリーンキーボードを作成する方法を示しています。水平拡張キーボードは、320x240ディスプレイでのタッチ入力を容易にするように設計されています。
 
-*See also the `keyboard` and `vertical-expanding-keyboard` examples.*
+*`keyboard`および`vertical-expanding-keyboard`のサンプルも参照してください。*
 
-> For more information about the expanding keyboard, see our blog post [Introducing an Expanding Keyboard for Small Screens](https://blog.moddable.com/blog/expanding-keyboard/).
+> 拡張キーボードの詳細については、ブログ記事[Introducing an Expanding Keyboard for Small Screens](https://blog.moddable.com/blog/expanding-keyboard/)をご覧ください。
 
 ***
 
@@ -152,7 +152,7 @@ The `horizontal-expanding-keyboard` example demonstrates the use of the expandin
 
 ![](http://www.moddable.com/assets/piu-gifs/images.gif)
 
-The `images` example demonstrates how to render GIFs, JPEGs, and PNGs.
+`images`のサンプルは、GIF、JPEG、およびPNGをレンダリングする方法を示しています。
 
 ***
 
@@ -160,9 +160,9 @@ The `images` example demonstrates how to render GIFs, JPEGs, and PNGs.
 
 ![](http://www.moddable.com/assets/piu-gifs/keyboard.gif)
 
-The `keyboard` example demonstrates the use of the keyboard module to create an on-screen keyboard for a touch screen. The keyboard module may be used on many screen sizes.
+`keyboard`のサンプルは、キーボードモジュールを使用してタッチスクリーン用のオンスクリーンキーボードを作成する方法を示しています。キーボードモジュールは多くの画面サイズで使用できます。
 
-*See also the `horizontal-expanding-keyboard` and `vertical-expanding-keyboard` examples.*
+*`horizontal-expanding-keyboard` と `vertical-expanding-keyboard` のサンプルも参照してください。*
 
 ***
 
@@ -170,7 +170,7 @@ The `keyboard` example demonstrates the use of the keyboard module to create an 
 
 ![](http://www.moddable.com/assets/piu-gifs/list.gif)
 
-The `list` example uses a Piu `Port` object to create a scrolling list of items that may be tapped.
+`list` のサンプルでは、Piuの `Port` オブジェクトを使用して、タップ可能なアイテムのスクロールリストを作成します。
 
 ***
 
@@ -178,7 +178,7 @@ The `list` example uses a Piu `Port` object to create a scrolling list of items 
 
 ![](http://www.moddable.com/assets/piu-gifs/localization.gif)
 
-The `localization` example translates text on the screen to the language selected. You can read more about how localization is implemented in the Moddable SDK [here](../..//documentation/piu/localization.md).
+`localization` のサンプルでは、選択された言語に画面上のテキストを翻訳します。Moddable SDKでのローカライゼーションの実装方法については [こちら](../..//documentation/piu/localization.md) を参照してください。
 
 ***
 
@@ -186,7 +186,7 @@ The `localization` example translates text on the screen to the language selecte
 
 ![](http://www.moddable.com/assets/piu-gifs/love-e-ink.gif)
 
-The `love-e-ink` example is designed for the 128x296 Crystalfontz ePaper display. It updates small portions of the screen at a time and displays the message "Moddable ♥ Eink."
+`love-e-ink` のサンプルは、128x296 Crystalfontz ePaperディスプレイ用に設計されています。画面の小さな部分を一度に更新し、「Moddable ♥ Eink」というメッセージを表示します。
 
 ***
 
@@ -194,7 +194,7 @@ The `love-e-ink` example is designed for the 128x296 Crystalfontz ePaper display
 
 ![](http://www.moddable.com/assets/piu-gifs/love-js.gif)
 
-The `love-js` example is designed for a 128x128 pixel screen. It plays an animation of three different images to display the message "Moddable ♥ JavaScript."
+`love-js` のサンプルは、128x128ピクセルの画面用に設計されています。3つの異なる画像のアニメーションを再生して、「Moddable ♥ JavaScript」というメッセージを表示します。
 
 ***
 
@@ -202,7 +202,7 @@ The `love-js` example is designed for a 128x128 pixel screen. It plays an animat
 
 ![](http://www.moddable.com/assets/piu-gifs/map-puzzle.gif)
 
-The `map-puzzle` example implements a simple puzzle for a touch screen. Move pieces of the puzzle by touching them while dragging across the screen.
+`map-puzzle`のサンプルは、タッチスクリーン用のシンプルなパズルを実装しています。画面をドラッグしながらパズルのピースをタッチして移動させます。
 
 ***
 
@@ -210,16 +210,15 @@ The `map-puzzle` example implements a simple puzzle for a touch screen. Move pie
 
 ![](http://www.moddable.com/assets/piu-gifs/neon-light.gif)
 
-The `neon-light` example displays English and Japanese text over a colorful, animated background.
+`neon-light`のサンプルは、カラフルでアニメーションの背景に英語と日本語のテキストを表示します。
 
 ***
 
-### `one-line` and `one-line-keyboard`
-
+### `one-line` と `one-line-keyboard`
 
 ![](http://www.moddable.com/assets/piu-gifs/one-line.gif)  ![](http://www.moddable.com/assets/piu-gifs/one-line-keyboard.gif)
 
-The `one-line` and `one-line-keyboard` examples are designed to work together. The `one-line` example opens a WebSocket server and displays its IP address on screen. The `one-line-keyboard` example opens a WebSocket client that connects to the `one-line` server and sends user-inputted text for it to display.
+`one-line`と`one-line-keyboard`のサンプルは一緒に動作するように設計されています。`one-line`のサンプルはWebSocketサーバーを開き、画面にIPアドレスを表示します。`one-line-keyboard`のサンプルは`one-line`サーバーに接続するWebSocketクライアントを開き、ユーザーが入力したテキストを送信して表示させます。
 
 ***
 
@@ -227,7 +226,7 @@ The `one-line` and `one-line-keyboard` examples are designed to work together. T
 
 <img src="http://www.moddable.com/assets/piu-gifs/outline-clock.png" width=200>
 
-The `outline/clock` example renders an analog clock using Canvas outlines.
+`outline/clock` のサンプルは、Canvasのアウトラインを使用してアナログ時計をレンダリングします。
 
 ***
 
@@ -235,7 +234,7 @@ The `outline/clock` example renders an analog clock using Canvas outlines.
 
 <img src="http://www.moddable.com/assets/piu-gifs/outline-figures.png" width=200>
 
-The `outline/figures` example contains mods to draw all of the figures from the Outline documentation.
+`outline/figures` のサンプルには、Outlineドキュメントのすべての図形を描画するためのモジュールが含まれています。
 
 ***
 
@@ -243,7 +242,7 @@ The `outline/figures` example contains mods to draw all of the figures from the 
 
 <img src="http://www.moddable.com/assets/piu-gifs/outline-shapes.png" width=160>
 
-The `outline/shapes` example renders four different outline shapes in a manner similar to the balls example.
+`outline/shapes` のサンプルは、ボールのサンプルと同様の方法で4つの異なるアウトライン形状をレンダリングします。
 
 ***
 
@@ -251,7 +250,7 @@ The `outline/shapes` example renders four different outline shapes in a manner s
 
 <img src="https://www.moddable.com/assets/piu-gifs/preferences.png" width=190>
 
-The `preferences` example demonstrates how to set preferences that are saved across boot. Tap a color to change the background color and set a background color preference. When the device is rebooted, the background color will be the last color selected.
+`preferences` のサンプルは、ブート間で保存される設定を行う方法を示しています。色をタップして背景色を変更し、背景色の設定を行います。デバイスが再起動されると、背景色は最後に選択された色になります。
 
 ***
 
@@ -259,7 +258,7 @@ The `preferences` example demonstrates how to set preferences that are saved acr
 
 ![](http://www.moddable.com/assets/piu-gifs/scroller.gif)
 
-The `scroller` example shows how to create vertical and horizontal scrolling content. Tap the title bar to toggle between the two directions.
+`scroller` のサンプルは、垂直および水平のスクロールコンテンツを作成する方法を示しています。タイトルバーをタップして、2つの方向を切り替えます。
 
 ***
 
@@ -267,7 +266,7 @@ The `scroller` example shows how to create vertical and horizontal scrolling con
 
 <img src="http://www.moddable.com/assets/piu-gifs/sound.png" width=190>
 
-The `sound` example demonstrates how to use the Piu `Sound` object. Tap the play button to play a sound. Tap the volume buttons to adjust the volume.
+`sound` のサンプルは、Piuの `Sound` オブジェクトの使い方を示しています。再生ボタンをタップして音を再生します。音量ボタンをタップして音量を調整します。
 
 ***
 
@@ -275,7 +274,7 @@ The `sound` example demonstrates how to use the Piu `Sound` object. Tap the play
 
 ![](http://www.moddable.com/assets/piu-gifs/spinner.gif)
 
-The `spinner` example implements a simple spinning animation, useful for loading screens.
+`spinner` のサンプルは、読み込み画面に便利なシンプルなスピニングアニメーションを実装しています。
 
 ***
 
@@ -283,7 +282,7 @@ The `spinner` example implements a simple spinning animation, useful for loading
 
 ![](http://www.moddable.com/assets/piu-gifs/spiral.gif)
 
-The `spiral` example uses a Piu `Port` object to draw spirals of random sizes on the screen.
+`spiral` のサンプルは、Piuの `Port` オブジェクトを使用して、ランダムなサイズのスパイラルを画面に描画します。
 
 ***
 
@@ -291,7 +290,7 @@ The `spiral` example uses a Piu `Port` object to draw spirals of random sizes on
 
 ![](http://www.moddable.com/assets/piu-gifs/text.gif)
 
-The `text` example uses the Piu `Text` object to render a variety of text styles with different sizes, colors, and alignments.
+`text` のサンプルは、Piuの `Text` オブジェクトを使用して、さまざまなサイズ、色、配置のテキストスタイルをレンダリングします。
 
 ***
 
@@ -299,7 +298,7 @@ The `text` example uses the Piu `Text` object to render a variety of text styles
 
 ![](http://www.moddable.com/assets/piu-gifs/timeline.gif)
 
-The `timeline` example demonstrates the use of the `to`, `from`, and `on` functions of the Piu `Timeline` object. Tap an option to see an animation that uses the corresponding function.
+`timeline` のサンプルは、Piuの `Timeline` オブジェクトの `to`、`from`、および `on` 関数の使用方法を示しています。対応する関数を使用したアニメーションを見るには、オプションをタップします。
 
 ***
 
@@ -307,7 +306,7 @@ The `timeline` example demonstrates the use of the `to`, `from`, and `on` functi
 
 ![](http://www.moddable.com/assets/piu-gifs/transitions.gif)
 
-The `transitions example demonstrates the use of the Piu comb and wipe transitions. These are useful for creating full screen transitions.
+`transitions`のサンプルは、Piuのcombおよびwipeトランジションの使用方法を示しています。これらはフルスクリーントランジションを作成するのに役立ちます。
 
 ***
 
@@ -315,20 +314,19 @@ The `transitions example demonstrates the use of the Piu comb and wipe transitio
 
 ![](http://www.moddable.com/assets/piu-gifs/vertical-expanding-keyboard.gif)
 
-The `vertical-expanding-keyboard` example demonstrates the use of the expanding keyboard module to create an on-screen keyboard for a touch screen. The vertical expanding keyboard is designed to make touch input easier on 240x320 displays.
+`vertical-expanding-keyboard`のサンプルは、拡張キーボードモジュールを使用してタッチスクリーン用のオンスクリーンキーボードを作成する方法を示しています。縦に拡張するキーボードは、240x320ディスプレイでのタッチ入力を容易にするように設計されています。
 
-*See also the `keyboard` and `horizontal-expanding-keyboard` examples.*
+*`keyboard`および`horizontal-expanding-keyboard`のサンプルも参照してください。*
 
-> For more information about the expanding keyboard, see our blog post [Introducing an Expanding Keyboard for Small Screens](https://blog.moddable.com/blog/expanding-keyboard/).
+> 拡張キーボードの詳細については、ブログ記事[Introducing an Expanding Keyboard for Small Screens](https://blog.moddable.com/blog/expanding-keyboard/)をご覧ください。
 
 ***
-
 
 ### `weather` and `mini-weather`
 
 ![](http://www.moddable.com/assets/piu-gifs/weather.gif)
 
-The `weather` and `mini-weather` examples display the weather forecast for five different cities. Forecasts are retrieved by sending HTTP requests to a cloud service.
+`weather`および`mini-weather`のサンプルは、5つの異なる都市の天気予報を表示します。予報はクラウドサービスにHTTPリクエストを送信して取得されます。
 
 ***
 
@@ -336,6 +334,6 @@ The `weather` and `mini-weather` examples display the weather forecast for five 
 
 ![](http://www.moddable.com/assets/piu-gifs/wifi-config.gif)
 
-The `wifi-config` example allows the user to configure the Wi-Fi network by selecting from a list of available networks. The on-screen keyboard is used to enter the password for secure networks.
+`wifi-config`のサンプルでは、利用可能なネットワークのリストから選択してWi-Fiネットワークを設定することができます。画面上のキーボードを使用して、セキュアネットワークのパスワードを入力します。
 
 ***
