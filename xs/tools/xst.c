@@ -70,6 +70,7 @@ static void fx_createRealm(xsMachine* the);
 static void fx_detachArrayBuffer(xsMachine* the);
 static void fx_evalScript(xsMachine* the);
 static void fx_gc(xsMachine* the);
+static void fx_isLockedDown(xsMachine* the);
 static void fx_metering(xsMachine* the);
 static void fx_runScript(xsMachine* the);
 
@@ -321,6 +322,7 @@ void fxBuildAgent(xsMachine* the)
 	slot = fxNextHostFunctionProperty(the, slot, fx_detachArrayBuffer, 1, xsID("detachArrayBuffer"), XS_DONT_ENUM_FLAG); 
 	slot = fxNextHostFunctionProperty(the, slot, fx_gc, 1, xsID("gc"), XS_DONT_ENUM_FLAG); 
 	slot = fxNextHostFunctionProperty(the, slot, fx_evalScript, 1, xsID("evalScript"), XS_DONT_ENUM_FLAG); 
+	slot = fxNextHostFunctionProperty(the, slot, fx_isLockedDown, 1, xsID("isLockedDown"), XS_DONT_ENUM_FLAG); 
 	slot = fxNextHostFunctionProperty(the, slot, fx_metering, 1, xsID("metering"), XS_DONT_ENUM_FLAG); 
 	slot = fxNextSlotProperty(the, slot, global, xsID("global"), XS_GET_ONLY);
 
@@ -365,11 +367,6 @@ void fxPrintUsage()
 	printf("\telse strings are paths to scripts\n");
 }
 
-void fx_gc(xsMachine* the)
-{
-	xsCollectGarbage();
-}
-
 void fx_evalScript(xsMachine* the)
 {
 	txSlot* realm;
@@ -382,6 +379,16 @@ void fx_evalScript(xsMachine* the)
 	aStream.size = mxStringLength(fxToString(the, mxArgv(0)));
 	fxRunScript(the, fxParseScript(the, &aStream, fxStringGetter, mxProgramFlag | mxDebugFlag), mxRealmGlobal(realm), C_NULL, mxRealmClosures(realm)->value.reference, C_NULL, module);
 	mxPullSlot(mxResult);
+}
+
+void fx_gc(xsMachine* the)
+{
+	xsCollectGarbage();
+}
+
+void fx_isLockedDown(xsMachine* the)
+{
+	xsResult = (mxProgram.value.reference->flag & XS_DONT_MARSHALL_FLAG) ? xsTrue : xsFalse;
 }
 
 void fx_metering(xsMachine* the)
