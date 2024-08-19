@@ -1,16 +1,16 @@
-## Test apps for RTC
+## RTCのテストアプリ
 
-`setTime` - sets the time to current time.
+`setTime` - 現在の時刻に設定します。
 
-`showTime` - prints the time reported by the RTC.
+`showTime` - RTCが報告する時刻を表示します。
 
-`test` - try a number of different values
+`test` - さまざまな時刻の値を試します。
 
-### To try different RTC drivers:
+### 異なるRTCドライバを試すには:
 
-You will need to change the `main.js` and `manifest.json` to include the driver for your device.
+デバイス用のドライバを含めるために、`main.js`と`manifest.json`を変更する必要があります。
 
-| Class | Module Specifier |
+| クラス | モジュール指定子 |
 | :---: | :--- |
 | `DS1307` | `embedded:RTC/DS1307`
 | `DS3231` | `embedded:RTC/DS3231`
@@ -19,14 +19,13 @@ You will need to change the `main.js` and `manifest.json` to include the driver 
 | `PCF8563` | `embedded:RTC/PCF8563`
 | `MCP7940` | `embedded:RTC/MCP7940`
 
-
-in `main.js`, change the `import RTC` to match your device. For example:
+`main.js`で、デバイスに合わせて`import RTC`を変更します。例えば：
 
 ```
 import RTC from "embedded:RTC/DS1307";
 ```
 
-in the `manifest.json` file, change the `include` for your device. For example:
+`manifest.json`ファイルで、デバイスに合わせて`include`を変更します。例えば：
 
 ```
 	"include": [
