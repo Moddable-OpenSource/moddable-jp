@@ -1,15 +1,15 @@
-# Files
+# ファイル
 Copyright 2017-2024 Moddable Tech, Inc.<BR>
-Revised: August 9, 2024
+改訂： 2024年8月9日
 
-## Table of Contents
+## 目次
 
-* [File Systems](#filesystems)
-	* [File](#file)
-	* [Directory](#directory)
-	* [File Iterator](#file-iterator)
-	* [File System](#file-system)
-	* [Host File System Configuration](#platforms)
+* [ファイルシステム](#filesystems)
+	* [ファイル](#file)
+	* [ディレクトリ](#directory)
+	* [ファイルイテレータ](#file-iterator)
+	* [ファイルシステム](#file-system)
+	* [ホストファイルシステムの設定](#platforms)
 		* [SPIFFS](#spiffs)
 		* [FAT32](#fat32)
 		* [littlefs](#littlefs)
@@ -19,13 +19,13 @@ Revised: August 9, 2024
 * [Flash](#flash)
 
 <a id="filesystems"></a>
-## File Systems
+## ファイルシステム
 
-The File module contains several classes used to access files and, when supported, directories.
+ファイルモジュールには、ファイルおよび（サポートされている場合は）ディレクトリにアクセスするために使用されるいくつかのクラスが含まれています。
 
-### File Paths
+### ファイルパス
 
-The root path of the default file system varies depending on the host. To make it straightforward to write scripts that work on a variety of different devices, the Moddable SDK includes the root path of the default file system in the `config/mc` module.
+デフォルトのファイルシステムのルートパスはホストによって異なります。さまざまなデバイスで動作するスクリプトを簡単に作成できるように、Moddable SDKにはデフォルトのファイルシステムのルートパスが `config/mc` モジュールに含まれています。
 
 ```js
 import config from "mc/config";
@@ -33,20 +33,20 @@ import config from "mc/config";
 File.delete(config.file.root + "test.txt");
 ```
 
-As a rule, scripts should always prefix full paths with this root.
+原則として、スクリプトは常にこのルートでフルパスをプレフィックスする必要があります。
 
-The forward slash character (`/`) is always used as a path separator, even on hosts that natively use a different path separator.
+スラッシュ文字 (`/`) は、ネイティブで異なるパスの区切り文字を使用するホストでも、常にパスの区切り文字として使用されます。
 
-The `System.config()` function, described below, provides the length of the longest supported path through the `maxPathLength` property.
+以下に説明する `System.config()` 関数は、`maxPathLength` プロパティを通じてサポートされる最長パスの長さを提供します。
 
 <a id="file"></a>
 ### class File
 
-- **Source code:** [file](../../modules/files/file)
-- **Relevant Examples:** [files](../../examples/files/files/)
+- **ソースコード:** [file](../../modules/files/file)
+- **関連する例:** [files](../../examples/files/files/)
 
-The `File` class provides access to files.
-On error the methods of the class raise an `UnknownError` exception passing an error message as argument.
+`File` クラスはファイルへのアクセスを提供します。
+エラーが発生した場合、クラスのメソッドはエラーメッセージを引数として渡す `UnknownError` 例外を発生させます。
 
 ```js
 import {File} from "file";
@@ -54,9 +54,9 @@ import {File} from "file";
 
 #### `constructor(path [, write])`
 
-The `File` constructor opens a file for read or write. The optional write argument selects the mode. The default value for write is `false`. When opened, the file position is 0.
+`File` コンストラクタは、読み取りまたは書き込み用にファイルを開きます。オプションのwrite引数はモードを選択します。writeのデフォルト値は `false` です。開かれると、ファイル位置は0になります。
 
-If the file does not exist, an exception is thrown when opening in read mode. When opening in write mode, a new file is created if it does not already exist.
+ファイルが存在しない場合、読み取りモードで開くと例外がスローされます。書き込みモードで開くと、ファイルが存在しない場合は新しいファイルが作成されます。
 
 ```js
 let file = new File(config.file.root + "preferences.json");
@@ -66,7 +66,7 @@ let file = new File(config.file.root + "preferences.json");
 
 #### `read(type [, count])`
 
-The `read` function reads from the current position. The data is read into a `String` or `ArrayBuffer` based on the value of the `type` argument. The `count` argument is the number of bytes to read. The default value of `count` is the number of bytes between the current `position` and the file `length`.
+`read` 関数は現在の位置からデータを読み取ります。データは `type` 引数の値に基づいて `String` または `ArrayBuffer` に読み込まれます。`count` 引数は読み取るバイト数です。`count` のデフォルト値は、現在の `position` からファイルの `length` までのバイト数です。
 
 ```js
 let file = new File(config.file.root + "preferences.json");
@@ -77,7 +77,7 @@ file.close();
 
 #### `write(value [, ...values])`
 
-The `write` function writes one or more values to the file starting at the current `position`. The values may be either a `String` or `ArrayBuffer`.
+`write` 関数は、現在の `position` から始めて、1つ以上の値をファイルに書き込みます。値は `String` または `ArrayBuffer` のいずれかです。
 
 ```js
 File.delete(config.file.root + "preferences.json");
@@ -88,21 +88,21 @@ file.close();
 
 ***
 
-#### `length` property
+#### `length` プロパティ
 
-The `length` property is a number indicating the number of bytes in the file. It is read-only.
+`length` プロパティは、ファイル内のバイト数を示す数値です。これは読み取り専用です。
 
 ***
 
-#### `position` property
+#### `position` プロパティ
 
-The `position` property is a number indicating the byte offset into the file, for the next read or write operation.
+`position` プロパティは、次の読み取りまたは書き込み操作のためのファイル内のバイトオフセットを示す数値です。
 
 ***
 
 #### `static delete(path)`
 
-The static `delete` function removes the file at the specified path.
+指定されたパスのファイルを削除する静的な `delete` 関数です。
 
 ```js
 File.delete(config.file.root + "test.txt");
@@ -112,7 +112,7 @@ File.delete(config.file.root + "test.txt");
 
 #### `static exists(path)`
 
-The static `exists` function returns a boolean indicating whether a file exists at the specified path.
+指定されたパスにファイルが存在するかどうかを示すブール値を返す静的な `exists` 関数です。
 
 ```js
 let exists = File.exists(config.file.root + "test.txt");
@@ -122,13 +122,13 @@ let exists = File.exists(config.file.root + "test.txt");
 
 #### `static rename(from, to)`
 
-The static `rename` function renames the file specified by the `from` argument to the name specified by the `to` argument.
+`from` 引数で指定されたファイルを `to` 引数で指定された名前に変更する静的な `rename` 関数です。
 
 ```js
 File.rename(config.file.root + "test.txt", "betterName.txt");
 ```
 
-The `to` argument may be either a file name, as in the example above, or a full file path, as in the example below. The full file path form is useful when the host file system supports using `rename` to move a file between directories.
+`to` 引数は、上記の例のようにファイル名でも、以下の例のように完全なファイルパスでもかまいません。ホストファイルシステムがディレクトリ間でファイルを移動するために `rename` をサポートしている場合、完全なファイルパス形式が便利です。
 
 ```js
 File.rename(config.file.root + "test.txt", config.file.root + "better/name.txt");
@@ -136,9 +136,9 @@ File.rename(config.file.root + "test.txt", config.file.root + "better/name.txt")
 
 ***
 
-#### Example: Get File Size
+#### 例: ファイルサイズを取得する
 
-This example opens a file in read-only mode to retrieve the file's length. If the file does not exist, it is not created and an exception is thrown.
+この例では、ファイルを読み取り専用モードで開き、ファイルの長さを取得します。ファイルが存在しない場合、ファイルは作成されず、例外がスローされます。
 
 ```js
 let file = new File(config.file.root + "test.txt");
@@ -148,9 +148,9 @@ file.close();
 
 ***
 
-#### Example: Read File as String
+#### 例: ファイルを文字列として読み込む
 
-This example retrieves the entire content of a file into a `String`. If there is insufficient memory available to store the string or the file does not exist, an exception is thrown.
+この例では、ファイルの全内容を `String` に取得します。文字列を保存するためのメモリが不足している場合や、ファイルが存在しない場合は、例外がスローされます。
 
 ```js
 let file = new File(config.file.root + "test.txt");
@@ -160,9 +160,9 @@ file.close();
 
 ***
 
-#### Example: Read File into ArrayBuffers
+#### 例: ファイルをArrayBuffersに読み込む
 
-This example reads a file into one or more `ArrayBuffer` objects. The final `ArrayBuffer` is smaller than 1024 when the file size is not an integer multiple of 1024.
+この例では、ファイルを1つ以上の `ArrayBuffer` オブジェクトに読み込みます。ファイルサイズが1024の整数倍でない場合、最後の `ArrayBuffer` は1024より小さくなります。
 
 ```js
 let file = new File(config.file.root + "test.txt");
@@ -174,9 +174,9 @@ file.close();
 
 ***
 
-#### Example: Write String to File
+#### 例: 文字列をファイルに書き込む
 
-This example deletes a file, opens it for write (which creates a new empty file), and then writes two `String` values to the file. The script then moves the read/write position to the start of the file, and reads the entire file contents into a single `String`, which is traced to the console.
+この例では、ファイルを削除し、書き込み用に開き（これにより新しい空のファイルが作成されます）、次に2つの `String` 値をファイルに書き込みます。スクリプトは次に読み書き位置をファイルの先頭に移動し、ファイルの全内容を1つの `String` に読み込み、それをコンソールにトレースします。
 
 ```js
 File.delete(config.file.root + "test.txt");
@@ -197,19 +197,19 @@ file.close();
 <a id="directory"></a>
 ### class Directory
 
-- **Source code:** [file](../../modules/files/file)
+- **ソースコード:** [file](../../modules/files/file)
 
-The `Directory` class creates and deletes directories. To list the files and directories in a directory, use the `Iterator` class.
+`Directory` クラスはディレクトリを作成および削除します。ディレクトリ内のファイルやディレクトリを一覧表示するには、`Iterator` クラスを使用します。
 
 ```js
 import {Directory} from "file";
 ```
 
-> **Note**: Because the SPIFFS file system is a flat file system, directories cannot be created or deleted when on it.
+> **注意**: SPIFFSファイルシステムはフラットファイルシステムであるため、ディレクトリを作成または削除することはできません。
 
 #### `static create(path)`
 
-The `create` function creates a directory at the specified path. All parent directories in `path` must already exist: `create` does not automatically create parent directories.
+`create` 関数は指定されたパスにディレクトリを作成します。`path` 内のすべての親ディレクトリは既に存在している必要があります。`create` は親ディレクトリを自動的に作成しません。
 
 ```js
 Directory.create(config.file.root + "tmp");
@@ -219,7 +219,7 @@ Directory.create(config.file.root + "tmp");
 
 #### `static delete(path)`
 
-The `delete` function deletes the directory at the specified path. On most file systems, the directory must be empty to be deleted and `delete` throws an exception when it is not.
+`delete` 関数は指定されたパスのディレクトリを削除します。ほとんどのファイルシステムでは、ディレクトリを削除するためには空である必要があり、空でない場合 `delete` は例外をスローします。
 
 ```js
 Directory.delete(config.file.root + "tmp");
@@ -230,32 +230,32 @@ Directory.delete(config.file.root + "tmp");
 <a id="file-iterator"></a>
 ### class File Iterator
 
-- **Source code:** [file](../../modules/files/file)
-- **Relevant Examples:** [files](../../examples/files/files/)
+- **ソースコード:** [file](../../modules/files/file)
+- **関連する例:** [files](../../examples/files/files/)
 
-The File `Iterator` class enumerates the files and subdirectories in a directory.
+File `Iterator` クラスはディレクトリ内のファイルとサブディレクトリを列挙します。
 
 ```js
 import {Iterator} from "file";
 ```
 
-> **Note**: Because the SPIFFS file system is a flat file system,  no subdirectories are returned on devices that use it.
+> **注意**: SPIFFSファイルシステムはフラットなファイルシステムであるため、それを使用するデバイスではサブディレクトリは返されません。
 
 #### `constructor(path)`
 
-The constructor takes as its sole argument the path of the directory to iterate over.
+コンストラクタは、反復するディレクトリのパスを唯一の引数として受け取ります。
 
 ```js
 let iterator = new Iterator(config.file.root);
 ```
 
-The iterator instance is a JavaScript [iterable object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of) so it may be used in `for...of` loops. An example is provided below.
+イテレータインスタンスはJavaScriptの[反復可能オブジェクト](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of)であるため、`for...of`ループで使用できます。以下に例を示します。
 
 ***
 
 #### `next()`
 
-The `next` function is called repeatedly, each time retrieving information about one file. When all files have been returned, the `next` function returns `undefined`. For each file and subdirectory, next returns an object. The object always contains a `name` property with the file name. If the object contains a `length` property, it references a file and the `length` property is the size of the file in bytes. If the `length` property is absent, it references a directory.
+`next` 関数は繰り返し呼び出され、そのたびに1つのファイルに関する情報を取得します。すべてのファイルが返された後、`next` 関数は `undefined` を返します。各ファイルとサブディレクトリについて、nextはオブジェクトを返します。オブジェクトには常にファイル名を持つ `name` プロパティが含まれます。オブジェクトに `length` プロパティが含まれている場合、それはファイルを参照し、`length` プロパティはファイルのサイズをバイト単位で示します。`length` プロパティがない場合、それはディレクトリを参照します。
 
 ```js
 let item = iterator.next();
@@ -263,9 +263,9 @@ let item = iterator.next();
 
 ***
 
-#### Example: List Contents of a Directory
+#### 例: ディレクトリの内容をリストする
 
-This example lists all the files and subdirectories in a directory.
+この例では、ディレクトリ内のすべてのファイルとサブディレクトリをリストします。
 
 ```js
 let iterator = new Iterator(config.file.root);
@@ -278,9 +278,9 @@ while (item = iterator.next()) {
 }
 ```
 
-The iterator's `next` function returns an object.  If the object has a `length` property, it is a file; if there is no `length` property, it is a directory.
+イテレータの `next` 関数はオブジェクトを返します。オブジェクトに `length` プロパティがある場合、それはファイルです。`length` プロパティがない場合、それはディレクトリです。
 
-This is a variation of the same example using a `for...of` loop.
+これは `for...of` ループを使用した同じ例のバリエーションです。
 
 ```js
 for (const item of (new Iterator(config.file.root))) {
@@ -294,11 +294,11 @@ for (const item of (new Iterator(config.file.root))) {
 ***
 
 <a id="file-system"></a>
-### class File System
+### クラス File System
 
-- **Source code:** [file](../../modules/files/file)
+- **ソースコード:** [file](../../modules/files/file)
 
-The File `System` class provides information about the file system.
+File `System` クラスはファイルシステムに関する情報を提供します。
 
 ```js
 import {System} from "file";
@@ -306,7 +306,7 @@ import {System} from "file";
 
 #### `static config()`
 
-The `config` function returns a dictionary with information about the file system. At this time, the dictionary has a single property, `maxPathLength`, which indicates the length of the longest file path in bytes.
+`config` 関数はファイルシステムに関する情報を持つ辞書を返します。現在、この辞書には `maxPathLength` という単一のプロパティがあり、これはバイト単位で最長のファイルパスの長さを示します。
 
 ```js
 let maxPathLength = System.config().maxPathLength;
@@ -316,34 +316,34 @@ let maxPathLength = System.config().maxPathLength;
 
 #### `static info()`
 
-The `info` function returns a dictionary with information about the free and used space in the file system, if available. The `used` property of the dictionary gives the number of bytes in use and the `total` property indicates the maximum capacity of the file system in bytes.
+`info` 関数は、利用可能な場合、ファイルシステムの空き容量と使用容量に関する情報を持つ辞書を返します。辞書の `used` プロパティは使用中のバイト数を示し、`total` プロパティはファイルシステムの最大容量をバイト単位で示します。
 
 ```js
 let info = System.info();
 let percentFree = 1 - (info.used / info.total);
 ```
 
-The properties available on the object returned by `info` vary based on the capabilities of the host platform. Consequently, the `total` and `used` properties may not be available and other properties may be present.
+`info`によって返されるオブジェクトのプロパティは、ホストプラットフォームの機能に基づいて異なります。そのため、`total`および`used`プロパティが利用できない場合や、他のプロパティが存在する場合があります。
 
 ***
 
 <a id="platforms"></a>
-### Host File System Configuration
+### ホストファイルシステムの構成
 
-This section describes how the file system is implemented on some embedded hosts. This information is helpful for situations where the default file system configuration does not meet the needs of a particular project.
+このセクションでは、いくつかの組み込みホストでファイルシステムがどのように実装されているかについて説明します。この情報は、デフォルトのファイルシステム構成が特定のプロジェクトのニーズを満たさない場合に役立ちます。
 
 <a id="spiffs"></a>
 #### SPIFFS -- ESP8266 & ESP32
 
-On ESP8266 and (by default) ESP32, the File module is implemented using the [SPIFFS](https://github.com/pellepl/spiffs) file system.
+ESP8266および（デフォルトで）ESP32では、ファイルモジュールは[SPIFFS](https://github.com/pellepl/spiffs)ファイルシステムを使用して実装されています。
 
-SPIFFS is a flat file system, meaning that there are no directories and all files are at the root.
+SPIFFSはフラットファイルシステムであり、ディレクトリがなく、すべてのファイルがルートにあります。
 
-The SPIFFS file system requires some additional memory. Including SPIFFS in the build increase RAM use by about 500 bytes on ESP8266. Using the SPIFFS file system requires about another 3 KB of RAM. To minimize the memory impact, the `File` class only instantiates the SPIFFS file system when necessary -- when a file is open and when a file is deleted. The SPIFFS file system is automatically closed when not in use.
+SPIFFSファイルシステムは追加のメモリを必要とします。ビルドにSPIFFSを含めると、ESP8266で約500バイトのRAMが増加します。SPIFFSファイルシステムを使用するには、さらに約3 KBのRAMが必要です。メモリの影響を最小限に抑えるために、`File`クラスは必要な場合にのみSPIFFSファイルシステムをインスタンス化します。つまり、ファイルが開かれているときとファイルが削除されるときです。SPIFFSファイルシステムは使用されていないときに自動的に閉じられます。
 
-If the SPIFFS file system has not been initialized, it is formatted when first used. Initialization takes up to one minute.
+SPIFFSファイルシステムが初期化されていない場合、初めて使用するときにフォーマットされます。初期化には最大で1分かかります。
 
-On ESP32, the SPIFFS partition size is specified in a partitions file with a partition of type `data` and subtype `spiffs`. The [default partitions.csv](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/partitions.csv) allocates a 64 KB partition for this purpose. A custom partition file can be specified by setting the `PARTITIONS_FILE` variable in the `build` section of the project manifest.
+ESP32では、SPIFFSパーティションサイズは`data`タイプおよび`spiffs`サブタイプのパーティションを持つパーティションファイルで指定されます。[デフォルトのpartitions.csv](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/partitions.csv)は、この目的のために64 KBのパーティションを割り当てます。カスタムパーティションファイルは、プロジェクトマニフェストの`build`セクションで`PARTITIONS_FILE`変数を設定することで指定できます。
 
 ```JSON
 "build": {
@@ -351,7 +351,7 @@ On ESP32, the SPIFFS partition size is specified in a partitions file with a par
 }
 ```
 
-On ESP32, the SPIFFS file system is mounted at a specified path and all files/directories created should be accessed within that root path. The default root path is `/mod`, but this can be changed with the `root` define in the manifest:
+ESP32では、SPIFFSファイルシステムは指定されたパスにマウントされ、作成されたすべてのファイル/ディレクトリはそのルートパス内でアクセスする必要があります。デフォルトのルートパスは`/mod`ですが、マニフェストの`root`定義で変更できます。
 
 ```JSON
 "defines": {
@@ -364,11 +364,11 @@ On ESP32, the SPIFFS file system is mounted at a specified path and all files/di
 <a id="fat32"></a>
 #### FAT32 -- ESP32
 
-The `File` class implements an optional FAT32 file system for the ESP32. Unlike SPIFFS, FAT32 file systems are not flat: they have directory structures and long filenames (up to 255 characters).
+`File`クラスは、ESP32用のオプションのFAT32ファイルシステムを実装しています。SPIFFSとは異なり、FAT32ファイルシステムはフラットではありません。ディレクトリ構造と長いファイル名（最大255文字）を持っています。
 
-If the FAT32 file system has not been initialized then it is formatted when first used. As with SPIFFS, the `File` class only instantiates the FAT32 file system when necessary and it is automatically closed when not in use.
+FAT32ファイルシステムが初期化されていない場合、最初に使用されたときにフォーマットされます。SPIFFSと同様に、`File`クラスは必要に応じてFAT32ファイルシステムをインスタンス化し、使用されていないときには自動的に閉じられます。
 
-To enable the FAT32 file system, set the `fat32` [manifest define](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/defines.md) to `1`:
+FAT32ファイルシステムを有効にするには、`fat32` [マニフェスト定義](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/tools/defines.md)を`1`に設定します：
 
 ```JSON
 "defines": {
@@ -378,7 +378,7 @@ To enable the FAT32 file system, set the `fat32` [manifest define](https://githu
 }
 ```
 
-The storage partition used by the default Moddable SDK build for ESP32 does not reserve a partition for FAT32. Therefore, it is necessary to use a different partition file in projects that use FAT32. To do that, set the  `PARTITIONS_FILE` variable in the `build` section of the project manifest:
+ESP32用のデフォルトのModdable SDKビルドで使用されるストレージパーティションは、FAT32用のパーティションを予約していません。したがって、FAT32を使用するプロジェクトでは異なるパーティションファイルを使用する必要があります。そのためには、プロジェクトマニフェストの`build`セクションで`PARTITIONS_FILE`変数を設定します：
 
 ```JSON
 "build": {
@@ -386,7 +386,7 @@ The storage partition used by the default Moddable SDK build for ESP32 does not 
 }
 ```
 
-The FAT32 partition has the type `data` and subtype `fat`.  The FAT32 implementation requires a minimum partition size of about 576 KB. The format of the partition is defined by the ESP-IDF. The following example shows a partitions file with a FAT32 partition of the minimum size:
+FAT32パーティションのタイプは`data`で、サブタイプは`fat`です。FAT32の実装には約576 KBの最小パーティションサイズが必要です。パーティションのフォーマットはESP-IDFによって定義されます。以下の例は、最小サイズのFAT32パーティションを含むパーティションファイルを示しています：
 
 ```CSV
 # Name,   Type, SubType, Offset,  Size, Flags
@@ -397,7 +397,7 @@ xs,       0x40, 1,       0x310000, 0x040000,
 settings, data, 1,       0x350000, 0x010000,
 storage,  data, fat,     0x360000, 0x090000,
 ```
-The default name for the FAT32 partition is `storage`. To use a different name, set the `partition` define in the manifest:
+FAT32パーティションのデフォルト名は`storage`です。別の名前を使用するには、マニフェストで`partition`定義を設定します。
 
 ```JSON
 "defines": {
@@ -407,7 +407,7 @@ The default name for the FAT32 partition is `storage`. To use a different name, 
 }
 ```
 
-By default, the FAT32 file system is mounted at `/mod`. To change the default root, set the `root` define in the manifest:
+デフォルトでは、FAT32ファイルシステムは`/mod`にマウントされます。デフォルトのルートを変更するには、マニフェストで`root`定義を設定します。
 
 ```JSON
 "defines": {
@@ -419,9 +419,9 @@ By default, the FAT32 file system is mounted at `/mod`. To change the default ro
 
 <a id="littlefs"></a>
 #### littlefs
-The [littlefs](https://github.com/littlefs-project/littlefs) file system is "a little fail-safe filesystem designed for microcontrollers." It provides a high reliability, hierarchical file system in a small code footprint (about 60 KB) using minimal memory (well under 1 KB) with a high degree of configurability. littlefs also supports long file names (up to 255 characters) and formats a new partition very quickly.
+[littlefs](https://github.com/littlefs-project/littlefs)ファイルシステムは「マイクロコントローラ向けに設計された小さなフェイルセーフファイルシステム」です。これは、最小限のメモリ（1 KB未満）を使用して、小さなコードフットプリント（約60 KB）で高信頼性の階層型ファイルシステムを提供し、高度な構成可能性を備えています。littlefsは長いファイル名（最大255文字）もサポートしており、新しいパーティションを非常に迅速にフォーマットします。
 
-The Moddable SDK supports littlefs using the APIs described above. To use littlefs, include its manifest.
+Moddable SDKは、上記のAPIを使用してlittlefsをサポートしています。littlefsを使用するには、そのマニフェストを含めます。
 
 ```json
 "include": {
@@ -429,14 +429,14 @@ The Moddable SDK supports littlefs using the APIs described above. To use little
 }
 ```
 
-> **Note**: A project may use the littlefs manifest or the default file manifest (`$MODDABLE/modules/files/file/manifest.json`). Both cannot currently be included in the same project.
+> **注**: プロジェクトは littlefs マニフェストまたはデフォルトのファイルマニフェスト (`$MODDABLE/modules/files/file/manifest.json`) を使用することができます。両方を同じプロジェクトに含めることは現在できません。
 
-The backing store for littlefs varies depending the host platform:
+littlefsのバックストアはホストプラットフォームによって異なります：
 
-- **ESP32** - littlefs uses the "storage" partition to hold the file system.
-- **ESP8266** - the file system is stored in the upper 3 MB of flash (the same area used by SPIFFS).
-- **nRF52** - littlefs uses the free space following the firmware image and installed mod. The default size is 64 KB, which may be overridden by `MODDEF_FILE_LFS_PARTITION_SIZE` in the manifest `defines`. If there is not enough space, an exception is thrown when accessing the file system.
-- **Others**, littlefs uses a static memory buffer to hold the file system. The default size is 64 KB, which may be overridden by `MODDEF_FILE_LFS_PARTITION_SIZE` in the manifest. This RAM disk mode allows littlefs to be used with the simulator.
+- **ESP32** - littlefsはファイルシステムを保持するために "storage" パーティションを使用します。
+- **ESP8266** - ファイルシステムはフラッシュの上位3 MBに保存されます (SPIFFSと同じ領域）。
+- **nRF52** - littlefsはファームウェアイメージとインストールされたモジュールの後の空き領域を使用します。デフォルトのサイズは64 KBで、マニフェストの `defines` に `MODDEF_FILE_LFS_PARTITION_SIZE` を設定することで上書きできます。十分な空き領域がない場合、ファイルシステムにアクセスすると例外がスローされます。
+- **その他** - littlefsはファイルシステムを保持するために静的メモリバッファを使用します。デフォルトのサイズは64 KBで、マニフェストの `MODDEF_FILE_LFS_PARTITION_SIZE` で上書きできます。このRAMディスクモードにより、シミュレータでlittlefsを使用することができます。
 
 ```json
 	"defines": {
@@ -448,9 +448,9 @@ The backing store for littlefs varies depending the host platform:
 	},
 ```
 
-The littlefs implementation is thread safe on devices running FreeRTOS (ESP32 and nRF52) allowing littlefs to be used with Workers. Thread safety is irrelevant on ESP8266 as it runs as a single process. The thread safety support may be extended for other runtime environments.
+littlefsの実装は、FreeRTOS（ESP32およびnRF52）を実行しているデバイス上でスレッドセーフであり、littlefsをWorkersと一緒に使用することができます。ESP8266では単一プロセスとして実行されるため、スレッドセーフは関係ありません。スレッドセーフのサポートは、他のランタイム環境にも拡張される可能性があります。
 
-The littlefs implementation can be configured to trade-off performance and memory use. The default configuration in the Moddable SDK uses the least memory possible. For projects that make lightweight use of the file system, this offers adequate performance. To improve performance, the configuration may be changed in the project's manifest. The `read_size`, `prog_size`, `lookahead_size`, and `block_cycles` values are described in [`lfs.h`](https://github.com/littlefs-project/littlefs/blob/40dba4a556e0d81dfbe64301a6aa4e18ceca896c/lfs.h#L194-L230). Experimentation has shown that increasing the four `*_size` settings from 16 bytes to 512 gives a significant performance boost at the expense of 2 KB of RAM.
+littlefsの実装は、パフォーマンスとメモリ使用量のトレードオフを構成することができます。Moddable SDKのデフォルト構成は、可能な限り最小のメモリを使用します。ファイルシステムを軽量に使用するプロジェクトにとって、これは十分なパフォーマンスを提供します。パフォーマンスを向上させるために、プロジェクトのマニフェストで構成を変更することができます。`read_size`、`prog_size`、`lookahead_size`、および`block_cycles`の値は、[`lfs.h`](https://github.com/littlefs-project/littlefs/blob/40dba4a556e0d81dfbe64301a6aa4e18ceca896c/lfs.h#L194-L230)に記載されています。実験により、4つの`*_size`設定を16バイトから512バイトに増やすことで、2 KBのRAMを犠牲にして大幅なパフォーマンス向上が得られることが示されています。
 
 ```json
 	"defines": {
@@ -466,35 +466,35 @@ The littlefs implementation can be configured to trade-off performance and memor
 	},
 ```
 
-When not in use (when all files and file iterators are closed), the littlefs implementation unmounts the file system. This releases all memory. This is the same behavior implemented by SPIFFS and FAT32.
+使用されていないとき（すべてのファイルとファイルイテレータが閉じられているとき）、littlefsの実装はファイルシステムをアンマウントします。これにより、すべてのメモリが解放されます。これは、SPIFFSやFAT32によって実装されているのと同じ動作です。
 
 <a id="zip"></a>
 ## class ZIP
 
-- **Source code:** [zip](../../modules/files/zip)
-- **Relevant Examples:** [zip](../../examples/files/zip/), [httpzip](../../examples/network/http/httpzip)
+- **ソースコード:** [zip](../../modules/files/zip)
+- **関連する例:** [zip](../../examples/files/zip/), [httpzip](../../examples/network/http/httpzip)
 
-The `ZIP` class implements read-only file system access to the contents of a ZIP file stored in memory. Typically these are stored in flash memory. A ZIP file is a convenient way to embed a read-only file system into a project.
+`ZIP` クラスは、メモリに格納されたZIPファイルの内容に対する読み取り専用のファイルシステムアクセスを実装します。通常、これらはフラッシュメモリに格納されます。ZIPファイルは、読み取り専用のファイルシステムをプロジェクトに埋め込む便利な方法です。
 
-The `ZIP` implementation provides access to the files contained in the ZIP file.   By default, the files in most ZIP files are compressed. The `ZIP` class does not decompress the data when reading. ZIP does not require files to be compressed, so one option is to build a ZIP file with uncompressed content. On devices with enough memory, ZIP files with compressed content may be used by decompressing the data after reading using the zlib `inflate` module.
+`ZIP` の実装は、ZIPファイルに含まれるファイルへのアクセスを提供します。通常、ほとんどのZIPファイルのファイルは圧縮されています。`ZIP` クラスは読み取り時にデータを解凍しません。ZIPはファイルを圧縮する必要がないため、非圧縮の内容でZIPファイルを作成するオプションもあります。十分なメモリを持つデバイスでは、読み取り後にzlibの `inflate` モジュールを使用してデータを解凍することで、圧縮された内容のZIPファイルを使用することができます。
 
-One way to create a ZIP file with uncompressed content is the [`zip`](https://linux.die.net/man/1/zip) command line tool. It creates uncompressed ZIP files when a compression level of zero is specified. The following command line creates a ZIP file named `test.zip` with the uncompressed contents of the directory `test`.
+ZIPファイルを圧縮なしで作成する方法の1つに、[`zip`](https://linux.die.net/man/1/zip) コマンドラインツールがあります。圧縮レベルをゼロに指定すると、圧縮なしのZIPファイルが作成されます。以下のコマンドラインは、ディレクトリ `test` の内容を圧縮なしで `test.zip` という名前のZIPファイルに作成します。
 
 	zip -0r test.zip test
 
-To compress the content, use a different compression level. The highest compression level is `9`:
+内容を圧縮するには、異なる圧縮レベルを使用します。最高の圧縮レベルは `9` です：
 
 	zip -9r test.zip test
 
-**Note**: The `zip` command line tool creates a directory named "test" at the root of the ZIP file. For example, the file at "test/example.txt" is accessed in the ZIP file as "test/example.txt" not "example.txt".
+**注意**: `zip` コマンドラインツールは、ZIPファイルのルートに「test」という名前のディレクトリを作成します。例えば、「test/example.txt」にあるファイルは、ZIPファイル内では「test/example.txt」としてアクセスされ、「example.txt」としてはアクセスされません。
 
 ### `constructor(buffer)`
 
-The `ZIP` constructor instantiates a `ZIP` object to access the contents of the buffer as a read-only file system. The buffer may be either an `ArrayBuffer` or a Host Buffer.
+`ZIP` コンストラクタは、バッファの内容を読み取り専用ファイルシステムとしてアクセスするための `ZIP` オブジェクトをインスタンス化します。バッファは `ArrayBuffer` またはホストバッファのいずれかである必要があります。
 
-The constructor validates that the buffer contains a ZIP archive, throwing an exception if it does not.
+コンストラクタは、バッファがZIPアーカイブを含んでいることを検証し、含んでいない場合は例外をスローします。
 
-A ZIP archive is stored in memory. If it is ROM, it will be accessed using a Host Buffer, a variant of an `ArrayBuffer`. The host platform software provides the Host Buffer instance through a platform specific mechanism. This example uses the `Resource` constructor to create the Host Buffer.
+ZIPアーカイブはメモリに格納されます。ROMの場合、ホストバッファを使用してアクセスされます。ホストバッファは `ArrayBuffer` の一種です。ホストプラットフォームソフトウェアは、プラットフォーム固有のメカニズムを通じてホストバッファインスタンスを提供します。この例では、ホストバッファを作成するために `Resource` コンストラクタを使用します。
 
 ```js
 let buffer = new Resource("test.zip");
@@ -505,7 +505,7 @@ let archive = new ZIP(buffer);
 
 ### `file(path)`
 
-The `file` function instantiates an object to access the content of the specified path within the ZIP archive. The returned instance implements the same API as the `File` class.
+`file` 関数は、ZIPアーカイブ内の指定されたパスの内容にアクセスするためのオブジェクトをインスタンス化します。返されるインスタンスは `File` クラスと同じAPIを実装しています。
 
 ```js
 let file = archive.file("small.txt");
@@ -515,7 +515,7 @@ let file = archive.file("small.txt");
 
 ### `iterate(path)`
 
-The `iterate` function instantiates an object to access the content of the specified directory path within the ZIP archive. The returned instance implements the same API as the Iterator class. Directory paths end with a slash ("`/`") character and, with the exception of the root path, do not begin with a slash.
+`iterate` 関数は、ZIPアーカイブ内の指定されたディレクトリパスの内容にアクセスするためのオブジェクトをインスタンス化します。返されるインスタンスはIteratorクラスと同じAPIを実装しています。ディレクトリパスはスラッシュ（"`/`"）文字で終わり、ルートパスを除いてスラッシュで始まりません。
 
 ```js
 let root = archive.iterate("/");
@@ -525,25 +525,25 @@ let root = archive.iterate("/");
 
 ### `map(path)`
 
-The `map` function returns a Host Buffer that references the bytes of the file at the specified path.
+`map` 関数は、指定されたパスのファイルのバイトを参照するホストバッファを返します。
 
 ***
 
 ### `method`
 
-The read-only `method` property returns an integer indicating how the file is compressed in the ZIP file. The values are taken from the ZIP specification. For example, the value 8 indicates `deflate` compression was used.
+読み取り専用の `method` プロパティは、ZIPファイル内でファイルがどのように圧縮されているかを示す整数を返します。値はZIP仕様から取られています。例えば、値8は `deflate` 圧縮が使用されたことを示します。
 
 ***
 
 ### `crc`
 
-The read-only `crc` property returns an integer containing the CRC value stored for the file in the ZIP file. This property is useful for caching.
+読み取り専用の `crc` プロパティは、ZIPファイルに格納されているファイルのCRC値を含む整数を返します。このプロパティはキャッシュに便利です。
 
 ***
 
-### Example: Read File from ZIP Archive
+### 例: ZIPアーカイブからファイルを読み取る
 
-The `ZIP` instance's `file` function provides an instance used to access a file. Though instantiated differently, the ZIP file instance shares the same API with the `File` class.
+`ZIP` インスタンスの `file` 関数は、ファイルにアクセスするために使用されるインスタンスを提供します。異なる方法でインスタンス化されますが、ZIPファイルインスタンスは `File` クラスと同じAPIを共有します。
 
 ```js
 let file = archive.file("small.txt");
@@ -555,9 +555,9 @@ file.close();
 
 ***
 
-### Example: List Contents of a ZIP Archive's Directory
+### 例: ZIPアーカイブのディレクトリの内容をリストする
 
-The following example iterates the files and directories at the root of the archive. Often the root contains only a single directory.
+次の例では、アーカイブのルートにあるファイルとディレクトリを反復処理します。多くの場合、ルートには単一のディレクトリしか含まれていません。
 
 ```js
 let root = archive.iterate("/");
@@ -570,7 +570,7 @@ while (item = root.next()) {
 }
 ```
 
-The ZIP iterator expects directory paths to end with a slash ("`/`"). To iterate the contents of a directory named "test" at the root, use the following code:
+ZIPイテレータはディレクトリパスがスラッシュ（"`/`"）で終わることを期待します。ルートにある「test」という名前のディレクトリの内容を反復処理するには、次のコードを使用します。
 
 ```js
 let iterator = archive.iterate("test/");
@@ -581,10 +581,10 @@ let iterator = archive.iterate("test/");
 <a id="resource"></a>
 ## class Resource
 
-- **Source code:** [resource](../../modules/files/resource)
-- **Relevant Examples:** [zip](../../examples/files/zip/), many [Commodetto examples](../../examples/commodetto) including [sprite](../../examples/commodetto/sprite) and [text](../../examples/commodetto/text)
+- **ソースコード:** [resource](../../modules/files/resource)
+- **関連する例:** [zip](../../examples/files/zip/)、多くの [Commodetto の例](../../examples/commodetto) には [sprite](../../examples/commodetto/sprite) や [text](../../examples/commodetto/text) が含まれます
 
-The `Resource` class provides access to assets from an application's resource map.
+`Resource` クラスは、アプリケーションのリソースマップからアセットにアクセスするためのものです。
 
 ```js
 import Resource from "Resource";
@@ -592,7 +592,7 @@ import Resource from "Resource";
 
 ### `constructor(path)`
 
-The `Resource` constructor takes a single argument, the resource path, and returns a Host Buffer containing the resource data.
+`Resource` コンストラクタは、リソースパスを引数として取り、リソースデータを含むホストバッファを返します。
 
 ```js
 let resource = new Resource("logo.bmp");
@@ -602,8 +602,7 @@ trace(`resource size is ${resource.byteLength}\n`);
 ***
 
 ### `static exists(path)`
-
-The static `exists` function returns a boolean indicating whether a resource exists at the specified path.
+静的な `exists` 関数は、指定されたパスにリソースが存在するかどうかを示すブール値を返します。
 
 ```js
 let path = "test.zip";
@@ -615,31 +614,31 @@ if (Resource.exists(path))
 
 ### `slice(begin[[, end], copy])`
 
-The `slice` function returns a portion of the resource in an `ArrayBuffer`. The default value of `end` is the resource size.
+`slice` 関数は、リソースの一部を `ArrayBuffer` として返します。`end` のデフォルト値はリソースのサイズです。
 
 ```js
 let resource = new Resource("table.dat");
-let buffer1 = resource.slice(5);		// Get a buffer starting from offset 5
-let buffer2 = resource.slice(0, 10);	// Get a buffer of the first 10 bytes
+let buffer1 = resource.slice(5);		// オフセット5から始まるバッファを取得
+let buffer2 = resource.slice(0, 10);	// 最初の10バイトのバッファを取得
 ```
 
-The optional `copy` argument defaults to `true`. If it is set to `false`, the return value is a read-only `HostBuffer` that references the original resource data. This option is useful for creating a reference to a portion of the resource data without copying it to RAM.
+オプションの `copy` 引数のデフォルト値は `true` です。これを `false` に設定すると、返される値は元のリソースデータを参照する読み取り専用の `HostBuffer` になります。このオプションは、リソースデータの一部をRAMにコピーせずに参照を作成するのに便利です。
 
 ***
 
 <a id="preference"></a>
 ## class Preference
 
-- **Source code:** [preference](../../modules/files/preference/)
-- **Relevant Examples:** [preference](../../examples/files/preference/), [preferences](../../examples/piu/preferences/)
+- **ソースコード:** [preference](../../modules/files/preference/)
+- **関連する例:** [preference](../../examples/files/preference/), [preferences](../../examples/piu/preferences/)
 
-The `Preference` class provides storage of persistent preference storage. Preferences are appropriate for storing small amounts of data that needs to persist between runs of an application.
+`Preference` クラスは永続的な設定の保存を提供します。設定は、アプリケーションの実行間で持続する必要がある少量のデータを保存するのに適しています。
 
 ```js
 import Preference from "preference";
 ```
 
-Preferences are grouped by domain. A domain contains one or more keys. Each domain/key pair holds a single value, which is either a `Boolean`, integer (e.g. `Number` with no fractional part), `String` or `ArrayBuffer`.
+設定はドメインごとにグループ化されます。ドメインには1つ以上のキーが含まれます。各ドメイン/キーのペアは、`Boolean`、整数（例：小数部分のない `Number`）、`String` または `ArrayBuffer` のいずれかの単一の値を保持します。
 
 ```js
 const domain = "wifi";
@@ -647,18 +646,18 @@ let ssid = Preference.get(domain, "ssid");
 let password = Preference.get(domain, "psk");
 ```
 
-Limits on the length of key/domain names and preference values vary by target platform.
+キー/ドメイン名および設定値の長さの制限は、ターゲットプラットフォームによって異なります。
 
- - On ESP8266, key/domain names are limited to 32 characters and values are limited to 63 bytes.
- - On ESP32, the `Preference` class is backed by the ESP-IDF's [NVS Library](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/storage/nvs_flash.html) which limits key/domain names to 15 characters and values to 4000 bytes.
+ - ESP8266では、キー/ドメイン名は32文字に制限され、値は63バイトに制限されます。
+ - ESP32では、`Preference` クラスはESP-IDFの [NVSライブラリ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/storage/nvs_flash.html) によってサポートされており、キー/ドメイン名は15文字、値は4000バイトに制限されます。
 
-On embedded devices the storage space for preferences is limited. The amount depends on the device, but it can be as little as 4 KB. Consequently, applications should take care to keep their  preferences as small as practical.
+組み込みデバイスでは、設定のためのストレージスペースは限られています。その容量はデバイスによりますが、4 KB程度しかない場合もあります。そのため、アプリケーションは設定をできるだけ小さく保つように注意する必要があります。
 
-> **Note**: On embedded devices, preferences are stored in SPI flash which has a limited number of erase cycles. Applications should minimize the number of write operations (set and delete). In practice, this isn't a significant concern. However, an application that updates preferences once per minute, for example, could eventually exceed the available erase cycles for the preference storage area in SPI flash.
+> **注意**: 組み込みデバイスでは、設定は消去サイクルが限られているSPIフラッシュに保存されます。アプリケーションは書き込み操作（設定と削除）の回数を最小限に抑えるべきです。実際には、これは大きな問題ではありません。しかし、例えば設定を1分ごとに更新するアプリケーションは、最終的にSPIフラッシュの設定保存領域の消去サイクルを超える可能性があります。
 
 ### `static set(domain, key, value)`
 
-The static `set` function sets a preference value.
+静的な `set` 関数は設定値を設定します。
 
 ```js
 Preference.set("wifi", "ssid", "linksys");
@@ -670,7 +669,7 @@ Preference.set("wifi", "channel", 6);
 
 ### `static get(domain, key)`
 
-The static `get` function reads a preference value. If the preference does not exist, `get` returns `undefined`.
+静的な `get` 関数は設定値を読み取ります。設定が存在しない場合、`get` は `undefined` を返します。
 
 ```js
 let value = Preference.get("settings", "timezone");
@@ -682,7 +681,7 @@ if (value !== undefined)
 
 ### `static delete(domain, key)`
 
-The static `delete` function removes a preference. If the preference does not exist, no error is thrown.
+静的な `delete` 関数は、設定を削除します。設定が存在しない場合、エラーはスローされません。
 
 ```js
 Preference.delete("wifi", "password");
@@ -692,7 +691,7 @@ Preference.delete("wifi", "password");
 
 ### `static keys(domain)`
 
-Returns an array of all keys under the given domain.
+指定されたドメインのすべてのキーの配列を返します。
 
 ```js
 let wifiKeys = Preference.keys("wifi");
@@ -705,46 +704,46 @@ for (let key of wifiKeys)
 <a id="flash"></a>
 ## class Flash
 
-- **Source code:** [file](../../modules/files/flash)
+- **ソースコード:** [file](../../modules/files/flash)
 
-The `Flash` class provides access to flash memory partitions.
+`Flash` クラスはフラッシュメモリパーティションへのアクセスを提供します。
 
 ### `constructor(name)`
-The Flash constructor creates an instance bound to the partition indicated by the `name` argument. The names of available partitions, if any, are host-dependent.
+Flashコンストラクタは、`name` 引数で示されるパーティションにバインドされたインスタンスを作成します。利用可能なパーティションの名前は、ホストに依存します。
 
 ***
 ### `close()`
 
-Releases all resources held by the Flash instance. Calls to any methods of the instance made after calling `close()` throw.
+Flashインスタンスが保持するすべてのリソースを解放します。`close()` を呼び出した後にインスタンスのメソッドを呼び出すと、例外がスローされます。
 
 ***
 ### `erase(block)`
 
-Erases one block of the flash partition. The `block` argument is the index of the block within the partition, starting with block 0. To convert from block number to index, multiply by the instance's `blockSize`.
+フラッシュパーティションの1ブロックを消去します。`block` 引数はパーティション内のブロックのインデックスで、ブロック0から始まります。ブロック番号からインデックスに変換するには、インスタンスの `blockSize` を掛けます。
 
 ***
 ### `read(offset, byteLength)`
 
-Reads `byteLength` bytes starting at byte `offset` in the partition into an `ArrayBuffer`.
+パーティション内のバイト `offset` から `byteLength` バイトを `ArrayBuffer` に読み込みます。
 
 ***
 ### `write(offset, byteLength, buffer)`
 
-Writes the first `byteLength` bytes from `buffer` starting at byte `offset` in the partition. The `buffer` argument may be any byte buffer.
+パーティション内のバイト `offset` から `buffer` の最初の `byteLength` バイトを書き込みます。`buffer` 引数は任意のバイトバッファで構いません。
 
 ***
 ### `map()`
-Returns a read-only host buffer that may be wrapped in a view to read directly from the flash partition. If `map()` is not supported by the host, the function throws an exception.
+フラッシュパーティションから直接読み取るためにビューにラップできる読み取り専用のホストバッファを返します。ホストが `map()` をサポートしていない場合、この関数は例外をスローします。
 
 ***
 
 ### `byteLength`
-The read-only `byteLength` property provides the size of the flash partition.
+読み取り専用の `byteLength` プロパティは、フラッシュパーティションのサイズを提供します。
 
 ***
 ### `blockSize`
-The read-only `blockSize` property provides the size of a block (aka sector) in the flash partition. Using this value is recommended instead of hard-coding the common flash block size of `4096`.
+読み取り専用の `blockSize` プロパティは、フラッシュパーティション内のブロック（セクターとも呼ばれる）のサイズを提供します。この値を使用することが、一般的なフラッシュブロックサイズ `4096` をハードコーディングする代わりに推奨されます。
 
 ***
 
-**Note**. The `readString()` API is experimental and should not be used in production. It is potentially unsafe because it assumes that the input is a valid UTF-8 string.
+**注意**。`readString()` APIは実験的なものであり、本番環境で使用すべきではありません。入力が有効なUTF-8文字列であると仮定しているため、潜在的に安全ではありません。
