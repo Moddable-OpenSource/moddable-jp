@@ -18,7 +18,7 @@
  *
  */
 
-const { openSync, writeSync } = require('node:fs');
+const fs = require('node:fs');
 const { Buffer } = require('node:buffer');
 
 const { Machine } = require('./xsbug-machine.js');
@@ -40,9 +40,26 @@ class LogMachine extends Machine {
 		this.log += data;
 		if (this.log.endsWith("\n")) {
 			if (this.log.startsWith("|:") && this.log.endsWith(":|\n")) {
-				if (!this.binaryOutput)
-					this.binaryOutput = openSync(process.env.MODDABLE + "/build/tmp/log.bin", "w+");
-				writeSync(this.binaryOutput, Buffer.from(this.log.slice(2, this.log.length - 4), "base64"), 0);
+				const payload = this.log.slice(2, this.log.length - 3);
+				if (payload.startsWith("@filename ")) {
+					const parts = payload.split(" ");
+					if (parts[1])
+						this.binaryName = parts[1];
+				}
+				else if (payload.startsWith("@close")) {
+					if (this.binaryOutput)
+						fs.closeSync(this.binaryOutput);
+					delete this.binaryOutput;
+					delete this.binaryName;
+				}
+				else if (payload.startsWith("@")) {
+					console.log(`ignoring ${payload}`);
+				}
+				else if (payload) {
+					if (!this.binaryOutput)
+						this.binaryOutput = fs.openSync(process.env.MODDABLE + "/build/tmp/" + (this.binaryName ? this.binaryName : "log.bin"), "w+");
+					fs.writeSync(this.binaryOutput, Buffer.from(payload, "base64"), 0);
+				}
 			}
 			else
 				console.log(this.log.slice(0, this.log.length - 1));
