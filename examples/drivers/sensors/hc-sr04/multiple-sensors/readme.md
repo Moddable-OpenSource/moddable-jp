@@ -1,5 +1,5 @@
-This example demonstrates how to trigger and read from multiple HC-SR04 sensors in a round-robin fashion.
+このサンプルでは、複数のHC-SR04センサーをラウンドロビン方式でトリガーし、読み取る方法を示します。
 
-The Echo pins are all connected to a shared bus (ESP32 GPIO 12 by default) while each HC-SR04 needs a separate trigger pin (ESP32 GPIOs 13, 14, and 27 by default). To avoid damage to the HC-SR04 sensors, the Echo pins must be electrically isolated from each other. That can be accomplished with diodes, as shown in the diagram below:
+Echoピンはすべて共有バス（デフォルトではESP32 GPIO 12）に接続されている一方で、各HC-SR04には別々のトリガーピン（デフォルトではESP32 GPIO 13、14、および27）が必要です。HC-SR04センサーを損傷から守るために、Echoピンは互いに電気的に分離されている必要があります。これは、以下の図に示すようにダイオードを使用して達成できます。
 
 ![](circuit.png)
