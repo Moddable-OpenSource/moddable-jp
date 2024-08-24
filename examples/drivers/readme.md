@@ -136,7 +136,7 @@ ePaperディスプレイに基本的なデジタル時計を描画し、1分ご�
 
 ### [`m5stack-imu`](./m5stack-imu)
 
-[Commodetto](../../documentation/commodetto/commodetto.md)アプリは、[M5Stack Fire](https://www.aliexpress.com/item/32847906756.html?spm=2114.12010615.8148356.14.11c127aeBNzJBb)用です。オンボードのInvenSense MPU-6050加速度計/ジャイロとXtrinsic MAG3110磁力計のデータに基づいてデバイスの動きを視覚化します。
+[M5Stack Fire](https://www.aliexpress.com/item/32847906756.html?spm=2114.12010615.8148356.14.11c127aeBNzJBb)用の[Commodetto](../../documentation/commodetto/commodetto.md)アプリです。オンボードのInvenSense MPU-6050加速度計/ジャイロとXtrinsic MAG3110磁力計のデータに基づいてデバイスの動きを視覚化します。
 
 ***
 
