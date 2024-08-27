@@ -107,7 +107,6 @@ endif
 
 # LINK_OPTIONS = -arch i386 -dynamiclib -flat_namespace -undefined suppress -Wl,-exported_symbol,_fxScreenLaunch -Wl,-dead_strip
 LINK_OPTIONS = \
-	-s ASYNCIFY=1\
 	-s ENVIRONMENT=web\
 	-s ALLOW_MEMORY_GROWTH=1\
 	-s MODULARIZE=1\
