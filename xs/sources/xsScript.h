@@ -52,6 +52,7 @@ typedef struct sxScope txScope;
 typedef struct sxParser txParser;
 typedef struct sxParserChunk txParserChunk;
 typedef struct sxParserJump txParserJump;
+typedef struct sxParserState txParserState;
 
 typedef struct sxByteCode txByteCode;
 typedef struct sxBigIntCode txBigIntCode;
@@ -586,6 +587,23 @@ struct sxParserJump {
 	txParserJump* nextJump;
 };
 
+struct sxParserState {
+	int line;
+	int crlf;
+	int escaped;
+	txBigInt bigint;
+	txInteger integer;
+	txSize modifierLength;
+	txString modifier;
+	txNumber number;
+	txSize rawLength;
+	txString raw;
+	txSize stringLength;
+	txString string;
+	txSymbol* symbol;
+	txToken token;
+};
+
 struct sxParser {
 	txParserChunk* first;
 	txParserJump* firstJump;
@@ -615,35 +633,7 @@ struct sxParser {
 #if mxCESU8
 	txU4 surrogate;
 #endif
-	int line;
-	int crlf;
-	int escaped;
-	txBigInt bigint;
-	txInteger integer;
-	txSize modifierLength;
-	txString modifier;
-	txNumber number;
-	txSize rawLength;
-	txString raw;
-	txSize stringLength;
-	txString string;
-	txSymbol* symbol;
-	txToken token;
-
-	int line2;
-	int crlf2;
-	int escaped2;
-	txBigInt bigint2;
-	txInteger integer2;
-	txSize modifierLength2;
-	txString modifier2;
-	txNumber number2;
-	txSize rawLength2;
-	txString raw2;
-	txSize stringLength2;
-	txString string2;
-	txSymbol* symbol2;
-	txToken token2;
+	txParserState states[3];
 	
 	txSymbol* function;
 
@@ -966,11 +956,12 @@ extern void fxCheckStrictKeyword(txParser* parser);
 extern void fxGetNextCharacter(txParser* parser);
 extern void fxGetNextRegExp(txParser* parser, txU4 c);
 extern void fxGetNextToken(txParser* parser);
-extern void fxGetNextToken2(txParser* parser);
 extern void fxGetNextTokenTemplate(txParser* parser);
 extern void fxGetNextTokenJSON(txParser* parser);
 extern void fxGetNextTokenJSXAttribute(txParser* parser);
 extern void fxGetNextTokenJSXChild(txParser* parser);
+extern void fxLookAheadOnce(txParser* parser);
+extern void fxLookAheadTwice(txParser* parser);
 
 /* xsSyntaxical.c */
 
