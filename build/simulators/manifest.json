@@ -14,12 +14,22 @@
 	],
 	"platforms": {
 		"lin": {
+			"modules": {
+				"*": [
+					"$(MODULES)/base/timer/modTimer"
+				]
+			}
 		},
 		"lin/*": {
 			"build": {
 				"SIMULATORS": "$(BUILD_SIMULATOR)"
 			},
-			"include": "./$(SUBPLATFORM)/manifest.json"
+			"include": "./$(SUBPLATFORM)/manifest.json",
+			"modules": {
+				"*": [
+					"$(MODULES)/base/timer/modTimer"
+				]
+			}
 		},
 		"mac": {
 			"modules": {
