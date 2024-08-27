@@ -4310,7 +4310,7 @@ STACK_OVERFLOW:
 
 #ifdef mxMetering
 
-void fxBeginMetering(txMachine* the, txBoolean (*callback)(txMachine*, txU4), txU4 interval)
+void fxBeginMetering(txMachine* the, txBoolean (*callback)(txMachine*, txU8), txU8 interval)
 {
 	the->meterCallback = callback;
 	the->meterCount = ((txU8)interval) << 16;

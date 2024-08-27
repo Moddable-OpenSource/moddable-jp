@@ -498,7 +498,7 @@ struct sxMachine {
 	void (*onBreak)(txMachine*, txU1 stop);
 #endif
 #ifdef mxMetering
-	txBoolean (*meterCallback)(txMachine*, txU4);
+	txBoolean (*meterCallback)(txMachine*, txU8);
 	txU8 meterCount;
 	txU8 meterIndex;
 	txU8 meterInterval;
@@ -715,7 +715,7 @@ mxExport void fxImport(txMachine*);
 mxExport void fxImportNow(txMachine*);
 
 #ifdef mxMetering
-mxExport void fxBeginMetering(txMachine* the, txBoolean (*callback)(txMachine*, txU4), txU4 interval);
+mxExport void fxBeginMetering(txMachine* the, txBoolean (*callback)(txMachine*, txU8), txU8 interval);
 mxExport void fxCheckMetering(txMachine* the);
 mxExport void fxEndMetering(txMachine* the);
 #endif
