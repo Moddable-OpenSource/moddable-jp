@@ -44,7 +44,10 @@ UF2_VOLUME_NAME ?= RPI-RP2
 PICO_VID ?= 2e8a
 PICO_PID ?= 000a
 
-UF2CONV = $(PICO_SDK_DIR)/build/elf2uf2/elf2uf2
+# UF2CONV = $(PICO_SDK_DIR)/build/elf2uf2/elf2uf2
+UF2CONV = $(PICO_SDK_DIR)/build/_deps/picotool/picotool
+
+PICO_SUBCLASS ?= rp2040
 
 # spot-check installation
 ifeq ($(wildcard $(PICO_ROOT)),)
@@ -131,25 +134,23 @@ ASMFLAGS += $(FP_OPTS)
 # Linker flags
 
 LDFLAGS += \
+	-mcpu=cortex-m0plus			\
 	-mthumb						\
 	-march=armv6-m				\
-	-mcpu=cortex-m0plus			\
 	-Wl,--build-id=none			\
-	--specs=nosys.specs			\
+	-Wl,-Map=$(BIN_DIR)/xs_pico.map		\
+	--specs=nosys.specs	
 
 LDFLAGS += \
-	-Wl,--wrap=sprintf			\
-	-Wl,--wrap=snprintf			\
-	-Wl,--wrap=vsnprintf		\
 	-Wl,--wrap=__clzsi2			\
 	-Wl,--wrap=__clzdi2			\
 	-Wl,--wrap=__ctzsi2			\
-	-Wl,--wrap=__ctzdi2			\
 	-Wl,--wrap=__popcountsi2			\
 	-Wl,--wrap=__popcountdi2			\
 	-Wl,--wrap=__clz			\
 	-Wl,--wrap=__clzl			\
 	-Wl,--wrap=__clzll			\
+	-Wl,--wrap=__clzdi2			\
 	-Wl,--wrap=__aeabi_idiv			\
 	-Wl,--wrap=__aeabi_idivmod			\
 	-Wl,--wrap=__aeabi_ldivmod			\
@@ -291,15 +292,17 @@ LDFLAGS += \
 	-Wl,--wrap=__aeabi_memset4			\
 	-Wl,--wrap=__aeabi_memcpy8			\
 	-Wl,--wrap=__aeabi_memset8			\
-	-Wl,-Map=$(BIN_DIR)/xs_pico.map		\
 	-Wl,--script=$(LINKER_SCRIPT)		\
 	-Wl,-z,max-page-size=4096	\
 	-Wl,--gc-sections		\
+	-Wl,--wrap=sprintf			\
+	-Wl,--wrap=snprintf			\
+	-Wl,--wrap=vsnprintf			\
 	-Wl,--wrap=printf			\
 	-Wl,--wrap=vprintf			\
 	-Wl,--wrap=puts				\
 	-Wl,--wrap=putchar			\
-	-Wl,--wrap=getchar			\
+	-Wl,--wrap=getchar
 
 
 LIB_FILES += \
@@ -308,54 +311,62 @@ LIB_FILES += \
 INC_DIRS = \
 	$(TMP_DIR)	\
 	$(PICO_SDK_DIR)/src/boards/include	\
-	$(PICO_SDK_DIR)/src/common/pico_base/include	\
+	$(PICO_SDK_DIR)/src/common/boot_picobin_headers/include	\
+	$(PICO_SDK_DIR)/src/common/boot_picoboot_headers/include	\
+	$(PICO_SDK_DIR)/src/common/hardware_claim/include	\
+	$(PICO_SDK_DIR)/src/common/pico_base_headers/include	\
 	$(PICO_SDK_DIR)/src/common/pico_binary_info/include	\
 	$(PICO_SDK_DIR)/src/common/pico_bit_ops/include	\
 	$(PICO_SDK_DIR)/src/common/pico_divider/include	\
-	$(PICO_SDK_DIR)/src/common/pico_stdlib/include	\
+	$(PICO_SDK_DIR)/src/common/pico_stdlib_headers/include	\
 	$(PICO_SDK_DIR)/src/common/pico_sync/include	\
 	$(PICO_SDK_DIR)/src/common/pico_time/include	\
-	$(PICO_SDK_DIR)/src/common/pico_usb_reset_interface/include		\
+	$(PICO_SDK_DIR)/src/common/pico_usb_reset_interface_headers/include		\
 	$(PICO_SDK_DIR)/src/common/pico_util/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/boot_stage2/include		\
+	$(PICO_SDK_DIR)/src/$(PICO_SUBCLASS)/hardware_regs/include \
+	$(PICO_SDK_DIR)/src/$(PICO_SUBCLASS)/hardware_structs/include \
+	$(PICO_SDK_DIR)/src/$(PICO_SUBCLASS)/pico_platform/include \
+	$(PICO_SDK_DIR)/src/host/pico_platform/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/hardware_adc/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_base/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_boot_lock/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_clocks/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_dma/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_divider/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_flash/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/hardware_gpio/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/hardware_i2c/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_spi/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_pwm/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_base/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_claim/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_sync/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_uart/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_divider/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_timer/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_clocks/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_irq/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/hardware_pio/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_dma/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_pll/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_pwm/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/hardware_resets/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_spi/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_sync/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_sync_spin_lock/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_ticks/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_timer/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_uart/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_vreg/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/hardware_watchdog/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/hardware_xosc/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_pll/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_vreg/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_irq/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_flash/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_atomic/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_bootrom/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_double/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_fix/$(PICO_SUBCLASS)_usb_device_enumeration/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_float/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/pico_int64_ops/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_malloc/include		\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_platform_compiler/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_platform_panic/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_platform_sections/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_printf/include	\
-	$(PICO_SDK_DIR)/src/rp2_common/pico_platform/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_runtime_init/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_runtime/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_stdio/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_stdio_usb/include	\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_time_adapter/include	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_unique_id/include	\
-	$(PICO_SDK_DIR)/src/rp2040/hardware_regs/include	\
-	$(PICO_SDK_DIR)/src/rp2040/hardware_structs/include	\
-	$(PICO_SDK_DIR)/lib/tinyusb/src		\
-	$(PICO_SDK_DIR)/lib/tinyusb/src/common		\
-	$(PICO_SDK_DIR)/lib/tinyusb/hw		\
+	$(PICO_SDK_DIR)/lib/tinyusb/src	 \
 	$(XS_DIR)/../modules/files/preference \
 	$(XS_DIR)/../modules/base/instrumentation \
 	$(XS_DIR)/../modules/base/timer \
@@ -442,37 +453,39 @@ PICO_OBJ = \
 	$(LIB_DIR)/adc.c.o \
 	$(LIB_DIR)/async_context_base.c.o \
 	$(LIB_DIR)/async_context_poll.c.o \
-	$(LIB_DIR)/binary_info.c.o \
+	$(LIB_DIR)/atomic.c.o \
+	$(LIB_DIR)/bs2_default_padded_checksummed.S.o \
 	$(LIB_DIR)/bit_ops_aeabi.S.o \
 	$(LIB_DIR)/bootrom.c.o \
-	$(LIB_DIR)/bs2_default_padded_checksummed.S.o \
 	$(LIB_DIR)/claim.c.o \
 	$(LIB_DIR)/clocks.c.o \
-	$(LIB_DIR)/crt0.S.o \
 	$(LIB_DIR)/critical_section.c.o \
+	$(LIB_DIR)/crt0.S.o \
 	$(LIB_DIR)/datetime.c.o \
+	$(LIB_DIR)/divider.S.o \
+	$(LIB_DIR)/divider_hardware.S.o \
 	$(LIB_DIR)/dma.c.o	\
-	$(LIB_DIR)/double_aeabi.S.o \
-	$(LIB_DIR)/double_init_rom.c.o \
+	$(LIB_DIR)/double_aeabi_$(PICO_SUBCLASS).S.o \
+	$(LIB_DIR)/double_init_rom_$(PICO_SUBCLASS).c.o \
 	$(LIB_DIR)/double_math.c.o \
-	$(LIB_DIR)/double_v1_rom_shim.S.o \
+	$(LIB_DIR)/double_v1_rom_shim_$(PICO_SUBCLASS).S.o \
 	$(LIB_DIR)/flash.c.o \
-	$(LIB_DIR)/float_aeabi.S.o \
-	$(LIB_DIR)/float_init_rom.c.o \
+	$(LIB_DIR)/float_aeabi_$(PICO_SUBCLASS).S.o \
+	$(LIB_DIR)/float_init_rom_$(PICO_SUBCLASS).c.o \
 	$(LIB_DIR)/float_math.c.o \
-	$(LIB_DIR)/float_v1_rom_shim.S.o \
+	$(LIB_DIR)/float_v1_rom_shim_$(PICO_SUBCLASS).S.o \
 	$(LIB_DIR)/gpio.c.o \
- 	$(LIB_DIR)/hardware_divider.S.o \
 	$(LIB_DIR)/i2c.c.o \
 	$(LIB_DIR)/irq.c.o \
 	$(LIB_DIR)/irq_handler_chain.S.o \
 	$(LIB_DIR)/lock_core.c.o \
+	$(LIB_DIR)/malloc.c.o \
 	$(LIB_DIR)/mem_ops_aeabi.S.o \
 	$(LIB_DIR)/mutex.c.o \
+	$(LIB_DIR)/newlib_interface.c.o \
+	$(LIB_DIR)/panic.c.o \
 	$(LIB_DIR)/pheap.c.o \
-	$(LIB_DIR)/pico_divider.S.o \
 	$(LIB_DIR)/pico_int64_ops_aeabi.S.o \
-	$(LIB_DIR)/pico_malloc.c.o \
 	$(LIB_DIR)/pio.c.o	\
 	$(LIB_DIR)/platform.c.o \
 	$(LIB_DIR)/pll.c.o \
@@ -480,32 +493,39 @@ PICO_OBJ = \
 	$(LIB_DIR)/queue.c.o \
 	$(LIB_DIR)/rand.c.o \
 	$(LIB_DIR)/reset_interface.c.o \
-	$(LIB_DIR)/rp2040_usb_device_enumeration.c.o \
 	$(LIB_DIR)/runtime.c.o \
+	$(LIB_DIR)/runtime_init.c.o \
+	$(LIB_DIR)/runtime_init_clocks.c.o \
+	$(LIB_DIR)/runtime_init_stack_guard.c.o \
 	$(LIB_DIR)/sem.c.o \
 	$(LIB_DIR)/spi.c.o \
+	$(LIB_DIR)/standard_binary_info.c.o \
 	$(LIB_DIR)/stdlib.c.o \
+	$(LIB_DIR)/stdio.c.o \
+	$(LIB_DIR)/stdio_usb.c.o \
+	$(LIB_DIR)/stdio_usb_descriptors.c.o \
 	$(LIB_DIR)/sync.c.o \
+	$(LIB_DIR)/sync_spin_lock.c.o \
+	$(LIB_DIR)/ticks.c.o \
 	$(LIB_DIR)/time.c.o \
 	$(LIB_DIR)/timeout_helper.c.o \
 	$(LIB_DIR)/timer.c.o \
+ 	$(LIB_DIR)/uart.c.o \
+ 	$(LIB_DIR)/unique_id.c.o \
 	$(LIB_DIR)/vreg.c.o \
 	$(LIB_DIR)/watchdog.c.o \
 	$(LIB_DIR)/xosc.c.o \
 	\
-	$(LIB_DIR)/stdio.c.o \
-	$(LIB_DIR)/stdio_usb.c.o \
-	$(LIB_DIR)/stdio_usb_descriptors.c.o \
-	$(LIB_DIR)/dcd_rp2040.c.o \
-	$(LIB_DIR)/rp2040_usb.c.o \
+	$(LIB_DIR)/dcd_$(PICO_SUBCLASS).c.o \
+	$(LIB_DIR)/$(PICO_SUBCLASS)_usb.c.o \
 	$(LIB_DIR)/usbd.c.o \
 	$(LIB_DIR)/usbd_control.c.o \
 	$(LIB_DIR)/cdc_device.c.o \
 	$(LIB_DIR)/vendor_device.c.o \
 	$(LIB_DIR)/tusb.c.o \
 	$(LIB_DIR)/tusb_fifo.c.o \
- 	$(LIB_DIR)/uart.c.o \
- 	$(LIB_DIR)/unique_id.c.o \
+	$(LIB_DIR)/$(PICO_SUBCLASS)_usb_device_enumeration.c.o
+
 
 LWIP_OBJ = \
 	$(LIB_DIR)/cyw43_lwip.c.o	\
@@ -521,6 +541,7 @@ LWIP_OBJ = \
 	$(LIB_DIR)/raw.c.o	\
 	$(LIB_DIR)/stats.c.o	\
 	$(LIB_DIR)/sys.c.o	\
+	\
 	$(LIB_DIR)/altcp.c.o	\
 	$(LIB_DIR)/altcp_alloc.c.o	\
 	$(LIB_DIR)/altcp_tcp.c.o	\
@@ -566,41 +587,52 @@ PICO_OBJ += \
 
 
 PICO_SRC_DIRS = \
+	$(PICO_SDK_DIR)/src/$(PICO_SUBCLASS)/pico_platform	\
+	$(PICO_SDK_DIR)/src/common/hardware_claim		\
 	$(PICO_SDK_DIR)/src/common/pico_sync				\
 	$(PICO_SDK_DIR)/src/common/pico_time				\
 	$(PICO_SDK_DIR)/src/common/pico_util				\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_dma			\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_pio			\
 	$(PICO_SDK_DIR)/src/rp2_common/hardware_adc			\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_gpio		\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_pwm			\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_i2c			\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_spi			\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_claim		\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_sync		\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_flash		\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_uart		\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_divider		\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_timer		\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_boot_lock	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_dma			\
 	$(PICO_SDK_DIR)/src/rp2_common/hardware_clocks		\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_divider		\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_flash		\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_gpio		\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_i2c			\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_irq			\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_pio			\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_pll			\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_pwm			\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_spi			\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_sync		\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_sync_spin_lock	\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_timer		\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_ticks		\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_uart		\
+	$(PICO_SDK_DIR)/src/rp2_common/hardware_vreg		\
 	$(PICO_SDK_DIR)/src/rp2_common/hardware_watchdog	\
 	$(PICO_SDK_DIR)/src/rp2_common/hardware_xosc		\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_pll			\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_vreg		\
-	$(PICO_SDK_DIR)/src/rp2_common/hardware_irq			\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_async_context	\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_atomic		\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_bit_ops			\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_bootrom			\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_crt0			\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_clib_interface	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_double			\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_int64_ops		\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_float			\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_malloc			\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_mem_ops			\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_printf			\
-	$(PICO_SDK_DIR)/src/rp2_common/pico_platform		\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_platform_compiler		\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_platform_panic		\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_platform_sections		\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_rand				\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_runtime			\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_runtime_init			\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_stdlib			\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_standard_binary_info	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_standard_link	\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_stdio			\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_stdio_usb		\
@@ -624,7 +656,7 @@ PICO_SRC_DIRS += \
 	$(PICO_SDK_DIR)/lib/lwip/src/netif					\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_lwip			\
 	$(PICO_SDK_DIR)/src/rp2_common/pico_cyw43_arch		\
-	$(PICO_SDK_DIR)/src/rp2_common/pico_cyw43_driver	\
+	$(PICO_SDK_DIR)/src/rp2_common/pico_cyw43_driver
 
 SDK_GLUE_OBJ = \
 	$(TMP_DIR)/xsmain.c.o \
@@ -653,63 +685,73 @@ SIZE  = $(TOOLS_BIN)/$(TOOLS_PREFIX)size
 
 AR_FLAGS = crs
 
-#	-DmxNoConsole=1
-#	-DPICO_DEBUG_MALLOC=1
-
 PICO_SDK_DEFINES= \
 	-DPICO_STDIO_ENABLE_CRLF_SUPPORT=0 \
 	-DPICO_STDIO_USB_DEFAULT_CRLF=0 \
 	-DPICO_STDIO_DEFAULT_CRLF=0 \
-	-DPICO_DEBUG_MALLOC_LOW_WATER=0	\
+	-DPICO_DEBUG_MALLOC_LOW_WATER=1	\
 	-DPICO_DEFAULT_UART_BAUD_RATE=$(DEBUGGER_SPEED) \
 	-DPICO_HEAP_SIZE=0xC000 \
 -DPICO_AUDIO_I2S_MONO_INPUT=1 \
 -DPICO_MAX_SHARED_IRQ_HANDLERS=6u
 
-PICO_C_DEFINES= \
+PICO_C_DEFINES = \
 	$(PICO_SDK_DEFINES) \
 	-DCFG_TUSB_DEBUG=0 \
-	-DCFG_TUSB_MCU=OPT_MCU_RP2040 \
 	-DCFG_TUSB_OS=OPT_OS_PICO \
+	-DLIB_PICO_ATOMIC=1		\
 	-DLIB_PICO_BIT_OPS=1	\
 	-DLIB_PICO_BIT_OPS_PICO=1	\
+-DLIB_PICO_CLIB_INTERFACE=1	\
+-DLIB_PICO_CRT0=1	\
+-DLIB_PICO_CXX_OPTIONS=1	\
 	-DLIB_PICO_DIVIDER=1	\
 	-DLIB_PICO_DIVIDER_HARDWARE=1	\
 	-DLIB_PICO_DOUBLE=1	\
 	-DLIB_PICO_DOUBLE_PICO=1	\
+-DLIB_PICO_FIX_RP2040_USB_DEVICE_ENUMERATION=1	\
 	-DLIB_PICO_FLOAT=1	\
 	-DLIB_PICO_FLOAT_PICO=1	\
 	-DLIB_PICO_INT64_OPS=1	\
 	-DLIB_PICO_INT64_OPS_PICO=1	\
 	-DLIB_PICO_MALLOC=1	\
+	-DLIB_PICO_MEM_OPS=1	\
 	-DLIB_PICO_MEM_OPS_PICO=1	\
+-DLIB_NEWLIB_INTERFACE=1	\
 	-DLIB_PICO_PLATFORM=1	\
+-DLIB_PICO_PLATFORM_COMPILER=1	\
+-DLIB_PICO_PLATFORM_PANIC=1	\
+-DLIB_PICO_PLATFORM_SECTIONS=1	\
 	-DLIB_PICO_PRINTF=1	\
 	-DLIB_PICO_PRINTF_PICO=1	\
-	-DLIB_PICO_RAND=1	\
 	-DLIB_PICO_RUNTIME=1	\
+	-DLIB_PICO_RUNTIME_INIT=1	\
+	-DLIB_PICO_STANDARD_BINARY_INFO=1	\
 	-DLIB_PICO_STANDARD_LINK=1	\
 	-DLIB_PICO_STDIO=1	\
 	-DLIB_PICO_STDIO_USB=1	\
 	-DLIB_PICO_STDLIB=1	\
 	-DLIB_PICO_SYNC=1	\
-	-DLIB_PICO_SYNC_CORE=1	\
 	-DLIB_PICO_SYNC_CRITICAL_SECTION=1	\
 	-DLIB_PICO_SYNC_MUTEX=1	\
 	-DLIB_PICO_SYNC_SEM=1	\
 	-DLIB_PICO_TIME=1	\
+	-DLIB_PICO_TIME_ADAPTER=1	\
 	-DLIB_PICO_UNIQUE_ID=1	\
 	-DLIB_PICO_UTIL=1	\
+-DPICO_32BIT=1	\
 	-DPICO_BUILD=1	\
 	-DPICO_COPY_TO_RAM=0	\
 	-DPICO_CXX_ENABLE_EXCEPTIONS=0	\
+-DPICO_EXTRAS=1		\
 	-DPICO_NO_FLASH=0	\
 	-DPICO_NO_HARDWARE=0	\
 	-DPICO_ON_DEVICE=1	\
 	-DPICO_PROGRAM_URL=\"https://github.com/Moddable-OpenSource\"	\
 	-DPICO_TARGET_NAME=\"$(NAME)\"	\
-	-DPICO_USE_BLOCKED_RAM=0 \
-	-DLIB_PICO_FIX_RP2040_USB_DEVICE_ENUMERATION=1	\
+	-DPICO_USE_BLOCKED_RAM=0
+
+#	-DPICO_DEBUG_MALLOC=1
 
 PICO_C_DEFINES += \
 	-DCYW43_LWIP=1				\
@@ -725,6 +767,18 @@ PICO_C_DEFINES += \
 	-DPICO_BOARD=\"pico\"
 endif
 BOARD_INCLUDE = -include $(PICO_SDK_DIR)/src/boards/include/boards/pico_w.h
+
+
+ifeq ("$(PICO_SUBCLASS)","rp2040")
+PICO_C_DEFINES += \
+	-DPICO_RP2040=1	\
+	-DCFG_TUSB_MCU=OPT_MCU_RP2040
+else
+PICO_C_DEFINES += \
+	-DPICO_RP2350=1
+	-DCFG_TUSB_MCU=OPT_MCU_RP2350
+endif
+
 
 C_DEFINES = \
 	$(PICO_C_DEFINES) \
@@ -842,7 +896,7 @@ allclean:
 
 $(BIN_DIR)/xs_pico.uf2: $(BIN_DIR)/xs_pico.elf
 	@echo Making: $(BIN_DIR)/xs_pico.uf2 from xs_pico.elf
-	$(UF2CONV) $(BIN_DIR)/xs_pico.elf $(BIN_DIR)/xs_pico.uf2
+	$(UF2CONV) uf2 convert $(BIN_DIR)/xs_pico.elf $(BIN_DIR)/xs_pico.uf2 --family $(PICO_SUBCLASS) --abs-block
 
 xsbug:
 	$(KILL_SERIAL2XSBUG)
@@ -931,9 +985,9 @@ $(LIB_DIR)/hardware_divider.S.o: $(PICO_SDK_DIR)/src/rp2_common/hardware_divider
 	@echo "# asm (special) " $(PICO_SDK_DIR)/src/rp2_common/hardware_divider/divider.S
 	$(CC) $(C_FLAGS) $(C_INCLUDES) $(C_DEFINES) $< -o $(LIB_DIR)/hardware_divider.S.o
 
-$(LIB_DIR)/pico_divider.S.o: $(PICO_SDK_DIR)/src/rp2_common/pico_divider/divider.S
+$(LIB_DIR)/divider_hardware.S.o: $(PICO_SDK_DIR)/src/rp2_common/pico_divider/divider_hardware.S
 	@echo "# asm  (special)" $(<F)
-	$(CC) $(C_FLAGS) $(C_INCLUDES) $(C_DEFINES) $< -o $(LIB_DIR)/pico_divider.S.o
+	$(CC) $(C_FLAGS) $(C_INCLUDES) $(C_DEFINES) $< -o $(LIB_DIR)/divider_hardware.S.o
 
 CYW43_FW_FILE=43439A0-7.95.49.00.combined
 CYW43_FW_PATH=$(PICO_SDK_DIR)/lib/cyw43-driver/firmware
@@ -950,7 +1004,7 @@ $(LIB_DIR)/cyw43_resource.o: $(CYW43_FW_PATH)
 		$@
 
 ##@@ force to 1 while porting
-# MAKEFLAGS_JOBS = --jobs 1
+MAKEFLAGS_JOBS = --jobs 1
 MAKEFLAGS += $(MAKEFLAGS_JOBS)
 ifneq ($(VERBOSE),1)
 MAKEFLAGS += --silent
