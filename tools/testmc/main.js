@@ -22,8 +22,6 @@ import {} from "_262";
 import {} from "harness";
 import ChecksumOut from "commodetto/checksumOut";
 import Timer from "timer";
-import WiFi from "wifi";
-import Net from "net";
 import config from "mc/config";
 import { URL, URLSearchParams } from "url";
 globalThis.URL = URL;
@@ -151,6 +149,11 @@ Object.defineProperty(globalThis, "screen", {
 	}
 });
 
+/* *** For devices without WiFi, comment out the block below
+*/
+import WiFi from "wifi";
+import Net from "net";
+
 globalThis.$NETWORK = {
 	get connected() {
 		if (WiFi.Mode.station !== WiFi.mode)
@@ -192,6 +195,8 @@ globalThis.$NETWORK = {
 	},
 	invalidDomain: "fail.moddable.com",
 };
+/*
+*** end *** for devices without WiFI *** */
 
 class HostObject @ "xs_hostobject_destructor" {
 	constructor() @ "xs_hostobject"
