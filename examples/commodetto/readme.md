@@ -187,7 +187,7 @@ Copyright 2023 Moddable Tech, Inc.<BR>
 
 ![](https://www.moddable.com/assets/commodetto-gifs/static.gif)
 
-`static`のサンプルは、Pocoを使用して効率的に静的をレンダリングする方法を示しています。
+`static`のサンプルは、Pocoを拡張して効率的にstatic（テレビの砂嵐）をレンダリングする方法を示しています。
 
 ***
 
