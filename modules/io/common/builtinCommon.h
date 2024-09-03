@@ -66,6 +66,10 @@ enum {
 	kIOFormatInvalid = 0xFF,
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void builtinGetFormat(xsMachine *the, uint8_t format);
 uint8_t builtinSetFormat(xsMachine *the);
 
@@ -76,6 +80,10 @@ int32_t builtinGetSignedInteger(xsMachine *the, xsSlot *slot);
 uint32_t builtinGetUnsignedInteger(xsMachine *the, xsSlot *slot);
 
 xsSlot *builtinGetCallback(xsMachine *the, xsIdentifier id);
+
+#ifdef __cplusplus
+}
+#endif
 
 #if kPinBanks
 	#define builtinIsPinFree(pin) builtinArePinsFree(pin >> 5, 1 << (pin & 0x1F))
