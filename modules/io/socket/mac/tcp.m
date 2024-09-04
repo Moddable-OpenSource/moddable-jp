@@ -169,10 +169,12 @@ void xs_tcp_constructor(xsMachine *the)
 			char addrStr[32];
 
 			xsmcGet(xsVar(0), xsArg(0), xsID_address);
+			if (xsUndefinedType == xsmcTypeOf(xsVar(0)))
+				xsUnknownError("invalid address");
 			xsmcToStringBuffer(xsVar(0), addrStr, sizeof(addrStr));
 
 			xsmcGet(xsVar(0), xsArg(0), xsID_port);
-			port = xsmcToInteger(xsVar(0));
+			port = builtinGetSignedInteger(the, &xsVar(0)); 
 			if ((port < 0) || (port > 65535))
 				xsRangeError("invalid port");
 
@@ -386,6 +388,7 @@ void xs_tcp_write(xsMachine *the)
 void xs_tcp_get_remoteAddress(xsMachine *the)
 {
 	TCP tcp = xsmcGetHostDataValidate(xsThis, (void *)&xsTCPHooks);
+	if (!tcp->cfSkt) return;
 	CFDataRef address = CFSocketCopyPeerAddress(tcp->cfSkt);
 	const UInt8 *bytes = CFDataGetBytePtr((__bridge CFDataRef)address);
 	struct sockaddr_in addr = *(struct sockaddr_in *)bytes;
@@ -397,6 +400,7 @@ void xs_tcp_get_remoteAddress(xsMachine *the)
 void xs_tcp_get_remotePort(xsMachine *the)
 {
 	TCP tcp = xsmcGetHostDataValidate(xsThis, (void *)&xsTCPHooks);
+	if (!tcp->cfSkt) return;
 	CFDataRef address = CFSocketCopyPeerAddress(tcp->cfSkt);
 	const UInt8 *bytes = CFDataGetBytePtr((__bridge CFDataRef)address);
 	struct sockaddr_in addr = *(struct sockaddr_in *)bytes;
@@ -407,12 +411,14 @@ void xs_tcp_get_remotePort(xsMachine *the)
 void xs_tcp_get_format(xsMachine *the)
 {
 	TCP tcp = xsmcGetHostDataValidate(xsThis, (void *)&xsTCPHooks);
+	if (!tcp->cfSkt) return;
 	builtinGetFormat(the, tcp->format);
 }
 
 void xs_tcp_set_format(xsMachine *the)
 {
 	TCP tcp = xsmcGetHostDataValidate(xsThis, (void *)&xsTCPHooks);
+	if (!tcp->cfSkt) return;
 	uint8_t format = builtinSetFormat(the);
 	if ((kIOFormatNumber != format) && (kIOFormatBuffer != format))
 		xsRangeError("unimplemented");
