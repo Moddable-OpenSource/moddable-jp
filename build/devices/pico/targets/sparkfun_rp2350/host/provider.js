@@ -47,8 +47,8 @@ const device = {
 		default: {
 			io: SPI,
 			clock: 22,
-			in: 35,
-			out: 32,
+			in: 23,
+			out: 20,
 			port: 0
 		}
 	},
@@ -56,9 +56,29 @@ const device = {
 		default: {
 			io: Analog,
 			pin: 26
+		},
+		A0: {
+			io: Analog,
+			pin: 26
+		},
+		A1: {
+			io: Analog,
+			pin: 27
+		},
+		A2: {
+			io: Analog,
+			pin: 28
+		},
+		A3: {
+			io: Analog,
+			pin: 29
 		}
 	},
-	io: { Analog, Digital, DigitalBank, I2C, PWM, Serial, SMBus }
+	io: { Analog, Digital, DigitalBank, I2C, PWM, Serial, SMBus },
+	pin: {
+		led: 29,
+		button: 9
+	}
 };
 
 export default device;
