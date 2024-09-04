@@ -57,6 +57,18 @@
 			"error": "testmc is unsupported on esp8266"
 		},
 		"pico": {
+			"defines": {
+				"XS_TEST": 1,
+				"softreset": 1
+			},
+			"modules": {
+				"~": [
+					"$(BUILD)/devices/pico/setup/piu",
+					"$(BUILD)/devices/pico/setup/network"
+				]
+			}
+		},
+		"pico/pico_w": {
 			"include": [
 				"$(MODDABLE)/examples/manifest_net.json"
 			],

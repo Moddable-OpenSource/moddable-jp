@@ -26,6 +26,10 @@ import config from "mc/config";
 import { URL, URLSearchParams } from "url";
 globalThis.URL = URL;
 globalThis.URLSearchParams = URLSearchParams;
+/* comment out the import of WiFi or Net if your platform doesn't support it */
+import WiFi from "wifi";
+import Net from "net";
+/* end network */
 
 globalThis.$DO = function(f) {
 	return function(...args) {
@@ -149,13 +153,11 @@ Object.defineProperty(globalThis, "screen", {
 	}
 });
 
-/* *** For devices without WiFi, comment out the block below
-*/
-import WiFi from "wifi";
-import Net from "net";
-
 globalThis.$NETWORK = {
-	get connected() {
+    get connected() {
+		if (WiFi === undefined)
+			return false;
+
 		if (WiFi.Mode.station !== WiFi.mode)
 			WiFi.mode = WiFi.Mode.station;
 
@@ -180,7 +182,7 @@ globalThis.$NETWORK = {
 		});
 	},
 	async wifi(options) {
-		// could be async to allow time to bring up an AP 
+		// could be async to allow time to bring up an AP
 		return {ssid: config.ssid, password: config.password};
 	},
 	async resolve(domain) {
@@ -195,8 +197,6 @@ globalThis.$NETWORK = {
 	},
 	invalidDomain: "fail.moddable.com",
 };
-/*
-*** end *** for devices without WiFI *** */
 
 class HostObject @ "xs_hostobject_destructor" {
 	constructor() @ "xs_hostobject"
