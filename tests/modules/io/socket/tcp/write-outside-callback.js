@@ -9,10 +9,7 @@ await $NETWORK.connected;
 
 $TESTMC.timeout(5_000);
 
-let resolve, reject, p = new Promise((a, b) => {
-	resolve = a;
-	reject = b;
-});
+const {promise: p, resolve, reject} = Promise.withResolvers();
 
 let t = new TCP({
 	address: await $NETWORK.resolve("www.example.com"),
@@ -26,6 +23,9 @@ let t = new TCP({
 });
 assert.throws(Error, () => t.write(Uint8Array.of(1)), "write before connected");
 
-t.write(new ArrayBuffer(await p));
+const bytes = await p;
+assert.sameValue(typeof bytes, "number");
+assert(bytes > 0, "need at least 1 byte writable");
+t.write(new ArrayBuffer(bytes));
 
 $DONE();

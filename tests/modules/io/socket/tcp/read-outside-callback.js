@@ -9,10 +9,7 @@ await $NETWORK.connected;
 
 $TESTMC.timeout(5_000);
 
-let resolve, reject, p = new Promise((a, b) => {
-	resolve = a;
-	reject = b;
-});
+const {promise: p, resolve, reject} = Promise.withResolvers();
 
 const host = "www.example.com";
 let wrote = false;
