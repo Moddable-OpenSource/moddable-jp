@@ -1,53 +1,53 @@
-# Expanding Keyboard Reference
+# 拡張キーボードのリファレンス
 Copyright 2019 Moddable Tech, Inc.<BR>
-Revised: July 2, 2019
+改訂： July 2, 2019
 
-The vertical and horizontal expanding keyboard modules implement touch screen keyboards for use with [Piu](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md) on Moddable One and Moddable Two [products](https://www.moddable.com/product.php). The keys automatically expand when tapped, eliminating the need for a stylus. Both keyboards implement the same API.
+縦型および横型の拡張キーボードモジュールは、Moddable OneおよびModdable Two [製品](https://www.moddable.com/product.php)上で[Piu](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md)と共に使用するためのタッチスクリーンキーボードを実装します。キーはタップすると自動的に拡大し、スタイラスを必要としません。両方のキーボードは同じAPIを実装しています。
 
-- **Source code:** [`vertical/keyboard.js`](../../modules/input/expanding-keyboard/vertical/keyboard.js) [`horizontal/keyboard.js`](../../modules/input/expanding-keyboard/horizontal/keyboard.js)
-- **Relevant Examples:** [vertical-expanding-keyboard](../../examples/piu/vertical-expanding-keyboard/main.js) [horizontal-expanding-keyboard](../../examples/piu/horizontal-expanding-keyboard/main.js)
+- **ソースコード:** [`vertical/keyboard.js`](../../modules/input/expanding-keyboard/vertical/keyboard.js) [`horizontal/keyboard.js`](../../modules/input/expanding-keyboard/horizontal/keyboard.js)
+- **関連するサンプル:** [vertical-expanding-keyboard](../../examples/piu/vertical-expanding-keyboard/main.js) [horizontal-expanding-keyboard](../../examples/piu/horizontal-expanding-keyboard/main.js)
 
-The keyboards are designed to fit a 240 x 320 screen. The vertical keyboard height is 185 pixels. The horizontal keyboard height is 164 pixels and designed to run in a landscape orientation. Both orientations fill the application screen width.
+キーボードは240 x 320の画面にフィットするように設計されています。縦型キーボードの高さは185ピクセルです。横型キーボードの高さは164ピクセルで、横向きで動作するように設計されています。どちらの向きでもアプリケーション画面の幅を埋めます。
 
-Key presses trigger events that can be captured in the application's behavior. The style (font and weight) of the keyboard's text are defined by a [`Style`](./piu.md#style-object) object supplied by the caller. This allows the use of `Style` templates.
+キー押下はアプリケーションの動作でキャプチャできるイベントをトリガーします。キーボードのテキストのスタイル（フォントとウェイト）は、呼び出し元が提供する[`Style`](./piu.md#style-object)オブジェクトによって定義されます。これにより、`Style`テンプレートを使用することができます。
 
-A `KeyboardField` container and associated behavior are additionally provided to facilitate integrating the keyboard into apps. This container displays the keys pressed along with a blinking I-beam cursor. The `KeyboardField` height should be tall enough to fit the I-beam cursor, which is outset from the field text.
+さらに、キーボードをアプリに統合するための`KeyboardField`コンテナと関連する動作が提供されています。このコンテナは、押されたキーと点滅するIビームカーソルを表示します。`KeyboardField`の高さは、フィールドテキストから外れたIビームカーソルが収まるのに十分な高さである必要があります。
 
-## Keyboard Module Exports
+## キーボードモジュールのエクスポート
 
-| Export | Type |  Description |
+| エクスポート | タイプ | 説明 |
 | :---: | :---: | :--- |
-| `VerticalExpandingKeyboard` | `constructor` | Constructor used to create vertical expanding keyboard instances. |
-| `HorizontalExpandingKeyboard` | `constructor` | Constructor used to create horizontal expanding keyboard instances. |
+| `VerticalExpandingKeyboard` | `constructor` | 垂直に拡張するキーボードインスタンスを作成するためのコンストラクタ。 |
+| `HorizontalExpandingKeyboard` | `constructor` | 水平方向に拡張するキーボードインスタンスを作成するためのコンストラクタ。 |
 
 ```js
 import {VerticalExpandingKeyboard} from "keyboard";
 import {HorizontalExpandingKeyboard} from "keyboard";
 ```
 
-## KeyboardField Module Exports
+## KeyboardField モジュールのエクスポート
 
-| Export | Type |  Description |
+| エクスポート | タイプ | 説明 |
 | :---: | :---: | :--- |
-| `KeyboardField` | `constructor` | Constructor used to create keyboard field instances. |
+| `KeyboardField` | `constructor` | キーボードフィールドインスタンスを作成するために使用されるコンストラクタ。 |
 
 ```js
 import {KeyboardField} from "common/keyboard";
 ```
 
-## Keyboard Objects
+## キーボードオブジェクト
 
-### Constructor Description
+### コンストラクタの説明
 
 #### `VerticalExpandingKeyboard(behaviorData, dictionary)`
 #### `HorizontalExpandingKeyboard(behaviorData, dictionary)`
 
-| Argument | Type | Description |
+| 引数 | タイプ | 説明 |
 | :---: | :---: | :--- |
-| `behaviorData`	| `*` |	A parameter that is passed into the `onCreate `function of the keyboard's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to configure the resulting keyboard. Only parameters specified in the [Dictionary](#keyboard-dictionary) section below will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | キーボードの `behavior` の `onCreate` 関数に渡されるパラメータ。これは `null` や任意のパラメータを持つ辞書を含む任意のタイプのオブジェクトである可能性があります。 |
+| `dictionary` | `object` | 結果として得られるキーボードを構成するプロパティを持つオブジェクト。以下の [Dictionary](#keyboard-dictionary) セクションで指定されたパラメータのみが効果を持ち、他のパラメータは無視されます。 |
 
-Returns a `VerticalExpandingKeyboard` or `HorizontalExpandingKeyboard` `Container` instance.
+`VerticalExpandingKeyboard` または `HorizontalExpandingKeyboard` の `Container` インスタンスを返します。
 
 ```js
 const KeyboardStyle = Style.template({ font:"18px Roboto", color:"black" });
@@ -57,74 +57,74 @@ let keyboard = new VerticalExpandingKeyboard(null, { Style:KeyboardStyle, target
 ![](../assets/piu/vertical-expanding-keyboard.png)
 
 <a id="keyboard-dictionary"></a>
-### Dictionary
+### 辞書
 
-| Parameter | Type | Default Value | Description |
+| パラメータ | 型 | デフォルト値 | 説明 |
 | :---: | :---: | :---: | :--- |
-| `Style` | `style` | n/a | **Required.** A Piu Style object that will be used for the text on keys. |
-| `target` | `object` | n/a | **Required.** A Piu Container object that will receive the `onKeyUp` event. |
-| `doTransition` | `boolean` | `false`| Whether or not to transition in the keyboard when it is first displayed and transition out when dismissed. |
+| `Style` | `style` | n/a | **必須。** キーのテキストに使用されるPiuスタイルオブジェクト。 |
+| `target` | `object` | n/a | **必須。** `onKeyUp`イベントを受け取るPiuコンテナオブジェクト。 |
+| `doTransition` | `boolean` | `false`| キーボードが最初に表示されるときにトランジションし、閉じられるときにトランジションするかどうか。 |
 
 <a id="key-callback"></a>
-### Triggered Events
+### トリガーイベント
 
 #### `onKeyboardOK(container, text)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | :---: | :---: | :--- |
-| `container` | `object` | The behavior's Container object |
-| `text` | `string` | The complete string entered into the field |
+| `container` | `object` | ビヘイビアのコンテナオブジェクト |
+| `text` | `string` | フィールドに入力された完全な文字列 |
 
-The keyboard bubbles this event when the OK button is pressed.
+OKボタンが押されたときにキーボードがこのイベントをバブルします。
 
 #### `onKeyboardRowsContracted(container)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | :---: | :---: | :--- |
-| `container` | `object` | The behavior's Container object |
+| `container` | `object` | ビヘイビアのコンテナオブジェクト |
 
-The keyboard bubbles this event when it is done horizontally contracting the keyboard rows back to the unzoomed view.
+キーボードが水平方向にキーボード行を元のズームされていないビューに戻すと、このイベントがバブルされます。
 
 #### `onKeyboardRowsExpanded(container)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | :---: | :---: | :--- |
-| `container` | `object` | The behavior's Container object |
+| `container` | `object` | ビヘイビアのコンテナオブジェクト |
 
-The keyboard bubbles this event when it is done horizontally expanding the keyboard rows to the zoomed view.
+キーボードが水平方向にキーボード行をズームされたビューに拡張すると、このイベントがバブルされます。
 
 #### `onKeyboardTransitionFinished(container, out)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | :---: | :---: | :--- |
-| `container` | `object` | The behavior's Container object |
-| `out` | `boolean` | Set `true` when the keyboard transitions out of view, `false` when the keyboard transitions into view |
+| `container` | `object` | ビヘイビアのコンテナオブジェクト |
+| `out` | `boolean` | キーボードがビューから外れるときに `true` を設定し、キーボードがビューに入るときに `false` を設定します |
 
-The keyboard bubbles this event when it is done transitioning on and off the screen. The `onKeyboardTransitionFinished` function will usually be implemented and triggered in the calling application's behavior.
+キーボードが画面のオンとオフを切り替えると、このイベントがバブルされます。`onKeyboardTransitionFinished` 関数は通常、呼び出し元アプリケーションのビヘイビアで実装され、トリガーされます。
 
 #### `onKeyUp(container, key)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | :---: | :---: | :--- |
-| `container` | `object` | The behavior's Container object |
-| `key` | `string` | The string value of the key that was pressed (e.g., `'a'`, `'3'`, `'$'`). It can also be `\b` for backspace or `\r` for the submit button.|
+| `container` | `object` | ビヘイビアのコンテナオブジェクト |
+| `key` | `string` | 押されたキーの文字列値（例：`'a'`、`'3'`、`'$'`）。バックスペースの場合は `\b`、送信ボタンの場合は `\r` も可能です。|
 
-The keyboard bubbles the `onKeyUp` event when a key is released. The `onKeyUp` function will usually be implemented and triggered in the calling application's behavior.
+キーボードはキーが放されたときに `onKeyUp` イベントをバブルします。`onKeyUp` 関数は通常、呼び出し元アプリケーションのビヘイビアで実装され、トリガーされます。
 
 ***
 
-## KeyboardField Object
+## KeyboardField オブジェクト
 
-### Constructor Description
+### コンストラクタの説明
 
 #### `KeyboardField(behaviorData, dictionary)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | :---: | :---: | :--- |
-| `behaviorData`	| `*` |	A parameter that is passed into the `onCreate `function of the keyboard field's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to configure the resulting keyboard field. Only parameters specified in the [Dictionary](#keyboard-field-dictionary) section below will have an effect; other parameters will be ignored.
+| `behaviorData`	| `*` |	キーボードフィールドの `behavior` の `onCreate` 関数に渡されるパラメータ。このパラメータは任意の型のオブジェクトであり得ます。`null` や任意のパラメータを持つ辞書も含まれます。 |
+| `dictionary` | `object` | 結果として得られるキーボードフィールドを構成するプロパティを持つオブジェクト。以下の [Dictionary](#keyboard-field-dictionary) セクションで指定されたパラメータのみが効果を持ちます。他のパラメータは無視されます。 |
 
-Returns a `KeyboardField` `Container` instance.
+`KeyboardField` の `Container` インスタンスを返します。
 
 ```js
 const FieldStyle = Style.template({ font: "20px Open Sans", color: "black", horizontal:"left", vertical:"middle" });
@@ -134,19 +134,18 @@ let keyboardField = new KeyboardField(null, { Style:FieldStyle });
 <a id="keyboard-field-dictionary"></a>
 ### Dictionary
 
-| Parameter | Type | Default Value | Description |
+| パラメータ | 型 | デフォルト値 | 説明 |
 | :---: | :---: | :---: | :--- |
-| `Style` | `style` | n/a | **Required.** A Piu Style object that will be used for the keyboard entry text. |
-| `password` | `boolean` | `false` | Set `true` to enable password mode. The password mode hides each character displayed after a short delay. |
+| `Style` | `style` | n/a | **必須。** キーボード入力テキストに使用されるPiuスタイルオブジェクト。 |
+| `password` | `boolean` | `false` | パスワードモードを有効にするには`true`を設定します。パスワードモードでは、短時間表示された後に各文字が隠されます。 |
 
-### Triggered Events
+### トリガーイベント
 
 #### `onKeyboardOK(container, text)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | :---: | :---: | :--- |
-| `container` | `object` | The behavior's Container object |
-| `text` | `string` | The complete string entered into the field |
+| `container` | `object` | ビヘイビアのコンテナオブジェクト |
+| `text` | `string` | フィールドに入力された完全な文字列 |
 
-The keyboard bubbles this event when the OK button is pressed.
-
+OKボタンが押されたときにキーボードがこのイベントをバブルします。

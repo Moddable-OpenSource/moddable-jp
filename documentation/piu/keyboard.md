@@ -1,40 +1,41 @@
-# Keyboard
+# キーボード
 
-The Keyboard module implements a touch screen keyboard with a responsive layout for use with Piu.
+キーボードモジュールは、Piuで使用するためのレスポンシブレイアウトを備えたタッチスクリーンキーボードを実装します。
 
-- **Source code:** [`keyboard.js`](../../modules/input/keyboard/keyboard.js)
-- **Relevant Example:** [keyboard](../../examples/piu/keyboard/main.js)
+- **ソースコード:** [`keyboard.js`](../../modules/input/keyboard/keyboard.js)
+- **関連するサンプル:** [keyboard](../../examples/piu/keyboard/main.js)
 
-The keyboard is implemented using a [`Port`](./piu.md#port-object) object that automatically fills its parent container, allowing it to reflow in a manner controlled by the application. The dictionary passed to the constructor configures properties of the keyboard.
+キーボードは、親コンテナを自動的に埋める[`Port`](./piu.md#port-object)オブジェクトを使用して実装されており、アプリケーションによって制御される方法でリフローすることができます。コンストラクタに渡される辞書は、キーボードのプロパティを構成します。
 
-Key presses trigger events that can be captured in the application's behavior. The style (font and weight) of the keyboard's text are driven by a [`Style`](./piu.md#style-object) object supplied by the caller. This allows the use of `Style` templates.
+キー押下は、アプリケーションの動作でキャプチャできるイベントをトリガーします。キーボードのテキストのスタイル（フォントとウェイト）は、呼び出し元が提供する[`Style`](./piu.md#style-object)オブジェクトによって駆動されます。これにより、`Style`テンプレートを使用することができます。
 
-The keyboard implements a `doKeyboardTransitionOut` event that can be triggered to cause the keyboard to transition off-screen. When the transition is complete, the keyboard triggers an event to notify the application.
+キーボードは、キーボードを画面外に移行させるためにトリガーできる`doKeyboardTransitionOut`イベントを実装しています。移行が完了すると、キーボードはアプリケーションに通知するイベントをトリガーします。
 
-## Module Exports
+## モジュールエクスポート
 
-| Export | Type |  Description |
+
+| エクスポート | 型 |  説明 |
 | :---: | :---: | :--- |
-| `Keyboard` | `constructor` | Constructor used to create Keyboard instances. |
-| `BACKSPACE` | `string` | Constant used to indicate that the backspace key was pressed. |
-| `SUBMIT` | `string` | Constant used to indicate that the submit key was pressed. |
+| `Keyboard` | `constructor` | キーボードインスタンスを作成するために使用されるコンストラクタ。 |
+| `BACKSPACE` | `string` | バックスペースキーが押されたことを示すために使用される定数。 |
+| `SUBMIT` | `string` | サブミットキーが押されたことを示すために使用される定数。 |
 
 ```js
 import {Keyboard, BACKSPACE, SUBMIT} from "keyboard";
 ```
 
-## Keyboard Object
+## キーボードオブジェクト
 
-### Constructor Description
+### コンストラクタの説明
 
 #### `Keyboard(behaviorData, dictionary)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | :---: | :---: | :--- |
-| `behaviorData`	| `*` |	A parameter that is passed into the `onCreate `function of the keyboard's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to configure the resulting keyboard. Only parameters specified in the [Dictionary](#keyboard-dictionary) section below will have an effect; other parameters will be ignored.
+| `behaviorData`	| `*` |	キーボードの `behavior` の `onCreate` 関数に渡されるパラメータ。これは `null` や任意のパラメータを持つ辞書を含む任意のタイプのオブジェクトである可能性があります。 |
+| `dictionary` | `object` | 結果として得られるキーボードを構成するためのプロパティを持つオブジェクト。以下の [Dictionary](#keyboard-dictionary) セクションで指定されたパラメータのみが効果を持ち、他のパラメータは無視されます。
 
-Returns a `keyboard` instance, a `Port` object that uses an instance of the `KeyboardBehavior` class as its behavior.
+`keyboard` インスタンス、つまりその動作として `KeyboardBehavior` クラスのインスタンスを使用する `Port` オブジェクトを返します。
 
 ```js
 let OpenSans18 = new Style({ font: "semibold 18px Open Sans", color: "black" });
@@ -44,59 +45,58 @@ let keyboard = new Keyboard(null, {style: OpenSans18, doTransition: false})
 ![](../assets/piu/keyboard.png)
 
 <a id="keyboard-dictionary"></a>
-### Dictionary
+### 辞書
 
-| Parameter | Type | Default Value | Description |
+| パラメータ | 型 | デフォルト値 | 説明 |
 | :---: | :---: | :---: | :--- |
-| `style` | `style` | n/a | **Required.** A Piu Style object that will be used for the text on keys. |
-| `bgColor` | `string` | `"#5b5b5b"`| The background fill color. |
-| `doTransition` | `boolean` | `false`| Whether or not to transition in the keyboard when it is first displayed. |
-| `keyColor` | `string` | `"#d8d8d8"`| The color for the character keys when not being pressed. |
-| `keyDownColor` | `string` | `"#999999"`| The color for the character keys while they are being pressed. |
-| `keyToggledColor` | `string` | `"#7b7b7b"`| The color for the character keys while they are being pressed. |
-| `specialKeyColor` | `string` | `"#999999"`| The color for the special keys (shift, symbol, backspace, and submit) when not being pressed. |
-| `specialTextColor` | `string` | `"#ffffff"`| The color for the text on special keys (shift, symbol, backspace, and submit). |
-| `submit` | `string` | `"OK"`| String to render on the submit key. |
-| `textColor` | `string` | `"#000000"`| The color for the text on character keys. |
-| `transitionTime` | `number` | `250`| The duration of the keyboard in/out transition in milliseconds. |
+| `style` | `style` | n/a | **必須。** キーのテキストに使用されるPiu Styleオブジェクト。 |
+| `bgColor` | `string` | `"#5b5b5b"`| 背景の塗りつぶし色。 |
+| `doTransition` | `boolean` | `false`| キーボードが最初に表示されるときにトランジションするかどうか。 |
+| `keyColor` | `string` | `"#d8d8d8"`| 押されていないときの文字キーの色。 |
+| `keyDownColor` | `string` | `"#999999"`| 押されているときの文字キーの色。 |
+| `keyToggledColor` | `string` | `"#7b7b7b"`| 押されているときの文字キーの色。 |
+| `specialKeyColor` | `string` | `"#999999"`| 押されていないときの特殊キー（シフト、シンボル、バックスペース、送信）の色。 |
+| `specialTextColor` | `string` | `"#ffffff"`| 特殊キー（シフト、シンボル、バックスペース、送信）のテキストの色。 |
+| `submit` | `string` | `"OK"`| 送信キーに表示される文字列。 |
+| `textColor` | `string` | `"#000000"`| 文字キーのテキストの色。 |
+| `transitionTime` | `number` | `250`| キーボードのイン/アウトトランジションの持続時間（ミリ秒）。 |
 
 <a id="key-callback"></a>
-### Triggered Events
+### トリガーされたイベント
 
 #### `onKeyboardTransitionFinished()`
-The keyboard will bubble this event when it is done transitioning off-screen. The `onKeyboardTransitionFinished` function will usually be implemented and triggered in the calling application's behavior.
+キーボードが画面外に移行し終わったときに、このイベントがバブルされます。`onKeyboardTransitionFinished` 関数は通常、呼び出し元アプリケーションの動作で実装され、トリガーされます。
 
 ***
 
 #### `onKeyDown(key)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | :---: | :---: | :--- |
-| `key` | `string` | In most cases, the string will be the value of the key that is down (e.g. `"a"`, `"3"`, `"$"`). It can also be one of the two constants exported by the module:  `BACKSPACE` or `SUBMIT` which indicate that those keys are down on the keyboard.|
+| `key` | `string` | ほとんどの場合、文字列は押されたキーの値になります（例: `"a"`, `"3"`, `"$"`）。また、モジュールによってエクスポートされる2つの定数のいずれかである場合もあります: `BACKSPACE` または `SUBMIT`。これらはキーボード上でそのキーが押されたことを示します。|
 
-The keyboard will bubble this event when a key is pressed down. The `onKeyDown` function will usually be implemented and triggered in the calling application's behavior.
-
+キーボードがキーを押されたときに、このイベントがバブルされます。`onKeyDown` 関数は通常、呼び出し元アプリケーションの動作で実装され、トリガーされます。
 
 ***
 
 #### `onKeyUp(key)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | :---: | :---: | :--- |
-| `key` | `string` | In most cases, the string will be the value of the key that was released (e.g. `"a"`, `"3"`, `"$"`). It can also be one of the two constants exported by the module:  `BACKSPACE` or `SUBMIT` which indicate that those keys were released on the keyboard.|
+| `key` | `string` | ほとんどの場合、文字列は放されたキーの値になります（例: `"a"`, `"3"`, `"$"`）。また、モジュールによってエクスポートされる2つの定数のいずれかである場合もあります: `BACKSPACE` または `SUBMIT`。これらはキーボード上でそのキーが放されたことを示します。|
 
-The keyboard will bubble an event `onKeyUp` when a key is released. The `onKeyUp` function will usually be implemented and triggered in the calling application's behavior.
+キーボードはキーが放されたときに `onKeyUp` イベントをバブルします。`onKeyUp` 関数は通常、呼び出し元アプリケーションの動作で実装され、トリガーされます。
 
 ***
 
-### Received Events
+### 受信イベント
 
-#### `doKeyboardTransitionOut(keyboard)`
+#### `doKeyboardTransitionOut(keyboard)` {#examples}
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | :---: | :---: | :--- |
-| `keyboard` | `keyboard` | The `keyboard` object that received the event. |
+| `keyboard` | `keyboard` | イベントを受信した `keyboard` オブジェクト。 |
 
-This function can be triggered to cause the keyboard to transition off screen. When the transition is complete, the `onKeyboardTransitionFinished` event will be bubbled by the keyboard.
+この関数は、キーボードを画面外に移行させるためにトリガーされることがあります。移行が完了すると、キーボードによって `onKeyboardTransitionFinished` イベントがバブルされます。
 
 ***
