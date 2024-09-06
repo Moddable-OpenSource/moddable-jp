@@ -167,7 +167,7 @@ void xs_tcp_constructor(xsMachine *the)
 				xsUnknownError("invalid address");;
 
 			xsmcGet(xsVar(0), xsArg(0), xsID_port);
-			port = xsmcToInteger(xsVar(0));
+			port = builtinGetSignedInteger(the, &xsVar(0));
 			if ((port < 0) || (port > 65535))
 				xsRangeError("invalid port");
 
