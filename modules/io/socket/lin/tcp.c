@@ -357,7 +357,7 @@ void xs_tcp_get_remoteAddress(xsMachine *the)
 
 	xsResult = xsStringBuffer(NULL, 4 * 5);
 	out = xsmcToString(xsResult);
-	inet_ntop(AF_INET, &addr, out, 4 * 5);
+	inet_ntop(AF_INET, &addr.sin_addr, out, 4 * 5);
 }
 
 void xs_tcp_get_remotePort(xsMachine *the)
