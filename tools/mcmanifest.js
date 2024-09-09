@@ -269,7 +269,7 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 				mergedConfig = mergedConfig.concat(instConfig.split(regex));
 			}
 		}
-		
+
 		// Merge any application sdkconfig files
 		if (tool.environment.SDKCONFIGPATH != baseConfigDirectory) {
 			let appConfigFile = tool.environment.SDKCONFIGPATH + tool.slash + "sdkconfig.defaults";
@@ -374,16 +374,35 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 				}
 			}
 		}
-		
+
 		// Write the result, if it has changed
 		let buildConfigFile = outputConfigDirectory + tool.slash + "sdkconfig.mc";
 		tool.setenv("SDKCONFIG_FILE", buildConfigFile);
 		this.line("SDKCONFIG_FILE=", buildConfigFile);
 		if (tool.isDirectoryOrFile(buildConfigFile) == 1){
 			const oldConfig = tool.readFileString(buildConfigFile);
-			if (oldConfig == baseConfig) return;
+			if (oldConfig != baseConfig)
+				tool.writeFileString(buildConfigFile, baseConfig);
 		}
-		tool.writeFileString(buildConfigFile, baseConfig);
+		else
+			tool.writeFileString(buildConfigFile, baseConfig);
+
+		// esp-idf component dependencies
+		if (("esp32" == tool.platform) && (tool.dependencies)) {
+			let depStr = "BUILD_DEPENDENCIES = ";
+			for (var dep of tool.dependencies)
+				depStr += `idf.py add-dependency espressif/${dep.name}${dep.version} ;`;
+			this.line(depStr);
+			this.line();
+
+			let cmakeTweakFile = outputConfigDirectory + tool.slash + "xs_idf_deps.txt";
+			let tweakStr = "set(ESP_COMPONENTS ";
+			for (var dep of tool.dependencies)
+				tweakStr += `espressif__${dep.name} `;
+			tweakStr += ")\n";
+			tool.writeFileString(cmakeTweakFile, tweakStr);
+		}
+
 	}
 	generateBLEDefinitions(tool) {
 		this.write("BLE =");
@@ -499,6 +518,7 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 		this.generateDataDefinitions(tool);
 		this.generateBLEDefinitions(tool);
 		this.generateResourcesDefinitions(tool);
+		this.generateDependenciesDefinitions(tool);
 	}
 	generateManifestDefinitions(tool) {
 		this.write("MANIFEST =");
@@ -730,6 +750,22 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 		}
 		this.line("");
 		this.line("");
+	}
+	generateDependenciesDefinitions(tool) {
+		if ("esp32" == tool.platform) {
+			if (tool.dependencies?.length) {
+				var libLine = "LIBRARIES =\\\n";
+				this.write("MANAGED_COMPONENT_DIRS = \\\n");
+				for (var dep of tool.dependencies) {
+					var depLine = "\t" + tool.tmpPath + tool.slash + "xsProj-" + tool.environment.ESP32_SUBCLASS + tool.slash + "managed_components" + tool.slash + "espressif__" + dep.name + "/include \\\n";
+					this.write(depLine);
+					libLine += "\t" + tool.tmpPath + tool.slash + "xsProj-" + tool.environment.ESP32_SUBCLASS + tool.slash + "build" + tool.slash + "esp-idf" + tool.slash + "espressif__" + dep.name + "/libespressif__" + dep.name + ".a \\\n";
+				}
+				this.write("\n");
+				this.write(libLine);
+				this.write("\n");
+			}
+		}
 	}
 	generateResourcesRules(tool) {
 		var formatPath = "$(TMP_DIR)" + tool.slash + "mc.format.h";
@@ -2141,6 +2177,13 @@ export class Tool extends TOOL {
 						manifest.include = manifest.include.concat(platformInclude);
 					}
 				}
+				if (platform.dependency && ("esp32" == this.platform)) {
+					manifest.dependencies = [];
+					for (let i=0; i<platform.dependency.length; i++) {
+						const dep = platform.dependency[i];
+						manifest.dependencies.push(dep);
+					}
+				}
 			}
 		}
 		if ("include" in manifest) {
@@ -2282,6 +2325,8 @@ export class Tool extends TOOL {
 		this.bleServicesFiles.already = {};
 		this.pioFiles = [];
 		this.pioFiles.already = {};
+
+		this.dependencies = manifest.dependencies;
 
 		var rule = new DataRule(this);
 		rule.process(this.manifest.data);

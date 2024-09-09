@@ -166,6 +166,7 @@ DRIVER_DIRS = \
 
 INC_DIRS = \
 	$(DRIVER_DIRS) \
+	$(MANAGED_COMPONENT_DIRS) \
 	$(IDF_PATH)/components \
 	$(IDF_PATH)/components/bootloader_support/include \
 	$(IDF_PATH)/components/bt/include \
@@ -401,13 +402,14 @@ MEM_USAGE = \
 
 VPATH += $(SDK_DIRS) $(XS_DIRS)
 
-.PHONY: all bootloaderCheck
+.PHONY: all bootloaderCheck prepareOutput
 
 PROJ_DIR_TEMPLATE = $(BUILD_DIR)/devices/esp32/xsProj-$(ESP32_SUBCLASS)
 PROJ_DIR_FILES = \
 	$(PROJ_DIR)/main/main.c \
 	$(PROJ_DIR)/main/component.mk \
 	$(PROJ_DIR)/main/CMakeLists.txt \
+	$(PROJ_DIR)/xs_idf_deps.txt \
 	$(PROJ_DIR)/CMakeLists.txt \
 	$(PROJ_DIR)/partitions.csv \
 	$(PROJ_DIR)/Makefile
@@ -577,6 +579,7 @@ xsbug:
 prepareOutput:
 	-@rm $(PROJ_DIR)/xs_esp32.elf 2>/dev/null
 	-@rm $(BIN_DIR)/xs_esp32.elf 2>/dev/null
+	-@rm $(TMP_DIR)/xsProj-$(ESP32_SUBCLASS)/main/idf_component.yml
 
 DUMP_VARS:
 	echo "#\n#\n# vars\n#\n#\n"
@@ -587,7 +590,10 @@ DUMP_VARS:
 	echo "# IDF_RECONFIGURE_CMD is $(IDF_RECONFIGURE_CMD)"
 	echo "# SDKCONFIG_H_DIR is $(SDKCONFIG_H_DIR)"
 
-precursor: idfVersionCheck prepareOutput $(PROJ_DIR_FILES) bootloaderCheck $(BLE) $(SDKCONFIG_H) $(LIB_DIR) $(BIN_DIR)/xs_$(ESP32_SUBCLASS).a
+dependencies:
+	echo "# Configure dependencies..."; cd $(PROJ_DIR) ; $(BUILD_DEPENDENCIES)
+
+precursor: prepareOutput idfVersionCheck $(PROJ_DIR_FILES) bootloaderCheck $(BLE) $(SDKCONFIG_H) dependencies $(LIB_DIR) $(BIN_DIR)/xs_$(ESP32_SUBCLASS).a
 	cp $(BIN_DIR)/xs_$(ESP32_SUBCLASS).a $(BLD_DIR)/.
 	touch $(PROJ_DIR)/main/main.c
 
@@ -629,7 +635,7 @@ $(TMP_DIR)/buildinfo.h:
 $(LIB_DIR):
 	mkdir -p $(LIB_DIR)
 	
-$(BIN_DIR)/xs_$(ESP32_SUBCLASS).a: $(TMP_DIR)/buildinfo.h $(SDK_OBJ) $(XS_OBJ) $(TMP_DIR)/xsPlatform.c.o $(TMP_DIR)/xsHost.c.o $(TMP_DIR)/xsHosts.c.o $(TMP_DIR)/mc.xs.c.o $(TMP_DIR)/mc.resources.c.o $(OBJECTS) 
+$(BIN_DIR)/xs_$(ESP32_SUBCLASS).a: $(TMP_DIR)/buildinfo.h $(SDK_OBJ) $(XS_OBJ) $(TMP_DIR)/xsPlatform.c.o $(TMP_DIR)/xsHost.c.o $(TMP_DIR)/xsHosts.c.o $(TMP_DIR)/mc.xs.c.o $(TMP_DIR)/mc.resources.c.o $(OBJECTS)
 	@echo "# ar xs_$(ESP32_SUBCLASS).a"
 	$(CC) $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) $(TMP_DIR)/buildinfo.c -o $(TMP_DIR)/buildinfo.c.o
 	$(AR) $(AR_FLAGS) $(BIN_DIR)/xs_$(ESP32_SUBCLASS).a $^ $(TMP_DIR)/buildinfo.c.o
@@ -670,6 +676,9 @@ $(PROJ_DIR)/main/CMakeLists.txt: $(PROJ_DIR)/main $(PROJ_DIR_TEMPLATE)/main/CMak
 
 $(PROJ_DIR)/CMakeLists.txt: $(PROJ_DIR_TEMPLATE)/CMakeLists.txt
 	cp -f $(PROJ_DIR_TEMPLATE)/CMakeLists.txt $@
+
+$(PROJ_DIR)/xs_idf_deps.txt: $(PROJ_DIR_TEMPLATE)/xs_idf_deps.txt
+	cp -f $(PROJ_DIR_TEMPLATE)/xs_idf_deps.txt $@
 
 $(PROJ_DIR)/Makefile: $(PROJ_DIR_TEMPLATE)/Makefile
 	cp -f $? $@
