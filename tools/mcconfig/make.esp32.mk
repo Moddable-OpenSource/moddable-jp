@@ -123,12 +123,6 @@ else
 	USB_OPTION = -DUSE_USB=$(USE_USB)
 endif
 
-ifeq ($(USE_USB),1) 
-	TINY_USB_BITS=$(PROJ_DIR)/managed_components
-endif
-
-# 	$(IDF_PATH)/components/driver/deprecated
-
 DRIVER_DIRS_OLD = \
 	$(IDF_PATH)/components/driver/dac/include \
 	$(IDF_PATH)/components/driver/gpio/include \
@@ -590,10 +584,10 @@ DUMP_VARS:
 	echo "# IDF_RECONFIGURE_CMD is $(IDF_RECONFIGURE_CMD)"
 	echo "# SDKCONFIG_H_DIR is $(SDKCONFIG_H_DIR)"
 
-dependencies:
-	echo "# Configure dependencies..."; cd $(PROJ_DIR) ; $(BUILD_DEPENDENCIES)
+dependencies: $(PROJ_DIR)/main
+	echo "# Configure dependencies..."; cd $(PROJ_DIR) ; rm -f $(PROJ_DIR)/main/idf_component.yml ; $(BUILD_DEPENDENCIES)
 
-precursor: prepareOutput idfVersionCheck $(PROJ_DIR_FILES) bootloaderCheck $(BLE) $(SDKCONFIG_H) dependencies $(LIB_DIR) $(BIN_DIR)/xs_$(ESP32_SUBCLASS).a
+precursor: prepareOutput idfVersionCheck $(PROJ_DIR_FILES) bootloaderCheck $(BLE) dependencies $(SDKCONFIG_H) $(LIB_DIR) $(BIN_DIR)/xs_$(ESP32_SUBCLASS).a
 	cp $(BIN_DIR)/xs_$(ESP32_SUBCLASS).a $(BLD_DIR)/.
 	touch $(PROJ_DIR)/main/main.c
 
@@ -619,9 +613,6 @@ clean:
 	-rm -rf $(BIN_DIR) 2>/dev/null
 	-rm -rf $(TMP_DIR) 2>/dev/null
 	-rm -rf $(LIB_DIR) 2>/dev/null	
-
-$(PROJ_DIR)/managed_components: $(PROJ_DIR)/main
-	echo "# Configure tinyusb..."; cd $(PROJ_DIR) ; idf.py add-dependency "espressif/esp_tinyusb"
 
 $(SDKCONFIG_H): $(SDKCONFIG_FILE) $(PROJ_DIR_FILES) $(TINY_USB_BITS)
 	-rm $(PROJ_DIR)/sdkconfig 2>/dev/null

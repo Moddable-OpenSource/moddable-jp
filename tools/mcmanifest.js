@@ -389,16 +389,22 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 
 		// esp-idf component dependencies
 		if (("esp32" == tool.platform) && (tool.dependencies)) {
+			var dep;
 			let depStr = "BUILD_DEPENDENCIES = ";
-			for (var dep of tool.dependencies)
-				depStr += `idf.py add-dependency espressif/${dep.name}${dep.version} ;`;
+			for (dep of tool.dependencies)
+				depStr += `idf.py add-dependency \"${dep.namespace}/${dep.name}${dep.version}\" ; `;
+			if (tool.environment.USE_USB == 1) {
+				depStr += "idf.py add-dependency \"espressif/esp_tinyusb\"";
+			}
 			this.line(depStr);
 			this.line();
 
 			let cmakeTweakFile = outputConfigDirectory + tool.slash + "xs_idf_deps.txt";
 			let tweakStr = "set(ESP_COMPONENTS ";
-			for (var dep of tool.dependencies)
-				tweakStr += `espressif__${dep.name} `;
+			for (dep of tool.dependencies)
+				tweakStr += `${dep.namespace}__${dep.name} `;
+			if (tool.environment.USE_USB == 1)
+				tweakStr += "espressif__esp_tinyusb";
 			tweakStr += ")\n";
 			tool.writeFileString(cmakeTweakFile, tweakStr);
 		}
@@ -754,15 +760,11 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 	generateDependenciesDefinitions(tool) {
 		if ("esp32" == tool.platform) {
 			if (tool.dependencies?.length) {
-				var libLine = "LIBRARIES =\\\n";
 				this.write("MANAGED_COMPONENT_DIRS = \\\n");
 				for (var dep of tool.dependencies) {
-					var depLine = "\t" + tool.tmpPath + tool.slash + "xsProj-" + tool.environment.ESP32_SUBCLASS + tool.slash + "managed_components" + tool.slash + "espressif__" + dep.name + "/include \\\n";
+					var depLine = "\t" + tool.tmpPath + tool.slash + "xsProj-" + tool.environment.ESP32_SUBCLASS + tool.slash + "managed_components" + tool.slash + dep.namespace + "__" + dep.name + "/include \\\n";
 					this.write(depLine);
-					libLine += "\t" + tool.tmpPath + tool.slash + "xsProj-" + tool.environment.ESP32_SUBCLASS + tool.slash + "build" + tool.slash + "esp-idf" + tool.slash + "espressif__" + dep.name + "/libespressif__" + dep.name + ".a \\\n";
 				}
-				this.write("\n");
-				this.write(libLine);
 				this.write("\n");
 			}
 		}
@@ -1985,6 +1987,20 @@ export class Tool extends TOOL {
 		}
 		this.currentDirectory = currentDirectory;
 	}
+	mergeDependencies(manifests) {
+		manifests.forEach(manifest => {
+			manifest.dependencies?.forEach(dep => {
+				var found = false;
+				for (const cmp in this.manifest.dependency) {
+					if (cmp.namespace != dep.namespace) continue;
+					if (cmp.name != dep.name) continue;
+					found = true;
+				}
+				if (!found)
+					this.manifest.dependency.push(dep);
+			});
+		});
+	}
 	mergeNodeRed(manifests) {
 		if (!this.environment.NODEREDMCU)
 			return;
@@ -2180,7 +2196,9 @@ export class Tool extends TOOL {
 				if (platform.dependency && ("esp32" == this.platform)) {
 					manifest.dependencies = [];
 					for (let i=0; i<platform.dependency.length; i++) {
-						const dep = platform.dependency[i];
+						var dep = platform.dependency[i];
+						if (undefined === dep.namespace)
+							dep.namespace = "espressif";
 						manifest.dependencies.push(dep);
 					}
 				}
@@ -2243,6 +2261,7 @@ export class Tool extends TOOL {
 			config:{},
 			creation:{},
 			defines:{},
+			dependency:[],
 			data:{},
 			modules:{},
 			resources:{},
@@ -2257,6 +2276,8 @@ export class Tool extends TOOL {
 			typescript: {compiler: "tsc", tsconfig: {compilerOptions: {}}}
 		};
 		this.manifests.forEach(manifest => this.mergeManifest(this.manifest, manifest));
+
+		this.mergeDependencies(this.manifests);
 	
 		if (this.manifest.errors.length) {
 			this.manifest.errors.forEach(error => { this.reportError(null, 0, error); });
@@ -2326,7 +2347,7 @@ export class Tool extends TOOL {
 		this.pioFiles = [];
 		this.pioFiles.already = {};
 
-		this.dependencies = manifest.dependencies;
+		this.dependencies = this.manifest.dependency;
 
 		var rule = new DataRule(this);
 		rule.process(this.manifest.data);
