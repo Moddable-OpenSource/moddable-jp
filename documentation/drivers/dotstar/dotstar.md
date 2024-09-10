@@ -1,6 +1,6 @@
 # DotStar display driver
 Copyright 2018 Moddable Tech, Inc.<BR>
-Revised: January 3, 2018
+Revised: September 10, 2024
 
 The DotStar display controller drives strings of color LED lights. The displays are available from [Adafruit](https://learn.adafruit.com/adafruit-dotstar-leds/overview) in various lengths and configurations
 
@@ -11,7 +11,7 @@ The [dotstar](../../../examples/drivers/dotstar) example works with a 144 LED Do
 ### Adding DotStar to a project
 To add the DotStar driver to a project, include its manifest:
 
-```
+```jsonc
 "include": [
 	/* other includes here */
 	"$(MODULES)/drivers/dotstar/manifest.json"
@@ -37,7 +37,7 @@ In the `defines` object, the optional `brightness` property may be set, where 25
 ### Configuring SPI
 The `defines` object must contain the `spi_port`.
 
-```
+```jsonc
 "defines": {
 	"dotstar": {
 		/* other properties here */

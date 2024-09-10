@@ -1,6 +1,6 @@
 # BLE
 Copyright 2017-2024 Moddable Tech, Inc.<BR>
-Revised: March 29, 2024
+Revised: September 10, 2024
 
 ## About This Document
 This document describes the Moddable SDK Bluetooth Low Energy (BLE) modules. Both client (master) and server (slave) roles are supported on Espressif ESP32, Silicon Labs Blue Gecko, Qualcomm QCA4020, and Nordic nRF52 devices.
@@ -37,7 +37,7 @@ Pre-made manifests are available for the BLE client and BLE server. Add them to 
 
 To add the BLE client to a project:
 
-```
+```jsonc
 "include": [
 	/* other includes here */
 	"$(MODDABLE)/modules/network/ble/manifest_client.json"
@@ -46,7 +46,7 @@ To add the BLE client to a project:
 
 To add the BLE server to a project:
 
-```
+```jsonc
 "include": [
 	/* other includes here */
 	"$(MODDABLE)/modules/network/ble/manifest_server.json"
