@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2023 Moddable Tech, Inc.
+ * Copyright (c) 2019-2024 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -62,7 +62,15 @@ enum {
 	kIOFormatStringUTF8 = 4,
 	kIOFormatSocketTCP = 5,
 
-	kIOFormatNext,
+	kIOFormatUint8 = 6,
+	kIOFormatInt8 = 7,
+	kIOFormatUint16 = 8,
+	kIOFormatInt16 = 9,
+	kIOFormatUint32 = 10,
+	kIOFormatInt32 = 11,
+	kIOFormatUint64 = 12,
+	kIOFormatInt64 = 13,
+
 	kIOFormatInvalid = 0xFF,
 };
 
