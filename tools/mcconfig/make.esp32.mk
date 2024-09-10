@@ -403,7 +403,6 @@ PROJ_DIR_FILES = \
 	$(PROJ_DIR)/main/main.c \
 	$(PROJ_DIR)/main/component.mk \
 	$(PROJ_DIR)/main/CMakeLists.txt \
-	$(PROJ_DIR)/xs_idf_deps.txt \
 	$(PROJ_DIR)/CMakeLists.txt \
 	$(PROJ_DIR)/partitions.csv \
 	$(PROJ_DIR)/Makefile
@@ -584,7 +583,7 @@ DUMP_VARS:
 	echo "# IDF_RECONFIGURE_CMD is $(IDF_RECONFIGURE_CMD)"
 	echo "# SDKCONFIG_H_DIR is $(SDKCONFIG_H_DIR)"
 
-dependencies: $(PROJ_DIR)/main
+dependencies: $(PROJ_DIR) $(PROJ_DIR_FILES) $(PROJ_DIR)/../xs_idf_deps.txt
 	echo "# Configure dependencies..."; cd $(PROJ_DIR) ; rm -f $(PROJ_DIR)/main/idf_component.yml ; $(BUILD_DEPENDENCIES)
 
 precursor: prepareOutput idfVersionCheck $(PROJ_DIR_FILES) bootloaderCheck $(BLE) dependencies $(SDKCONFIG_H) $(LIB_DIR) $(BIN_DIR)/xs_$(ESP32_SUBCLASS).a
@@ -614,7 +613,7 @@ clean:
 	-rm -rf $(TMP_DIR) 2>/dev/null
 	-rm -rf $(LIB_DIR) 2>/dev/null	
 
-$(SDKCONFIG_H): $(SDKCONFIG_FILE) $(PROJ_DIR_FILES) $(TINY_USB_BITS)
+$(SDKCONFIG_H): $(SDKCONFIG_FILE) $(PROJ_DIR_FILES)
 	-rm $(PROJ_DIR)/sdkconfig 2>/dev/null
 	echo "# Reconfiguring ESP-IDF..." ; cd $(PROJ_DIR) ; $(IDF_RECONFIGURE_CMD)
 
@@ -667,9 +666,6 @@ $(PROJ_DIR)/main/CMakeLists.txt: $(PROJ_DIR)/main $(PROJ_DIR_TEMPLATE)/main/CMak
 
 $(PROJ_DIR)/CMakeLists.txt: $(PROJ_DIR_TEMPLATE)/CMakeLists.txt
 	cp -f $(PROJ_DIR_TEMPLATE)/CMakeLists.txt $@
-
-$(PROJ_DIR)/xs_idf_deps.txt: $(PROJ_DIR_TEMPLATE)/xs_idf_deps.txt
-	cp -f $(PROJ_DIR_TEMPLATE)/xs_idf_deps.txt $@
 
 $(PROJ_DIR)/Makefile: $(PROJ_DIR_TEMPLATE)/Makefile
 	cp -f $? $@

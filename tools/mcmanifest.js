@@ -387,30 +387,6 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 		else
 			tool.writeFileString(buildConfigFile, baseConfig);
 
-		// esp-idf component dependencies
-/*
-		if (("esp32" == tool.platform) && 
-			((tool.dependencies) || (tool.environment.USE_USB == 1))) {
-			var dep;
-			let depStr = "BUILD_DEPENDENCIES = ";
-			for (dep of tool.dependencies)
-				depStr += `idf.py add-dependency \"${dep.namespace}/${dep.name}${dep.version}\" ; `;
-			if (tool.environment.USE_USB == 1)
-				depStr += "idf.py add-dependency \"espressif/esp_tinyusb\"";
-			this.line(depStr);
-			this.line();
-
-			let cmakeTweakFile = outputConfigDirectory + tool.slash + "xs_idf_deps.txt";
-			let tweakStr = "set(ESP_COMPONENTS ";
-			for (dep of tool.dependencies)
-				tweakStr += `${dep.namespace}__${dep.name} `;
-			if (tool.environment.USE_USB == 1)
-				tweakStr += "espressif__esp_tinyusb";
-			tweakStr += ")\n";
-			tool.writeFileString(cmakeTweakFile, tweakStr);
-		}
-*/
-
 	}
 	generateBLEDefinitions(tool) {
 		this.write("BLE =");
