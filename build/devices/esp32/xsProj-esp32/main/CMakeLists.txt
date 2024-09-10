@@ -17,7 +17,7 @@
 #   along with the Moddable SDK Tools.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include(../xs_idf_deps.txt)
+include(../../xs_idf_deps.txt)
 
 file(TO_CMAKE_PATH "$ENV{MODDABLE}" ENV_MODDABLE)
 file(TO_CMAKE_PATH "$ENV{IDF_PATH}" ENV_IDF_PATH)

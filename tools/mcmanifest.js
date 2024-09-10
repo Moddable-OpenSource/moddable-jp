@@ -388,14 +388,15 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 			tool.writeFileString(buildConfigFile, baseConfig);
 
 		// esp-idf component dependencies
-		if (("esp32" == tool.platform) && (tool.dependencies)) {
+/*
+		if (("esp32" == tool.platform) && 
+			((tool.dependencies) || (tool.environment.USE_USB == 1))) {
 			var dep;
 			let depStr = "BUILD_DEPENDENCIES = ";
 			for (dep of tool.dependencies)
 				depStr += `idf.py add-dependency \"${dep.namespace}/${dep.name}${dep.version}\" ; `;
-			if (tool.environment.USE_USB == 1) {
+			if (tool.environment.USE_USB == 1)
 				depStr += "idf.py add-dependency \"espressif/esp_tinyusb\"";
-			}
 			this.line(depStr);
 			this.line();
 
@@ -408,6 +409,7 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 			tweakStr += ")\n";
 			tool.writeFileString(cmakeTweakFile, tweakStr);
 		}
+*/
 
 	}
 	generateBLEDefinitions(tool) {
@@ -517,6 +519,9 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 		}
 		
 		this.line("");
+
+		const ESP32_SUBCLASS = tool.environment.ESP32_SUBCLASS ?? "esp32";
+		tool.outputConfigDirectory = tool.outputPath + tool.slash + "tmp" + tool.slash + "esp32" + tool.slash + (tool.subplatform ?? "") + tool.slash + (tool.debug ? "debug" : (tool.instrument ? "instrument" : "release")) + tool.slash + tool.environment.NAME; //  + tool.slash + "xsProj-" + ESP32_SUBCLASS;
 
 		this.generateManifestDefinitions(tool);
 		this.generateModulesDefinitions(tool);
@@ -768,6 +773,35 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 				this.write("\n");
 			}
 		}
+		if (("esp32" == tool.platform) && 
+			((tool.dependencies) || (tool.environment.USE_USB == 1))) {
+
+			var dep, did = 0;
+			let depStr = "BUILD_DEPENDENCIES = ";
+			for (dep of tool.dependencies) {
+				if (did++)
+					depStr += "& ";
+				depStr += `idf.py add-dependency \"${dep.namespace}/${dep.name}${dep.version}\" `;
+			}
+			if (tool.environment.USE_USB == 1) {
+				if (did++)
+					depStr += "& ";
+				depStr += "idf.py add-dependency \"espressif/esp_tinyusb\"";
+			}
+			this.line(depStr);
+			this.line();
+
+			let cmakeTweakFile = tool.outputConfigDirectory + tool.slash + "xs_idf_deps.txt";
+			let tweakStr = "set(ESP_COMPONENTS ";
+			for (dep of tool.dependencies)
+				tweakStr += `${dep.namespace}__${dep.name} `;
+			if (tool.environment.USE_USB == 1)
+				tweakStr += "espressif__esp_tinyusb";
+			tweakStr += ")\n";
+			tool.writeFileString(cmakeTweakFile, tweakStr);
+		}
+	}
+	generateDependencyRules(tool) {
 	}
 	generateResourcesRules(tool) {
 		var formatPath = "$(TMP_DIR)" + tool.slash + "mc.format.h";
@@ -1079,6 +1113,7 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 		this.generateConfigurationRules(tool);
 		this.generateBLERules(tool);
 		this.generateResourcesRules(tool);
+		this.generateDependencyRules(tool);
 	}
 }
 
