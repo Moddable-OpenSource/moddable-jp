@@ -47,17 +47,22 @@ class LogMachine extends Machine {
 						this.binaryName = parts[1];
 				}
 				else if (payload.startsWith("@close")) {
-					if (this.binaryOutput)
+					if (this.binaryOutput) {
 						fs.closeSync(this.binaryOutput);
+						console.log(`#xsbug-log capture: ${this.binaryPath}`);
+					}
 					delete this.binaryOutput;
 					delete this.binaryName;
+					delete this.binaryPath;
 				}
 				else if (payload.startsWith("@")) {
 					console.log(`ignoring ${payload}`);
 				}
 				else if (payload) {
-					if (!this.binaryOutput)
-						this.binaryOutput = fs.openSync(process.env.MODDABLE + "/build/tmp/" + (this.binaryName ? this.binaryName : "log.bin"), "w+");
+					if (!this.binaryOutput) {
+						this.binaryPath = process.env.MODDABLE + "/build/tmp/" + (this.binaryName ? this.binaryName : "log.bin");
+						this.binaryOutput = fs.openSync(this.binaryPath, "w+");
+					}
 					fs.writeSync(this.binaryOutput, Buffer.from(payload, "base64"), 0);
 				}
 			}
