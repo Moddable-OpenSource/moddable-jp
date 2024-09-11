@@ -1,7 +1,7 @@
-# ECMA-419 FT6206 タッチドライバー
+# ECMA-419 FT6206 タッチドライバ
 更新日: 2022年11月16日
 
-このディレクトリには、FT6206 タッチドライバーの2つの別々の実装が含まれています。どちらもECMA-419の[センサークラスパターン](https://419.ecma-international.org/#-sensor-class-pattern)および[タッチ](https://419.ecma-international.org/#-sensor-classes-touch)センサークラスに準拠しています。
+このディレクトリには、FT6206 タッチドライバの2つの別々の実装が含まれています。どちらもECMA-419の[センサークラスパターン](https://419.ecma-international.org/#-sensor-class-pattern)および[タッチ](https://419.ecma-international.org/#-sensor-classes-touch)センサークラスに準拠しています。
 
 ft6206.jsの実装は同期SMBus I/Oを使用します。これは、SMBusをサポートするすべてのECMA-419デプロイメントで動作するはずです。ft6206_async.jsの実装は、ECMA-419第2版の一部として導入された非同期SMBus I/Oを使用します。これは、`SMBus.Async`コンストラクタを提供するECMA-419デプロイメントでのみ動作します。
 

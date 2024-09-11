@@ -80,7 +80,7 @@ mcconfig [manifest] [-d] [-f format] [-i] [-m] [-o directory] [-p platform] [-r 
 - `-v`: `make`によって実行されるすべてのコマンドをトレースします。
 - `key-=value`または`key="value"`の形式で指定された設定引数。これらはマニフェストの`config`セクションにマージされます。`mc/config`モジュールをインポートしてアクセスします。Moddableが提供するホストは、ネットワーキングおよび/またはディスプレイをサポートしているため、次の設定プロパティを定義しています：
   - `ssid="wifi ssid"`および`password="wifi password"`：ネットワーク認証情報を指定し、アプリを起動する前にネットワークに接続します。
-  - `screen=screen_driver`および`touch=touch_driver`：画面またはタッチドライバーを指定します。画面およびタッチドライバーの設定についての詳細は、[examples readme](../../examples/readme.md)を参照してください。
+  - `screen=screen_driver`および`touch=touch_driver`：画面またはタッチドライバを指定します。画面およびタッチドライバの設定についての詳細は、[examples readme](../../examples/readme.md)を参照してください。
 
 > **注意**: リリースビルドを生成するには、コマンドラインから `-d` と `-i` を除外してください。
 

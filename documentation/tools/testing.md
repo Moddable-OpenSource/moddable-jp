@@ -627,7 +627,7 @@ screen.checkImage("4e008cd76aa8c80e480d966a8aa91228");
 ```
 
 #### `doTouchBegan()`, `doTouchMoved()`, `doTouchEnded()` {/*examples*/}
-これらの関数は、タッチスクリーンドライバーによって生成されたかのようにタッチ入力イベントを送信します。各関数への引数は `id, x, y, ticks` です。これらの `async` 関数は、タッチイベントが配信された後に解決されます。
+これらの関数は、タッチスクリーンドライバによって生成されたかのようにタッチ入力イベントを送信します。各関数への引数は `id, x, y, ticks` です。これらの `async` 関数は、タッチイベントが配信された後に解決されます。
 
 ```js
 await screen.doTouchBegan(0, 100, 100, Time.ticks);

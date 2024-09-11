@@ -8,3 +8,7 @@ rules:
     patterns:
       - プルリクエスト
       - /[pP]ull [rR]equest/g
+  - expected: ドライバ
+    patterns:
+    - ドライバー
+

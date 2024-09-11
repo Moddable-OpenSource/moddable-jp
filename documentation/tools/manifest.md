@@ -212,7 +212,7 @@ Moddable SDKの各サンプルアプリケーションは、[examples directory]
 
 - `manifest_net.json` はWi-Fiを使用するアプリケーション用です。Socket、Net、SNTP、Wi-Fiモジュールが含まれています。HTTPやMQTTなどの特定のネットワークプロトコルは含まれていません。
 
-- `manifest_piu.json` は [Piu アプリケーションフレームワーク](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md) を使用するアプリケーション用です。Piuを使用するために必要なすべてのモジュールが含まれています。スクリーンとタッチドライバーは、Piuマニフェストをデバイスに依存しないようにするため、通常は対象デバイス自体のマニフェストによって提供されます。
+- `manifest_piu.json` は [Piu アプリケーションフレームワーク](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md) を使用するアプリケーション用です。Piuを使用するために必要なすべてのモジュールが含まれています。スクリーンとタッチドライバは、Piuマニフェストをデバイスに依存しないようにするため、通常は対象デバイス自体のマニフェストによって提供されます。
 
 いくつかのタッチ、ディスプレイ、センサー[ドライバー](../../modules/drivers)および一部の[ネットワークモジュール](../../modules/network)も、プロジェクトに簡単に組み込むためのマニフェストを持っています。
 
@@ -349,7 +349,7 @@ VMは初期化時に `keys.initial` ランタイムキーのスペースを割�
 
 `config` オブジェクトには、アプリケーションのスクリプトからアクセス可能な値が含まれています。
 
-これは一般的に、ターゲットプラットフォームのマニフェストでスクリーンドライバー、タッチドライバー、デフォルトの回転を指定するために使用されます。これらのプロパティは [Commodetto](../commodetto/commodetto.md) および [Piu](../piu/piu.md) のセットアップモジュールによって使用されます。
+これは一般的に、ターゲットプラットフォームのマニフェストでスクリーンドライバ、タッチドライバ、デフォルトの回転を指定するために使用されます。これらのプロパティは [Commodetto](../commodetto/commodetto.md) および [Piu](../piu/piu.md) のセットアップモジュールによって使用されます。
 
 ```json
 "config": {
