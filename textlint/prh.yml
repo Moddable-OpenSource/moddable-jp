@@ -10,5 +10,5 @@ rules:
       - /[pP]ull [rR]equest/g
   - expected: ドライバ
     patterns:
-    - ドライバー
+      - ドライバー
 
