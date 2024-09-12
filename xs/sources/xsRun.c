@@ -815,7 +815,7 @@ XS_CODE_JUMP:
 				if (slot && (slot->flag & XS_INTERNAL_FLAG)) {
 					if ((slot->kind == XS_CODE_KIND) || (slot->kind == XS_CODE_X_KIND)) {
 						if (byte && !mxIsConstructor(variable))
-							mxRunDebug(XS_TYPE_ERROR, "no constructor");
+							mxRunDebug(XS_TYPE_ERROR, "new: not a constructor");
 						variable = slot->value.code.closures;
 						if (variable) {
 							mxPushKind(XS_REFERENCE_KIND);
@@ -841,7 +841,7 @@ XS_CODE_JUMP:
 					}
 					if ((slot->kind == XS_CALLBACK_KIND) || (slot->kind == XS_CALLBACK_X_KIND)) {
 						if (byte && !mxIsConstructor(variable))
-							mxRunDebug(XS_TYPE_ERROR, "no constructor");
+							mxRunDebug(XS_TYPE_ERROR, "new: not a constructor");
 						mxPushKind(XS_VAR_KIND);
 						mxStack->value.environment.variable.count = 0;
 			#ifdef mxDebug
@@ -903,7 +903,7 @@ XS_CODE_JUMP:
 #ifdef mxHostFunctionPrimitive
 			else if (slot->kind == XS_HOST_FUNCTION_KIND) {
 				if (byte)
-					mxRunDebug(XS_TYPE_ERROR, "no constructor");
+					mxRunDebug(XS_TYPE_ERROR, "new: not a constructor");
 				mxPushKind(XS_VAR_KIND);
 				mxStack->value.environment.variable.count = 0;
 #ifdef mxDebug
@@ -929,7 +929,12 @@ XS_CODE_JUMP:
 				goto XS_CODE_END_ALL;
 			}
 #endif
-			mxRunDebug(XS_TYPE_ERROR, "no function");
+			if (byte) {
+				mxRunDebug(XS_TYPE_ERROR, "new: not a constructor");
+			}
+			else {
+				mxRunDebug(XS_TYPE_ERROR, "call: not a function");
+			}
 			mxBreak;
 			
 		mxCase(XS_CODE_BEGIN_SLOPPY)

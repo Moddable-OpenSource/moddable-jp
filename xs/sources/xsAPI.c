@@ -1333,18 +1333,22 @@ void fxThrowMessage(txMachine* the, txString path, txInteger line, txError error
 	txSize length = 0;
     va_list arguments;
     txSlot* slot;
-#ifdef mxDebug
- 	if (!the->debugEval)
-		fxBufferFrameName(the, message, sizeof(message), the->frame, ": ");
-	length = mxStringLength(message);
-#endif
     va_start(arguments, format);
-    c_vsnprintf(message + length, sizeof(message) - length, format, arguments);
+    c_vsnprintf(message, sizeof(message), format, arguments);
     va_end(arguments);
 
+	//??
 	length = (txSize)c_strlen(message) - 1;
 	while (length && (0x80 & message[length]))
 		message[length--] = 0;
+		
+#ifdef mxDebug
+ 	if (!the->debugEval) {
+		c_strncat(message, " (at ", sizeof(message) - mxStringLength(message) - 1);
+		length = (txSize)c_strlen(message);
+		fxBufferFrameName(the, message + length, sizeof(message) - length, the->frame, ")");
+	}
+#endif
 
 	if ((error <= XS_NO_ERROR) || (XS_ERROR_COUNT <= error))
 		error = XS_UNKNOWN_ERROR;
