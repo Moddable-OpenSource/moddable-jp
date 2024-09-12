@@ -44,10 +44,10 @@ const headers = [
 
 function callWithInvalidReceivers(obj, functionName, ...args)
 {
-	assert.throws(SyntaxError, () => obj[functionName].apply(new $TESTMC.HostObjectChunk, ...args), `${functionName} with HostObjectChunk`);
-	assert.throws(SyntaxError, () => obj[functionName].apply(new $TESTMC.HostObject, ...args), `${functionName} with HostObject`);
-	assert.throws(SyntaxError, () => obj[functionName].apply("a string", ...args), `${functionName} with string`);
-	assert.throws(SyntaxError, () => obj[functionName].apply([], ...args), `${functionName} with array`);
+	assert.throws(SyntaxError, () => obj[functionName].apply(new $TESTMC.HostObjectChunk, args), `${functionName} with HostObjectChunk`);
+	assert.throws(SyntaxError, () => obj[functionName].apply(new $TESTMC.HostObject, args), `${functionName} with HostObject`);
+	assert.throws(SyntaxError, () => obj[functionName].apply("a string", args), `${functionName} with string`);
+	assert.throws(SyntaxError, () => obj[functionName].apply([], args), `${functionName} with array`);
 }
 
 assert(await writable >= 8, "expected at least 8 bytes writable");
