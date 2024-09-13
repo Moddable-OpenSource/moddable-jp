@@ -1,6 +1,6 @@
 # Using the Moddable SDK with ESP32
 Copyright 2016-2024 Moddable Tech, Inc.<BR>
-Revised: August 8, 2024
+Revised: September 13, 2024
 
 This document provides a guide to building apps for the ESP32 line of SoCs from Espressif. The Moddable SDK supports [ESP32](https://www.espressif.com/en/products/socs/esp32), [ESP32-S2](https://www.espressif.com/en/products/socs/esp32-s2), [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3), [ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3), [ESP32-C6](https://www.espressif.com/en/products/socs/esp32-c6), and [ESP32-H2](https://www.espressif.com/en/products/socs/esp32-h2).
 
@@ -31,6 +31,7 @@ This document provides a guide to building apps for the ESP32 line of SoCs from 
 	* [Build configuration](#usb_build)
 	* [TinyUSB](#usb_tinyusb) (esp32s2, esp32s3)
 	* [Serial-JTAG](#usb_serial_jtag) (esp32s3, esp32c3, esp32c6, esp32h2)
+* [Using ESP Registry components](#idf-components)
 
 
 <a id="overview"></a>
@@ -132,6 +133,8 @@ The Moddable SDK supports devices built on ESP32-S3. The following table lists e
 
 | Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
+| <img src="./../assets/devices/moddable-six.png" width=125><BR>Moddable Six | `esp32/moddable_six`<BR>`esp32/moddable_six_cdc`<br>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit parallel display bus<BR>Capacitive touch<BR>Neopixel<BR>Qwiic connector<BR>Optional speaker<br><BR>20 External pins  | <li>[Moddable Six developer guide](./moddable-six.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
+| <img src="./../assets/devices/moddable-display-6.png" width=125><BR>Moddable Display 2 | `esp32/moddable_display_6`<BR>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit parallel display bus<BR>Capacitive touch<BR>Neopixel<BR>Qwiic connector<BR>Optional speaker<br><BR>20 External pins  | <li>[Moddable Display developer guide](./moddable-display.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
 |  <img src="https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/_images/esp32-s3-devkitc-1-v1.1-isometric.png" width=125><BR>ESP32-S3-DevKitC-1-N8 | `esp32/esp32s3` | |<li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html)</li> |
 |  <img src="./../assets/devices/adafruit-qt-py-eps32-s3.png" width=125><BR>Adafruit QT Py ESP32-S3 | `esp32/qtpys3` | Neopixel, 1 button, STEMMA/QWIIC  | <li>[Product page](https://www.adafruit.com/product/5426)</li> |
 |  <img src="./../assets/devices/adafruit-esp32-s3-tft-feather.png" width=125><BR>Adafruit ESP32-S3 TFT Feather | `esp32/feather_s3_tft` | 1.14" TFT display<BR> 240 x 135 16-bit color | <li>[Product page](https://www.adafruit.com/product/5483)</li>|
@@ -1054,7 +1057,7 @@ Done
 
 After you press __Reset__ on the device, the device will restart and connect to `xsbug`.
 
-These devices use this technique:
+These are some of the devices use this technique:
 
 | Platform | Device |
 | :---: | :--- |
@@ -1083,10 +1086,11 @@ Build your application:
 
 `mcconfig -d -m -p esp32/esp32s3_cdc`
 
-These devices use this technique:
+These are some of the devices use this technique:
 
 | Platform | Device |
 | :---: | :--- |
+| `esp32/moddable_six_cdc` | Moddable Six |
 | `esp32/c3_devkit_rust` | Espressif C3 DevKit Rust |
 | `esp32/esp32c3_cdc` | Espressif C3 DevKitM |
 | `esp32/esp32s3_cdc` | Espressif ESP32-S3-DevKitC |
@@ -1094,4 +1098,26 @@ These devices use this technique:
 | `esp32/xiao_esp32c3` | Seeed Xiao ESP32C3 |
 
 
+<a id="idf-components"></a>
 
+## Using ESP Registry components
+
+The [ESP Component Registry](https://components.espressif.com/) contains many components and libraries for the Espressif devices.
+
+You can write modules that expose the functionality of these components to your JavaScript modules.
+
+Add a `dependency` property in the `platforms`:`esp32` section of the manifest:
+
+```json
+	"platforms": {
+		"esp32": {
+			"dependency": [
+				{ "name": "onewire_bus", "version": "^1.0.2" }
+			]
+		}
+	}
+```
+
+The library and include files from the dependencies will be loaded from the ESP Registry automatically and made available to your project. You can then write your module with a native part to interface with the component. 
+
+The [onewire module](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/drivers/onewire) demonstrates the use of `dependency`.

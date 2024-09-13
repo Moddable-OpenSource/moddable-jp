@@ -1,6 +1,6 @@
 # Manifest
-Copyright 2017-2023 Moddable Tech, Inc.<BR>
-Revised: August 3, 2023
+Copyright 2017-2024 Moddable Tech, Inc.<BR>
+Revised: September 13, 2024
 
 A manifest is a JSON file that describes the modules and resources necessary to build a Moddable app. This document explains the properties of the JSON object and how manifests are processed by the Moddable SDK build tools.
 
@@ -614,6 +614,25 @@ For example, if the `platforms` object of a manifest is as follows, building for
 }
 ```
 
+The `esp32` platform has an additional property `dependency` which can be used to [add ESP Registry components](../devices/esp32/manifest.md#idf-components) to your project.
+
+```json
+	"platforms": {
+		"esp32": {
+			"dependency": [
+				{ "name": "onewire_bus", "version": "^1.0.2" },
+				{ "namespace": "waveshare", "name": "esp_lcd_jd9365_8", "version": "^0.0.2" }
+			]
+		}
+	}
+```
+
+`namespace` is optional and defaults to `espressif`.
+
+The library and include files from the dependencies will be loaded from the ESP Registry and made available to you. You can then write your module with a native part to interface with the component. 
+
+The [onewire module](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/drivers/onewire) demonstrates the use of `dependency`.
+
 <a id="subplatforms"></a>
 #### Subplatforms
 
@@ -660,6 +679,8 @@ The `SUBPLATFORM` variable is automatically defined by `mcconfig`. A wildcard is
 		}
 	}
 ```
+
+
 ***
 
 <a id="bundle"></a>
