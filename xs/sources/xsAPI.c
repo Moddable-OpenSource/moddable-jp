@@ -1344,7 +1344,7 @@ void fxThrowMessage(txMachine* the, txString path, txInteger line, txError error
 		
 #ifdef mxDebug
  	if (!the->debugEval) {
-		c_strncat(message, " (at ", sizeof(message) - mxStringLength(message) - 1);
+		c_strncat(message, " (in ", sizeof(message) - mxStringLength(message) - 1);
 		length = (txSize)c_strlen(message);
 		fxBufferFrameName(the, message + length, sizeof(message) - length, the->frame, ")");
 	}
