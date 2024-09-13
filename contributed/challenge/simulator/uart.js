@@ -45,12 +45,14 @@ export default class UARTServer {
 		this.index++;
 		if (this.index == 10)
 			this.index = 0;
-		this.target.defer("onReceived", `
-@ function* test() {
+		if (0) {
+			this.target.defer("onReceived", `
+function* test() {
   guess("${ this.index.toString().repeat(10) }");
   yield;
 }
 `);
+		}
 		this.timer = Timer.set(() => {
 			delete this.timer;
 			this.onDisconnected();
