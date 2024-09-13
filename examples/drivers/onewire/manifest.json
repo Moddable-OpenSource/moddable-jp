@@ -15,7 +15,7 @@
 		"esp": {
 			"config": {
 				"onewire": {
-					"pin": "4"
+					"pin": 4
 				}
 			},
 			"defines": {
@@ -27,14 +27,14 @@
 		"esp32": {
 			"config": {
 				"onewire": {
-					"pin": "16"
+					"pin": 16
 				}
 			}
 		},
 		"win": {
 			"config": {
 				"onewire": {
-					"pin": "1"
+					"pin": 1
 				}
 			}
 		}
