@@ -743,7 +743,10 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 			if (tool.dependencies?.length) {
 				this.write("MANAGED_COMPONENT_DIRS = \\\n");
 				for (var dep of tool.dependencies) {
-					var depLine = "\t" + tool.tmpPath + tool.slash + "xsProj-" + tool.environment.ESP32_SUBCLASS + tool.slash + "managed_components" + tool.slash + dep.namespace + "__" + dep.name + "/include \\\n";
+					var depLine = "\t";
+					if (tool.windows)
+						depLine += "-I";
+					depLine += tool.tmpPath + tool.slash + "xsProj-" + tool.environment.ESP32_SUBCLASS + tool.slash + "managed_components" + tool.slash + dep.namespace + "__" + dep.name + "/include \\\n";
 					this.write(depLine);
 				}
 				this.write("\n");
