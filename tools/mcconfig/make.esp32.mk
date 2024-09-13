@@ -583,8 +583,10 @@ DUMP_VARS:
 	echo "# IDF_RECONFIGURE_CMD is $(IDF_RECONFIGURE_CMD)"
 	echo "# SDKCONFIG_H_DIR is $(SDKCONFIG_H_DIR)"
 
-dependencies: $(PROJ_DIR) $(PROJ_DIR_FILES) $(PROJ_DIR)/../xs_idf_deps.txt
-	echo "# Configure dependencies..."; cd $(PROJ_DIR) ; rm -f $(PROJ_DIR)/main/idf_component.yml ; $(BUILD_DEPENDENCIES)
+dependencies: $(PROJ_DIR)/../xs_idf_deps.txt
+	echo "# Configure dependencies..."
+	rm -f $(PROJ_DIR)/main/idf_component.yml
+	cd $(PROJ_DIR) ; $(BUILD_DEPENDENCIES)
 
 precursor: prepareOutput idfVersionCheck $(PROJ_DIR_FILES) bootloaderCheck $(BLE) dependencies $(SDKCONFIG_H) $(LIB_DIR) $(BIN_DIR)/xs_$(ESP32_SUBCLASS).a
 	cp $(BIN_DIR)/xs_$(ESP32_SUBCLASS).a $(BLD_DIR)/.
