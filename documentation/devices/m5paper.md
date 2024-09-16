@@ -87,11 +87,11 @@ macOSでのM5PaperのUSBドライバの状況は少し厄介です。以下の�
 <a id="display-driver"></a>
 ### Display Driver
 
-ディスプレイドライバーは[Poco `PixelsOut`](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/commodetto.md#pixelsout-class)の実装です。これにより、Moddable SDKの[Poco](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/poco.md)グラフィックスAPIと[Piu](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md)ユーザーインターフェースフレームワークの両方を使用することができます。
+ディスプレイドライバは[Poco `PixelsOut`](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/commodetto.md#pixelsout-class)の実装です。これにより、Moddable SDKの[Poco](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/poco.md)グラフィックスAPIと[Piu](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md)ユーザーインターフェースフレームワークの両方を使用することができます。
 
 多くの既存のPocoおよびPiuの例はEPDで動作しますが、その多くは実用的ではありません。これらは高リフレッシュレートの小型カラーLCD用に設計されているため、低リフレッシュレートの大きなグレーディスプレイでは見た目が滑稽になることが多いです。このディスプレイ用に設計されたいくつかの例が必要です。
 
-ディスプレイドライバーは完全にJavaScriptで書かれています。すべてのハードウェアアクセスに[Ecma-419 IO](https://419.ecma-international.org/#-9-io-class-pattern) APIを使用しています。パフォーマンスは優れており、ネイティブのM5Paperライブラリに組み込まれているEPDクラスよりも高速なことが多いです。その理由の1つは、Pocoが4ビットグレーピクセルに直接レンダリングできるため、ピクセルフォーマットの変換が不要になることです。もう一つの理由は、ディスプレイコントローラーへのSPI転送が一度に数千ピクセルのバルク転送で行われるため、4ピクセルずつ転送する場合に比べて転送されるビット数が半分以上削減されることです。
+ディスプレイドライバは完全にJavaScriptで書かれています。すべてのハードウェアアクセスに[Ecma-419 IO](https://419.ecma-international.org/#-9-io-class-pattern) APIを使用しています。パフォーマンスは優れており、ネイティブのM5Paperライブラリに組み込まれているEPDクラスよりも高速なことが多いです。その理由の1つは、Pocoが4ビットグレーピクセルに直接レンダリングできるため、ピクセルフォーマットの変換が不要になることです。もう一つの理由は、ディスプレイコントローラーへのSPI転送が一度に数千ピクセルのバルク転送で行われるため、4ピクセルずつ転送する場合に比べて転送されるビット数が半分以上削減されることです。
 
 メモリ使用量も非常に低いです。ESP32メモリにはフレームバッファがなく、レンダリングされたピクセルは16ラインのレンダーバッファ（約8 KB）から直接ディスプレイに送信されます。
 
@@ -137,7 +137,7 @@ onFinishedFirstDraw(application, mode) {
 
 <a id="image-filters"></a>
 #### 画像フィルター
-ディスプレイドライバーは、いくつかの異なる[ピクセルフィルター](https://github.com/phoddie/m5paper/blob/4110701c8084c07d7f777a44e17e970ffd18f729/targets/m5paper/it8951.js#L342-L349)をサポートしています。これらのフィルターはピクセルの輝度を調整します。画像の最適化や特殊効果の適用に役立ちます。デフォルトのフィルターは「なし」です。フィルターは各フレームごとに変更できます。フィルターを変更するには、グローバルな`screen`オブジェクトの`config`メソッドを呼び出します。例えば：
+ディスプレイドライバは、いくつかの異なる[ピクセルフィルター](https://github.com/phoddie/m5paper/blob/4110701c8084c07d7f777a44e17e970ffd18f729/targets/m5paper/it8951.js#L342-L349)をサポートしています。これらのフィルターはピクセルの輝度を調整します。画像の最適化や特殊効果の適用に役立ちます。デフォルトのフィルターは「なし」です。フィルターは各フレームごとに変更できます。フィルターを変更するには、グローバルな`screen`オブジェクトの`config`メソッドを呼び出します。例えば：
 
 ```js
 screen.config({filter: "negative"});
@@ -168,7 +168,7 @@ Moddable SDKのすべてのドキュメントは[documentation](../)ディレク
 - `commodetto` サブディレクトリには、2DグラフィックスAPIを提供するビットマップ グラフィックス ライブラリであるCommodettoと、軽量レンダリング エンジンであるPocoに関連するリソースが含まれています。
 - `piu` サブディレクトリには、複雑で応答性の高いレイアウトを簡単に作成できるようにするユーザー インターフェイス フレームワークであるPiuに関連するリソースが含まれています。
 - `networking` サブディレクトリには、BLE、ネットワーク ソケット、およびHTTP/HTTPS、WebSockets、DNS、SNTP、telnetなどのソケット上に構築されたさまざまな標準の安全なネットワーキング プロトコルに関連するネットワーキング リソースが含まれています。
-- `pins` サブディレクトリには、サポートされているハードウェア プロトコル (デジタル、アナログ、PWM、I2Cなど） に関連するリソースが含まれています。市販の一般的なセンサー用の多数のドライバーと対応するサンプル アプリも利用できます。
+- `pins` サブディレクトリには、サポートされているハードウェア プロトコル (デジタル、アナログ、PWM、I2Cなど） に関連するリソースが含まれています。市販の一般的なセンサー用の多数のドライバと対応するサンプル アプリも利用できます。
 
 <a id="support"></a>
 ### サポート
