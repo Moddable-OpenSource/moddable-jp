@@ -469,25 +469,29 @@ void fxConstructArrayEntry(txMachine* the, txSlot* entry)
 	the->stack += 3;
 }
 
+enum {
+	mxCreateEmptyArray = 0,
+	mxCreateArrayWithLength = 1,
+	mxCreateArrayWithChunk = 2,
+};
 txSlot* fxCreateArray(txMachine* the, txFlag flag, txIndex length)
 {
-    txBoolean resize = 1;
 	if (mxIsReference(mxThis) && mxIsConstructor(mxThis->value.reference)) {
 		mxPushSlot(mxThis);
 		if (the->stack->value.reference != mxArrayConstructor.value.reference)
-			resize = 0;
+			flag &= mxCreateArrayWithLength;
 	}
 	else
 		mxPush(mxArrayConstructor);
 	mxNew();
-	if (flag) {
+	if (flag & mxCreateArrayWithLength) {
 		mxPushUnsigned(length);
 		mxRunCount(1);
 	}
 	else
 		mxRunCount(0);
 	mxPullSlot(mxResult);
-	if (resize)
+	if (flag & mxCreateArrayWithChunk)
 		fxSetIndexSize(the, mxResult->value.reference->next, length, XS_CHUNK);
 	return fxCheckArray(the, mxResult, XS_MUTABLE);
 }
@@ -1166,7 +1170,7 @@ void fx_Array_from(txMachine* the)
 			else
 				length = fxCheckArrayLength(the, the->stack);
 			mxPop();
-			fxCreateArray(the, 1, length);
+			fxCreateArray(the, mxCreateArrayWithLength, length);
 			while (index < length) {
 				mxPushSlot(mxArgv(0));
 				mxGetIndex(index);
@@ -1176,7 +1180,7 @@ void fx_Array_from(txMachine* the)
 			}
 		}
 		else {
-			fxCreateArray(the, 0, 0);
+			fxCreateArray(the, mxCreateEmptyArray, 0);
 			mxTemporary(iterator);
 			mxTemporary(next);
 			fxGetIterator(the, mxArgv(0), iterator, next, 0);
@@ -1196,7 +1200,7 @@ void fx_Array_from(txMachine* the)
 		}
 	}
 	else {
-		fxCreateArray(the, 1, length);
+		fxCreateArray(the, mxCreateArrayWithLength, 0);
 	}
 	mxPushUnsigned(length);
 	mxPushSlot(mxResult);
@@ -1236,10 +1240,9 @@ void fx_Array_isArray(txMachine* the)
 void fx_Array_of(txMachine* the)
 {
 	txIndex count = (txIndex)mxArgc, index = 0;
-	txSlot* array = fxCreateArray(the, 1, count);
+	txSlot* array = fxCreateArray(the, mxCreateArrayWithLength | mxCreateArrayWithChunk, count);
 	if (array) {
 		txSlot* slot;
-		fxSetIndexSize(the, array, count, XS_CHUNK);
 		slot = array->value.array.address;
 		while (index < count) {
 			txSlot* argument = mxArgv(index);
