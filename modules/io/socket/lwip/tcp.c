@@ -754,11 +754,8 @@ void xs_listener_read(xsMachine *the)
 	ListenerPending pending;
 	TCP tcp;
 
-	if (NULL == listener->pending) {
-		xsDebugger();
-		xsCall0(xsArg(0), xsID_close);
+	if (NULL == listener->pending)
 		return;
-	}
 
 	builtinCriticalSectionBegin();
 	pending = listener->pending;
