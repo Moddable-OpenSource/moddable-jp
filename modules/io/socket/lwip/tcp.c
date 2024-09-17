@@ -661,14 +661,16 @@ void xs_listener_constructor(xsMachine *the)
 	Listener listener;
 	struct tcp_pcb *skt;
 	ip_addr_t address = *(IP_ADDR_ANY);
-	uint16_t port = 0;
+	int port = 0;
 	xsSlot *onReadable;
 
 	xsmcVars(1);
 
 	if (xsmcHas(xsArg(0), xsID_port)) {
 		xsmcGet(xsVar(0), xsArg(0), xsID_port);
-		port = (uint16_t)xsmcToInteger(xsVar(0));
+		port = builtinGetSignedInteger(the, &xsVar(0)); 
+		if ((port < 0) || (port > 65535))
+			xsRangeError("invalid port");
 	}
 	//@@ address
 
