@@ -153,7 +153,7 @@ void fxCheckFunction(txParser* parser)
 			}
 		}
 	}
-	fxReportParserError(parser, parser->line, "no function");
+	fxReportParserError(parser, node->line, "no function");
 }
 
 void fxCheckGenerator(txParser* parser)
@@ -173,7 +173,7 @@ void fxCheckGenerator(txParser* parser)
 			}
 		}
 	}
-	fxReportParserError(parser, parser->line, "no generator function");
+	fxReportParserError(parser, node->line, "no generator function");
 }
 
 void fxParserTree(txParser* parser, void* theStream, txGetter theGetter, txUnsigned flags, txString* name)
@@ -181,13 +181,17 @@ void fxParserTree(txParser* parser, void* theStream, txGetter theGetter, txUnsig
 	mxTryParser(parser) {
 		parser->stream = theStream;
 		parser->getter = theGetter;
-		parser->line = 1;
 		parser->flags = flags;
-		parser->modifier = parser->emptyString;
-		parser->string = parser->emptyString;
-		parser->line2 = 1;
-		parser->modifier2 = parser->emptyString;
-		parser->string2 = parser->emptyString;
+
+		parser->states[0].line = 1;
+		parser->states[0].modifier = parser->emptyString;
+		parser->states[0].string = parser->emptyString;
+		parser->states[1].line = 1;
+		parser->states[1].modifier = parser->emptyString;
+		parser->states[1].string = parser->emptyString;
+		parser->states[2].line = 1;
+		parser->states[2].modifier = parser->emptyString;
+		parser->states[2].string = parser->emptyString;
 	
 		parser->root = NULL;
 	
@@ -205,7 +209,7 @@ void fxParserTree(txParser* parser, void* theStream, txGetter theGetter, txUnsig
 				}	
 			}
 			else
-				fxReportParserError(parser, parser->line, "invalid character %d", parser->character);
+				fxReportParserError(parser, 1, "invalid character %d", parser->character);
 		}
 		fxGetNextToken(parser);
 		if (parser->flags & mxProgramFlag) {

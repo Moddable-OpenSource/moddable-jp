@@ -325,7 +325,7 @@ import structuredClone from "structuredClone";
 Moddable SDKの`structuredClone`関数は、循環参照や`transferables`オプションを含む、可能な限りWHATWGによって定義された[アルゴリズム](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)を実装しています。
 
 ```js
-const a = {a: 1, b: Uint8Array.of(1, 2, 3,)}
+const a = {a: 1, b: Uint8Array.of(1, 2, 3)}
 const aCopy = structuredClone(a);
 ```
 

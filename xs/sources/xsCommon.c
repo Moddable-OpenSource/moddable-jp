@@ -1382,14 +1382,14 @@ const txString gxIDStrings[XS_ID_COUNT] = {
 	"parseInt",
 	"trace",
 	"unescape",
-	"Infinity",
-	"NaN",
-	"undefined",
 #if mxExplicitResourceManagement	
 	"AsyncDisposableStack",
 	"DisposableStack",
 	"SuppressedError",
 #endif	
+	"Infinity",
+	"NaN",
+	"undefined",
 	"Compartment",
 	"Function",
 	"eval",

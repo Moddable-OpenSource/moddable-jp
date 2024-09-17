@@ -42,7 +42,6 @@ class File @ "xs_filelittlefs_destructor"{
 	flush() @ "xs_filelittlefs_flush"
 }
 
-
 class Scan @ "xs_scanlittlefs_destructor" {
 	constructor(options) @ "xs_scanlittlefs"
 	close() @ "xs_scanlittlefs_close"
@@ -84,4 +83,4 @@ class Directory @ "xs_direectorylittlefs_destructor" {
 	}
 }
 
-export {File, Scan, Directory}
+export {Directory}

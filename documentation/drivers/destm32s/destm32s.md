@@ -1,6 +1,6 @@
 # DESTM32S display driver
 Copyright 2017 Moddable Tech, Inc.<BR>
-Revised: December 30, 2017
+Revised: September 10, 2024
 
 The DESTM32S display controller drives three different ePaper displays. The displays are available from various sources, including Crystalfontz where we purchased our test units. They use a small adapter board (from [good-display.com](http://www.good-display.com/products_detail/productId=327.html)), though the display controller is part of the ePaper display itself (so called chip-on-glass).
 
@@ -17,7 +17,7 @@ The [love-e-ink](../../../examples/piu/love-e-ink) example is designed to work w
 ### Adding DESTM32 to a project
 To add the SSD1351 driver to a project, include its manifest:
 
-```
+```jsonc
 "include": [
 	/* other includes here */
 	"$(MODULES)/drivers/destm32s/manifest.json"
@@ -79,7 +79,7 @@ For 104 x 212 black, white, gray, and red:
 ### Configuring SPI
 The `defines` object must contain the `spi_port`, along with the `DC`, `CS`, and `BUSY`. pin numbers. If a `RST` pin is provided, the device will be reset when the constructor is invoked. If the `cs_port`, `dc_port`, `rst_port`, or `busy_port` properties are not provided, they default to NULL.
 
-```
+```jsonc
 "defines": {
 	"ssd1351": {
 		/* other properties here */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023  Moddable Tech, Inc.
+ * Copyright (c) 2022-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -167,7 +167,7 @@ void xs_tcp_constructor(xsMachine *the)
 				xsUnknownError("invalid address");;
 
 			xsmcGet(xsVar(0), xsArg(0), xsID_port);
-			port = xsmcToInteger(xsVar(0));
+			port = builtinGetSignedInteger(the, &xsVar(0));
 			if ((port < 0) || (port > 65535))
 				xsRangeError("invalid port");
 
@@ -357,7 +357,7 @@ void xs_tcp_get_remoteAddress(xsMachine *the)
 
 	xsResult = xsStringBuffer(NULL, 4 * 5);
 	out = xsmcToString(xsResult);
-	inet_ntop(AF_INET, &addr, out, 4 * 5);
+	inet_ntop(AF_INET, &addr.sin_addr, out, 4 * 5);
 }
 
 void xs_tcp_get_remotePort(xsMachine *the)
@@ -635,6 +635,7 @@ void xs_listener_close_(xsMachine *the)
 		xsForget(listener->obj);
 		xs_listener_destructor_(listener);
 		xsmcSetHostData(xsThis, NULL);
+		xsmcSetHostDestructor(xsThis, NULL);
 	}
 }
 

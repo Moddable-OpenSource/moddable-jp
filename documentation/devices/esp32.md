@@ -1,6 +1,6 @@
 # Moddable SDKでESP32を使用する
 Copyright 2016-2024 Moddable Tech, Inc.<BR>
-改訂： 2024年8月8日
+改訂： 2024年9月13日
 
 このドキュメントは、EspressifのESP32シリーズのSoC向けにアプリを構築するためのガイドを提供します。Moddable SDKは、[ESP32](https://www.espressif.com/en/products/socs/esp32)、[ESP32-S2](https://www.espressif.com/en/products/socs/esp32-s2)、[ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3)、[ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3)、[ESP32-C6](https://www.espressif.com/en/products/socs/esp32-c6)、および[ESP32-H2](https://www.espressif.com/en/products/socs/esp32-h2)をサポートしています。
 
@@ -129,6 +129,8 @@ Moddable SDKはESP32-S3上に構築されたデバイスをサポートしてい
 
 | 名前 | プラットフォーム識別子 | 主要機能 | リンク |
 | :---: | :--- | :--- | :--- |
+| <img src="./../assets/devices/moddable-six.png" width=125><BR>Moddable Six | `esp32/moddable_six`<BR>`esp32/moddable_six_cdc`<br>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit 並列ディスプレイバス<BR>静電容量式タッチ<BR>Neopixel<BR>Qwiic コネクタ<BR>追加のスピーカー<br><BR>20個の外部ピン  | <li>[Moddable Six 開発者ガイド](./moddable-six.md)</li><li>[Moddable製品ページ](https://www.moddable.com/hardware)</li> |
+| <img src="./../assets/devices/moddable-display-6.png" width=125><BR>Moddable Display 6 | `esp32/moddable_display_6`<BR>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit parallel display bus<BR>静電容量式タッチ<BR>Neopixel<BR>Qwiic コネクター<BR>追加のスピーカー<br><BR>20個の外部ピン  | <li>[Moddable Display  開発者ガイド](./moddable-display.md)</li><li>[Moddable製品ページ](https://www.moddable.com/hardware)</li> |
 |  <img src="https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/_images/esp32-s3-devkitc-1-v1.1-isometric.png" width=125><BR>ESP32-S3-DevKitC-1-N8 | `esp32/esp32s3` | |<li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html)</li> |
 |  <img src="./../assets/devices/adafruit-qt-py-eps32-s3.png" width=125><BR>Adafruit QT Py ESP32-S3 | `esp32/qtpys3` | Neopixel、1ボタン、STEMMA/QWIIC  | <li>[製品ページ](https://www.adafruit.com/product/5426)</li> |
 |  <img src="./../assets/devices/adafruit-esp32-s3-tft-feather.png" width=125><BR>Adafruit ESP32-S3 TFT Feather | `esp32/feather_s3_tft` | 1.14インチTFTディスプレイ<BR> 240 x 135 16ビットカラー | <li>[製品ページ](https://www.adafruit.com/product/5483)</li>|
@@ -1049,7 +1051,7 @@ Done
 
 デバイスの __Reset__ ボタンを押すと、デバイスが再起動し、`xsbug` に接続されます。
 
-これらのデバイスはこの技術を使用します：
+これらのうちいくつかデバイスはこの技術を使用します：
 
 | プラットフォーム | デバイス |
 | :---: | :--- |
@@ -1077,12 +1079,37 @@ Done
 
 `mcconfig -d -m -p esp32/esp32s3_cdc`
 
-これらのデバイスはこの技術を使用します：
+これらのうちいくつかはデバイスはこの技術を使用します：
 
 | プラットフォーム | デバイス |
 | :---: | :--- |
+| `esp32/moddable_six_cdc` | Moddable Six |
 | `esp32/c3_devkit_rust` | Espressif C3 DevKit Rust |
 | `esp32/esp32c3_cdc` | Espressif C3 DevKitM |
 | `esp32/esp32s3_cdc` | Espressif ESP32-S3-DevKitC |
 | `esp32/qtpyc3` | Adafruit QT Py C3 |
 | `esp32/xiao_esp32c3` | Seeed Xiao ESP32C3 |
+
+<a id="idf-components"></a>
+
+## ESP Registry componentsを使用する
+
+[ESP Component Registry](https://components.espressif.com/)は多くのEspressifデバイスのコンポーネントやライブラリを公開しています。
+
+これらのコンポーネントの機能をJavaScriptモジュール公開するモジュールを作成できます。
+
+マニフェストの`platforms`:`esp32` セクションに`dependency`プロパティを追加します：
+
+```json
+	"platforms": {
+		"esp32": {
+			"dependency": [
+				{ "name": "onewire_bus", "version": "^1.0.2" }
+			]
+		}
+	}
+```
+
+依存関係からのライブラリおよびインクルードファイルは、自動的にESPレジストリから読み込まれ、プロジェクトで利用可能になります。次に、コンポーネントと連携するネイティブ部分を持つモジュールを作成できます。
+
+[onewire module](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/drivers/onewire) `dependency`の示しています。

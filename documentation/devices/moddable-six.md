@@ -1,7 +1,7 @@
 # Moddable Six 開発者ガイド
 
 Copyright 2024 Moddable Tech, Inc.<BR>
-改訂日： 2024年7月18日
+改訂日： 2024年8月16日
 
 このドキュメントは、Moddable Sixに関する情報を提供します。ピンや内蔵コンポーネントの詳細、アプリのビルドとデプロイ方法、追加の開発リソースへのリンクが含まれています。
 
@@ -168,7 +168,7 @@ USBポートを使用するには：
 
 	プログラマの向きが正しいことを確認してください。向きは以下の画像と一致する必要があります。
 
-	![image](https://gist.github.com/assets/6822704/c605ef5b-0b80-46a2-a87c-1cab80b59deb)
+	<img width="50%" src="../assets/devices/moddable-six-programmer.png">
 
 2. プログラマをマイクロUSBケーブルでコンピュータに接続します
 

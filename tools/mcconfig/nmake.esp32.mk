@@ -83,7 +83,6 @@ USE_USB = 0
 !ENDIF
 
 !IF "$(USE_USB)"=="1"
-TINY_USB_BITS=$(PROJ_DIR)/managed_components
 !IF "$(USB_VENDOR_ID)"==""
 USB_VENDOR_ID = beef
 !ENDIF
@@ -220,6 +219,7 @@ DRIVER_DIRS = \
 
 INC_DIRS = \
 	$(DRIVER_DIRS) \
+	$(MANAGED_COMPONENT_DIRS) \
  	-I$(IDF_PATH)\components \
  	-I$(IDF_PATH)\components\bootloader_support\include \
  	-I$(IDF_PATH)\components\bt\include \
@@ -495,7 +495,7 @@ PROJ_DIR_FILES = $(PROJ_DIR_FILES) \
 !ENDIF
 !ENDIF
 
-.PHONY: all
+.PHONY: all dependencies
 
 all: $(LAUNCH)
 
@@ -514,7 +514,11 @@ clean:
 	if exist $(PROJ_DIR) del /s/q/f $(PROJ_DIR)\*.* > NUL
 	if exist $(PROJ_DIR) rmdir /s/q $(PROJ_DIR)
 
-precursor: idfVersionCheck $(BLE) $(SDKCONFIG_H) $(LIB_DIR) $(BIN_DIR)\xs_$(ESP32_SUBCLASS).a
+dependencies: $(PROJ_DIR) $(PROJ_DIR_FILES) $(PROJ_DIR)\..\xs_idf_deps.txt
+	if exist $(TMP_DIR)\xsProj-$(ESP32_SUBCLASS)\main\idf_component.yml del $(TMP_DIR)\xsProj-$(ESP32_SUBCLASS)\main\idf_component.yml
+	echo "# Configure dependencies..." & cd $(PROJ_DIR) & $(BUILD_DEPENDENCIES)
+
+precursor: idfVersionCheck $(BLE) dependencies $(SDKCONFIG_H) $(LIB_DIR) $(BIN_DIR)\xs_$(ESP32_SUBCLASS).a
 	copy $(BIN_DIR)\xs_$(ESP32_SUBCLASS).a $(BLD_DIR)\.
 
 debug: precursor
@@ -608,10 +612,7 @@ xidfVersionCheck:
 		exit 1
 	)
 
-$(PROJ_DIR)\managed_components:
-	echo "# Configure tinyusb..."; cd $(PROJ_DIR) ; idf.py add-dependency "espressif/esp_tinyusb"
-
-$(SDKCONFIG_H): $(SDKCONFIG_FILE) $(PROJ_DIR_FILES) $(TINY_USB_BITS)
+$(SDKCONFIG_H): $(SDKCONFIG_FILE) $(PROJ_DIR_FILES)
 	@echo Reconfiguring ESP-IDF...
 	if exist $(PROJ_DIR)\sdkconfig del $(PROJ_DIR)\sdkconfig
 	cd $(PROJ_DIR) 

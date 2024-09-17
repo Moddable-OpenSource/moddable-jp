@@ -269,7 +269,7 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 				mergedConfig = mergedConfig.concat(instConfig.split(regex));
 			}
 		}
-		
+
 		// Merge any application sdkconfig files
 		if (tool.environment.SDKCONFIGPATH != baseConfigDirectory) {
 			let appConfigFile = tool.environment.SDKCONFIGPATH + tool.slash + "sdkconfig.defaults";
@@ -374,16 +374,19 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 				}
 			}
 		}
-		
+
 		// Write the result, if it has changed
 		let buildConfigFile = outputConfigDirectory + tool.slash + "sdkconfig.mc";
 		tool.setenv("SDKCONFIG_FILE", buildConfigFile);
 		this.line("SDKCONFIG_FILE=", buildConfigFile);
 		if (tool.isDirectoryOrFile(buildConfigFile) == 1){
 			const oldConfig = tool.readFileString(buildConfigFile);
-			if (oldConfig == baseConfig) return;
+			if (oldConfig != baseConfig)
+				tool.writeFileString(buildConfigFile, baseConfig);
 		}
-		tool.writeFileString(buildConfigFile, baseConfig);
+		else
+			tool.writeFileString(buildConfigFile, baseConfig);
+
 	}
 	generateBLEDefinitions(tool) {
 		this.write("BLE =");
@@ -493,12 +496,16 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 		
 		this.line("");
 
+		const ESP32_SUBCLASS = tool.environment.ESP32_SUBCLASS ?? "esp32";
+		tool.outputConfigDirectory = tool.outputPath + tool.slash + "tmp" + tool.slash + "esp32" + tool.slash + (tool.subplatform ?? "") + tool.slash + (tool.debug ? "debug" : (tool.instrument ? "instrument" : "release")) + tool.slash + tool.environment.NAME; //  + tool.slash + "xsProj-" + ESP32_SUBCLASS;
+
 		this.generateManifestDefinitions(tool);
 		this.generateModulesDefinitions(tool);
 		this.generateObjectsDefinitions(tool);
 		this.generateDataDefinitions(tool);
 		this.generateBLEDefinitions(tool);
 		this.generateResourcesDefinitions(tool);
+		this.generateDependenciesDefinitions(tool);
 	}
 	generateManifestDefinitions(tool) {
 		this.write("MANIFEST =");
@@ -730,6 +737,50 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 		}
 		this.line("");
 		this.line("");
+	}
+	generateDependenciesDefinitions(tool) {
+		if ("esp32" == tool.platform) {
+			if (tool.dependencies?.length) {
+				this.write("MANAGED_COMPONENT_DIRS = \\\n");
+				for (var dep of tool.dependencies) {
+					var depLine = "\t";
+					if (tool.windows)
+						depLine += "-I";
+					depLine += tool.tmpPath + tool.slash + "xsProj-" + tool.environment.ESP32_SUBCLASS + tool.slash + "managed_components" + tool.slash + dep.namespace + "__" + dep.name + "/include \\\n";
+					this.write(depLine);
+				}
+				this.write("\n");
+			}
+		}
+		if (("esp32" == tool.platform) && 
+			((tool.dependencies) || (tool.environment.USE_USB == 1))) {
+
+			var dep, did = 0;
+			let depStr = "BUILD_DEPENDENCIES = ";
+			for (dep of tool.dependencies) {
+				if (did++)
+					depStr += "& ";
+				depStr += `idf.py add-dependency \"${dep.namespace}/${dep.name}${dep.version}\" `;
+			}
+			if (tool.environment.USE_USB == 1) {
+				if (did++)
+					depStr += "& ";
+				depStr += "idf.py add-dependency \"espressif/esp_tinyusb\"";
+			}
+			this.line(depStr);
+			this.line();
+
+			let cmakeTweakFile = tool.outputConfigDirectory + tool.slash + "xs_idf_deps.txt";
+			let tweakStr = "set(ESP_COMPONENTS ";
+			for (dep of tool.dependencies)
+				tweakStr += `${dep.namespace}__${dep.name} `;
+			if (tool.environment.USE_USB == 1)
+				tweakStr += "espressif__esp_tinyusb";
+			tweakStr += ")\n";
+			tool.writeFileString(cmakeTweakFile, tweakStr);
+		}
+	}
+	generateDependencyRules(tool) {
 	}
 	generateResourcesRules(tool) {
 		var formatPath = "$(TMP_DIR)" + tool.slash + "mc.format.h";
@@ -1041,6 +1092,7 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 		this.generateConfigurationRules(tool);
 		this.generateBLERules(tool);
 		this.generateResourcesRules(tool);
+		this.generateDependencyRules(tool);
 	}
 }
 
@@ -1949,6 +2001,20 @@ export class Tool extends TOOL {
 		}
 		this.currentDirectory = currentDirectory;
 	}
+	mergeDependencies(manifests) {
+		manifests.forEach(manifest => {
+			manifest.dependencies?.forEach(dep => {
+				var found = false;
+				for (const cmp in this.manifest.dependency) {
+					if (cmp.namespace != dep.namespace) continue;
+					if (cmp.name != dep.name) continue;
+					found = true;
+				}
+				if (!found)
+					this.manifest.dependency.push(dep);
+			});
+		});
+	}
 	mergeNodeRed(manifests) {
 		if (!this.environment.NODEREDMCU)
 			return;
@@ -2141,6 +2207,15 @@ export class Tool extends TOOL {
 						manifest.include = manifest.include.concat(platformInclude);
 					}
 				}
+				if (platform.dependency && ("esp32" == this.platform)) {
+					manifest.dependencies = [];
+					for (let i=0; i<platform.dependency.length; i++) {
+						var dep = platform.dependency[i];
+						if (undefined === dep.namespace)
+							dep.namespace = "espressif";
+						manifest.dependencies.push(dep);
+					}
+				}
 			}
 		}
 		if ("include" in manifest) {
@@ -2200,6 +2275,7 @@ export class Tool extends TOOL {
 			config:{},
 			creation:{},
 			defines:{},
+			dependency:[],
 			data:{},
 			modules:{},
 			resources:{},
@@ -2214,6 +2290,8 @@ export class Tool extends TOOL {
 			typescript: {compiler: "tsc", tsconfig: {compilerOptions: {}}}
 		};
 		this.manifests.forEach(manifest => this.mergeManifest(this.manifest, manifest));
+
+		this.mergeDependencies(this.manifests);
 	
 		if (this.manifest.errors.length) {
 			this.manifest.errors.forEach(error => { this.reportError(null, 0, error); });
@@ -2282,6 +2360,8 @@ export class Tool extends TOOL {
 		this.bleServicesFiles.already = {};
 		this.pioFiles = [];
 		this.pioFiles.already = {};
+
+		this.dependencies = this.manifest.dependency;
 
 		var rule = new DataRule(this);
 		rule.process(this.manifest.data);

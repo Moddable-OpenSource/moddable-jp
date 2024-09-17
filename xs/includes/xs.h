@@ -1446,6 +1446,10 @@ mxImport xsStringValue fxToStringBuffer(xsMachine*, xsSlot*, xsStringValue, xsIn
 mxImport xsStringValue fxToStringX(xsMachine*, xsSlot*);
 mxImport void fxUnsigned(xsMachine*, xsSlot*, xsUnsignedValue);
 mxImport xsUnsignedValue fxToUnsigned(xsMachine*, xsSlot*);
+mxImport void fxFromBigInt64(xsMachine* the, xsSlot* slot, int64_t value);
+mxImport int64_t fxToBigInt64(xsMachine* the, xsSlot* slot);
+mxImport void fxFromBigUint64(xsMachine* the, xsSlot* slot, uint64_t value);
+mxImport uint64_t fxToBigUint64(xsMachine* the, xsSlot* slot);
 
 mxImport void *fxArrayBuffer(xsMachine*, xsSlot*, void*, xsIntegerValue, xsIntegerValue);
 mxImport void fxGetArrayBufferData(xsMachine*, xsSlot*, xsIntegerValue, void*, xsIntegerValue);
