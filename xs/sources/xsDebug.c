@@ -415,15 +415,15 @@ txBoolean fxDebugEvalExpression(txMachine* the, txSlot* frame, txSlot* expressio
 		mxPushUndefined();
 		closures = fxNewEnvironmentInstance(the, C_NULL);
 		if (scope) {
-			txSlot* local = environment;
+			txSlot* local = scope;
 			txID id;
 			property = closures->next;
-			while (local > scope) {
-				local--;
+			while (local < environment) {
 				id = local->ID;
 				if ((0 < id) && (id < the->keyCount)) {
 					property = fxNextSlotProperty(the, property, local, id, local->flag);
 				}
+				local++;
 			}
 		}
 		the->scope = the->stack;
@@ -472,11 +472,10 @@ txBoolean fxDebugEvalExpression(txMachine* the, txSlot* frame, txSlot* expressio
 		property->value.home.module = C_NULL;
 		
 		if (scope) {
-			txSlot* local = environment;
+			txSlot* local = scope;
 			txID id;
 			property = closures->next->next;
-			while (local > scope) {
-				local--;
+			while (local < environment) {
 				id = local->ID;
 				if ((0 < id) && (id < the->keyCount)) {
 					if (property->kind != XS_CLOSURE_KIND) {
@@ -485,6 +484,7 @@ txBoolean fxDebugEvalExpression(txMachine* the, txSlot* frame, txSlot* expressio
 					}
 					property = property->next;
 				}
+				local++;
 			}		
 		}
 	

@@ -1,6 +1,6 @@
 # マニフェスト
 著作権2017-2023 Moddable Tech, Inc.<BR>
-改訂： 2023年8月3日
+改訂： 2023年9月13日
 
 マニフェストは、Moddableアプリを構築するために必要なモジュールとリソースを記述するJSONファイルです。このドキュメントでは、JSONオブジェクトのプロパティと、マニフェストがModdable SDKビルドツールによってどのように処理されるかについて説明します。
 
@@ -611,6 +611,25 @@ TLS証明書は `*` 配列に含めるべきです。
 }
 ```
 
+The `esp32` platform has an additional property `dependency` which can be used to [add ESP Registry components](../devices/esp32/manifest.md#idf-components) to your project.
+
+```json
+	"platforms": {
+		"esp32": {
+			"dependency": [
+				{ "name": "onewire_bus", "version": "^1.0.2" },
+				{ "namespace": "waveshare", "name": "esp_lcd_jd9365_8", "version": "^0.0.2" }
+			]
+		}
+	}
+```
+
+`namespace` is optional and defaults to `espressif`.
+
+The library and include files from the dependencies will be loaded from the ESP Registry and made available to you. You can then write your module with a native part to interface with the component.
+
+The [onewire module](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/drivers/onewire) demonstrates the use of `dependency`.
+
 <a id="subplatforms"></a>
 #### サブプラットフォーム
 
@@ -657,6 +676,8 @@ TLS証明書は `*` 配列に含めるべきです。
 		}
 	}
 ```
+
+
 ***
 
 <a id="bundle"></a>

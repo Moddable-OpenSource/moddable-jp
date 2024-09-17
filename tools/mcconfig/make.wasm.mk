@@ -20,7 +20,6 @@
 HOST_OS := $(shell uname)
 
 CC = emcc
-OPT = wasm-opt
 
 XS_DIRECTORIES = \
 	$(XS_DIR)/includes \
@@ -136,9 +135,7 @@ $(BIN_DIR)/index.html: 	$(BUILD_DIR)/makefiles/wasm/index.html
 	
 $(BIN_DIR)/mc.js: $(XS_OBJECTS) $(TMP_DIR)/mc.xs.c.o $(TMP_DIR)/mc.resources.c.o $(OBJECTS) $(TMP_DIR)/mc.main.c.o
 	@echo "# cc mc.js"
-	$(CC) $(LINK_OPTIONS) $(LINK_LIBRARIES) $^ -o $@
-	@echo "# wasm-opt"
-	$(OPT) -O2 $(BIN_DIR)/mc.wasm -o $(BIN_DIR)/mc.wasm
+	$(CC) -O3 $(LINK_OPTIONS) $(LINK_LIBRARIES) $^ -o $@
 
 $(XS_OBJECTS) : $(XS_HEADERS)
 $(LIB_DIR)/%.c.o: %.c

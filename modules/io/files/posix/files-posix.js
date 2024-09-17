@@ -84,4 +84,4 @@ class Directory @ "xs_direectoryposix_destructor" {
 	}
 }
 
-export {File, Scan, Directory}
+export {Directory}
