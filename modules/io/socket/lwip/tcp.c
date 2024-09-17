@@ -213,12 +213,14 @@ void xs_tcp_constructor(xsMachine *the)
 	tcp_recv(skt, tcpReceive);
 
 	tcp->triggerable = triggerable;
-	tcp->onReadable = onReadable;
-	tcp->onWritable = onWritable;
-	tcp->onError = onError;
+	if (triggerable) {
+		tcp->onReadable = onReadable;
+		tcp->onWritable = onWritable;
+		tcp->onError = onError;
 
-	if (onWritable)
-		tcp_sent(skt, tcpSent);
+		if (onWritable)
+			tcp_sent(skt, tcpSent);
+	}
 
 	if (connect) {
 		if (tcp_connect_safe(skt, &address, port, tcpConnect))
@@ -685,7 +687,7 @@ void xs_listener_constructor(xsMachine *the)
 		xsUnknownError("no socket");
 
 	skt->so_options |= SOF_REUSEADDR;
-	if (tcp_bind_safe(skt, &address, port)) {
+	if (tcp_bind_safe(skt, &address, (uint16_t)port)) {
 		tcp_close_safe(skt);
 		xsUnknownError("socket bind");
 	}
