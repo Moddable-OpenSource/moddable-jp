@@ -62,7 +62,7 @@ let leds = new MCP23008({ sda: 4, scl: 5 });
 | パラメータ | 型 | デフォルト値 | 説明
 | --- | --- | --- | :--- |
 | `address`  | `number` | `0x20` | I2Cデバイスのアドレス |
-| `hz`       | `number` | 100kHz | I2Cデバイスのクロックスピード。 |
+| `hz`       | `number` | 100kHz | I2Cデバイスのクロック周波数。 |
 | `sda`      | `number` | 4 | I2Cのsda（データ）ピン。 |
 | `scl`      | `number` |  5 | I2Cのscl（クロック）ピン。     |
 | `inputs`   | `number` (byte) | `0b11111111` | 8つのGPIOピンの入力/出力初期化状態を表すバイト。`1`は入力、`0`は出力 |
