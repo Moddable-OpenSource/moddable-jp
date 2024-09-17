@@ -424,7 +424,7 @@ void fx_fuzzilli(xsMachine* the)
 }
 
 #ifdef mxMetering
-static xsBooleanValue xsAlwaysWithinComputeLimit(xsMachine* machine, xsUnsignedValue index)
+static xsBooleanValue xsAlwaysWithinComputeLimit(xsMachine* machine, uint64_t index)
 {
 	return 1;
 }
@@ -575,7 +575,7 @@ int fuzz(int argc, char* argv[])
 	#define mxFuzzMeter (214748380)
 #endif
 
-static xsBooleanValue xsWithinComputeLimit(xsMachine* machine, xsUnsignedValue index)
+static xsBooleanValue xsWithinComputeLimit(xsMachine* machine, uint64_t index)
 {
 	// may be useful to print current index for debugging
 //	fprintf(stderr, "Current index: %u\n", index);

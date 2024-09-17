@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2023 Moddable Tech, Inc.
+ * Copyright (c) 2019-2024 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -22,6 +22,8 @@
 #define __BUILTINCOMMON_H__
 
 #if ESP32
+	#include "freertos/FreeRTOS.h"
+
 	#if kCPUESP32C3 || kCPUESP32C6 || kCPUESP32H2
 		#define kPinBanks (1)
 	#else
@@ -60,9 +62,21 @@ enum {
 	kIOFormatStringUTF8 = 4,
 	kIOFormatSocketTCP = 5,
 
-	kIOFormatNext,
+	kIOFormatUint8 = 6,
+	kIOFormatInt8 = 7,
+	kIOFormatUint16 = 8,
+	kIOFormatInt16 = 9,
+	kIOFormatUint32 = 10,
+	kIOFormatInt32 = 11,
+	kIOFormatUint64 = 12,
+	kIOFormatInt64 = 13,
+
 	kIOFormatInvalid = 0xFF,
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void builtinGetFormat(xsMachine *the, uint8_t format);
 uint8_t builtinSetFormat(xsMachine *the);
@@ -74,6 +88,10 @@ int32_t builtinGetSignedInteger(xsMachine *the, xsSlot *slot);
 uint32_t builtinGetUnsignedInteger(xsMachine *the, xsSlot *slot);
 
 xsSlot *builtinGetCallback(xsMachine *the, xsIdentifier id);
+
+#ifdef __cplusplus
+}
+#endif
 
 #if kPinBanks
 	#define builtinIsPinFree(pin) builtinArePinsFree(pin >> 5, 1 << (pin & 0x1F))

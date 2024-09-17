@@ -187,7 +187,7 @@ Copyright 2023 Moddable Tech, Inc.<BR>
 
 ![](https://www.moddable.com/assets/commodetto-gifs/static.gif)
 
-`static`のサンプルは、Pocoを拡張して効率的にstatic（テレビの砂嵐）をレンダリングする方法を示しています。
+`static`のサンプルは、Pocoを拡張して効率的に [テレビの砂嵐](https://en.wikipedia.org/wiki/Noise_(video))をレンダリングする方法を示しています。詳細は[こちら](https://github.com/Moddable-OpenSource/moddable/issues/1396)をご覧ください。
 
 ***
 

@@ -144,6 +144,7 @@ class MyEffect extends NeoStrandEffect {
     constructor(dictionary) {
         super(dictionary);
         this.name = "MyEffect"
+    }
 }
 
 activate(effect) {

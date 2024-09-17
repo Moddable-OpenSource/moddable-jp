@@ -498,7 +498,7 @@ struct sxMachine {
 	void (*onBreak)(txMachine*, txU1 stop);
 #endif
 #ifdef mxMetering
-	txBoolean (*meterCallback)(txMachine*, txU4);
+	txBoolean (*meterCallback)(txMachine*, txU8);
 	txU8 meterCount;
 	txU8 meterIndex;
 	txU8 meterInterval;
@@ -715,7 +715,7 @@ mxExport void fxImport(txMachine*);
 mxExport void fxImportNow(txMachine*);
 
 #ifdef mxMetering
-mxExport void fxBeginMetering(txMachine* the, txBoolean (*callback)(txMachine*, txU4), txU4 interval);
+mxExport void fxBeginMetering(txMachine* the, txBoolean (*callback)(txMachine*, txU8), txU8 interval);
 mxExport void fxCheckMetering(txMachine* the);
 mxExport void fxEndMetering(txMachine* the);
 #endif
@@ -1638,6 +1638,7 @@ extern void fxBuildDataView(txMachine* the);
 extern void fxConstructArrayBufferResult(txMachine* the, txSlot* constructor, txInteger length);
 
 extern txInteger fxArgToByteLength(txMachine* the, txInteger argi, txInteger length);
+extern txS8 fxArgToSafeByteLength(txMachine* the, txInteger argi, txInteger length);
 extern txInteger fxGetDataViewSize(txMachine* the, txSlot* view, txSlot* buffer);
 
 /* xsAtomics.c */

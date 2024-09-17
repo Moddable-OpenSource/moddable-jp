@@ -75,7 +75,7 @@ static void fxScreenAbort(txScreen* screen, int status);
 static gboolean fxScreenAbortAux(gpointer data);
 static void fxScreenBufferChanged(txScreen* screen);
 static void fxScreenFormatChanged(txScreen* screen);
-static gboolean fxScreenIdle(gpointer data);
+static gboolean fxScreenIdle(GtkWidget* widget, GdkFrameClock* frame_clock, gpointer data);
 static void fxScreenPost(txScreen* screen, char* message, int size);
 static gboolean fxScreenPostAux(gpointer data);
 static void fxScreenRecordTouch(txScreen* screen, int kind, int index, int x, int y);
@@ -691,7 +691,9 @@ void fxScreenFormatChanged(txScreen* screen)
 	}
 }
 
-gboolean fxScreenIdle(gpointer data)
+
+gboolean fxScreenIdle(GtkWidget* widget, GdkFrameClock* frame_clock, gpointer data)
+// gboolean fxScreenIdle(gpointer data)
 {
 	txScreen* screen = (txScreen*)data;
 	if (screen->idle) 
@@ -752,7 +754,7 @@ void fxScreenStart(txScreen* screen, double interval)
 {
 	PiuScreen* self = (PiuScreen*)screen->view;
     if (!(*self)->timerRunning) {
-        (*self)->timer = g_timeout_add(20, fxScreenIdle, (*self)->screen);
+    	(*self)->timer = gtk_widget_add_tick_callback((*self)->gtkDrawingArea, fxScreenIdle, (*self)->screen, NULL); 
         (*self)->timerRunning = TRUE;
 	}
 }
@@ -761,7 +763,7 @@ void fxScreenStop(txScreen* screen)
 {
 	PiuScreen* self = (PiuScreen*)screen->view;
     if ((*self)->timerRunning) {
-        g_source_remove((*self)->timer);
+    	gtk_widget_remove_tick_callback((*self)->gtkDrawingArea, (*self)->timer);
         (*self)->timerRunning = FALSE;
 	}
 }

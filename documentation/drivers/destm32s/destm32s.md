@@ -1,6 +1,6 @@
 # DESTM32S ディスプレイドライバ
 Copyright 2017 Moddable Tech, Inc.<BR>
-改訂： 2017年12月30日
+改訂： 2024年9月10日
 
 DESTM32Sディスプレイコントローラは、3種類のePaperディスプレイを動作します。これらのディスプレイは、Crystalfontzを含むさまざまなサイトから入手可能で、私たちのテストユニットもここから購入しました。これらは小さなアダプターボード（[good-display.com](http://www.good-display.com/products_detail/productId=327.html)から）を使用しますが、ディスプレイコントローラはePaperディスプレイ自体の一部です（いわゆるチップオンガラス）。
 
@@ -17,7 +17,7 @@ Moddable SDKのePaperディスプレイドライバは、LCDディスプレイ�
 ### プロジェクトにDESTM32を追加する
 SSD1351ドライバをプロジェクトに追加するには、そのマニフェストをインクルードします：
 
-```
+```jsonc
 "include": [
 	/* other includes here */
 	"$(MODULES)/drivers/destm32s/manifest.json"
@@ -79,7 +79,7 @@ DESTM32Sドライバは、入力として8ビットのグレーまたは、デ�
 `defines`オブジェクトには、`spi_port`、および`DC`、`CS`、`BUSY`のピン番号を含める必要があります。`RST`ピンが提供されている場合、コンストラクタが呼び出されたときにデバイスがリセットされます。`cs_port`、`dc_port`、`rst_port`、または`busy_port`プロパティが提供されていない場合、それらはデフォルトでNULLになります。
 
 
-```
+```jsonc
 "defines": {
 	"ssd1351": {
 		/* other properties here */

@@ -793,14 +793,14 @@ enum {
 	_parseInt,
 	_trace,
 	_unescape,
-	_Infinity,
-	_NaN,
-	_undefined,
 #if mxExplicitResourceManagement	
 	_AsyncDisposableStack,
 	_DisposableStack,
 	_SuppressedError,
 #endif	
+	_Infinity,
+	_NaN,
+	_undefined,
 	_Compartment,
 	_Function,
 	_eval,

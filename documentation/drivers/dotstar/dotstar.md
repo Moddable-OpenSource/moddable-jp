@@ -1,6 +1,6 @@
 # DotStarディスプレイドライバ
 Copyright 2018 Moddable Tech, Inc.<BR>
-改訂：2018年1月3日
+改訂：2024年9月10日
 
 DotStarディスプレイコントローラーは、カラーLEDライトのストリングを動作します。ディスプレイは、さまざまな長さと構成で[Adafruit](https://learn.adafruit.com/adafruit-dotstar-leds/overview)から入手できます。
 
@@ -11,7 +11,7 @@ DotStarディスプレイコントローラーは、カラーLEDライトのス�
 ### DotStarをプロジェクトに追加する
 プロジェクトにDotStarドライバを追加するには、そのマニフェストをインクルードします：
 
-```
+```jsonc
 "include": [
 	/* other includes here */
 	"$(MODULES)/drivers/dotstar/manifest.json"
@@ -37,7 +37,7 @@ DotStarドライバは、16ビットカラー（`rgb565le`）ピクセルを必�
 ### SPIの設定
 `defines`オブジェクトには`spi_port`が含まれている必要があります。
 
-```
+```jsonc
 "defines": {
 	"dotstar": {
 		/* other properties here */

@@ -1,6 +1,6 @@
 # マニフェスト
 著作権2017-2023 Moddable Tech, Inc.<BR>
-改訂： 2023年8月3日
+改訂： 2023年9月13日
 
 マニフェストは、Moddableアプリを構築するために必要なモジュールとリソースを記述するJSONファイルです。このドキュメントでは、JSONオブジェクトのプロパティと、マニフェストがModdable SDKビルドツールによってどのように処理されるかについて説明します。
 
@@ -212,7 +212,7 @@ Moddable SDKの各サンプルアプリケーションは、[examples directory]
 
 - `manifest_net.json` はWi-Fiを使用するアプリケーション用です。Socket、Net、SNTP、Wi-Fiモジュールが含まれています。HTTPやMQTTなどの特定のネットワークプロトコルは含まれていません。
 
-- `manifest_piu.json` は [Piu アプリケーションフレームワーク](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md) を使用するアプリケーション用です。Piuを使用するために必要なすべてのモジュールが含まれています。スクリーンとタッチドライバーは、Piuマニフェストをデバイスに依存しないようにするため、通常は対象デバイス自体のマニフェストによって提供されます。
+- `manifest_piu.json` は [Piu アプリケーションフレームワーク](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/piu/piu.md) を使用するアプリケーション用です。Piuを使用するために必要なすべてのモジュールが含まれています。スクリーンとタッチドライバは、Piuマニフェストをデバイスに依存しないようにするため、通常は対象デバイス自体のマニフェストによって提供されます。
 
 いくつかのタッチ、ディスプレイ、センサー[ドライバー](../../modules/drivers)および一部の[ネットワークモジュール](../../modules/network)も、プロジェクトに簡単に組み込むためのマニフェストを持っています。
 
@@ -349,7 +349,7 @@ VMは初期化時に `keys.initial` ランタイムキーのスペースを割�
 
 `config` オブジェクトには、アプリケーションのスクリプトからアクセス可能な値が含まれています。
 
-これは一般的に、ターゲットプラットフォームのマニフェストでスクリーンドライバー、タッチドライバー、デフォルトの回転を指定するために使用されます。これらのプロパティは [Commodetto](../commodetto/commodetto.md) および [Piu](../piu/piu.md) のセットアップモジュールによって使用されます。
+これは一般的に、ターゲットプラットフォームのマニフェストでスクリーンドライバ、タッチドライバ、デフォルトの回転を指定するために使用されます。これらのプロパティは [Commodetto](../commodetto/commodetto.md) および [Piu](../piu/piu.md) のセットアップモジュールによって使用されます。
 
 ```json
 "config": {
@@ -611,6 +611,25 @@ TLS証明書は `*` 配列に含めるべきです。
 }
 ```
 
+The `esp32` platform has an additional property `dependency` which can be used to [add ESP Registry components](../devices/esp32/manifest.md#idf-components) to your project.
+
+```json
+	"platforms": {
+		"esp32": {
+			"dependency": [
+				{ "name": "onewire_bus", "version": "^1.0.2" },
+				{ "namespace": "waveshare", "name": "esp_lcd_jd9365_8", "version": "^0.0.2" }
+			]
+		}
+	}
+```
+
+`namespace` is optional and defaults to `espressif`.
+
+The library and include files from the dependencies will be loaded from the ESP Registry and made available to you. You can then write your module with a native part to interface with the component.
+
+The [onewire module](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/drivers/onewire) demonstrates the use of `dependency`.
+
 <a id="subplatforms"></a>
 #### サブプラットフォーム
 
@@ -657,6 +676,8 @@ TLS証明書は `*` 配列に含めるべきです。
 		}
 	}
 ```
+
+
 ***
 
 <a id="bundle"></a>

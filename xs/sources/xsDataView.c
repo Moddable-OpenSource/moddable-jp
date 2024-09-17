@@ -375,6 +375,27 @@ txInteger fxArgToByteLength(txMachine* the, txInteger argi, txInteger length)
 	return length;
 }
 
+txS8 fxArgToSafeByteLength(txMachine* the, txInteger argi, txInteger length)
+{
+	txSlot *arg = mxArgv(argi);
+	if ((mxArgc > argi) && (arg->kind != XS_UNDEFINED_KIND)) {
+		txNumber value;
+		if (XS_INTEGER_KIND == arg->kind) {
+			txS8 value = arg->value.integer;
+			if (value < 0)
+				mxRangeError("out of range byteLength");
+			return value;
+		}
+		value = c_trunc(fxToNumber(the, arg));
+		if (c_isnan(value))
+			return 0;
+		if ((value < 0) || (C_MAX_SAFE_INTEGER < value))
+			mxRangeError("out of range byteLength");
+		return (txS8)value;
+	}
+	return length;
+}
+
 txSlot* fxArgToInstance(txMachine* the, txInteger i)
 {
 	if (mxArgc > i)
@@ -461,32 +482,36 @@ txSlot* fxNewArrayBufferInstance(txMachine* the)
 void fx_ArrayBuffer(txMachine* the)
 {
 	txSlot* instance;
-	txInteger byteLength;
-	txInteger maxByteLength = -1;
+	txS8 byteLength;
+	txS8 maxByteLength = -1;
 	txSlot* property;
 	if (mxIsUndefined(mxTarget))
 		mxTypeError("call: ArrayBuffer");
-	mxPushSlot(mxTarget);
-	fxGetPrototypeFromConstructor(the, &mxArrayBufferPrototype);
-	instance = fxNewArrayBufferInstance(the);
-	mxPullSlot(mxResult);
-	byteLength = fxArgToByteLength(the, 0, 0);
+	byteLength = fxArgToSafeByteLength(the, 0, 0);
 	if ((mxArgc > 1) && mxIsReference(mxArgv(1))) {
 		mxPushSlot(mxArgv(1));
 		mxGetID(mxID(_maxByteLength));
 		mxPullSlot(mxArgv(1));
-		maxByteLength = fxArgToByteLength(the, 1, -1);
+		maxByteLength = fxArgToSafeByteLength(the, 1, -1);
 	}
 	if (maxByteLength >= 0) {
 		if (byteLength > maxByteLength)
 			mxRangeError("byteLength > maxByteLength");
 	}
+	mxPushSlot(mxTarget);
+	fxGetPrototypeFromConstructor(the, &mxArrayBufferPrototype);
+	instance = fxNewArrayBufferInstance(the);
+	mxPullSlot(mxResult);
+	if (byteLength > 0x7FFFFFFF)
+		mxRangeError("out of range byteLength");
+	if (maxByteLength > 0x7FFFFFFF)
+		mxRangeError("out of range maxByteLength");
 	property = instance->next;
-	property->value.arrayBuffer.address = fxNewChunk(the, byteLength);
-	c_memset(property->value.arrayBuffer.address, 0, byteLength);
+	property->value.arrayBuffer.address = fxNewChunk(the, (txSize)byteLength);
+	c_memset(property->value.arrayBuffer.address, 0, (txSize)byteLength);
 	property = property->next;
-	property->value.bufferInfo.length = byteLength;
-	property->value.bufferInfo.maxLength = maxByteLength;
+	property->value.bufferInfo.length = (txSize)byteLength;
+	property->value.bufferInfo.maxLength = (txSize)maxByteLength;
 }
 
 void fx_ArrayBuffer_fromBigInt(txMachine* the)
@@ -1599,6 +1624,8 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 			view = dispatch->next;
 			buffer = view->next;
 			data = fxCheckArrayBufferDetached(the, buffer, XS_MUTABLE);
+			if (length > (fxGetDataViewSize(the, view, buffer) >> dispatch->value.typedArray.dispatch->shift))
+				mxTypeError("TypedArray too small");
 		}
 		else
 			mxTypeError("no TypedArray");
@@ -1716,8 +1743,9 @@ void fx_TypedArray_prototype_byteLength_get(txMachine* the)
 	txSlot* dispatch = instance->next;
 	txSlot* view = dispatch->next;
 	txSlot* buffer = view->next;
+	txU2 shift = dispatch->value.typedArray.dispatch->shift;
 	mxResult->kind = XS_INTEGER_KIND;
-	mxResult->value.integer = fxGetDataViewSize(the, view, buffer);
+	mxResult->value.integer = fxGetDataViewSize(the, view, buffer) & ~((1 << shift) - 1);
 }
 
 void fx_TypedArray_prototype_byteOffset_get(txMachine* the)
