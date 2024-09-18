@@ -732,6 +732,17 @@ void xs_listener_read(xsMachine *the)
 	CFRunLoopAddSource(CFRunLoopGetCurrent(), tcp->cfRunLoopSource, kCFRunLoopCommonModes);
 }
 
+void xs_listener_get_port(xsMachine *the)
+{
+	Listener listener = xsmcGetHostDataValidate(xsThis, (void *)&xsListenerHooks);
+	if (!listener->cfSkt) return;
+	CFDataRef address = CFSocketCopyAddress(listener->cfSkt);
+	const UInt8 *bytes = CFDataGetBytePtr((__bridge CFDataRef)address);
+	struct sockaddr_in addr = *(struct sockaddr_in *)bytes;
+
+	xsmcSetInteger(xsResult, htons(addr.sin_port));
+}
+
 void xs_listener_mark(xsMachine* the, void* it, xsMarkRoot markRoot)
 {
 	Listener listener = it;

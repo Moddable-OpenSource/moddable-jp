@@ -775,6 +775,13 @@ void xs_listener_read(xsMachine *the)
 	tcp_recv(tcp->skt, tcpReceive);
 }
 
+void xs_listener_get_port(xsMachine *the)
+{
+	Listener listener = xsmcGetHostDataValidate(xsThis, (void *)&xsListenerHooks);
+
+	xsmcSetInteger(xsResult, listener->skt->local_port);
+}
+
 void listenerDeliver(void *the, void *refcon, uint8_t *message, uint16_t messageLength)
 {
 	Listener listener = refcon;
