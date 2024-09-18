@@ -189,6 +189,7 @@ HEADERS =\
 	$(INSTRUMENTATION)\modInstrumentation.h
 OBJECTS = \
 	$(TMP_DIR)\adpcm-lib.obj \
+	$(TMP_DIR)\adpcm-dns.obj \
 	$(TMP_DIR)\commodettoBitmap.obj \
 	$(TMP_DIR)\commodettoBufferOut.obj \
 	$(TMP_DIR)\commodettoColorCellOut.obj \
