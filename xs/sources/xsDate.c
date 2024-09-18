@@ -649,7 +649,7 @@ void fx_Date_prototype_set_aux(txMachine* the, txDateTime* dt, txBoolean utc, tx
 	if (c_isnan(number))
 		return;
 	if (slot->flag & XS_DONT_SET_FLAG)
-		mxTypeError("Date instance is read-only");
+		mxTypeError("this: read-only Date instance");
 	mxResult->value.number = slot->value.number = fxDateMerge(dt, utc);
 	mxResult->kind = XS_NUMBER_KIND;
 }
@@ -938,7 +938,8 @@ void fx_Date_prototype_setFullYear(txMachine* the)
 void fx_Date_prototype_setTime(txMachine* the)
 {
 	txSlot* slot = fxDateCheck(the);
-	if (!slot) mxTypeError("this is no date");
+	if (slot->flag & XS_DONT_SET_FLAG)
+		mxTypeError("this: read-only Date instance");
 	if (mxArgc < 1)
 		slot->value.number = C_NAN;
 	else {
@@ -1049,7 +1050,7 @@ void fx_Date_prototype_toDateString(txMachine* the)
 		*p = 0;
 	}
 	else
-		c_strcpy(buffer, "Invalid Date");
+		c_strcpy(buffer, "invalid Date instance");
 	fxCopyStringC(the, mxResult, buffer);
 }
 
@@ -1073,7 +1074,7 @@ void fx_Date_prototype_toISOString(txMachine* the)
 		*p = 0;
 	}
 	else
-        mxRangeError("invalid date");
+        mxRangeError("invalid Date instance");
 	fxCopyStringC(the, mxResult, buffer);
 }
 
@@ -1169,7 +1170,7 @@ void fx_Date_prototype_toString(txMachine* the)
 		*p = 0;
 	}
 	else
-		c_strcpy(buffer, "Invalid Date");
+		c_strcpy(buffer, "invalid Date instance");
 	fxCopyStringC(the, mxResult, buffer);
 }
 
@@ -1186,7 +1187,7 @@ void fx_Date_prototype_toTimeString(txMachine* the)
 		*p = 0;
 	}
 	else
-		c_strcpy(buffer, "Invalid Date");
+		c_strcpy(buffer, "invalid Date instance");
 	fxCopyStringC(the, mxResult, buffer);
 }
 
@@ -1210,7 +1211,7 @@ void fx_Date_prototype_toUTCString(txMachine* the)
 		*p = 0;
 	}
 	else
-		c_strcpy(buffer, "Invalid Date");
+		c_strcpy(buffer, "invalid Date instance");
 	fxCopyStringC(the, mxResult, buffer);
 }
 
@@ -1263,7 +1264,7 @@ txSlot* fxDateCheck(txMachine* the)
 		if ((it) && (it->flag & XS_INTERNAL_FLAG) && (it->kind == XS_DATE_KIND))
 			return it;
 	}
-	mxTypeError("this is no date");
+	mxTypeError("this: not a Date instance");
 	return C_NULL;
 }
 

@@ -2393,7 +2393,7 @@ void fx_Array_prototype_sort(txMachine* the)
 			if (fxIsCallable(the, slot))
 				function = slot;
 			else
-				mxTypeError("compare is no function");
+				mxTypeError("compare: not a function");
 		}
 	}
 //	if (function)
@@ -2625,7 +2625,7 @@ void fx_Array_prototype_toSorted(txMachine* the)
 			if (fxIsCallable(the, slot))
 				function = slot;
 			else
-				mxTypeError("compare is no function");
+				mxTypeError("compare: not a function");
 		}
 	}
 	LENGTH = fxGetArrayLength(the, mxThis);

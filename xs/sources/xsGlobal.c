@@ -204,7 +204,7 @@ txSlot* fxCheckIteratorInstance(txMachine* the, txSlot* slot, txID id)
 			return instance;
 		}
 	}
-	mxTypeError("this is no iterator");
+	mxTypeError("this: not an iterator");
 	return C_NULL;
 }
 
@@ -225,7 +225,7 @@ txBoolean fxIteratorNext(txMachine* the, txSlot* iterator, txSlot* next, txSlot*
 	mxCall();
 	mxRunCount(0);
 	if (!mxIsReference(the->stack))
-		mxTypeError("iterator result is no object");
+		mxTypeError("iterator result: not an object");
 	mxDub();
 	mxGetID(mxID(_done));
 	if (fxToBoolean(the, the->stack)) {
@@ -253,7 +253,7 @@ void fxIteratorReturn(txMachine* the, txSlot* iterator, txBoolean abrupt)
 			mxCall();
 			mxRunCount(0);
 			if (!mxIsReference(the->stack))
-				mxTypeError("iterator result is no object");
+				mxTypeError("iterator result: not an object");
 		}
 		mxPop();
 	}
@@ -278,7 +278,7 @@ txBoolean fxGetIterator(txMachine* the, txSlot* iterable, txSlot* iterator, txSl
 	mxCall();
 	mxRunCount(0);
 	if (!mxIsReference(the->stack))
-		mxTypeError("iterator is no object");
+		mxTypeError("iterator: not an object");
 	if (next) {
 		mxDub();
 		mxGetID(mxID(_next));

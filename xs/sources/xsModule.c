@@ -1175,7 +1175,7 @@ void fxLoadVirtualModuleSource(txMachine* the, txSlot* record, txSlot* instance)
 	slot = the->stack;
 	if (!mxIsUndefined(slot)) {
 		if (!fxIsCallable(the, slot))
-			mxTypeError("execute is no function");
+			mxTypeError("execute: not a function");
 	}
 	function = fxNewHostFunction(the, fxExecuteVirtualModuleSource, 0, XS_NO_ID, mxExecuteVirtualModuleSourceProfileID);
 	property = mxFunctionInstanceHome(function);
@@ -1547,7 +1547,7 @@ void fxMapModuleDescriptor(txMachine* the, txSlot* realm, txID moduleID, txSlot*
 {
 	txSlot* property;
 	if (!mxIsReference(descriptor))
-		mxTypeError("descriptor is no object");
+		mxTypeError("descriptor: not an object");
 
 	mxPushSlot(descriptor);
 	mxGetID(fxID(the, "namespace"));
@@ -1586,7 +1586,7 @@ void fxMapModuleDescriptor(txMachine* the, txSlot* realm, txID moduleID, txSlot*
 		else {
 			txSlot* instance = module->value.reference;
 			if (!mxIsReference(property))
-				mxTypeError("descriptor.namespace is no object");
+				mxTypeError("descriptor.namespace: not an object");
 			if (mxIsModule(property->value.reference))
 				goto namespace;
 			fxLoadVirtualModuleNamespace(the, property->value.reference, instance);
@@ -1714,7 +1714,7 @@ namespace:
 			goto done;
 		}
 		if (!mxIsReference(property))
-			mxTypeError("descriptor.source is no object");
+			mxTypeError("descriptor.source: not an object");
 		if (mxIsModuleSource(property->value.reference))
 			fxDuplicateModuleTransfers(the, property, module);
 		else
@@ -1735,7 +1735,7 @@ importMeta:
 	property = the->stack;
 	if (!mxIsUndefined(property)) {
 		if (!mxIsReference(property))
-			mxTypeError("descriptor.importMeta is no object");
+			mxTypeError("descriptor.importMeta: not an object");
 		txSlot* meta = mxModuleMeta(module);
 		meta->value.reference->flag &= ~XS_DONT_PATCH_FLAG;
 		mxPushUndefined();
@@ -2626,7 +2626,7 @@ txSlot* fxCheckCompartmentInstance(txMachine* the, txSlot* slot)
 			return instance;
 		}
 	}
-	mxTypeError("this is no Compartment instance");
+	mxTypeError("this: not a Compartment instance");
 	return C_NULL;
 }
 
@@ -2661,7 +2661,7 @@ void fx_Compartment(txMachine* the)
 	if (!module) module = mxProgram.value.reference;
 	mxTry(the) {
 		if (mxIsUndefined(mxTarget))
-			mxTypeError("call Compartment");
+			mxTypeError("call: Compartment");
 			
 		mxPushSlot(mxTarget);
 		fxGetPrototypeFromConstructor(the, &mxCompartmentPrototype);
@@ -2745,7 +2745,7 @@ void fx_Compartment(txMachine* the)
 		
 		if (mxArgc > 0) {
 			if (!mxIsReference(mxArgv(0)))
-				mxTypeError("invalid options");
+				mxTypeError("options: not an object");
 		
 			mxPushSlot(mxArgv(0));
 			if (mxHasID(fxID(the, "globals"))) {
@@ -2753,7 +2753,7 @@ void fx_Compartment(txMachine* the)
 				mxGetID(fxID(the, "globals"));
 				slot = the->stack;
 				if (!mxIsReference(slot))
-					mxTypeError("options.globals is no object");
+					mxTypeError("options.globals: not an object");
 				mxPushUndefined();
 				mxPush(mxAssignObjectFunction);
 				mxCall();
@@ -2774,7 +2774,7 @@ void fx_Compartment(txMachine* the)
 				mxPushSlot(mxArgv(0));
 				mxGetID(fxID(the, "modules"));
 				if (!mxIsReference(the->stack))
-					mxTypeError("options.modules is no object");
+					mxTypeError("options.modules: not an object");
 				source = the->stack->value.reference;
 				at = fxNewInstance(the);
 				mxBehaviorOwnKeys(the, source, XS_EACH_NAME_FLAG, at);
@@ -2808,7 +2808,7 @@ void fx_Compartment(txMachine* the)
 				mxPushSlot(mxArgv(0));
 				mxGetID(fxID(the, "globalLexicals"));
 				if (!mxIsReference(the->stack))
-					mxTypeError("options.globalLexicals is no object");
+					mxTypeError("options.globalLexicals: not an object");
 				source = the->stack->value.reference;
 				at = fxNewInstance(the);
 				mxBehaviorOwnKeys(the, source, XS_EACH_NAME_FLAG, at);
@@ -2840,7 +2840,7 @@ void fx_Compartment(txMachine* the)
 				mxPushSlot(mxArgv(0));
 				mxGetID(fxID(the, "resolveHook"));
 				if (!fxIsCallable(the, the->stack))
-					mxTypeError("options.resolveHook is no function");
+					mxTypeError("options.resolveHook: not a function");
 			}
 			else
 				mxPushUndefined();
@@ -2852,7 +2852,7 @@ void fx_Compartment(txMachine* the)
 				mxPushSlot(mxArgv(0));
 				mxGetID(fxID(the, "importHook"));
 				if (!fxIsCallable(the, the->stack))
-					mxTypeError("options.importHook is no function");
+					mxTypeError("options.importHook: not a function");
 			}
 			else {
 				mxPushSlot(mxArgv(0));
@@ -2860,7 +2860,7 @@ void fx_Compartment(txMachine* the)
 					mxPushSlot(mxArgv(0));
 					mxGetID(fxID(the, "loadHook"));
 					if (!fxIsCallable(the, the->stack))
-						mxTypeError("options.loadHook is no function");
+						mxTypeError("options.loadHook: not a function");
 				}
 				else
 					mxPushUndefined();
@@ -2871,7 +2871,7 @@ void fx_Compartment(txMachine* the)
 				mxPushSlot(mxArgv(0));
 				mxGetID(fxID(the, "importNowHook"));
 				if (!fxIsCallable(the, the->stack))
-					mxTypeError("options.importNowHook is no function");
+					mxTypeError("options.importNowHook: not a function");
 			}
 			else {
 				mxPushSlot(mxArgv(0));
@@ -2879,7 +2879,7 @@ void fx_Compartment(txMachine* the)
 					mxPushSlot(mxArgv(0));
 					mxGetID(fxID(the, "loadNowHook"));
 					if (!fxIsCallable(the, the->stack))
-						mxTypeError("options.loadNowHook is no function");
+						mxTypeError("options.loadNowHook: not a function");
 				}
 				else
 					mxPushUndefined();
@@ -2977,7 +2977,7 @@ txSlot* fxCheckModuleSourceInstance(txMachine* the, txSlot* slot)
 			return instance;
 		}
 	}
-	mxTypeError("this is no ModuleSource instance");
+	mxTypeError("this: not a ModuleSource instance");
 	return C_NULL;
 }
 

@@ -400,7 +400,7 @@ txSlot* fxArgToInstance(txMachine* the, txInteger i)
 {
 	if (mxArgc > i)
 		return fxToInstance(the, mxArgv(i));
-	mxTypeError("Cannot coerce undefined to object");
+	mxTypeError("cannot coerce undefined to object");
 	return C_NULL;
 }
 
@@ -432,7 +432,7 @@ txSlot* fxCheckArrayBufferInstance(txMachine* the, txSlot* slot)
 		if (((slot = instance->next)) && (slot->flag & XS_INTERNAL_FLAG) && (slot->kind == XS_ARRAY_BUFFER_KIND))
 			return instance;
 	}
-	mxTypeError("this is no ArrayBuffer instance");
+	mxTypeError("this: not an ArrayBuffer instance");
 	return C_NULL;
 }
 
@@ -450,10 +450,10 @@ void fxConstructArrayBufferResult(txMachine* the, txSlot* constructor, txInteger
 	mxPushInteger(length);
 	mxRunCount(1);
 	if (the->stack->kind != XS_REFERENCE_KIND)
-		mxTypeError("no instance");
+		mxTypeError("not an object");
 	instance = the->stack->value.reference;
 	if (!(instance->next) || (instance->next->kind != XS_ARRAY_BUFFER_KIND))
-		mxTypeError("no ArrayBuffer instance");
+		mxTypeError("not an ArrayBuffer instance");
 	if (!constructor && (mxThis->value.reference == instance))
 		mxTypeError("same ArrayBuffer instance");
 	if (instance->next->next->value.bufferInfo.length < length)
@@ -663,7 +663,7 @@ void fx_ArrayBuffer_prototype_concat(txMachine* the)
 		if (bufferInfo) 
 			length = fxAddChunkSizes(the, length, bufferInfo->value.bufferInfo.length);
 		else
-			mxTypeError("arguments[%ld] is no ArrayBuffer instance", i);
+			mxTypeError("arguments[%ld]: not an ArrayBuffer instance", i);
 		i++;
 	}
 	fxConstructArrayBufferResult(the, C_NULL, length);
@@ -772,7 +772,7 @@ txSlot* fxCheckDataViewInstance(txMachine* the, txSlot* slot)
 		if (((slot = instance->next)) && (slot->flag & XS_INTERNAL_FLAG) && (slot->kind == XS_DATA_VIEW_KIND))
 			return instance;
 	}
-	mxTypeError("this is no DataView instance");
+	mxTypeError("this: not a DataView instance");
 	return C_NULL;
 }
 
@@ -882,7 +882,7 @@ void fx_DataView(txMachine* the)
 		}
 	}
 	if (!flag)
-		mxTypeError("buffer is no ArrayBuffer instance");
+		mxTypeError("buffer: not an ArrayBuffer instance");
 		
 	offset = fxArgToByteLength(the, 1, 0);
 	info = fxGetBufferInfo(the, mxArgv(0));
@@ -1351,7 +1351,7 @@ txSlot* fxCheckTypedArrayInstance(txMachine* the, txSlot* slot)
 		if (((slot = instance->next)) && (slot->flag & XS_INTERNAL_FLAG) && (slot->kind == XS_TYPED_ARRAY_KIND))
 			return instance;
 	}
-	mxTypeError("this is no TypedArray instance");
+	mxTypeError("this: not a TypedArray instance");
 	return C_NULL;
 }
 
@@ -1554,13 +1554,13 @@ void fx_TypedArray_from(txMachine* the)
 	txSlot* function = C_NULL;
 	txSlot* _this = C_NULL;
 	if (!mxIsReference(mxThis) || !(mxIsConstructor(mxThis->value.reference)))
-		mxTypeError("this is no constructor");
+		mxTypeError("this: not a constructor");
 	if (mxArgc > 1) {
 		txSlot* slot = mxArgv(1);
 		if (!mxIsUndefined(slot)) {
 			function = slot;
 			if (!fxIsCallable(the, function))
-				mxTypeError("map is no function");
+				mxTypeError("map: not a function");
 			if (mxArgc > 2)
 				_this = mxArgv(2);
 		}
@@ -1625,10 +1625,10 @@ void fx_TypedArray_from_object(txMachine* the, txSlot* instance, txSlot* functio
 			buffer = view->next;
 			data = fxCheckArrayBufferDetached(the, buffer, XS_MUTABLE);
 			if (length > (fxGetDataViewSize(the, view, buffer) >> dispatch->value.typedArray.dispatch->shift))
-				mxTypeError("TypedArray too small");
+				mxTypeError("result: too small TypedArray instance");
 		}
 		else
-			mxTypeError("no TypedArray");
+			mxTypeError("result: not a TypedArray instance");
 	}
 	if (list) {
 		txInteger index = 0;
@@ -1703,7 +1703,7 @@ void fx_TypedArray_of(txMachine* the)
 		mxResultTypedArrayDeclarations;
 		txU2 shift = resultDispatch->value.typedArray.dispatch->shift;
 		if (resultLength < count)
-			mxTypeError("insufficient TypedArray");
+			mxTypeError("result: too small TypedArray instance");
 		while (index < count) {
 			(*resultDispatch->value.typedArray.dispatch->coerce)(the, mxArgv(index));
 			if (resultBuffer->value.arrayBuffer.address == C_NULL)
@@ -1876,7 +1876,7 @@ void fx_TypedArray_prototype_filter(txMachine* the)
 		txInteger resultOffset = 0;
 		txInteger resultSize = resultDispatch->value.typedArray.dispatch->size;
 		if (resultLength < count)
-			mxTypeError("insufficient buffer");
+			mxTypeError("result: too small TypedArray instance");
 		slot = list->next;
 		while (slot) {
 			(*resultDispatch->value.typedArray.dispatch->coerce)(the, slot);
@@ -2147,7 +2147,7 @@ void fx_TypedArray_prototype_map(txMachine* the)
 		txU2 shift = resultDispatch->value.typedArray.dispatch->shift;
 		txInteger index = 0;
 		if (resultLength < length)
-			mxTypeError("insufficient buffer");
+			mxTypeError("result: too small TypedArray instance");
 		while (index < length) {
 			fxCallTypedArrayItem(the, function, dispatch, view, buffer->value.reference->next, index, C_NULL);
 			if (resultBuffer->value.arrayBuffer.address == C_NULL)
@@ -2315,7 +2315,7 @@ void fx_TypedArray_prototype_slice(txMachine* the)
 	{
 		mxResultTypedArrayDeclarations;
 		if (resultLength < count)
-			mxTypeError("insufficient buffer");
+			mxTypeError("result: too small TypedArray instance");
 		if (count) {
 			length = fxCheckDataViewSize(the, view, buffer, XS_IMMUTABLE);
 			if ((end <= length) && (resultDispatch->value.typedArray.dispatch->constructorID == dispatch->value.typedArray.dispatch->constructorID)) {
@@ -2379,7 +2379,7 @@ void fx_TypedArray_prototype_sort(txMachine* the)
 			if (fxIsCallable(the, slot))
 				function = slot;
 			else
-				mxTypeError("compare is no function");
+				mxTypeError("compare: not a function");
 		}
 	}
 	if (function)
@@ -2495,7 +2495,7 @@ void fx_TypedArray_prototype_toSorted(txMachine* the)
 			if (fxIsCallable(the, slot))
 				function = slot;
 			else
-				mxTypeError("compare is no function");
+				mxTypeError("compare: not a function");
 		}
 	}
 	mxPushSlot(constructor);
@@ -3291,16 +3291,16 @@ static void fxUint8ArrayGetBase64Options(txMachine* the, txInteger argi, txU1** 
 {
 	if ((mxArgc > argi) && !mxIsUndefined(mxArgv(argi))) {
 		if (!mxIsReference(mxArgv(argi)))
-			mxTypeError("options is no object");
+			mxTypeError("options: not an object");
 		mxPushSlot(mxArgv(argi));
 		mxGetID(mxID(_alphabet));
 		if (!mxIsUndefined(the->stack)) {
 			if (!mxIsStringPrimitive(the->stack))
-				mxTypeError("options.alphabet is no string");
+				mxTypeError("options.alphabet: not a string");
 			if (!c_strcmp(the->stack->value.string, "base64url"))
 				*alphabet = (txU1*)gxBase64URLAlphabet;
 			else if (c_strcmp(the->stack->value.string, "base64"))
-				mxTypeError("options.alphabet is neither 'base64' nor 'base64url'");
+				mxTypeError("options.alphabet: neither 'base64' nor 'base64url'");
 		}
 		mxPop();
 		if (lastChunkHandling) {
@@ -3308,13 +3308,13 @@ static void fxUint8ArrayGetBase64Options(txMachine* the, txInteger argi, txU1** 
 			mxGetID(mxID(_lastChunkHandling));
 			if (!mxIsUndefined(the->stack)) {
 				if (!mxIsStringPrimitive(the->stack))
-					mxTypeError("options.lastChunkHandling is no string");
+					mxTypeError("options.lastChunkHandling: not a string");
 				if (!c_strcmp(the->stack->value.string, "stop-before-partial"))
 					*lastChunkHandling = mxBase64StopBeforePartial;
 				else if (!c_strcmp(the->stack->value.string, "strict"))
 					*lastChunkHandling = mxBase64Strict;
 				else if (c_strcmp(the->stack->value.string, "loose"))
-					mxTypeError("options.lastChunkHandling is neither 'loose' nor 'strict' nor 'stop-before-partial'");
+					mxTypeError("options.lastChunkHandling: neither 'loose' nor 'strict' nor 'stop-before-partial'");
 			}
 			mxPop();
 		}
@@ -3330,7 +3330,7 @@ void fx_Uint8Array_fromBase64(txMachine* the)
 	txU1* src;
 	txU1* dst;
 	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
-		mxTypeError("string is no string");
+		mxTypeError("string: not a string");
 	fxUint8ArrayGetBase64Options(the, 1, &alphabet, &lastChunkHandling);
 	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
 	dstSize = (((srcSize + 3) / 4) * 3);
@@ -3361,10 +3361,10 @@ void fx_Uint8Array_fromHex(txMachine* the)
 	txU1* src;
 	txU1* dst;
 	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
-		mxTypeError("string is no string");
+		mxTypeError("string: not a string");
 	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
 	if (srcSize & 1)
-		mxSyntaxError("string has odd length");
+		mxSyntaxError("string: odd length");
 	dstSize = srcSize >> 1;
 	mxPush(mxUint8ArrayConstructor);
 	mxNew();
@@ -3396,9 +3396,9 @@ void fx_Uint8Array_prototype_setFromBase64(txMachine* the)
 	txU1* dst;
 	txSlot* property;
 	if (dispatch->value.typedArray.dispatch->constructorID != mxID(_Uint8Array))
-		mxTypeError("this is no Uint8Array instance");
+		mxTypeError("this: not a Uint8Array instance");
 	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
-		mxTypeError("string is no string");
+		mxTypeError("string: not a string");
 	fxUint8ArrayGetBase64Options(the, 1, &alphabet, &lastChunkHandling);
 	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
 	dstSize = fxCheckDataViewSize(the, view, buffer, XS_MUTABLE);
@@ -3424,12 +3424,12 @@ void fx_Uint8Array_prototype_setFromHex(txMachine* the)
 	txU1* dst;
 	txSlot* property;
 	if (dispatch->value.typedArray.dispatch->constructorID != mxID(_Uint8Array))
-		mxTypeError("this is no Uint8Array instance");
+		mxTypeError("this: not a Uint8Array instance");
 	if ((mxArgc < 1) || !mxIsStringPrimitive(mxArgv(0)))
-		mxTypeError("string is no string");
+		mxTypeError("string: not a string");
 	srcSize = (txSize)c_strlen(mxArgv(0)->value.string);
 	if (srcSize & 1)
-		mxSyntaxError("string has odd length");
+		mxSyntaxError("string: odd length");
 	dstSize = fxCheckDataViewSize(the, view, buffer, XS_MUTABLE);
 	src = (txU1*)(mxArgv(0)->value.string);
 	dst = (txU1*)(buffer->value.reference->next->value.arrayBuffer.address + view->value.dataView.offset);
@@ -3454,7 +3454,7 @@ void fx_Uint8Array_prototype_toBase64(txMachine* the)
 	txSize dstSize;
 	txU1 a, b, c;
 	if (dispatch->value.typedArray.dispatch->constructorID != mxID(_Uint8Array))
-		mxTypeError("this is no Uint8Array instance");
+		mxTypeError("this: not a Uint8Array instance");
 	fxUint8ArrayGetBase64Options(the, 0, &alphabet, C_NULL);
 	srcSize = fxCheckDataViewSize(the, view, buffer, XS_IMMUTABLE);
 	if (srcSize > (((0x7FFFFFFF >> 2) * 3) - 2))
@@ -3504,7 +3504,7 @@ void fx_Uint8Array_prototype_toHex(txMachine* the)
 	txSize dstSize;
 	txU1 a;
 	if (dispatch->value.typedArray.dispatch->constructorID != mxID(_Uint8Array))
-		mxTypeError("this is no Uint8Array instance");
+		mxTypeError("this: not a Uint8Array instance");
 	srcSize = fxCheckDataViewSize(the, view, buffer, XS_IMMUTABLE);
 	if (srcSize > (0x7FFFFFFF >> 1))
 		fxAbort(the, XS_NOT_ENOUGH_MEMORY_EXIT);

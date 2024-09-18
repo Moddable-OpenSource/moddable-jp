@@ -599,7 +599,7 @@ void fx_String_fromArrayBuffer(txMachine* the)
 		}
 	}
 	if (!arrayBuffer && !sharedArrayBuffer)
-		mxTypeError("argument is no ArrayBuffer instance");
+		mxTypeError("argument: not an ArrayBuffer instance");
 	limit = bufferInfo->value.bufferInfo.length;
 	offset = fxArgToByteLength(the, 1, 0);
 	if (limit < offset)
@@ -1835,7 +1835,7 @@ void fx_String_prototype_trimStart(txMachine* the)
 void fx_String_prototype_valueOf(txMachine* the)
 {
 	txSlot* slot = fxCheckString(the, mxThis);
-	if (!slot) mxTypeError("this is no string");
+	if (!slot) mxTypeError("this: not a string");
 	mxResult->kind = slot->kind;
 	mxResult->value = slot->value;
 }
@@ -1843,9 +1843,9 @@ void fx_String_prototype_valueOf(txMachine* the)
 txBoolean fx_String_prototype_withRegexp(txMachine* the, txID id, txBoolean global, txInteger count)
 {
 	if (mxIsUndefined(mxThis))
-		mxTypeError("this is undefined");
+		mxTypeError("this: undefined");
 	if (mxIsNull(mxThis))
-		mxTypeError("this is null");
+		mxTypeError("this: null");
 	if (mxArgc > 0) {
 		txSlot* regexp = mxArgv(0);
 		if (!mxIsUndefined(regexp) && !mxIsNull(regexp)) {
@@ -1925,9 +1925,9 @@ txSlot* fxCheckString(txMachine* the, txSlot* it)
 txString fxCoerceToString(txMachine* the, txSlot* theSlot)
 {
 	if (theSlot->kind == XS_UNDEFINED_KIND)
-		mxTypeError("this is undefined");
+		mxTypeError("this: undefined");
 	if (theSlot->kind == XS_NULL_KIND)
-		mxTypeError("this is null");
+		mxTypeError("this: null");
 	return fxToString(the, theSlot);
 }
 

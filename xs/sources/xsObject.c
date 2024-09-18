@@ -756,7 +756,7 @@ void fx_Object_fromEntries(txMachine* the)
 	while (fxIteratorNext(the, iterator, next, value)) {
 		mxTry(the) {
 			if (value->kind != XS_REFERENCE_KIND)
-				mxTypeError("item is no object");
+				mxTypeError("item: not an object");
 			mxPushSlot(value);
 			mxGetIndex(0);
 			mxPushSlot(value);

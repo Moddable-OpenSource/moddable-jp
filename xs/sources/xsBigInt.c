@@ -96,7 +96,7 @@ void fxBuildBigInt(txMachine* the)
 void fx_BigInt(txMachine* the)
 {
 	if (mxTarget->kind != XS_UNDEFINED_KIND)
-		mxTypeError("new BigInt");
+		mxTypeError("new: BigInt");
 	if (mxArgc > 0)
 		*mxResult = *mxArgv(0);
 	fxToPrimitive(the, mxResult, XS_NUMBER_HINT);
@@ -106,7 +106,7 @@ void fx_BigInt(txMachine* the)
 		if ((fpclass != FP_NAN) && (fpclass != FP_INFINITE) && (mxResult->value.number == check))
 			fxNumberToBigInt(the, mxResult);
 		else
-			mxRangeError("Cannot coerce number to bigint");
+			mxRangeError("cannot coerce number to bigint");
 	}
 	else if (mxResult->kind == XS_INTEGER_KIND) {
 		fxIntegerToBigInt(the, mxResult);
@@ -223,7 +223,7 @@ void fx_BigInt_fromArrayBuffer(txMachine* the)
 			arrayBuffer = slot;
 	}
 	if (!arrayBuffer)
-		mxTypeError("argument is no ArrayBuffer instance");
+		mxTypeError("argument: not an ArrayBuffer instance");
 	bufferInfo = arrayBuffer->next;
 	length = bufferInfo->value.bufferInfo.length;
 	if ((mxArgc > 1) && fxToBoolean(the, mxArgv(1)))
@@ -233,7 +233,7 @@ void fx_BigInt_fromArrayBuffer(txMachine* the)
     if (sign)
         length--;
 	if (length <= 0) {
-		mxSyntaxError("invalid ArrayBuffer instance");
+		mxSyntaxError("argument: invalid ArrayBuffer instance");
 // 		mxResult->value.bigint = gxBigIntNaN;
 // 		mxResult->kind = XS_BIGINT_X_KIND;
 		return;
@@ -272,7 +272,7 @@ void fx_BigInt_prototype_toString(txMachine* the)
 	txSlot* slot;
 	txU4 radix;
 	slot = fxBigIntCheck(the, mxThis);
-	if (!slot) mxTypeError("this is no bigint");
+	if (!slot) mxTypeError("this: not a bigint");
 	if (mxArgc == 0)
 		radix = 10;
 	else if (mxIsUndefined(mxArgv(0)))
@@ -290,7 +290,7 @@ void fx_BigInt_prototype_toString(txMachine* the)
 void fx_BigInt_prototype_valueOf(txMachine* the)
 {
 	txSlot* slot = fxBigIntCheck(the, mxThis);
-	if (!slot) mxTypeError("this is no bigint");
+	if (!slot) mxTypeError("this: not a bigint");
 	mxResult->kind = slot->kind;
 	mxResult->value = slot->value;
 }
@@ -785,31 +785,31 @@ again:
 		break;
 	case XS_INTEGER_KIND:
 		if (strict)
-			mxTypeError("Cannot coerce number to bigint");
+			mxTypeError("cannot coerce number to bigint");
 		fxIntegerToBigInt(the, slot);	
 		break;
 	case XS_NUMBER_KIND:
 		if (strict)
-			mxTypeError("Cannot coerce number to bigint");
+			mxTypeError("cannot coerce number to bigint");
 		fxNumberToBigInt(the, slot);	
 		break;
 	case XS_STRING_KIND:
 	case XS_STRING_X_KIND:
 		fxStringToBigInt(the, slot, 1);
 		if (mxBigIntIsNaN(&slot->value.bigint))
-			mxSyntaxError("Cannot coerce string to bigint");
+			mxSyntaxError("cannot coerce string to bigint");
 		break;
 	case XS_BIGINT_KIND:
 	case XS_BIGINT_X_KIND:
 		break;
 	case XS_SYMBOL_KIND:
-		mxTypeError("Cannot coerce symbol to bigint");
+		mxTypeError("cannot coerce symbol to bigint");
 		break;
 	case XS_REFERENCE_KIND:
 		fxToPrimitive(the, slot, XS_NUMBER_HINT);
 		goto again;
 	default:
-		mxTypeError("Cannot coerce to bigint");
+		mxTypeError("cannot coerce to bigint");
 		break;
 	}
 	return &slot->value.bigint;
