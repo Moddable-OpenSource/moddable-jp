@@ -654,6 +654,16 @@ void xs_listener_read(xsMachine *the)
 	c_free(pending);
 }
 
+void xs_listener_get_port(xsMachine *the)
+{
+	Listener listener = xsmcGetHostDataValidate(xsThis, (void *)&xsListenerHooks);
+	struct sockaddr_in sin;
+	socklen_t len = sizeof(sin);
+	if (!listener->skt) return;
+	if (getsockname(listener->skt, (struct sockaddr *)&sin, &len) == -1)return;
+	xsmcSetInteger(xsResult, ntohs(sin.sin_port));
+}
+
 void xs_listener_mark(xsMachine* the, void* it, xsMarkRoot markRoot)
 {
 	Listener listener = it;
