@@ -405,7 +405,7 @@ void xs_tcp_get_remotePort(xsMachine *the)
 	const UInt8 *bytes = CFDataGetBytePtr((__bridge CFDataRef)address);
 	struct sockaddr_in addr = *(struct sockaddr_in *)bytes;
 
-	xsmcSetInteger(xsResult, htons(addr.sin_port));
+	xsmcSetInteger(xsResult, ntohs(addr.sin_port));
 }
 
 void xs_tcp_get_format(xsMachine *the)
@@ -740,7 +740,7 @@ void xs_listener_get_port(xsMachine *the)
 	const UInt8 *bytes = CFDataGetBytePtr((__bridge CFDataRef)address);
 	struct sockaddr_in addr = *(struct sockaddr_in *)bytes;
 
-	xsmcSetInteger(xsResult, htons(addr.sin_port));
+	xsmcSetInteger(xsResult, ntohs(addr.sin_port));
 }
 
 void xs_listener_mark(xsMachine* the, void* it, xsMarkRoot markRoot)
