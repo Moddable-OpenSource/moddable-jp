@@ -97,7 +97,7 @@ void xs_tcp_constructor(xsMachine *the)
 {
 	TCP tcp;
 	uint8_t create = xsmcArgc > 0;
-	uint8_t connect = 0, triggerable = 0, triggered = 0, nodelay = 0, format = kIOFormatBuffer;
+	uint8_t connect = 0, triggerable = 0, triggered = 0, nodelay = 0, format = kIOFormatBuffer, ready = 0;
 	xsSlot *onReadable, *onWritable, *onError;
 	int port;
 	struct tcp_pcb *skt;
@@ -139,6 +139,7 @@ void xs_tcp_constructor(xsMachine *the)
 			skt = from->skt;
 			buffers = from->buffers;
 			triggered = from->triggered;
+			ready = from->ready;
 			if ((triggerable & kTCPWritable) && tcp_sndbuf(skt))
 				triggered |= kTCPWritable;
 			if ((triggerable & kTCPReadable) && buffers)
@@ -207,6 +208,7 @@ void xs_tcp_constructor(xsMachine *the)
 
 	tcp->skt = skt;
 	tcp->buffers = buffers;
+	tcp->ready = ready;
 
 	tcp_arg(skt, tcp);
 	tcp_err(skt, tcpError);
@@ -773,6 +775,8 @@ void xs_listener_read(xsMachine *the)
 	tcp_arg(tcp->skt, tcp);
 	tcp_err(tcp->skt, tcpError);
 	tcp_recv(tcp->skt, tcpReceive);
+	
+	tcp->ready = true;
 }
 
 void xs_listener_get_port(xsMachine *the)
