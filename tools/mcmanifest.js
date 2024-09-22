@@ -760,7 +760,7 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 			}
 		}
 		if (("esp32" == tool.platform) && 
-			((tool.dependencies) || (tool.environment.USE_USB == 1))) {
+			((tool.dependencies?.length > 0) || (tool.environment.USE_USB == 1))) {
 
 			var dep, did = 0;
 			let depStr = "BUILD_DEPENDENCIES = ";
