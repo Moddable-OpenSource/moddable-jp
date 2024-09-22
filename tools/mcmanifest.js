@@ -739,6 +739,9 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 		this.line("");
 	}
 	generateDependenciesDefinitions(tool) {
+		if ("mcrun" == tool.toolName)
+			return;
+
 		if ("esp32" == tool.platform) {
 			if (tool.dependencies?.length) {
 				var projBase = `${tool.tmpPath}${tool.slash}xsProj-${tool.environment.ESP32_SUBCLASS}${tool.slash}managed_components${tool.slash}`;
@@ -759,9 +762,7 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 				this.write("\n");
 			}
 		}
-		if (("esp32" == tool.platform) && 
-			((tool.dependencies?.length > 0) || (tool.environment.USE_USB == 1))) {
-
+		if ("esp32" == tool.platform) {
 			var dep, did = 0;
 			let depStr = "BUILD_DEPENDENCIES = ";
 			for (dep of tool.dependencies) {
