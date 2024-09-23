@@ -1,28 +1,28 @@
-# Ethernet
+# イーサネット
 Copyright 2021 Moddable Tech, Inc.<BR>
-Revised: September 10, 2024
+改訂： 2024年9月10日
 
-## Overview
+## 概要
 
-The Moddable SDK supports Ethernet for the ESP32. Ethernet support is an extension to our [network support](./network.md), which includes support for Wi-Fi and protocols like HTTP/HTTPS, MQTT, WebSockets, DNS, and mDNS. Most of the [networking examples](../../examples/network) in the Moddable SDK enable Wi-Fi by default, but examples that work with Wi-Fi can easily be made to use Ethernet instead.
+Moddable SDKはESP32のためのイーサネットをサポートしています。イーサネットサポートは、Wi-FiやHTTP/HTTPS、MQTT、WebSockets、DNS、mDNSなどのプロトコルをサポートする[ネットワークサポート](./network.md)の拡張です。Moddable SDKのほとんどの[ネットワーキングのサンプル](../../examples/network)はデフォルトでWi-Fiを有効にしていますが、Wi-Fiで動作するサンプルは簡単にイーサネットを使用するように変更できます。
 
-This document provides information about how to enable Ethernet in applications, details of the JavaScript API used to establish and monitor an Ethernet connection, and wiring instructions for a compatible Ethernet breakout board.
+このドキュメントでは、アプリケーションでイーサネットを有効にする方法、イーサネット接続を確立および監視するためのJavaScript APIの詳細、および互換性のあるイーサネットブレイクアウトボードの配線手順について説明します。
 
-## Table of Contents
+## 目次
 
-* [Wiring](#wiring)
-* [Enabling Ethernet in applications](#enabling-ethernet)
-* [Class Ethernet](#class-ethernet)
+* [配線](#wiring)
+* [アプリケーションでのアプリケーションでのイーサネットの有効化](#enabling-ethernet)
+* [イーサネットクラス](#class-ethernet)
 
 <a id="wiring"></a>
-## Wiring
+## 配線
 
-The Moddable SDK supports any Ethernet module you can wire into the hardware and integrate with the ESP-IDF. We've worked with various ENC28J60 Ethernet module breakout boards (pictured below) and had good results. This section contains wiring information for ENC28J60 modules.
+Moddable SDKは、ハードウェアに配線し、ESP-IDFと統合できる任意のイーサネットモジュールをサポートします。さまざまなENC28J60イーサネットモジュールブレイクアウトボード（下の写真）で作業し、良好な結果を得ました。このセクションには、ENC28J60モジュールの配線情報が含まれています。
 
 <img src="https://www.olimex.com/Products/Modules/Ethernet/ENC28J60-H/images/thumbs/310x230/ENC28J60-H-01.jpg" height=100>
 <img src="https://www.atomsindustries.com/assets/images/items/1077/1077.jpg" height=100>
 
-The ESP32 communicates with the ENC28J60 over SPI.
+ESP32はSPIを介してENC28J60と通信します。
 
 | ENC28J60 | ESP32 |
 | :---: | :---: |
@@ -34,18 +34,18 @@ The ESP32 communicates with the ENC28J60 over SPI.
 | PWR | PWR |
 | GND | GND |
 
-The diagram below shows a Moddable Two (an ESP32-based hardware module) wired to a HanRun ENC28J60 module.
+以下の図は、Moddable Two（ESP32ベースのハードウェアモジュール）がHanRun ENC28J60モジュールに配線されている様子を示しています。
 
 ![](../assets/network/enc28j60-wiring-moddable-two.png)
 
-You can use other ESP32-based development boards too. Many developers use NodeMCU ESP32 boards, pictured in the diagram below. These boards require you to solder to the GPIO 0 pad since they do not have a pinout for GPIO 0 (because GPIO 0 is used by the BOOT button).
+他のESP32ベースの開発ボードも使用できます。多くの開発者は、以下の図に示されているNodeMCU ESP32ボードを使用しています。これらのボードでは、GPIO 0のピン配置がないため（GPIO 0はBOOTボタンによって使用されるため）、GPIO 0パッドにハンダ付けする必要があります。
 
 ![](../assets/network/enc28j60-wiring-nodemcu.png)
 
 <a id="enabling-ethernet"></a>
-## Enabling Ethernet in Applications
+## アプリケーションでのイーサネットの有効化
 
-Most of the [networking examples](../../examples/network) in the Moddable SDK enable Wi-Fi by default. They do this by including the `manifest_net.json` manifest.
+Moddable SDKの[ネットワーキングのサンプル](../../examples/network)のほとんどは、デフォルトでWi-Fiを有効にしています。これらは、`manifest_net.json`マニフェストを含めることで実現しています。
 
 ```jsonc
 "include": [
@@ -54,7 +54,7 @@ Most of the [networking examples](../../examples/network) in the Moddable SDK en
 ],
 ```
 
-If you want to use Ethernet in these examples, you can simply replace `manifest_net.json` with `manifest_net_ethernet.json`. Note that you should not include both `manifest_net.json` and `manifest_net_ethernet.json`; only include one or the other.
+これらのサンプルでイーサネットを使用したい場合は、単に `manifest_net.json` を `manifest_net_ethernet.json` に置き換えるだけです。`manifest_net.json` と `manifest_net_ethernet.json` の両方を含めるべきではないことに注意してください。どちらか一方のみを含めてください。
 
 ```jsonc
 "include": [
@@ -63,13 +63,13 @@ If you want to use Ethernet in these examples, you can simply replace `manifest_
 ],
 ```
 
-The `manifest_net_ethernet.json` manifest includes a `setup/network` module that automatically sets up the connection to Ethernet. The connection is set up before the rest of the application runs. In other words, the device connects to Ethernet, then the application's `main` module is executed. If the device is unable to connect to Ethernet, the `main` module is never executed.
+`manifest_net_ethernet.json` マニフェストには、イーサネットへの接続を自動的に設定する `setup/network` モジュールが含まれています。接続はアプリケーションの残りの部分が実行される前に設定されます。つまり、デバイスはイーサネットに接続し、その後アプリケーションの `main` モジュールが実行されます。デバイスがイーサネットに接続できない場合、`main` モジュールは実行されません。
 
-You may choose to remove the `setup/network` module from your own applications and instead set up and monitor the Ethernet connection in the application code using the JavaScript APIs described in the [Class Ethernet](#class-ethernet) section below.
+独自のアプリケーションから `setup/network` モジュールを削除し、代わりに以下の [イーサネットクラス](#class-ethernet) セクションで説明されているJavaScript APIを使用してアプリケーションコード内でイーサネット接続を設定および監視することもできます。
 
-### ESP-IDF ENC28J60 Driver Multicast Packet Issue
+### ESP-IDF ENC28J60 ドライバマルチキャストパケット問題
 
-The ENC28J60 driver in the ESP-IDF contains a bug that causes multicast packets to be filtered out in hardware. Moddable has [fixed this bug via an ESP-IDF pull request](https://github.com/espressif/esp-idf/commit/3e9cdbdedfd47813a55454ff3b9541fb5c9f9a61) that will be included in a future ESP-IDF release. Until that time, if your project needs multicast you can apply this small fix in the file `$IDF_PATH/examples/ethernet/enc28j60/main/esp_eth_mac_enc28j60.c`, lines 551-552:
+ESP-IDFのENC28J60ドライバには、マルチキャストパケットがハードウェアでフィルタリングされるバグが含まれています。Moddableは、将来のESP-IDFリリースに含まれる[ESP-IDFプルリクエストを通じてこのバグを修正しました](https://github.com/espressif/esp-idf/commit/3e9cdbdedfd47813a55454ff3b9541fb5c9f9a61)。それまでの間、プロジェクトでマルチキャストが必要な場合は、次の小さな修正をファイル `$IDF_PATH/examples/ethernet/enc28j60/main/esp_eth_mac_enc28j60.c` の551-552行目に適用できます：
 
 ```diff
 -    // set up default filter mode: (unicast OR broadcast) AND crc valid
@@ -79,22 +79,22 @@ The ENC28J60 driver in the ESP-IDF contains a bug that causes multicast packets 
 ```
 
 <a id="class-ethernet"></a>
-## Class Ethernet
+## イーサネットクラス
 
-- **Source code:** [ethernet](../../modules/network/ethernet)
-- **Relevant Examples:** [`ethernet-test`](../../examples/network/ethernet/ethernet-test), [`ethernet-test-graphic`](../../examples/network/ethernet/ethernet-test-graphic), [`ethernet-monitor`](../../examples/network/ethernet/ethernet-monitor)
+- **ソースコード:** [ethernet](../../modules/network/ethernet)
+- **関連するサンプル:** [`ethernet-test`](../../examples/network/ethernet/ethernet-test), [`ethernet-test-graphic`](../../examples/network/ethernet/ethernet-test-graphic), [`ethernet-monitor`](../../examples/network/ethernet/ethernet-monitor)
 
-The `Ethernet` class provides access to use and configure the Ethernet capabilities of an Ethernet module.
+`Ethernet` クラスは、イーサネットモジュールのイーサネット機能を使用および構成するためのアクセスを提供します。
 
 ```js
 import Ethernet from "ethernet";
 ```
 
-The software for Ethernet is nearly identical to Wi-Fi with the exception of establishing a connection. Since Ethernet implements the same API as Wi-Fi, you can mostly use Ethernet as a drop-in replacement to Wi-Fi in examples from the Moddable SDK and in your own applications, rather than rewriting large portions of them.
+イーサネット用のソフトウェアは、接続の確立を除いてWi-Fiとほぼ同じです。イーサネットはWi-Fiと同じAPIを実装しているため、Moddable SDKのサンプルや自分のアプリケーションでWi-Fiの代わりにイーサネットをほぼそのまま使用することができます。
 
 ### `static start()`
 
-The `start` method begins the underlying process to manage the device's connection to the network.
+`start`メソッドは、デバイスのネットワーク接続を管理するための基礎的なプロセスを開始します。
 
 ```js
 Ethernet.start();
@@ -102,16 +102,16 @@ Ethernet.start();
 
 ### `constructor(callback)`
 
-The `Ethernet` constructor creates a monitor for the Ethernet status. It takes a callback function to receive status messages. Messages are strings representing the state of the Ethernet connection. The `Ethernet` class has properties that correspond to each string as a convenience for developers.
+`Ethernet`コンストラクタは、イーサネットのステータスを監視するためのモニターを作成します。ステータスメッセージを受け取るためのコールバック関数を取ります。メッセージはイーサネット接続の状態を表す文字列です。`Ethernet`クラスには、開発者の便宜のために各文字列に対応するプロパティがあります。
 
-| Property | Description |
+| プロパティ | 説明 |
 | :---: | :--- |
-| `Ethernet.connected` | Physical link established
-| `Ethernet.disconnected ` | Physical link lost
-| `Ethernet.gotIP` | IP address has been assigned via DHCP and network connection is ready for use
-| `Ethernet.lostIP ` | IP address has been lost and network connection is no longer usable
+| `Ethernet.connected` | 物理リンクが確立された
+| `Ethernet.disconnected` | 物理リンクが失われた
+| `Ethernet.gotIP` | DHCPによってIPアドレスが割り当てられ、ネットワーク接続が使用可能になった
+| `Ethernet.lostIP` | IPアドレスが失われ、ネットワーク接続が使用できなくなった
 
-> **Note:** Applications must call the static `start` method of the `Ethernet` class to initiate the Ethernet connection. Without calling `start`, the callback passed into the `Ethernet` constructor will never be called.
+> **注:** アプリケーションは、イーサネット接続接続を開始するために`Ethernet`クラスの静的メソッド`start`を呼び出す必要があります。`start`を呼び出さないと、`Ethernet`コンストラクタに渡されたコールバックは決して呼び出されません。
 
 ```js
 Ethernet.start();
@@ -129,7 +129,7 @@ let monitor = new Ethernet((msg) => {
 
 ### `close()`
 
-The `close` method closes the connection between the `Ethernet` instance and the underlying process managing the device's connection to the network. In other words, it prevents future calls to the callback function, but it does not disconnect from the network.
+`close`メソッドは、`Ethernet`インスタンスとデバイスのネットワーク接続を管理する基礎プロセスとの間の接続を閉じます。言い換えれば、将来のコールバック関数の呼び出しを防ぎますが、ネットワークからの切断は行いません。
 
 ```js
 let monitor = new Ethernet((msg) => {
@@ -139,11 +139,11 @@ let monitor = new Ethernet((msg) => {
 monitor.close();
 ```
 
-### Example: Get Ethernet IP address
+### 例: イーサネット IPアドレスの取得
 
-The following example begins the process of connecting to Ethernet and traces to the console when the connection succeeds with an IP address being assigned to the Ethernet device.
+次の例は、イーサネット接続への接続プロセスを開始し、接続が成功してイーサネット接続デバイスにIPアドレスが割り当てられたときにコンソールにログ出力します。
 
-The `Net.get` method can be used to get the IP and MAC addresses of the Ethernet interface, as with Wi-Fi. An optional second argument to `Net.get` specifies which interface to query: `"ethernet"`, `"ap"`, or `"station"`. If no second argument is provided, `Net.get` defaults to the active network interface (for example, when the only network connection is Ethernet, the Ethernet interface is the default).
+`Net.get`メソッドは、Wi-Fiと同様にイーサネット接続インターフェースのIPアドレスとMACアドレスを取得するために使用できます。`Net.get`のオプションの第二引数は、どのインターフェースをクエリするかを指定します： `"ethernet"`、`"ap"`、または`"station"`。第二引数が提供されない場合、`Net.get`はアクティブなネットワークインターフェースをデフォルトとします（例えば、唯一のネットワーク接続がイーサネット接続の場合、イーサネット接続インターフェースがデフォルトになります）。
 
 ```js
 Ethernet.start();
@@ -165,11 +165,11 @@ let monitor = new Ethernet((msg) => {
 });
 ```
 
-### Example: Get MAC address of Ethernet device
+### 例: イーサネットデバイスのMACアドレスを取得する
 
-The following example gets the MAC address of the Ethernet device and traces it to the console.
+次の例では、イーサネットデバイスのMACアドレスを取得し、それをコンソールにログ出力します。
 
-The `Net.get` method is documented in the **Net** section of the [networking documentation](./network.md). Note that there is a second argument passed into the `Net.get` function in this example: the string `"ethernet"`. This specifies that you want to get the MAC address of the ethernet device, not the MAC address of the Wi-Fi device on the ESP32.
+`Net.get`メソッドは[ネットワークドキュメント](./network.md)の**Net**セクションに記載されています。この例では、`Net.get`関数に渡される第2引数として文字列`"ethernet"`があることに注意してください。これは、ESP32のWi-FiデバイスのMACアドレスではなく、イーサネットデバイスのMACアドレスを取得したいことを指定しています。
 
 ```js
 let mac = Net.get("MAC", "ethernet");

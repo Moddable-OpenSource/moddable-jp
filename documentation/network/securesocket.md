@@ -1,28 +1,28 @@
-# TLS (SecureSocket)
+# TLS (セキュアソケット)
 Copyright 2017-2022 Moddable Tech, Inc.<BR>
-Revised: November 11, 2022
+改訂： 2022年11月11日
 
-## Table of Contents
+## 目次
 
-* [SecureSocket](#securesocket)
-	* [Use with HTTP client (`https:`)](#https)
-	* [Use with WebSocket client (`wss:`)](#websockets)
-	* [Use with MQTT client (`mqtts:`)](#mqtts)
-	* [TLS Certificates](#certificates)
-		* [Using a Built-in Certificate](#certificate-bulitin)
-		* [Providing a Certificate](#certificate-providing)
-		* [Converting PEM to DER](#converting-pem)
-		* [Updating Certificate Store](#certificate-update)
-	* [Memory](#memory)
-* [Configuration](#configuration)
+* [セキュアソケット](#securesocket)
+	* [HTTPクライアントでの使用 (`https:`)](#https)
+	* [WebSocketクライアントでの使用 (`wss:`)](#websockets)
+	* [MQTTクライアントでの使用 (`mqtts:`)](#mqtts)
+	* [TLS証明書](#certificates)
+		* [組み込み証明書の使用](#certificate-bulitin)
+		* [証明書の提供](#certificate-providing)
+		* [PEMをDERに変換](#converting-pem)
+		* [証明書ストアの更新](#certificate-update)
+	* [メモリ](#memory)
+* [設定](#configuration)
 
 <a id="securesocket"></a>
-## class `SecureSocket`
+## `SecureSocket`クラス
 
-- **Source code:** [securesocket](../../modules/crypt/securesocket)
-- **Relevant Examples:** [socketsecure](../../examples/network/socket/socketsecure), [httpsget](../../examples/network/http/httpsget), [mqttsecure](../../examples/network/mqtt/mqttsecure)
+- **ソースコード:** [securesocket](../../modules/crypt/securesocket)
+- **関連するサンプル:** [socketsecure](../../examples/network/socket/socketsecure), [httpsget](../../examples/network/http/httpsget), [mqttsecure](../../examples/network/mqtt/mqttsecure)
 
-The `SecureSocket` class implements TLS. At this time, there is no Listener in `SecureSocket`; there is only the Socket, which is TCP-only (no UDP).
+`SecureSocket`クラスはTLSを実装しています。現時点では、`SecureSocket`にはリスナーはなく、TCP専用のソケットのみが存在します（UDPはありません）。
 
 ```js
 import SecureSocket from "securesocket";
@@ -30,24 +30,24 @@ import SecureSocket from "securesocket";
 
 ### `constructor(dictionary)`
 
-The `SecureSocket` constructor takes a single argument, a object dictionary of initialization parameters. The dictionary is a super-set of the `Socket` dictionary (see the documentation of the `Socket` class in the [network documentation](./network.md) for details).
+`SecureSocket` のコンストラクタは、初期化パラメータのオブジェクト辞書を引数として受け取ります。この辞書は `Socket` 辞書のスーパーセットです（詳細は [ネットワークドキュメント](./network.md) の `Socket` クラスのドキュメントを参照してください）。
 
-`SecureSocket` extends the dictionary of the constructor with an additional property named `secure` which is itself a dictionary used to configure the TLS connection.
+`SecureSocket` は、TLS接続を構成するために使用される辞書である `secure` という追加のプロパティを持つコンストラクタの辞書を拡張します。
 
-The `secure` dictionary may contain the following properties:
+`secure` 辞書には次のプロパティを含めることができます：
 
-| Parameter | Default Value | Description |
+| パラメータ | デフォルト値 | 説明 |
 | :---: | :---: | :--- |
-| `protocolVersion` | `0x302` (TLS 1.1) | The minimum version of the TLS protocol to implement, in hex.<BR><BR>- `0x303` is TLS 1.2<BR>- `0x302` is TLS 1.1<BR>- `0x301` is TLS 1.0
-| `certificate` | N/A |  a certificate in DER (binary) format contained in an `ArrayBuffer`, `Uint8Array`, or host buffer
-| `trace` | `false` | If `true`, the TLS stack outputs a trace of its activity. This can be useful in diagnosing failures.
-| `verify` | `true` | If `false`, the certificate chain provided by the server is not verified. This should never be done in production systems but can be useful when debugging.
-| `tls_max_fragment_length` | N/A |  A number indicating the requested maximum fragment size. Unfortunately, many servers ignore this optional extension. When supported, can help reduce memory requirements.
-| `applicationLayerProtocolNegotiation` | N/A | Supports [RFC 7301](https://datatracker.ietf.org/doc/html/rfc7301). Either a `String` or `ArrayBuffer` value to indicate support for a single application layer protocol or an `Array` of one or more `String` and `ArrayBuffer` values to indicate support for multiple application layer protocols.
-| `clientKey` | N/A |  a key in DER (binary) format contained in an `ArrayBuffer`, `Uint8Array`, or host buffer
-| `clientCertificates ` | N/A |  an array of one or more client certificates in DER (binary) format contained in an `ArrayBuffer`, `Uint8Array`, or host buffer
+| `protocolVersion` | `0x302` (TLS 1.1) | 実装する TLS プロトコルの最小バージョン（16進数）。<BR><BR>- `0x303` は TLS 1.2<BR>- `0x302` は TLS 1.1<BR>- `0x301` は TLS 1.0
+| `certificate` | 該当なし | DER（バイナリ）形式の証明書を `ArrayBuffer`、`Uint8Array`、またはホストバッファに含む
+| `trace` | `false` | `true` の場合、TLS スタックはその活動をログ出力します。これは障害診断に役立ちます。
+| `verify` | `true` | `false` の場合、サーバーによって提供される証明書チェーンは検証されません。これは本番システムでは決して行うべきではありませんが、デバッグ時には役立つことがあります。
+| `tls_max_fragment_length` | 該当なし | 要求された最大フラグメントサイズを示す数値。残念ながら、多くのサーバーはこのオプションの拡張を無視します。サポートされている場合、メモリ要件を減らすのに役立ちます。
+| `applicationLayerProtocolNegotiation` | 該当なし | [RFC 7301](https://datatracker.ietf.org/doc/html/rfc7301) をサポートします。単一のアプリケーション層プロトコルのサポートを示す `String` または `ArrayBuffer` 値、または複数のアプリケーション層プロトコルのサポートを示す一つ以上の `String` および `ArrayBuffer` 値の `Array` を指定します。
+| `clientKey` | 該当なし | DER（バイナリ）形式のキーを `ArrayBuffer`、`Uint8Array`、またはホストバッファに含む
+| `clientCertificates ` | 該当なし | DER（バイナリ）形式の一つ以上のクライアント証明書を `ArrayBuffer`、`Uint8Array`、またはホストバッファに含む配列
 
-In the following example, the TLS socket is created with support for version `0x303` of TLS, which corresponds to TLS 1.2.
+以下の例では、TLSソケットはTLSのバージョン`0x303`（TLS 1.2に対応）をサポートするように作成されています。
 
 ```js
 let socket = new SecureSocket({
@@ -60,9 +60,9 @@ let socket = new SecureSocket({
 ```
 
 <a id="https"></a>
-### Use with HTTP client (`https:`)
+### HTTPクライアントでの使用 (`https:`)
 
-The HTTP `Client` class accepts an optional `Socket` property in the dictionary of its constructor. Set this property to `SecureSocket` to make an HTTPS request. The `secure` property may be provided to configure the TLS connection:
+HTTP `Client`クラスは、コンストラクタの辞書にオプションの`Socket`プロパティを受け入れます。このプロパティを`SecureSocket`に設定してHTTPSリクエストを行います。TLS接続を構成するために`secure`プロパティを提供することができます：
 
 ```js
 let request = new Request({
@@ -79,9 +79,9 @@ let request = new Request({
 ```
 
 <a id="websockets"></a>
-### Use with WebSocket client (`wss:`)
+### WebSocketクライアントでの使用 (`wss:`)
 
-The WebSocket `Client` class accepts an optional `Socket` property in the dictionary of its constructor. Set this property to `SecureSocket` to make an WSS request. The `secure` property may be provided to configure the TLS connection:
+WebSocket `Client`クラスは、コンストラクタの辞書にオプションの`Socket`プロパティを受け入れます。このプロパティを`SecureSocket`に設定してWSSリクエストを行います。TLS接続を構成するために`secure`プロパティを提供することができます：
 
 ```js
 let ws = new Client({
@@ -95,9 +95,9 @@ let ws = new Client({
 ```
 
 <a id="mqtts"></a>
-### Use with MQTT client (`mqtts:`)
+### MQTTクライアントでの使用 (`mqtts:`)
 
-The MQTT `Client` class accepts an optional `Socket` property in the dictionary of its constructor. Set this property to `SecureSocket` to establish a secure MQTT connection. The `secure` property may be provided to configure the TLS connection:
+MQTT `Client`クラスは、コンストラクタの辞書にオプションの`Socket`プロパティを受け入れます。このプロパティを`SecureSocket`に設定してセキュアなMQTT接続を確立します。TLS接続を構成するために`secure`プロパティを提供することができます：
 
 ```js
 const mqtt = new MQTT({
@@ -116,13 +116,13 @@ const mqtt = new MQTT({
 ```
 
 <a id="certificates"></a>
-### TLS Certificates
+### TLS証明書
 
-TLS Certificates are used to encrypt the data you send to a server. `SecureSocket` objects use certificates in DER (binary) format.
+TLS証明書は、サーバーに送信するデータを暗号化するために使用されます。`SecureSocket`オブジェクトは、DER（バイナリ）形式の証明書を使用します。
 
 <a id="certificate-bulitin"></a>
-#### Using a Built-in Certificate
-The certificate store is located in the [`modules/crypt/data` directory](../../modules/crypt/data) of the Moddable SDK. Not every certificate is used by every application, so it would be a waste of limited flash memory to include all of them by default. Instead, certificates are explicitly included in the `resources` section of manifests.
+#### 組み込み証明書の使用
+証明書ストアは、Moddable SDKの[`modules/crypt/data`ディレクトリ](../../modules/crypt/data)にあります。すべての証明書がすべてのアプリケーションで使用されるわけではないため、すべての証明書をデフォルトで含めるのは限られたフラッシュメモリの無駄になります。代わりに、証明書はマニフェストの`resources`セクションに明示的に指定します。
 
 ```json
 "resources": {
@@ -132,11 +132,12 @@ The certificate store is located in the [`modules/crypt/data` directory](../../m
 }
 ```
 
-If you are unsure which certificate you need to include, just run your application that tries to access a website and see what certificate fails to load. The application will throw an exception like the following:
+どの証明書を含める必要があるかわからない場合は、ウェブサイトにアクセスしようとするアプリケーションを実行し、どの証明書が読み込まれないかを確認してください。アプリケーションは次のような例外をスローします：
 
-![resource not found error message](../assets/network/ssl-resource-not-found.png)
+![リソースが見つからないエラーメッセージ](../assets/network/ssl-resource-not-found.png)
 
-In this case, `ca109.der` needs to be included, so it should be added in the manifest’s `resources` object.
+この場合、`ca109.der`を含める必要があるため、マニフェストの`resources`オブジェクトに追加する必要があります。
+
 
 ```json
 "resources": {
@@ -146,7 +147,7 @@ In this case, `ca109.der` needs to be included, so it should be added in the man
 }
 ```
 
-As an alternative to the certificate store, you can put the certificates needed in your application and pass the appropriate certificate in the `secure` dictionary.
+証明書ストアの代替として、アプリケーションに必要な証明書を配置し、`secure`ディクショナリに適切な証明書を渡すことができます。
 
 ```js
 let request = new Request({
@@ -162,8 +163,8 @@ let request = new Request({
 ```
 
 <a id="certificate-providing"></a>
-#### Providing a Certificate
-You do not have to use the certificates included in the Moddable SDK. You may pass any valid certificate in DER format in the SecureSocket’s dictionary:
+#### 証明書の提供
+Moddable SDKに含まれている証明書を使用する必要はありません。SecureSocketのディクショナリにDER形式の有効な証明書を渡すことができます。
 
 ```js
 let request = new Request({
@@ -175,43 +176,44 @@ let request = new Request({
 ```
 
 <a id="converting-pem"></a>
-#### Converting PEM to DER
-The `SecureSocket` implementation requires certificates to be provided in DER (binary) format. If you have a certificate in PEM (a Base64 encoded) format, you need to convert it to DER.
+#### PEMをDERに変換する
+`SecureSocket`の実装では、証明書をDER（バイナリ）形式で提供する必要があります。PEM（Base64エンコード）形式の証明書を持っている場合は、DERに変換する必要があります。
 
-Whenever possible, convert the PEM file to DER format before adding it to your project. There are many tools that can perform the conversion. A reliable choice is `openssl`. The following command line works for many certificates (substitute your PEM file path for `data.pem` and the desired output file path for `data.der`):
+可能であれば、プロジェクトに追加する前にPEMファイルをDER形式に変換してください。変換を行うツールは多数ありますが、信頼できる選択肢として`openssl`があります。以下のコマンドラインは多くの証明書に対して機能します（PEMファイルのパスを`data.pem`に、出力ファイルのパスを`data.der`に置き換えてください）:
+
 
 ```
 openssl x509 -inform pem -in data.pem -out data.der -outform der
 ```
 
 
-Sometimes there is no choices but to convert the PEM to DER at runtime. For example, during provisioning you might receive a certificate in PEM format from a service, and later you need to use that certificate to establish a TLS connection. The Moddable SDK provides the [`pemtoDER`](../crypt/crypt.md#transform-pemToDER) and [`privateKeyToPrivateKeyInfo`](../crypt/crypt.md#transform-privateKeyToPrivateKeyInfo) functions for these situations. These functions are part of the Crypt `Transform` class.
+時には、実行時にPEMをDERに変換するしかない場合があります。例えば、プロビジョニング中にサービスからPEM形式の証明書を受け取り、後でその証明書を使用してTLS接続を確立する必要がある場合です。Moddable SDKは、このような状況に対応するために[`pemtoDER`](../crypt/crypt.md#transform-pemToDER)および[`privateKeyToPrivateKeyInfo`](../crypt/crypt.md#transform-privateKeyToPrivateKeyInfo)関数を提供しています。これらの関数はCrypt `Transform`クラスの一部です。
 
 
 <a id="certificate-update"></a>
-#### Updating Certificate Store
-The certificate store may be updated with new and revised certificates in `$MODDABLE/modules/crypt/data`. Certificates are numbered sequentially starting with `ca0.der`. The certificate store index `ca.ski` must be rebuilt after adding or updating certificates . To update the index, run the `mcprintski` tool with no arguments. The `ca.ski` index file is updated in place. (This tool is currently only available on macOS. Windows and Linux could be supported with updates to their tool makefiles.)
+#### 証明書ストアの更新
+証明書ストアは、`$MODDABLE/modules/crypt/data`に新しい証明書や改訂された証明書を追加することで更新できます。証明書は`ca0.der`から始まる連番で番号が付けられます。証明書を追加または更新した後、証明書ストアインデックス`ca.ski`を再構築する必要があります。インデックスを更新するには、引数なしで`mcprintski`ツールを実行します。`ca.ski`インデックスファイルはその場で更新されます。（このツールは現在macOSでのみ利用可能です。WindowsおよびLinuxは、ツールのmakefileを更新することでサポートされる可能性があります）
 
 <a id="memory"></a>
-### Memory
+### メモリ
 
-The TLS handshake requires a fair amount of memory. The exact amount required varies depending on the site you are connecting to. As a rough guideline, the following should be free:
+TLSハンドシェイクにはかなりの量のメモリが必要です。必要な正確な量は、接続するサイトによって異なります。大まかなガイドラインとして、以下のメモリが空いている必要があります：
 
-- 4 KB of stack
-- 10 KB in the chunk heap
-- 6 KB in the slot heap
-- 2 KB in the system heap
+- スタックに4 KB
+- チャンクヒープに10 KB
+- スロットヒープに6 KB
+- システムヒープに2 KB
 
-Once the handshake is complete (e.g. once the secure connection is established), memory use drops considerably.
+ハンドシェイクが完了すると（例えば、セキュア接続が確立されると）、メモリ使用量は大幅に減少します。
 
-However, if the server sends large fragments (e.g. apple.com sends 16 KB fragments), there may not be enough free RAM on your microcontroller to buffer them. The requests will fail. Secure web servers designed to work with IoT devices will use smaller fragments by default and/or will support the `tls_max_fragment_length` extension.
+しかし、サーバーが大きなフラグメントを送信する場合（例えば、apple.comは16 KBのフラグメントを送信します）、それらをバッファするための十分な空きRAMがマイクロコントローラーにないかもしれません。リクエストは失敗します。IoTデバイスと連携するように設計されたセキュアなウェブサーバーは、デフォルトでより小さなフラグメントを使用するか、`tls_max_fragment_length` 拡張をサポートします。
 
-When working with HTTPS, it is best to use streaming mode to retrieve the response body as it arrives rather than having the HTTP client buffer the entire response body in memory. See the [`httpsgetstreaming` example](../../examples/network/http/httpsgetstreaming) for an example of this.
+HTTPSを使用する場合、HTTPクライアントが応答本文全体をメモリにバッファするのではなく、応答本文が到着するたびにストリーミングモードを使用して取得するのが最善です。このサンプルについては、[`httpsgetstreaming` のサンプル](../../examples/network/http/httpsgetstreaming)を参照してください。
 
 <a id="configuration"></a>
-## Configuration
+## 設定
 
-The TLS implementation defaults to enabling cipher suites that use DHE and ECDHE. These modes are computationally complex and therefore can take a long time to run on slower microcontrollers. The use of these suites is controlled by the `config` section of the manifest. To disable these suites, include the following in your project manifest:
+TLS実装はデフォルトでDHEおよびECDHEを使用する暗号スイートを有効にします。これらのモードは計算が複雑であるため、遅いマイクロコントローラ上で実行するのに長い時間がかかることがあります。これらのスイートの使用はマニフェストの`config`セクションで制御されます。これらのスイートを無効にするには、プロジェクトのマニフェストに以下を含めてください：
 
 ```json
 "config": {
