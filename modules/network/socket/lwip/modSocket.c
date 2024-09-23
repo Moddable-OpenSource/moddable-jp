@@ -462,10 +462,14 @@ void xs_socket_close(xsMachine *the)
 {
 	xsSocket xss = xsmcGetHostData(xsThis);
 
-	if (NULL == xss) {
-		xsTrace("close on closed socket\n");
+	if (NULL == xss)
 		return;
-	}
+
+	xsmcGetHostDataValidate(xsThis, xs_socket_destructor);
+
+	xsmcSetHostDestructor(xsThis, NULL);
+	xsmcSetHostData(xsThis, NULL);
+	xsForget(xsThis);
 
 	closeSocket(xss);
 
@@ -1189,6 +1193,12 @@ void xs_listener_close(xsMachine *the)
 		xsTrace("close on closed listener");
 		return;
 	}
+
+	xsmcGetHostDataValidate(xsThis, xs_listener_destructor);
+
+	xsmcSetHostDestructor(xsThis, NULL);
+	xsmcSetHostData(xsThis, NULL);
+	xsForget(xsThis);
 
 	socketSetPending((xsSocket)xsl, kPendingClose);
 }
