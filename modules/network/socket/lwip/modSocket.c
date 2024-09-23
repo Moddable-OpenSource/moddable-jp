@@ -421,18 +421,21 @@ static void closeSocket(xsSocket xss)
 		tcp_err(xss->skt, NULL);
 		tcp_close_safe(xss->skt);
 		xss->skt = NULL;
+		modInstrumentationAdjust(NetworkSockets, -1);
 	}
 
 	if (xss->udp) {
 		udp_recv(xss->udp, NULL, NULL);
 		udp_remove_safe(xss->udp);
 		xss->udp = NULL;
+		modInstrumentationAdjust(NetworkSockets, -1);
 	}
 
 	if (xss->raw) {
 		raw_recv(xss->raw, NULL, NULL);
 		raw_remove(xss->raw);
 		xss->raw = NULL;
+		modInstrumentationAdjust(NetworkSockets, -1);
 	}
 }
 
@@ -454,8 +457,6 @@ void xs_socket_destructor(void *data)
 	}
 
 	c_free(xss);
-
-	modInstrumentationAdjust(NetworkSockets, -1);
 }
 
 void xs_socket_close(xsMachine *the)
@@ -1181,8 +1182,6 @@ void xs_listener_destructor(void *data)
 		xs_socket_destructor(xsl->accept[i]);
 
 	c_free(xsl);
-
-	modInstrumentationAdjust(NetworkSockets, -1);
 }
 
 void xs_listener_close(xsMachine *the)
