@@ -183,9 +183,7 @@ static int socketDownUseCount(xsMachine *the, xsSocket xss)
 
 	xss->pending |= kPendingClose;
 	modCriticalSectionEnd();
-	destructor = xsGetHostDestructor(xss->obj);
-	xsmcSetHostData(xss->obj, NULL);
-	xsForget(xss->obj);
+	destructor = (kTCPListener == xss->kind) ? xs_listener_destructor : xs_socket_destructor;
 	(*destructor)(xss);
 	return 1;
 }
@@ -211,7 +209,7 @@ void xs_socket(xsMachine *the)
 	if (xsmcHas(xsArg(0), xsID_listener)) {
 		xsListener xsl;
 		xsmcGet(xsVar(0), xsArg(0), xsID_listener);
-		xsl = xsmcGetHostData(xsVar(0));
+		xsl = xsmcGetHostDataValidate(xsVar(0), xs_socket_destructor);
 
 		modCriticalSectionBegin();
 
@@ -482,7 +480,7 @@ void xs_socket_close(xsMachine *the)
 
 void xs_socket_get(xsMachine *the)
 {
-	xsSocket xss = xsmcGetHostData(xsThis);
+	xsSocket xss = xsmcGetHostDataValidate(xsThis, xs_socket_destructor);
 	const char *name = xsmcToString(xsArg(0));
 
 	if (xss->skt && (0 == c_strcmp(name, "REMOTE_IP"))) {
@@ -493,7 +491,7 @@ void xs_socket_get(xsMachine *the)
 
 void xs_socket_read(xsMachine *the)
 {
-	xsSocket xss = xsmcGetHostData(xsThis);
+	xsSocket xss = xsmcGetHostDataValidate(xsThis, xs_socket_destructor);
 	xsType dstType;
 	int argc = xsmcArgc;
 	uint16 srcBytes;
@@ -602,7 +600,7 @@ void xs_socket_read(xsMachine *the)
 
 void xs_socket_write(xsMachine *the)
 {
-	xsSocket xss = xsmcGetHostData(xsThis);
+	xsSocket xss = xsmcGetHostDataValidate(xsThis, xs_socket_destructor);
 	int argc = xsmcArgc;
 	char *msg;
 	xsUnsignedValue msgLen;
@@ -761,7 +759,7 @@ void xs_socket_write(xsMachine *the)
 
 void xs_socket_suspend(xsMachine *the)
 {
-	xsSocket xss = xsmcGetHostData(xsThis);
+	xsSocket xss = xsmcGetHostDataValidate(xsThis, xs_socket_destructor);
 
 	if (xsmcArgc) {
 		uint8_t suspended = xsmcToBoolean(xsArg(0));
@@ -1344,7 +1342,7 @@ done:
 
 void *modSocketGetLWIP(xsMachine *the, xsSlot *slot)
 {
-	xsSocket xss = xsmcGetHostData(*slot);
+	xsSocket xss = xsmcGetHostDataValidate(*slot, xs_socket_destructor);
 	struct tcp_pcb *skt = xss->skt;
 	if (skt) {
 		socketSetPending(xss, kPendingDisconnect | kPendingClose);
