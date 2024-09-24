@@ -59,6 +59,49 @@
 				"$(MODDABLE)/modules/pins/i2s/manifest.json"
 			],
 			"config": {
+				"digital": [12, 13, 16, 17, 26, 27],
+				"flashPartition": "xs_test",
+				"i2c": {
+					"hz": 100000,
+					"address": 53,
+					"unusedAddress": 99
+				},
+				"pwm": {
+					"from": true,
+					"pins": [18, 12, 13],
+					"ports": [4, 5],
+					"invalidPorts": [0, 1],
+					"resolutions": [10, 11, 12],
+					"hzs": [10000, 200, 17]
+				},
+				"spi": {
+					"select": 18,
+					"ports": [1, 2],
+					"invalidPorts": [3, -1],
+					"hzs": [1000, 10000, 20000]
+				},
+			 	"invalidPins": [
+					-10,
+					500
+				]
+			}
+		},
+		"esp32": {
+			"defines": {
+				"audioOut": {
+					"bitsPerSample": 16,
+					"numChannels": 1,
+					"sampleRate": 12000,
+					"streams": 2,
+					"queueLength": 4
+				}
+			},
+			"include": [
+				"$(MODULES)/base/worker/manifest.json",
+				"$(MODULES)/files/flash/manifest.json",
+				"$(MODDABLE)/modules/pins/i2s/manifest.json"
+			],
+			"config": {
 				"digital": [0, 1, 2, 3, 18, 19],
 				"flashPartition": "xs_test",
 				"i2c": {

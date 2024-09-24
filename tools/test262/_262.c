@@ -36,7 +36,7 @@
 	typedef TaskHandle_t txCondition;
 	typedef struct {
 #if nrf52
-		SemaphoreHandle_T sem;
+		SemaphoreHandle_t sem;
 #else
 		QueueHandle_t handle;
 		StaticSemaphore_t buffer;

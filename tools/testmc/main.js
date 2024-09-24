@@ -27,8 +27,8 @@ import { URL, URLSearchParams } from "url";
 globalThis.URL = URL;
 globalThis.URLSearchParams = URLSearchParams;
 /* comment out the import of WiFi or Net if your platform doesn't support it */
-import WiFi from "wifi";
-import Net from "net";
+//import WiFi from "wifi";
+//import Net from "net";
 /* end network */
 
 globalThis.$DO = function(f) {
@@ -153,6 +153,8 @@ Object.defineProperty(globalThis, "screen", {
 	}
 });
 
+/* *** MDK */
+/*
 globalThis.$NETWORK = {
     get connected() {
 		if (WiFi === undefined)
@@ -197,6 +199,8 @@ globalThis.$NETWORK = {
 	},
 	invalidDomain: "fail.moddable.com",
 };
+*/
+/* *** MDK */
 
 class HostObject @ "xs_hostobject_destructor" {
 	constructor() @ "xs_hostobject"

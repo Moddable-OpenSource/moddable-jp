@@ -151,6 +151,7 @@ LDFLAGS_RP2040 += \
 	-Wl,--wrap=__clz			\
 	-Wl,--wrap=__clzl			\
 	-Wl,--wrap=__clzll			\
+	-Wl,--wrap=__clzdi2			\
 	-Wl,--wrap=__aeabi_idiv			\
 	-Wl,--wrap=__aeabi_idivmod			\
 	-Wl,--wrap=__aeabi_ldivmod			\
@@ -859,6 +860,17 @@ C_FLAGS=\
 	-std=gnu11 \
 	-mthumb	\
 	-ffunction-sections -fdata-sections
+
+
+ifeq ("$(PICO_SUBCLASS)","rp2040")
+PICO_C_DEFINES += \
+	-DPICO_RP2040=1	\
+	-DCFG_TUSB_MCU=OPT_MCU_RP2040
+else
+PICO_C_DEFINES += \
+	-DPICO_RP2350=1
+endif
+
 
 C_DEFINES = \
 	$(PICO_C_DEFINES) \
