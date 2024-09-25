@@ -281,7 +281,7 @@ void app_main() {
 #ifdef mxDebug
 	uartConfig.baud_rate = DEBUGGER_SPEED;
 #else
-	uartConfig.baud_rate = 115200;		//@@ different from ESP8266
+	uartConfig.baud_rate = CONFIG_ESP_CONSOLE_UART_BAUDRATE;		//@@ different from ESP8266
 #endif
 	uartConfig.data_bits = UART_DATA_8_BITS;
 	uartConfig.parity = UART_PARITY_DISABLE;
