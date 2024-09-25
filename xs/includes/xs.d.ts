@@ -62,7 +62,7 @@ interface ArrayBufferConstructor {
 }
 
 interface ArrayBuffer {
-	concat?(...buffers: ArrayBufferLike[]): ArrayBuffer;
+	concat(...buffers: ArrayBufferLike[]): ArrayBuffer;
 }
 
 interface BigIntConstructor {
