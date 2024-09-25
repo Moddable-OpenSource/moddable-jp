@@ -1,14 +1,14 @@
 # MCP230XX
 Copyright 2017 Moddable Tech, Inc.<BR>
-Revised: Dec 21, 2017
+改訂： 2017年12月21日
 
-The [MCP23008](http://www.microchip.com/wwwproducts/en/MCP23008) device provides 8-bit, general purpose, parallel I/O expansion for I2C bus applications. (Description from MCP23008 product page)
+[MCP23008](http://www.microchip.com/wwwproducts/en/MCP23008) デバイスは、I2Cバスアプリケーション向けに8ビットの汎用並列I/O拡張を提供します。（MCP23008製品ページからの説明）
 
-The [MCP23017](http://www.microchip.com/wwwproducts/en/MCP23017) device provides 16-bit, general purpose, parallel I/O expansion for I2C bus applications. (Description from MCP23017 product page)
+[MCP23017](http://www.microchip.com/wwwproducts/en/MCP23017) デバイスは、I2Cバスアプリケーション向けに16ビットの汎用並列I/O拡張を提供します。（MCP23017製品ページからの説明）
 
-### Module "MCP230XX"
+### モジュール "MCP230XX"
 
-The driver module "MCP230XX" exports the following:
+ドライバモジュール "MCP230XX" は以下をエクスポートします：
 
 ```js
 export {
@@ -17,11 +17,11 @@ export {
 };
 ```
 
-### MCP23008 Class
+### MCP23008 クラス
 
-The `MCP23008` class produces instances that represent a single MCP23008 IC on the I2C bus. The `MCP23008` class extends an internal `Expander` class, which extends the `SMBus` class. `Expander` is not exported.
+`MCP23008` クラスは、I2Cバス上の単一のMCP23008 ICを表すインスタンスを生成します。`MCP23008` クラスは内部の `Expander` クラスを拡張しており、`Expander` クラスは `SMBus` クラスを拡張しています。`Expander` はエクスポートされません。
 
-Instance objects of `MCP23008` contain 8 `Pin` instance object entries.
+`MCP23008` のインスタンスオブジェクトには、8つの `Pin` インスタンスオブジェクトエントリが含まれています。
 
 ```js
 import Timer from "timer";
@@ -44,14 +44,13 @@ export default function() {
 
 ![](ESP8266-MCP23008-leds.png)
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `MCP23008([dictionary])`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | --- | --- | :--- |
-| `dictionary` | `object` | An object with properties to initialize the result. Supported parameters are specified in the [Dictionary](#MCP23008-dictionary) section below.
-
+| `dictionary` | `object` | 結果を初期化するためのプロパティを持つオブジェクト。サポートされているパラメータは以下の[Dictionary](#MCP23008-dictionary)セクションに記載されています。
 
 ```
 let leds = new MCP23008({ sda: 4, scl: 5 });
@@ -60,54 +59,53 @@ let leds = new MCP23008({ sda: 4, scl: 5 });
 <a id="MCP23008-dictionary"></a>
 #### Dictionary
 
-| Parameter | Type | Default Value | Description
+| パラメータ | 型 | デフォルト値 | 説明
 | --- | --- | --- | :--- |
-| `address`  | `number` | `0x20` | The address of the I2C device |
-| `hz`       | `number` | 100kHz | The clock speed of the I2C device. |
-| `sda`      | `number` | 4 | The I2C sda (data) pin. |
-| `scl`      | `number` |  5 | The I2C scl (clock) pin.     |
-| `inputs`   | `number` (byte) | `0b11111111` | A byte representing the input/output initialization state of the 8 GPIO pins. `1` for input, `0` for output |
-| `pullups`  | `number` (byte)  | `0b00000000` | A byte representing the pullup initialization state of the 8 GPIO pins. `1` for pullup, `0` for default |
+| `address`  | `number` | `0x20` | I2Cデバイスのアドレス |
+| `hz`       | `number` | 100kHz | I2Cデバイスのクロック周波数。 |
+| `sda`      | `number` | 4 | I2Cのsda（データ）ピン。 |
+| `scl`      | `number` |  5 | I2Cのscl（クロック）ピン。     |
+| `inputs`   | `number` (byte) | `0b11111111` | 8つのGPIOピンの入力/出力初期化状態を表すバイト。`1`は入力、`0`は出力 |
+| `pullups`  | `number` (byte)  | `0b00000000` | 8つのGPIOピンのプルアップ初期化状態を表すバイト。`1`はプルアップ、`0`はデフォルト |
 
-#### Properties
+#### プロパティ
 
-All properties are read-only.
+すべてのプロパティは読み取り専用です。
 
-| Name | Type | Value | Description|
+| 名前 | 型 | 値 | 説明 |
 | --- | --- | --- | :--- |
-| `length` | `number` | `8` | Number of pins in collection |
-| `offset` | `number` | `0` | Register offset |
-| `IODIR` | `number` | `0x00` | `IODIR` register |
-| `GPIO` | `number` | `0x06` | `GPIO` register |
-| `GPPU` | `number` | `0x09` | `GPPU` register |
-| 0-8 | `pin` | | `Pin` instances (see the section [Pin Class](#pin-class)) |
+| `length` | `number` | `8` | コレクション内のピンの数 |
+| `offset` | `number` | `0` | レジスタオフセット |
+| `IODIR` | `number` | `0x00` | `IODIR` レジスタ |
+| `GPIO` | `number` | `0x06` | `GPIO` レジスタ |
+| `GPPU` | `number` | `0x09` | `GPPU` レジスタ |
+| 0-8 | `pin` | | `Pin` インスタンス（[Pin Class](#pin-class)のセクションを参照） |
 
-#### Methods
+#### メソッド
 
 ##### `write(byte)`
 
-Temporarily sets the mode of all pins to output and writes all pins at once.
+一時的にすべてのピンのモードを出力に設定し、一度にすべてのピンに書き込みます。
 
 ```js
-let expander = new MCP23008(); // defaults to 0x20!
-expander.write(0b11111111); // Set all pins to 1
+let expander = new MCP23008(); // デフォルトは0x20です！
+expander.write(0b11111111); // すべてのピンを1に設定
 ```
 
 ##### `read()`
 
-Temporarily sets the mode of all pins to input, reads all pins at once, and returns their values.
+一時的にすべてのピンのモードを入力に設定し、一度にすべてのピンを読み取り、その値を返します。
 
 ```js
-let expander = new MCP23008(); // defaults to 0x20!
+let expander = new MCP23008(); // デフォルトは0x20です！
 trace(`${expander.read()}\n`);
 ```
 
+### MCP23017 クラス
 
-### MCP23017 Class
+`MCP23017` クラスは、I2Cバス上の単一のMCP23017 ICを表すインスタンスを生成します。`MCP23017` クラスは内部の `Expander` クラスを拡張しており、`Expander` クラスは `SMBus` クラスを拡張しています。
 
-The `MCP23017` class produces instances that represent a single MCP23017 IC on the I2C bus. The `MCP23017` class extends an internal `Expander` class, which extends the `SMBus` class.
-
-Instance objects of `MCP23017` contain 16 `Pin` instance object entries.
+`MCP23017`のインスタンスオブジェクトには、16の`Pin`インスタンスオブジェクトエントリが含まれています。
 
 ```js
 import Timer from "timer";
@@ -130,13 +128,13 @@ export default function() {
 
 ![](ESP8266-MCP23017-leds.png)
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `MCP23017([dictionary])`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | --- | --- | :--- |
-| `dictionary` | `object` | An object with properties to initialize the result. Supported parameters are specified in the [Dictionary](#MCP23017-dictionary) section below.
+| `dictionary` | `object` | 結果を初期化するためのプロパティを持つオブジェクト。サポートされているパラメータは以下の[Dictionary](#MCP23017-dictionary)セクションで指定されています。
 
 
 ```
@@ -146,52 +144,51 @@ let leds = new MCP23017({ sda: 4, scl: 5 });
 <a id="MCP23017-dictionary"></a>
 #### Dictionary
 
-| Parameter | Type | Default Value | Description
+| パラメータ | 型 | デフォルト値 | 説明
 | --- | --- | --- | :--- |
-| `address`  | `number` | `0x20` | The address of the I2C device |
-| `hz`       | `number` | 100kHz | The clock speed of the I2C device. |
-| `sda`      | `number` | 4 | The I2C sda (data) pin. |
-| `scl`      | `number` | 5 | The I2C scl (clock) pin. |
-| `inputs`   | `number` (word) |  `0b1111111111111111` | A word representing the input/output initialization state of the 16 GPIO pins. `1` for input, `0` for output |
-| `pullups`  | `number` (word) | `0b0000000000000000` | A word representing the pullup initialization state of the 16 GPIO pins. `1` for pullup, `0` for default |
+| `address`  | `number` | `0x20` | I2Cデバイスのアドレス |
+| `hz`       | `number` | 100kHz | I2Cデバイスのクロック周波数。 |
+| `sda`      | `number` | 4 | I2Cのsda（データ）ピン。 |
+| `scl`      | `number` | 5 | I2Cのscl（クロック）ピン。 |
+| `inputs`   | `number` (word) |  `0b1111111111111111` | 16のGPIOピンの入力/出力初期化状態を表すワード。入力の場合は`1`、出力の場合は`0` |
+| `pullups`  | `number` (word) | `0b0000000000000000` | 16のGPIOピンのプルアップ初期化状態を表すワード。プルアップの場合は`1`、デフォルトの場合は`0` |
 
-#### Properties
+#### プロパティ
 
-All properties are read-only.
+すべてのプロパティは読み取り専用です。
 
-| Name | Type | Value | Description|
+| 名前 | 型 | 値 | 説明 |
 | --- | --- | --- | :--- |
-| `length` | `number` | `16` | Number of pins in collection |
-| `offset` | `number` | `1` | Register offset |
-| `IODIR` | `number` | `0x00` | `IODIR` register |
-| `GPIO` | `number` | `0x0C` | `GPIO` register |
-| `GPPU` | `number` | `0x12` | `GPPU` register |
-| 0-16 | `pin` | | `Pin` instances (see the section [Pin Class](#pin-class)) |
+| `length` | `number` | `16` | コレクション内のピンの数 |
+| `offset` | `number` | `1` | レジスタオフセット |
+| `IODIR` | `number` | `0x00` | `IODIR` レジスタ |
+| `GPIO` | `number` | `0x0C` | `GPIO` レジスタ |
+| `GPPU` | `number` | `0x12` | `GPPU` レジスタ |
+| 0-16 | `pin` | | `Pin` インスタンス (セクション [Pin Class](#pin-class) を参照) |
 
-
-#### Methods
+#### メソッド
 
 ##### `write(word)`
 
-Temporarily sets the mode of all pins to output and writes all pins at once.
+一時的にすべてのピンのモードを出力に設定し、一度にすべてのピンに書き込みます。
 
 ```js
-let expander = new MCP23017(); // defaults to 0x20!
-expander.write(0b1111111111111111); // Set all pins to 1
+let expander = new MCP23017(); // デフォルトは 0x20!
+expander.write(0b1111111111111111); // すべてのピンを 1 に設定
 ```
 
 ##### `read()`
 
-Temporarily sets the mode of all pins to input, reads all pins at once, and returns their values.
+一時的にすべてのピンのモードを入力に設定し、一度にすべてのピンを読み取り、その値を返します。
 
 ```js
-let expander = new MCP23017(); // defaults to 0x20!
+let expander = new MCP23017(); // デフォルトは 0x20!
 trace(`${expander.read()}\n`);
 ```
 
-### Pin Class
+### ピンクラス
 
-The `Pin` class represents a single pin within a `MCP23008` or `MCP23017` instance object. The class is not exported; `Pin` instances are automatically created by `MCP23008` and `MCP23017` instances.
+`Pin` クラスは、`MCP23008` または `MCP23017` インスタンスオブジェクト内の単一のピンを表します。このクラスはエクスポートされません。`Pin` インスタンスは `MCP23008` および `MCP23017` インスタンスによって自動的に作成されます。
 
 ```js
 import Timer from "timer";
@@ -216,51 +213,51 @@ export default function() {
 
 ![](ESP8266-MCP23008-leds.png)
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Pin(dictionary)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | --- | --- | :--- |
-| `dictionary` | `object` | An object with properties to initialize the result. The required parameters are specified in the [Dictionary](#Pin-dictionary) section below.
+| `dictionary` | `object` | 結果を初期化するためのプロパティを持つオブジェクト。必要なパラメータは以下の[Dictionary](#Pin-dictionary)セクションで指定されています。
 
 
 <a id="Pin-dictionary"></a>
 #### Dictionary
 
-| Parameter | Type | Description
+| パラメータ | 型 | 説明
 | --- | --- | :--- |
-| `pin`  | `number` | The GPIO pin number |
-| `expander` | `expander` | The instance of `Expander` that created this `Pin` instance |
+| `pin`  | `number` | GPIOピン番号 |
+| `expander` | `expander` | この`Pin`インスタンスを作成した`Expander`のインスタンス |
 
-#### Properties
+#### プロパティ
 
-All properties are read-only.
+すべてのプロパティは読み取り専用です。
 
-| Name | Type | Description
+| 名前 | 型 | 説明
 | --- | --- | :--- |
-| `pin` | `number` | The GPIO pin number |
-| `expander` | `expander` | The instance of `Expander` that this `Pin` belongs to |
+| `pin` | `number` | GPIOピン番号 |
+| `expander` | `expander` | この`Pin`が属する`Expander`のインスタンス |
 
-#### Methods
+#### メソッド
 
 ##### `mode(mode)`
 
-| Argument | Type | Description |
+| 引数 | 型 | 説明 |
 | --- | --- | :--- |
-| `mode` | `number` | A number representing the desired mode. May be input, input pullup, or output.
+| `mode` | `number` | 希望するモードを表す数値。入力、入力プルアップ、または出力である可能性があります。
 
-Sets the pin's mode to the specified mode.
+ピンのモードを指定されたモードに設定します。
 
 ##### `read()`
 
-Sets the pin's mode to input, reads the value of the pin object, and returns the value.
+ピンのモードを入力に設定し、ピンオブジェクトの値を読み取り、その値を返します。
 
 ##### `write(value)`
 
-Sets the pin's mode to output and writes the value to the pin object.
+ピンのモードを出力に設定し、値をピンオブジェクトに書き込みます。
 
-### Manifest Example
+### マニフェストの例
 
 ```
 {

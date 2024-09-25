@@ -1,21 +1,21 @@
-# DESTM32S display driver
+# DESTM32S ディスプレイドライバ
 Copyright 2017 Moddable Tech, Inc.<BR>
-Revised: September 10, 2024
+改訂： 2024年9月10日
 
-The DESTM32S display controller drives three different ePaper displays. The displays are available from various sources, including Crystalfontz where we purchased our test units. They use a small adapter board (from [good-display.com](http://www.good-display.com/products_detail/productId=327.html)), though the display controller is part of the ePaper display itself (so called chip-on-glass).
+DESTM32Sディスプレイコントローラは、3種類のePaperディスプレイを動作します。これらのディスプレイは、Crystalfontzを含むさまざまなサイトから入手可能で、私たちのテストユニットもここから購入しました。これらは小さなアダプターボード（[good-display.com](http://www.good-display.com/products_detail/productId=327.html)から）を使用しますが、ディスプレイコントローラはePaperディスプレイ自体の一部です（いわゆるチップオンガラス）。
 
-- 122 x 250 black and white (available [here](https://www.crystalfontz.com/product/cfap122250a00213-epaper-display-122x250-eink))
-- 128 x 296 black, white, and red (available [here](https://www.crystalfontz.com/product/cfap128296d00290-128x296-epaper-display))
-- 104 x 212 black, white, gray, and red (available [here](https://www.crystalfontz.com/product/cfap104212b00213-epaper-104x212-eink))
+- 122 x 250白黒（[こちら](https://www.crystalfontz.com/product/cfap122250a00213-epaper-display-122x250-eink)で入手可能）
+- 128 x 296白黒および赤（[こちら](https://www.crystalfontz.com/product/cfap128296d00290-128x296-epaper-display)で入手可能）
+- 104 x 212白黒、グレーおよび赤（[こちら](https://www.crystalfontz.com/product/cfap104212b00213-epaper-104x212-eink)で入手可能）
 
-The black and white display uses a different controller from the two displays that support red pixels. The black and white display updates at approximately 4 frames per second, while the displays with red pixels take approximately 20 seconds per frame (e.g. 3 frames per minute).
+白黒ディスプレイは、赤ピクセルをサポートする2つのディスプレイとは異なるコントローラを使用します。白黒ディスプレイは約4フレーム毎秒で更新されますが、赤ピクセルを含むディスプレイは1フレームあたり約20秒（つまり1分あたり3フレーム）かかります。
 
-The ePaper display drivers in the Moddable SDK use the same API as LCD displays. However, because of their relatively slow refresh rate and other update requirements, they are typically used with dedicated applications which are designed to work well with the unique characteristics of the displays.
+Moddable SDKのePaperディスプレイドライバは、LCDディスプレイと同じAPIを使用します。しかし、比較的遅いリフレッシュレートやその他の更新要件のため、通常はディスプレイの特性に合わせて設計された専用アプリケーションで使用されます。
 
-The [love-e-ink](../../../examples/piu/love-e-ink) example is designed to work with the black and white ePaper display. It demonstrates how to update parts of the display continuously without the need for long full screen refreshes. The [redandblack](../../../examples/drivers/redandblack) example is designed to work with ePaper displays that have red pixels. It cycles through a slide show of images that contain black, white, and red pixels.
+[love-e-ink](../../../examples/piu/love-e-ink)のサンプルは、白黒のePaperディスプレイで動作するように設計されています。これは、長い全画面リフレッシュを必要とせずにディスプレイの一部を継続的に更新する方法を示しています。[redandblack](../../../examples/drivers/redandblack)のサンプルは、赤いピクセルを持つePaperディスプレイで動作するように設計されています。これは、黒、白、赤のピクセルを含む画像のスライドショーを循環させます。
 
-### Adding DESTM32 to a project
-To add the SSD1351 driver to a project, include its manifest:
+### プロジェクトにDESTM32を追加する
+SSD1351ドライバをプロジェクトに追加するには、そのマニフェストをインクルードします：
 
 ```jsonc
 "include": [
@@ -24,7 +24,7 @@ To add the SSD1351 driver to a project, include its manifest:
 ],
 ```
 
-If using Commodetto or Piu, set the `screen` property of the `config` object in the manifest to `destm32s` to make SSD1351 the default display driver. Since there is no touch input, set the touch driver name to an empty string to disable it.
+CommodettoまたはPiuを使用する場合、マニフェストの`config`オブジェクトの`screen`プロパティを`destm32s`に設定して、SSD1351をデフォルトのディスプレイドライバにします。タッチ入力がないため、タッチドライバ名を空の文字列に設定して無効にします。
 
 ```json
 "config": {
@@ -33,16 +33,16 @@ If using Commodetto or Piu, set the `screen` property of the `config` object in 
 },
 ```
 
-### Pixel format
-The DESTM32S driver requires 8-bit gray or, when the display supports color (e.g. red), 8-bit color pixels as input. When building with `mcconfig`, set the pixel format to `gray256` or `rgb332` on the command line:
+### ピクセルフォーマット
+DESTM32Sドライバは、入力として8ビットのグレーまたは、ディスプレイがカラーをサポートしている場合（例：赤）、8ビットのカラーピクセルを必要とします。`mcconfig`を使用してビルドする際、コマンドラインでピクセルフォーマットを`gray256`または`rgb332`に設定します：
 
 	mcconfig -m -p esp -r 90 -f gray256
 	mcconfig -m -p esp -r 90 -f rgb332
 
-### Defines
-In the `defines` object, declare the pixel `width` and `height`. The dimensions of the display specified in the manifest select the display controller that is used, so it is essential to set this correctly.
+### 定義
+`defines`オブジェクト内でピクセルの`width`と`height`を宣言します。マニフェストで指定されたディスプレイの寸法は、使用されるディスプレイコントローラを選択するため、正しく設定することが重要です。
 
-For 122 x 250 black and white:
+122 x 250の白黒の場合：
 
 ```json
 "defines": {
@@ -53,7 +53,7 @@ For 122 x 250 black and white:
 }
 ```
 
-For 128 x 296 black, white, and red:
+128 x 296の黒、白、赤の場合：
 
 ```json
 "defines": {
@@ -64,8 +64,7 @@ For 128 x 296 black, white, and red:
 }
 ```
 
-For 104 x 212 black, white, gray, and red:
-
+104 x 212の黒、白、グレー、赤の場合：
 
 ```json
 "defines": {
@@ -76,8 +75,9 @@ For 104 x 212 black, white, gray, and red:
 }
 ```
 
-### Configuring SPI
-The `defines` object must contain the `spi_port`, along with the `DC`, `CS`, and `BUSY`. pin numbers. If a `RST` pin is provided, the device will be reset when the constructor is invoked. If the `cs_port`, `dc_port`, `rst_port`, or `busy_port` properties are not provided, they default to NULL.
+### SPIの設定
+`defines`オブジェクトには、`spi_port`、および`DC`、`CS`、`BUSY`のピン番号を含める必要があります。`RST`ピンが提供されている場合、コンストラクタが呼び出されたときにデバイスがリセットされます。`cs_port`、`dc_port`、`rst_port`、または`busy_port`プロパティが提供されていない場合、それらはデフォルトでNULLになります。
+
 
 ```jsonc
 "defines": {
@@ -92,4 +92,4 @@ The `defines` object must contain the `spi_port`, along with the `DC`, `CS`, and
 }
 ```
 
-The `hz` property, when present, specifies the SPI bus speed. The default value is 500,000 Hz which is near the maximum SPI speed supported by the controllers.
+`hz` プロパティが存在する場合、SPIバスの速度を指定します。デフォルト値は500,000 Hzで、これはコントローラーがサポートする最大SPI速度に近い値です。
