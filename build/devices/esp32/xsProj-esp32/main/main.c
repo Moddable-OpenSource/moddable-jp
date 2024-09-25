@@ -269,5 +269,4 @@ void app_main() {
 #endif
 
 	xTaskCreate(loop_task, "main", kStack, NULL, 4, NULL);
-//	xTaskCreatePinnedToCore(loop_task, "main", kStack, NULL, 4, NULL, 0);
 }
