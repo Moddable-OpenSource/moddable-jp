@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -209,7 +209,7 @@ void xs_socket(xsMachine *the)
 	if (xsmcHas(xsArg(0), xsID_listener)) {
 		xsListener xsl;
 		xsmcGet(xsVar(0), xsArg(0), xsID_listener);
-		xsl = xsmcGetHostDataValidate(xsVar(0), xs_socket_destructor);
+		xsl = xsmcGetHostDataValidate(xsVar(0), xs_listener_destructor);
 
 		modCriticalSectionBegin();
 
@@ -470,7 +470,7 @@ void xs_socket_close(xsMachine *the)
 
 	xsmcSetHostDestructor(xsThis, NULL);
 	xsmcSetHostData(xsThis, NULL);
-	xsForget(xsThis);
+	xsForget(xss->obj);
 
 	closeSocket(xss);
 
@@ -1197,7 +1197,7 @@ void xs_listener_close(xsMachine *the)
 
 	xsmcSetHostDestructor(xsThis, NULL);
 	xsmcSetHostData(xsThis, NULL);
-	xsForget(xsThis);
+	xsForget(xsl->obj);
 
 	socketSetPending((xsSocket)xsl, kPendingClose);
 }
