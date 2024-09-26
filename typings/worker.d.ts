@@ -22,19 +22,19 @@ declare module "worker" {
 	export interface WorkerOptions {
 		static?: number;
 		chunk?: {
-			initial: number;
-			incremental: number;
+			initial?: number;
+			incremental?: number;
 		};
 		heap?: {
-			initial: number;
-			incremental: number;
+			initial?: number;
+			incremental?: number;
 		};
 		stack?: number;
 		keys?: {
-			initial: number;
-			incremental: number;
-			name: string;
-			symbol: string;
+			initial?: number;
+			incremental?: number;
+			name?: number;
+			symbol?: number;
 		};
 	}
 
