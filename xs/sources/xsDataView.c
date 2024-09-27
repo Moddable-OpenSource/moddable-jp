@@ -113,9 +113,9 @@ void fxGetArrayBufferData(txMachine* the, txSlot* slot, txInteger byteOffset, vo
 	txSlot* bufferInfo = arrayBuffer->next;
 	txInteger length = bufferInfo->value.bufferInfo.length;
 	if ((byteOffset < 0) || (length < byteOffset))
-		mxRangeError("out of range byteOffset %ld", byteOffset);
+		mxRangeError("invalid byteOffset %ld", byteOffset);
 	if ((byteLength < 0) || (length < (byteOffset + byteLength)))
-		mxRangeError("out of range byteLength %ld", byteLength);
+		mxRangeError("invalid byteLength %ld", byteLength);
 	c_memcpy(data, arrayBuffer->value.arrayBuffer.address + byteOffset, byteLength);
 }
 
@@ -142,9 +142,9 @@ void fxSetArrayBufferData(txMachine* the, txSlot* slot, txInteger byteOffset, vo
 	txSlot* bufferInfo = arrayBuffer->next;
 	txInteger length = bufferInfo->value.bufferInfo.length;
 	if ((byteOffset < 0) || (length < byteOffset))
-		mxRangeError("out of range byteOffset %ld", byteOffset);
+		mxRangeError("invalid byteOffset %ld", byteOffset);
 	if ((byteLength < 0) || (length < (byteOffset + byteLength)))
-		mxRangeError("out of range byteLength %ld", byteLength);
+		mxRangeError("invalid byteLength %ld", byteLength);
 	c_memcpy(arrayBuffer->value.arrayBuffer.address + byteOffset, data, byteLength);
 }
 
@@ -362,14 +362,16 @@ txInteger fxArgToByteLength(txMachine* the, txInteger argi, txInteger length)
 		if (XS_INTEGER_KIND == arg->kind) {
 			txInteger value = arg->value.integer;
 			if (value < 0)
-				mxRangeError("out of range byteLength");
+				mxRangeError("byteLength < 0");
 			return value;
 		}
 		value = c_trunc(fxToNumber(the, arg));
 		if (c_isnan(value))
 			return 0;
-		if ((value < 0) || (0x7FFFFFFF < value))
-			mxRangeError("out of range byteLength");
+		if (value < 0) 
+			mxRangeError("byteLength < 0");
+		if (0x7FFFFFFF < value)
+			mxRangeError("byteLength too big");
 		return (txInteger)value;
 	}
 	return length;
@@ -383,14 +385,16 @@ txS8 fxArgToSafeByteLength(txMachine* the, txInteger argi, txInteger length)
 		if (XS_INTEGER_KIND == arg->kind) {
 			txS8 value = arg->value.integer;
 			if (value < 0)
-				mxRangeError("out of range byteLength");
+				mxRangeError("byteLength < 0");
 			return value;
 		}
 		value = c_trunc(fxToNumber(the, arg));
 		if (c_isnan(value))
 			return 0;
-		if ((value < 0) || (C_MAX_SAFE_INTEGER < value))
-			mxRangeError("out of range byteLength");
+		if (value < 0) 
+			mxRangeError("byteLength < 0");
+		if (C_MAX_SAFE_INTEGER < value)
+			mxRangeError("byteLength too big");
 		return (txS8)value;
 	}
 	return length;
@@ -503,9 +507,9 @@ void fx_ArrayBuffer(txMachine* the)
 	instance = fxNewArrayBufferInstance(the);
 	mxPullSlot(mxResult);
 	if (byteLength > 0x7FFFFFFF)
-		mxRangeError("out of range byteLength");
+		mxRangeError("byteLength too big");
 	if (maxByteLength > 0x7FFFFFFF)
-		mxRangeError("out of range maxByteLength");
+		mxRangeError("maxByteLength too big");
 	property = instance->next;
 	property->value.arrayBuffer.address = fxNewChunk(the, (txSize)byteLength);
 	c_memset(property->value.arrayBuffer.address, 0, (txSize)byteLength);
@@ -887,12 +891,12 @@ void fx_DataView(txMachine* the)
 	offset = fxArgToByteLength(the, 1, 0);
 	info = fxGetBufferInfo(the, mxArgv(0));
 	if (info->value.bufferInfo.length < offset)
-		mxRangeError("out of range byteOffset %ld", offset);
+		mxRangeError("invalid byteOffset %ld", offset);
 	size = fxArgToByteLength(the, 2, -1);
 	if (size >= 0) {
 		txInteger end = offset + size;
 		if ((info->value.bufferInfo.length < end) || (end < offset))
-			mxRangeError("out of range byteLength %ld", size);
+			mxRangeError("invalid byteLength %ld", size);
 	}
 	else {
 		if (info->value.bufferInfo.maxLength < 0)
@@ -909,11 +913,11 @@ void fx_DataView(txMachine* the)
 	info = fxGetBufferInfo(the, buffer);
 	if (info->value.bufferInfo.maxLength >= 0) {
 		if (info->value.bufferInfo.length < offset)
-			mxRangeError("out of range byteOffset %ld", offset);
+			mxRangeError("invalid byteOffset %ld", offset);
 		else if (size >= 0) {
 			txInteger end = offset + size;
 			if ((info->value.bufferInfo.length < end) || (end < offset))
-				mxRangeError("out of range byteLength %ld", size);
+				mxRangeError("invalid byteLength %ld", size);
 		}
 	}
 	view->value.dataView.offset = offset;
@@ -961,7 +965,7 @@ void fx_DataView_prototype_get(txMachine* the, txNumber delta, txTypeCallback ge
 		endian = EndianLittle;
 	size = fxCheckDataViewSize(the, view, buffer, XS_IMMUTABLE);
 	if ((size < delta) || ((size - delta) < offset))
-		mxRangeError("out of range byteOffset");
+		mxRangeError("invalid byteOffset");
 	offset += view->value.dataView.offset;
 	(*getter)(the, buffer->value.reference->next, offset, mxResult, endian);
 }
@@ -1035,7 +1039,7 @@ void fx_DataView_prototype_set(txMachine* the, txNumber delta, txTypeCoerce coer
 		endian = EndianLittle;
 	size = fxCheckDataViewSize(the, view, buffer, XS_MUTABLE);
 	if ((size < delta) || ((size - delta) < offset))
-		mxRangeError("out of range byteOffset");
+		mxRangeError("invalid byteOffset");
 	offset += view->value.dataView.offset;
 	(*setter)(the, buffer->value.reference->next, offset, value, endian);
 	mxPop();
@@ -1457,12 +1461,12 @@ void fx_TypedArray(txMachine* the)
 				txInteger delta = size << shift;		//@@ overflow
 				txInteger end = fxAddChunkSizes(the, offset, delta);
 				if ((info->value.bufferInfo.length < end) || (end < offset))
-					mxRangeError("out of range length %ld", size);
+					mxRangeError("invalid length %ld", size);
 				size = delta;
 			}
 			else if (info->value.bufferInfo.maxLength >= 0) {
 				if (info->value.bufferInfo.length < offset)
-					mxRangeError("out of range offset %ld", offset);
+					mxRangeError("invalid offset %ld", offset);
 				size = -1;
 			}
 			else {
@@ -1470,7 +1474,7 @@ void fx_TypedArray(txMachine* the)
 					mxRangeError("invalid byteLength %ld", info->value.bufferInfo.length);
 				size = info->value.bufferInfo.length - offset;
 				if (size < 0)
-					mxRangeError("out of range byteLength %ld", size);
+					mxRangeError("invalid byteLength %ld", size);
 			}
 			view->value.dataView.offset = offset;
 			view->value.dataView.size = size;
@@ -1537,7 +1541,7 @@ void fx_TypedArray(txMachine* the)
 	else {
         txInteger length = fxArgToByteLength(the, 0, 0);
         if (length > (0x7FFFFFFF >> shift))
-			mxRangeError("out of range byteLength");
+			mxRangeError("byteLength too big");
         length <<= shift;
 		mxPush(mxArrayBufferConstructor);
 		mxNew();

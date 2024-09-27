@@ -1368,7 +1368,7 @@ void fxThrowMessage(txMachine* the, txString path, txInteger line, txError error
 		gxDefaults.captureErrorStack(the, slot, the->frame);
 	slot = fxNextStringProperty(the, slot, message, mxID(_message), XS_DONT_ENUM_FLAG);
 #ifdef mxDebug
-	fxDebugThrow(the, path, line, message);
+	fxDebugThrow(the, path, line, "throw");
 #endif
 	fxJump(the);
 }

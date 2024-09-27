@@ -603,10 +603,10 @@ void fx_String_fromArrayBuffer(txMachine* the)
 	limit = bufferInfo->value.bufferInfo.length;
 	offset = fxArgToByteLength(the, 1, 0);
 	if (limit < offset)
-		mxRangeError("out of range byteOffset %ld", offset);
+		mxRangeError("invalid byteOffset %ld", offset);
 	inLength = fxArgToByteLength(the, 2, limit - offset);
 	if ((limit < (offset + inLength)) || ((offset + inLength) < offset))
-		mxRangeError("out of range byteLength %ld", inLength);
+		mxRangeError("invalid byteLength %ld", inLength);
 
 	in = offset + (unsigned char *)(arrayBuffer ? arrayBuffer->value.arrayBuffer.address : sharedArrayBuffer->value.host.data);
 	while (inLength > 0) {
@@ -1340,15 +1340,17 @@ void fx_String_prototype_repeat(txMachine* the)
 		if (XS_INTEGER_KIND == arg->kind) {
 			count = arg->value.integer;
 			if (count < 0)
-				mxRangeError("out of range count");
+				mxRangeError("count < 0");
 		}
 		else {
 			txNumber value = c_trunc(fxToNumber(the, arg));
 			if (c_isnan(value))
 				count = 0;
 			else {
-				if ((value < 0) || (0x7FFFFFFF < value))
-					mxRangeError("out of range count");
+				if (value < 0)
+					mxRangeError("count < 0");
+				if (0x7FFFFFFF < value)
+					mxRangeError("count too big");
 				count = (txInteger)value;
 			}
 		}

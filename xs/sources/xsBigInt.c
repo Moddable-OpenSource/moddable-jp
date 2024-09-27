@@ -130,14 +130,14 @@ txNumber fx_BigInt_asAux(txMachine* the)
 			else {
 				value = c_trunc(value);
 				if (value < 0)
-					mxRangeError("out of range index");
+					mxRangeError("index < 0");
 				index = value;
 				if (index <= 0)
 					index = 0;
 				else if (index > C_MAX_SAFE_INTEGER)
 					index = C_MAX_SAFE_INTEGER;
 				if (value != index)
-					mxRangeError("out of range index");
+					mxRangeError("invalid index");
 			}
 		}
 	}
@@ -540,7 +540,7 @@ void fxBigintToArrayBuffer(txMachine* the, txSlot* slot, txU4 total, txBoolean s
 	}
 	if (sign) {
 		if (total >= 0x7FFFFFFF)
-			mxRangeError("out of range byteLength");
+			mxRangeError("byteLength too big");
 		offset++;
 		total++;
 	}
