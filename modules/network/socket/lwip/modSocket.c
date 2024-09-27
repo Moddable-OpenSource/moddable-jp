@@ -1181,6 +1181,8 @@ void xs_listener_destructor(void *data)
 	for (i = 0; i < kListenerPendingSockets; i++)
 		xs_socket_destructor(xsl->accept[i]);
 
+	modInstrumentationAdjust(NetworkSockets, -1);
+
 	c_free(xsl);
 }
 
