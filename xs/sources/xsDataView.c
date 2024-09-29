@@ -433,10 +433,13 @@ txSlot* fxCheckArrayBufferInstance(txMachine* the, txSlot* slot)
 {
 	if (slot->kind == XS_REFERENCE_KIND) {
 		txSlot* instance = slot->value.reference;
-		if (((slot = instance->next)) && (slot->flag & XS_INTERNAL_FLAG) && (slot->kind == XS_ARRAY_BUFFER_KIND))
+		txSlot* arrayBuffer = instance->next;
+		if (arrayBuffer && (arrayBuffer->flag & XS_INTERNAL_FLAG) && (arrayBuffer->kind == XS_ARRAY_BUFFER_KIND))
 			return instance;
 	}
-	mxTypeError("this: not an ArrayBuffer instance");
+	if (slot == mxThis)
+		mxTypeError("this: not an ArrayBuffer instance");
+	mxTypeError("not an ArrayBuffer instance");
 	return C_NULL;
 }
 
