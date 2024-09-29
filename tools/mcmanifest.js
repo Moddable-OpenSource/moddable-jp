@@ -752,10 +752,12 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 					if (tool.windows)
 						depLine += "-I";
 					depLine += depBase + "include \\\n";
-					for (var inc of dep.includes) {
-						if (tool.windows)
-							depLine += "-I";
-						depLine += `${depBase}${tool.resolveSlash(inc)} \\\n`;
+					if (dep.includes) {
+						for (var inc of dep.includes) {
+							if (tool.windows)
+								depLine += "-I";
+							depLine += `${depBase}${tool.resolveSlash(inc)} \\\n`;
+						}
 					}
 					this.write(depLine);
 				}
