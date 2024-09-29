@@ -885,11 +885,15 @@ void *fxSetHostChunk(txMachine* the, txSlot* slot, void* theValue, txSize theSiz
 	txSlot* host = fxCheckHostObject(the, slot);
 	if (host) {
 		host->flag |= XS_HOST_CHUNK_FLAG;
-		host->value.host.data = fxNewChunk(the, theSize);
-		if (theValue)
-			c_memcpy(host->value.host.data, theValue, theSize);
+		if (theSize) {
+			host->value.host.data = fxNewChunk(the, theSize);
+			if (theValue)
+				c_memcpy(host->value.host.data, theValue, theSize);
+			else
+				c_memset(host->value.host.data, 0, theSize);
+		}
 		else
-			c_memset(host->value.host.data, 0, theSize);
+			host->value.host.data = NULL;
 		return host->value.host.data;
 	}
 	else
