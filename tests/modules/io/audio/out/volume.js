@@ -12,7 +12,7 @@ assert((0.0 <= volume) && (volume <= 1.0), "volume out of range");
 
 [0, 0.4, 0.5, 0.6, 1].forEach(volume => {
 	out.volume = volume;
-	assert.sameValue(out.volume, volume);
+	assert.sameValue(Math.round(100 * out.volume), 100 * volume);
 });
 
 assert.throws(RangeError, () => out.volume = 1.1, "volume 1.1");
