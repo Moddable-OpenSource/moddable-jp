@@ -58,18 +58,17 @@
 enum {
 	kIOFormatNumber = 1,
 	kIOFormatBuffer = 2,
-	kIOFormatStringASCII = 3,
-	kIOFormatStringUTF8 = 4,
-	kIOFormatSocketTCP = 5,
+	kIOFormatString = 3,
+	kIOFormatSocketTCP = 4,
 
-	kIOFormatUint8 = 6,
-	kIOFormatInt8 = 7,
-	kIOFormatUint16 = 8,
-	kIOFormatInt16 = 9,
-	kIOFormatUint32 = 10,
-	kIOFormatInt32 = 11,
-	kIOFormatUint64 = 12,
-	kIOFormatInt64 = 13,
+	kIOFormatUint8 = 5,
+	kIOFormatInt8 = 6,
+	kIOFormatUint16 = 7,
+	kIOFormatInt16 = 8,
+	kIOFormatUint32 = 9,
+	kIOFormatInt32 = 10,
+	kIOFormatUint64 = 11,
+	kIOFormatInt64 = 12,
 
 	kIOFormatInvalid = 0xFF,
 };
