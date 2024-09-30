@@ -1,6 +1,6 @@
 # Getting Started with Raspberry Pi Pico
-Copyright 2021-2023 Moddable Tech, Inc.<BR>
-Revised: May 30, 2023
+Copyright 2021-2024 Moddable Tech, Inc.<BR>
+Revised: September 29, 2024
 
 This document describes how to start building Moddable applications for the Raspberry Pi Pico. It provides information on how to configure host build environments, how to build and deploy apps, and includes links to external development resources.
 
@@ -31,12 +31,13 @@ This document describes how to start building Moddable applications for the Rasp
 - [Reference Documents](#reference)
 
 <a id="about-pico"></a>
-## About Raspberry Pi Pico and Pico W
+## About Raspberry Pi Pico, Pico W and Pico 2
 
 <img src="../assets/devices/pi-pico.png" width="300">
 <img src="../assets/devices/pi-pico_w.png" height="300">
+<img src="../assets/devices/pi-pico_2.png" width="300">
 
-Please see the [Raspberry Pi Pico documentation](https://www.raspberrypi.org/documentation/pico/getting-started/) for details.
+Please see the [Raspberry Pi Pico documentation](https://www.raspberrypi.com/documentation/microcontrollers) for details.
 
 <a id="overview"></a>
 ## Overview
@@ -93,7 +94,21 @@ The Moddable SDK supports devices built with the Pico. The following table lists
 | <img src="../assets/devices/pico-ili9341.png" width=140></a><BR>ili9341 | `pico/ili9341` | ili9341 QVGA display<BR>320 x 240<BR>16-bit color | <li>[Generic 2.4" & 2.8" Displays (Resistive Touch) Wiring Guide - Pico](../displays/wiring-guide-generic-2.4-spi-pico.md)</li> |
 | <img src="../assets/devices/pico-ili9341-i2s-thumb.png" width=140></a><BR>ili9341 | `pico/ili9341_i2s` | ili9341 QVGA display<BR>320 x 240<BR>16-bit color<br>potentiometer, buttons<br>i2s audio | [Wiring Guide](../displays/images/pico-ili9341-i2s-wiring.png) |
 
-pico-ili9341-i2s-thumb.png
+### Pico 2
+
+The Raspberry Pi Pico 2 has the following features:
+
+- RP2350 microcontroller
+    - Dual-core ARM Cortex M33 @150 MHz
+    - Dual-core Hazard RISC V (not currently supported)
+- 520 KB RAM
+- 4 MB flash
+
+| Name | Platform identifier | Key features | Links |
+| :---: | :--- | :--- | :--- |
+| <img src="../assets/devices/pi-pico_2.png" width=220><BR>Rasberry Pi<BR>Pico 2 | `pico` | LED, 26 external pins  | <li>[Raspberry Pi Pico documentation](https://www.raspberrypi.org/documentation/pico/getting-started/)</li> |
+| <img src="../assets/devices/pico-sparkfun-pro-micro-rp2040.png" width=220></a><br>Sparkfun<br>Pro Micro RP2040 | `pico/pro_micro` | Qwiic/STEMMA connector, Neopixel | <li>[Sparkfun product page](https://www.sparkfun.com/products/18288)</li> |
+| <img src="../assets/devices/pico-pimoroni-pico-plus-2.png" height=220></a><br>Pimoroni<br>pico plus 2 | `pico/pico_plus_2` | Qwiic/STEMMA connector | <li>[Pimoroni product page](https://shop.pimoroni.com/products/pimoroni-pico-plus-2)</li> |
 
 <a id="setup"></a>
 ## SDK and Host Environment Setup
@@ -133,19 +148,19 @@ pico-ili9341-i2s-thumb.png
 
 	```text
 	cd $HOME/pico
-	git clone -b 1.5.0 https://github.com/raspberrypi/pico-sdk
+	git clone -b 2.0.0 https://github.com/raspberrypi/pico-sdk
 	cd pico-sdk
 	git submodule update --init
 	```
 
 	```text
 	cd $HOME/pico
-	git clone -b sdk-1.5.0 https://github.com/raspberrypi/pico-extras
+	git clone -b sdk-2.0.0 https://github.com/raspberrypi/pico-extras
 	```
 
 	```text
 	cd $HOME/pico
-	git clone -b sdk-1.5.0 https://github.com/raspberrypi/pico-examples
+	git clone -b sdk-2.0.0 https://github.com/raspberrypi/pico-examples
 	```
 
 6. Set the `PICO_SDK_DIR` environment variable to point to the Pico SDK directory:
@@ -250,19 +265,19 @@ Not yet available.
 
 	```text
 	cd $HOME/pico
-	git clone -b 1.5.0 https://github.com/raspberrypi/pico-sdk
+	git clone -b 2.0.0 https://github.com/raspberrypi/pico-sdk
 	cd pico-sdk
 	git submodule update --init
 	```
 
 	```text
 	cd $HOME/pico
-	git clone -b sdk-1.5.0 https://github.com/raspberrypi/pico-extras
+	git clone -b sdk-2.0.0 https://github.com/raspberrypi/pico-extras
 	```
 
 	```text
 	cd $HOME/pico
-	git clone -b sdk-1.5.0 https://github.com/raspberrypi/pico-examples
+	git clone -b sdk-2.0.0 https://github.com/raspberrypi/pico-examples
 	```
 
 6. Set the `PICO_SDK_DIR` environment variable to point to the Pico SDK directory:
