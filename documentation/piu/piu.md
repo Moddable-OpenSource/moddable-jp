@@ -12,10 +12,10 @@ Piu は、マイクロコントローラ上で実行するように設計され�
   * [重要な概念の紹介](#重要な概念の紹介)
     * [包含階層と外観](#包含階層と外観)
     * [Behavior and Flow](#behavior-and-flow)
-  * [Global Properties](#global-properties)
- 	 * [Built-in Properties](#built-in-properties)
- 	 * [Adding Additional Properties](#adding-additional-properties)
-  * [Descriptions of Properties](#descriptions-of-properties)
+  * [グローバルプロパティ](#global-properties)
+ 	 * [ビルトインプロパティ](#built-in-properties)
+ 	 * [プロパティの追加](#adding-additional-properties)
+  * [プロパティの説明](#descriptions-of-properties)
   	 * [Anchor](#anchor)
  	 * [Color](#color)
  	 * [Coordinates](#coordinates)
@@ -23,27 +23,27 @@ Piu は、マイクロコントローラ上で実行するように設計され�
  	 * [Font](#font)
  	 * [Tiles](#tiles)
  	 * [Variant, Variants, State, and States](#variant-variants-state-and-states)
-  * [Piu Object Reference](#piu-object-reference)
- 	 * [Application Object](#application-object)
- 	 * [Behavior Object](#behavior-object)
- 	 * [Column Object](#column-object)
- 	 * [Container Object](#container-object)
- 	 * [Content Object](#content-object)
- 	 * [Die Object](#die-object)
- 	 * [Image Object](#image-object)
- 	 * [Label Object](#label-object)
- 	 * [Layout Object](#layout-object)
- 	 * [Port Object](#port-object)
- 	 * [Row Object](#row-object)
- 	 * [Scroller Object](#scroller-object)
- 	 * [Shape Object](../commodetto/outline/Outlines.md)
- 	 * [Skin Object](#skin-object)
- 	 * [Sound Object](#sound-object)
- 	 * [Style Object](#style-object)
- 	 * [Text Object](#text-object)
- 	 * [Texture Object](#texture-object)
- 	 * [Timeline Object](#timeline-object)
- 	 * [Transition Object](#transition-object)
+  * [Piuオブジェクトリファレンス](#piu-object-reference)
+ 	 * [Applicationオブジェクト](#application-object)
+ 	 * [Behaviorオブジェクト](#behavior-object)
+ 	 * [Columnオブジェクト](#column-object)
+ 	 * [Containerオブジェクト](#container-object)
+ 	 * [Contentオブジェクト](#content-object)
+ 	 * [Dieオブジェクト](#die-object)
+ 	 * [Imageオブジェクト](#image-object)
+ 	 * [Labelオブジェクト](#label-object)
+ 	 * [Layoutオブジェクト](#layout-object)
+ 	 * [Portオブジェクト](#port-object)
+ 	 * [Rowオブジェクト](#row-object)
+ 	 * [Scrollerオブジェクト](#scroller-object)
+ 	 * [Shapeオブジェクト](../commodetto/outline/Outlines.md)
+ 	 * [Skinオブジェクト](#skin-object)
+ 	 * [Soundオブジェクト](#sound-object)
+ 	 * [Styleオブジェクト](#style-object)
+ 	 * [Textオブジェクト](#text-object)
+ 	 * [Textureオブジェクト](#texture-object)
+ 	 * [Timelineオブジェクト](#timeline-object)
+ 	 * [Transitionオブジェクト](#transition-object)
 
 ## 継承階層
 
@@ -73,9 +73,9 @@ Piu アプリケーションのグラフィカル ユーザー インターフ�
 - `container`オブジェクトは包含階層のブランチである
 - `content`オブジェクトは包含階層のリーフである
 
-アプリケーションはコンストラクタを使用して `content` オブジェクトと `container` オブジェクトを定義します。これらのオブジェクトは、`add`、`insert`、および `replace` 関数を使用して包含階層にアタッチされ、`remove` および `replace` 関数を使用して包含階層から削除されます。 これらのプロパティの説明については、[Container Object](#container-object) セクションの [Functions](#container-functions) を参照してください。
+アプリケーションはコンストラクタを使用して `content` オブジェクトと `container` オブジェクトを定義します。これらのオブジェクトは、`add`、`insert`、および `replace` 関数を使用して包含階層にアタッチされ、`remove` および `replace` 関数を使用して包含階層から削除されます。 これらのプロパティの説明については、[Containerオブジェクト](#container-object) セクションの [Functions](#container-functions) を参照してください。
 
-#### Bound and Unbound Contents
+#### BoundコンテンツとUnboundコンテンツ
 
 包含階層にアタッチされていないcontentsは*unbound* contentsと呼ばれ、包含階層にアタッチされているcontentsは*bound* contentsと呼ばれます。包含階層の一部であるオブジェクトのみが画面に表示されます。
 
@@ -109,7 +109,7 @@ let unconstrainedContent = new Content(null, {
 });
 ```
 
-#### Measure and Fit
+#### MeasureとFit
 
 <a id="measured-size"></a>
 ##### Measured size
@@ -293,17 +293,17 @@ Piu は、幅広いターゲット デバイスで役立つ低レベルのイベ
 
 ##### 高レベルのイベント
 
-アプリケーションは独自の高レベルのイベントを定義することもできます。一般的なイベント伝播パターンを効率的に実装するために、コンテンツには `delegate`、`distribute`、`bubble`、`firstThat`、および `lastThat` プロパティがあります。これらのプロパティの説明については、[Content Object](#content-object) セクションの [Functions](#content-functions) を参照してください。
+アプリケーションは独自の高レベルのイベントを定義することもできます。一般的なイベント伝播パターンを効率的に実装するために、コンテンツには `delegate`、`distribute`、`bubble`、`firstThat`、および `lastThat` プロパティがあります。これらのプロパティの説明については、[Contentオブジェクト](#content-object) セクションの [Functions](#content-functions) を参照してください。
 
-#### Animations
+#### アニメーション
 
 時間ベースのアニメーション動作を作成するには、複数の方法があります。 1 つの方法は、このドキュメントの [Duration, Fraction, Interval, Loop, and Time](#duration-fraction-interval-loop-and-time) セクションで説明されているように、`content` オブジェクトをクロックとして使用することです。 この方法は、イベントに応じて単一のコンテンツをアニメーション化する場合 (たとえば、タッチ フィードバックを表示する場合) や、単一のコンテンツを長時間アニメーション化する場合などによく使用されます。
 
-複数のコンテンツやプロパティをアニメーション化する複雑な動作を作成する最も簡単な方法は、`timeline` オブジェクトを使用することです。`timeline` オブジェクトは、一連のトゥイーンアニメーションのシーケンスと実行のメカニズムを提供するため、複数のコンテンツ オブジェクトの段階的なアニメーション (画面のグラフィック要素の切り替えなど) に最適な方法です。詳細については、このドキュメントの [Timeline Object](#timeline-object) セクションを参照してください。
+複数のコンテンツやプロパティをアニメーション化する複雑な動作を作成する最も簡単な方法は、`timeline` オブジェクトを使用することです。`timeline` オブジェクトは、一連のトゥイーンアニメーションのシーケンスと実行のメカニズムを提供するため、複数のコンテンツ オブジェクトの段階的なアニメーション (画面のグラフィック要素の切り替えなど) に最適な方法です。詳細については、このドキュメントの [Timelineオブジェクト](#timeline-object) セクションを参照してください。
 
-Piu の `transition` オブジェクトは、画面間を移動したり、コンテンツ オブジェクトを入れ替えたりする単純なアニメーションに最適です。多くの場合、コンテンツを追加または削除することで、包含階層を変更します。`timeline` オブジェクトと同様にオブジェクトのプロパティを変更することもできますが、アニメーションのシーケンスを作成するのはより複雑です。詳細については、このドキュメントの [Transition Object](#transition-object) セクションを参照してください。
+Piu の `transition` オブジェクトは、画面間を移動したり、コンテンツ オブジェクトを入れ替えたりする単純なアニメーションに最適です。多くの場合、コンテンツを追加または削除することで、包含階層を変更します。`timeline` オブジェクトと同様にオブジェクトのプロパティを変更することもできますが、アニメーションのシーケンスを作成するのはより複雑です。詳細については、このドキュメントの [Transitionオブジェクト](#transition-object) セクションを参照してください。
 
-##### Easing equations
+##### Easing方程式
 
 コンテンツ オブジェクトのプロパティを線形に変更するアニメーションは、見た目がぎこちないことがよくあります。Easing方程式を使用することは、より自然に感じられるアニメーションを実装するための一般的な方法です。
 
@@ -311,11 +311,11 @@ Piu は、JavaScript の `Math` オブジェクトを Robert Penner のオープ
 
 これらのEasing方程式の Piu 実装はすべて、単一の引数 (範囲 [0, 1] の `number`) を取ります。戻り値は範囲 [0, 1] の `number` で、入力をEasingされた出力にマッピングします。これらの方程式は、あらゆる種類のアニメーションで広く使用されています。一般的には、`content` オブジェクトの `fraction` プロパティまたは `transition` オブジェクトの `onStep` 関数の `fraction` 引数をマッピングするために使用され、多くの `timeline` オブジェクト関数の引数としても使用されます。
 
-## Global Properties
+## グローバルプロパティ
 
 Piu グローバル オブジェクトのプロパティは、アプリケーション内のどこでも使用できます。
 
-### Built-in Properties
+### ビルトインプロパティ
 
 - **Source code:** [`xsGlobal.c`][1]
 
@@ -338,9 +338,9 @@ trace(`sampleVariable value is: ${sampleVariable}\n`);    // "sampleVariable val
 
 ***
 
-### Adding Additional Properties
+### プロパティの追加
 
-グローバル オブジェクトのプロパティを設定することで、追加のプロパティを追加できます。
+グローバル オブジェクトのプロパティを設定することで、プロパティを追加できます。
 
 ```javascript
 global.application = new Application(null, {
@@ -349,7 +349,7 @@ global.application = new Application(null, {
 export default global.application;
 ```
 
-## Descriptions of Properties
+## プロパティの説明
 
 このセクションでは、以降の Piu オブジェクト リファレンス セクション全体で参照される特定のプロパティについて説明します。
 
@@ -719,7 +719,7 @@ application.add(new WiFiStatusIcon({ passwordProtected: true }, { top: 58, right
 
 ![](../assets/piu/stateAndVariant.gif)
 
-## Piu Object Reference
+## Piuオブジェクトリファレンス
 
 このセクションでは、Piu API を定義するオブジェクトの詳細について説明します。各オブジェクトについて、関連する場合は次の情報が提示されます。:
 
@@ -727,17 +727,17 @@ application.add(new WiFiStatusIcon({ passwordProtected: true }, { top: 58, right
 
 - **Relevant Examples**: オブジェクトの使用方法を示すサンプルアプリへのリンク
 
-- **Constructor Description**: オブジェクトのコンストラクタの説明
+- **コンストラクタの説明**: オブジェクトのコンストラクタの説明
 
 - **Dictionary**: オブジェクトの辞書ベースのコンストラクタに渡される辞書に関する追加情報が必要な場合に存在します。辞書に含まれる可能性があるプロパティについて説明します。辞書パラメーターは、作成されたインスタンスで同じ名前を持つプロパティを設定します (特に指定がない限り)。
 
-- **Prototype Description**: このオブジェクトのプロトタイプが継承するプロトタイプと、このオブジェクトのプロトタイプに固有のプロパティと機能の説明
+- **プロトタイプの説明**: このオブジェクトのプロトタイプが継承するプロトタイプと、このオブジェクトのプロトタイプに固有のプロパティと機能の説明
 
 - **Events**: オブジェクトがトリガーするイベントの説明
 
 完全な JavaScript プログラミング インターフェイスについては、[`piuAll.js`][0] を参照してください。
 
-### Application Object
+### Applicationオブジェクト
 
 - **Source code:** [`piuApplication.c`][2]
 - **Relevant Examples:** all
@@ -758,7 +758,7 @@ export default function() {
 }
 ```
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Application([behaviorData, dictionary])`
 
@@ -806,7 +806,7 @@ export default new BallApplication(null, { displayListLength:4096, touchCount:0 
 
 #### Dictionary
 
-`container` オブジェクトの場合と同じです ([Container Object](#container-object) セクションの [Dictionary](#container-dictionary) を参照)。さらに次のようになります。
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Dictionary](#container-dictionary) を参照)。さらに次のようになります。
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
@@ -814,18 +814,18 @@ export default new BallApplication(null, { displayListLength:4096, touchCount:0 
 | `displayListLength ` | `number` | Poco レンダリング エンジンを使用するターゲットのディスプレイ リスト バッファのサイズ (バイト単位)
 | `touchCount` | `number` | 同時にトリガーできるタッチイベントの数
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Container.prototype` から継承します。
 
-### Behavior Object
+### Behaviorオブジェクト
 
 - **Source code:** [`piuBehavior.c`][3]
 - **Relevant Examples:** [balls][18], [drag][19]
 
 `behavior` オブジェクトには、`content` オブジェクトによってトリガーされるイベントに対応する関数が含まれています。`content` オブジェクトは、その動作がイベントの名前を持つ関数プロパティを所有または継承しているかどうかを確認し、そうである場合は、その関数を呼び出し、最初のパラメータとして自身を渡します。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 アプリケーションは、`Behavior.prototype` から継承し、構築時に `content` オブジェクトに割り当てた `behavior` オブジェクトの独自のコンストラクタを定義します。`content` オブジェクトが構築されると、割り当てられた動作クラスのインスタンスが作成され、動作の `onCreate` イベントがトリガーされます。この関数はデフォルトでは何も行いません。たとえば、動作はこれを使用してプロパティを初期化できます。
 
@@ -849,18 +849,18 @@ application.add(sampleContent);
 
 ![Behavior Sample](../assets/piu/behaviorSample.gif)
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Object.prototype` から継承します。
 
-### Column Object
+### Columnオブジェクト
 
 - **Source code:** [`piuColumn.c`][4]
 - **Relevant Examples:** [keyboard][20], [weather][21]
 
 `column` オブジェクトは、その内容を垂直に配置する `container` オブジェクトです。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Column([behaviorData, dictionary])`
 
@@ -916,23 +916,23 @@ application.add(new SampleColumn({ firstColor:"red", secondColor:"blue" }));
 
 ![](../assets/piu/sampleColumn2.png)
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Container.prototype` から継承します。
 
 <a id="column-events"></a>
 #### Events
 
-`container` オブジェクトの場合と同じです ([Container Object](#container-object) セクションの [Events](#container-events) を参照してください)
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照してください)
 
-### Container Object
+### Containerオブジェクト
 
 - **Source code:** [`piuContainer.c`][5]
 - **Relevant Examples:** [drag][19], [transitions][23]
 
 `container` オブジェクトは、他の `content` オブジェクトを含むことができる `content` オブジェクトです。コンテナでは、`content` オブジェクトは二重リンク リストに格納されます。`content` オブジェクトには、`content` プロパティを使用してインデックスまたは名前でアクセスすることもできます (例: `container.content(0)` または `container.content("foo")`)。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Container([behaviorData, dictionary])`
 
@@ -998,12 +998,12 @@ application.add(new SampleContainer({ backgroundColor: "white", squareColor: "bl
 | --- | --- | :--- |
 | `clip` | `boolean` | `true` の場合、このコンテナはその内容をクリップします。
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Content.prototype` から継承します。
 
 <a id="container-properties"></a>
-##### Properties
+##### プロパティ
 
 `content` オブジェクトの場合と同じです ([コンテンツ オブジェクト](#content-object) セクションの [プロパティ](#content-properties) を参照)。さらに次のようになります。
 
@@ -1347,7 +1347,7 @@ application.add(sampleContainer);
 <a id="container-events"></a>
 #### Events
 
-`content` オブジェクトの場合と同じです ([Content Object](#content-object) セクションの [Events](#content-events) を参照)。さらに次のようになります。
+`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Events](#content-events) を参照)。さらに次のようになります。
 
 **`onTransitionBeginning(container)`**
 
@@ -1369,14 +1369,14 @@ application.add(sampleContainer);
 
 ***
 
-### Content Object
+### Contentオブジェクト
 
 - **Source code:** [`piuContent.c`][6]
 - **Relevant Examples:** [balls][18], [love-js][20]
 
 アプリケーションは、ボタン、アイコン、スライダー、スイッチ、タブなどのユーザー インターフェイスのグラフィカル部分に `content` オブジェクトを使用します。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Content([behaviorData, dictionary])`
 
@@ -1457,12 +1457,12 @@ application.add(new SampleContent({color: "blue"}));
 | `visible` | `boolean` | `true` の場合、このコンテンツは表示されます。
 | `width` | `number` | このコンテンツの幅（ピクセル単位）（作成されたインスタンスの `coordinates` プロパティで `width` を設定）。
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Object.prototype` から継承します。
 
 <a id="content-properties"></a>
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
@@ -1919,7 +1919,7 @@ application.add(sampleContent);
 
 これらのイベントは、指定された `content` オブジェクトがアクティブでタッチされたときにトリガーされます。
 
-### Die Object
+### Dieオブジェクト
 
 - **Source code:** [`piuDie.c`][7]
 - **Relevant Examples:** [cards][24]
@@ -1933,14 +1933,14 @@ application.add(sampleContent);
 
 両方の領域は最初は空です。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Die([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | このダイスの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Content Object](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Die.prototype.` から継承したオブジェクトである `die` インスタンスを返します。
 
@@ -2027,13 +2027,13 @@ application.add(sampleScreenWithDie);
 
 ![](../assets/piu/sampleDie2.png)
 
-#### Prototype Description
+#### プロトタイプの説明
 
 Prototypeは `Layout.prototype` から継承します。
 
 ##### Functions
 
-`layout` オブジェクトの場合と同じです（[Layout Object](#layout-object)のセクションの[Functions](#layout-functions)を参照）。さらに:
+`layout` オブジェクトの場合と同じです（[Layoutオブジェクト](#layout-object)のセクションの[Functions](#layout-functions)を参照）。さらに:
 
 **`and(x, y, width, height)`**
 
@@ -2307,7 +2307,7 @@ application.add(sampleContainer);
 
 ![](../assets/piu/dieXor.png)
 
-### Image Object
+### Imageオブジェクト
 
 - **Source code:** [`piuImage.c`][30]
 - **Relevant Examples:** [images][31]
@@ -2343,7 +2343,7 @@ GIF のフレーム レートはファイル自体に設定されており、ア
 
 サポートされているすべての画像タイプは、`.cs` 拡張子を持つ単一のリソースに圧縮されます。これらは、アプリケーションのスクリプト コードで参照する必要があるファイルです。たとえば、上記のアセットを使用して `image` オブジェクトを作成するには、アプリケーションはパス `"screen1.cs"`、`"screen2.cs"`、および `"street.cs"` を使用します。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Image([behaviorData, dictionary])`
 
@@ -2392,31 +2392,31 @@ application.add(new SampleImage("street.cs"));
 <a id="image-dictionary"></a>
 #### Dictionary
 
-`content`オブジェクトの場合と同じです（[Content Object](#content-object)のセクションの[Dictionary](#content-dictionary)を参照してください）。さらに:
+`content`オブジェクトの場合と同じです（[Contentオブジェクト](#content-object)のセクションの[Dictionary](#content-dictionary)を参照してください）。さらに:
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
 | `path` | `string` | 画像ファイルの URL。ファイル URL である必要があります。
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototypeは `Content.prototype` から継承します。
+プロトタイプは `Content.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
 | `frameCount ` | `number` | | ✓ | この画像に含まれるフレームの総数
 | `frameIndex ` | `number` | | | 現在のフレームのインデックス
 
-### Label Object
+### Labelオブジェクト
 
 - **Source code:** [`piuLabel.c`][8]
 - **Relevant Examples:** [cards][24], [keyboard][20]
 
 `label` オブジェクトは、単一のスタイルで 1 行に文字列をレンダリングする `content` オブジェクトです。文字列が `label` オブジェクトの境界に収まらない場合は切り捨てられます。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Label([behaviorData, dictionary])`
 
@@ -2462,23 +2462,23 @@ application.add(new SampleLabel({ string: "Hello, World!", style: redStyle }, { 
 <a id="label-dictionary"></a>
 #### Dictionary
 
-`content`オブジェクトの場合と同じです（[Content Object](#content-object)のセクションの[Dictionary](#content-dictionary)を参照してください）。さらに:
+`content`オブジェクトの場合と同じです（[Contentオブジェクト](#content-object)のセクションの[Dictionary](#content-dictionary)を参照してください）。さらに:
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
 | `string` | `string` | このラベルの文字列
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototypeは `Content.prototype` から継承します。
+プロトタイプは `Content.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
 | `string` | `string` | | | このラベルの文字列
 
-### Layout Object
+### Layoutオブジェクト
 
 - **Source code:** [`piuLayout.c`][9]
 - **Relevant Examples:** N/A
@@ -2489,14 +2489,14 @@ Prototypeは `Content.prototype` から継承します。
 
 高さが測定されると、`layout` オブジェクトは `onMeasureVertically` イベントをトリガーし、動作によって `layout` オブジェクトの測定された高さまたはそのコンテンツの座標を変更できます。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Layout([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | このレイアウトの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Content Object](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Layout.prototype/` から継承したオブジェクトである `layout` インスタンスを返します。
 
@@ -2589,13 +2589,13 @@ application.add(new SampleLayout(null, {bottom: 0, width: 200, right: 0, height:
 
 ![](../assets/piu/sampleLayout2.png)
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Container.prototype` から継承します。
 
 #### Events
 
-`container` オブジェクトの場合と同じです ([Container Object](#container-object) セクションの [Events](#container-events) を参照)。さらに次のようになります。:
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照)。さらに次のようになります。:
 
 **`onFitHorizontally(layout, width)`**
 
@@ -2641,7 +2641,7 @@ application.add(new SampleLayout(null, {bottom: 0, width: 200, right: 0, height:
 
 ***
 
-### Port Object
+### Portオブジェクト
 
 - **Source code:** [`piuPort.c`][10]
 - **Relevant Examples:** [countdown][25], [list][26], [spinner][27]
@@ -2650,14 +2650,14 @@ application.add(new SampleLayout(null, {bottom: 0, width: 200, right: 0, height:
 
 `port` オブジェクトには、すべての描画に影響するClip Rectangle (最初は `port` オブジェクトの境界) があります。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Port([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Content Object](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Port.prototype` から継承したオブジェクトである `port` インスタンスを返します。
 
@@ -2708,7 +2708,7 @@ application.add(new SamplePort(["blue", "red", "black"]));
 
 ![](../assets/piu/samplePort2.png)
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Content.prototype` から継承します。
 
@@ -3081,9 +3081,9 @@ application.add(samplePort);
 <a id="port-events"></a>
 #### Events
 
-Same as for `content` object (see [Events](#content-events) in the section [Content Object](#content-object)), plus:
+Same as for `content` object (see [Events](#content-events) in the section [Contentオブジェクト](#content-object)), plus:
 
-`content` オブジェクトの場合と同じです ([Content Object](#content-object) セクションの [Events](#content-events) を参照)。さらに次のようになります。
+`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Events](#content-events) を参照)。さらに次のようになります。
 
 **`onDraw(port, x, y, width, height)`**
 
@@ -3094,21 +3094,21 @@ Same as for `content` object (see [Events](#content-events) in the section [Cont
 
 このイベントは、指定された `port` オブジェクトが領域を更新する必要があるとき (無効化されているとき) にトリガーされます。
 
-### Row Object
+### Rowオブジェクト
 
 - **Source code:** [`piuRow.c`][11]
 - **Relevant Examples:** N/A
 
 `row` オブジェクトは、その内容を水平に配置する `container` オブジェクトです。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Row([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Content Object](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Row.prototype` から継承したオブジェクトである `row` インスタンスを返します。
 
@@ -3152,23 +3152,23 @@ application.add(new SampleRow({ firstColor:"red", secondColor:"blue" }));
 
 ![](../assets/piu/sampleRow2.png)
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Container.prototype` から継承します。
 
 <a id="row-events"></a>
 #### Events
 
-`container` オブジェクトの場合と同じです ([Container Object](#container-object) セクションの [Events](#container-events) を参照してください)
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照してください)
 
-### Scroller Object
+### Scrollerオブジェクト
 
 - **Source code:** [`piuScroller.c`][12]
 - **Relevant Examples:** [scroller][32], [list][26]
 
 `scroller` オブジェクトは、最初の `content` オブジェクトを水平方向および垂直方向にスクロールする `container` オブジェクトです。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Scroller([behaviorData, dictionary])`
 
@@ -3249,22 +3249,21 @@ application.add(screenWithScrollerSample);
 <a id="scroller-dictionary"></a>
 #### Dictionary
 
-`container` オブジェクトの場合と同じです ([Container Object](#container-object) セクションの [Dictionary](#container-dictionary) を参照)。さらに次のようになります。
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Dictionary](#container-dictionary) を参照)。さらに次のようになります。
 
 | Parameter | Type | Definition |
 | --- | --- | :--- |
 | `loop` | `boolean` | `true`の場合、このスクロールバーは最初の`content`オブジェクトをループします。
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Container.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
-| `constraint` | `object` | | ✓| The constrained scroll offsets of this scroller, as an object with `x` and `y` number properties. The scroll offsets when this scroller is tracking may be different from the constrained scroll offsets.
-このスクローラーの制約されたスクロール オフセット (`x` および `y` 数値プロパティを持つオブジェクト)。このスクローラーが追跡しているときのスクロール オフセットは、制約されたスクロール オフセットとは異なる場合があります。
+| `constraint` | `object` | | ✓| このスクローラーの制約されたスクロール オフセット (`x` および `y` 数値プロパティを持つオブジェクト)。このスクローラーが追跡しているときのスクロール オフセットは、制約されたスクロール オフセットとは異なる場合があります。
 | `loop` | `boolean` | `false` | | `true` の場合、このコンテンツは、その時間が継続時間と等しくなったときにクロックを再開します。
 | `scroll` | `object` | | |  このスクロールバーのスクロール オフセット。ピクセル単位で指定された `x` および `y` 数値プロパティを持つオブジェクトとして表されます。
 | `tracking` | `boolean` | `false` | | `true` の場合、このスクローラーは追跡しています。追跡中、スクローラーはスクロール オフセットを制限しません。
@@ -3414,7 +3413,7 @@ application.add(scrollerSample);
 <a id="scroller-events"></a>
 #### Events
 
-`container` オブジェクトの場合と同じです ([Container Object](#container-object) セクションの [Events](#container-events) を参照)。さらに次のようになります。
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照)。さらに次のようになります。
 
 ##### `onScrolled(scroller)`
 
@@ -3426,14 +3425,14 @@ application.add(scrollerSample);
 
 スクローラーによってトリガーされると、このイベントはスクローラーのすべてのコンテンツによってもトリガーされます。これにより、たとえばスクロールバーの実装が容易になります。
 
-### Skin Object
+### Skinオブジェクト
 
 - **Source code:** [`piuSkin.c`][13]
 - **Relevant Examples:** [balls][18], [cards][24], [drag][19]
 
 `skin` オブジェクトは `content` オブジェクトの外観を定義します。`texture` オブジェクトの一部を使用して `content` オブジェクトを描画または塗りつぶしたり、色を使用して `content` オブジェクトを塗りつぶしたりストロークしたりできます。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Skin([dictionary])`
 
@@ -3522,11 +3521,11 @@ application.add(borderedContent);
 | `fill` | `string` or `array` | `content` オブジェクトを塗りつぶす色。このドキュメントの [Color](#color) セクションで指定された形式の文字列または文字列の `array` として指定します。
 | `stroke` | `string` or `array` | このスキンのストロークの色。このドキュメントの[Color](#color)セクションで指定された形式の文字列または文字列の配列です。
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Object.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 `skin` オブジェクトのすべてのプロパティは読み取り専用ですが、コンテンツ オブジェクトのスタイルはいつでも変更できます。
 
@@ -3557,14 +3556,14 @@ application.add(borderedContent);
 
 ***
 
-### Sound Object
+### Soundオブジェクト
 
 - **Source code:** [`piuSound.c`][37]
 - **Relevant Examples:** [sound][38]
 
 `Sound` オブジェクトは、[`AudioOut` class](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/pins/audioout.md) を使用してオーディオを再生します。オーディオ リソースの全体または一部を 1 回または繰り返し再生するために使用できます。`Sound` オブジェクトは、ユーザーの操作に対する音声フィードバックを提供するために短いサウンドを再生するように設計されています。その他のオーディオ再生のニーズには、`AudioOut` クラスを直接使用してください。
 
-#### Constructor Description
+#### コンストラクタの説明
 再生されるオーディオ リソースごとに、Sound クラスの個別のインスタンスが作成されます。
 
 ##### `Sound(dictionary)`
@@ -3588,11 +3587,11 @@ let sampleSound = new Sound({ path: "piano.wav" });
 | `offset` | `number` | 再生を開始するオーディオのサンプル数。指定しない場合は、最初のサンプルから再生が始まります。
 | `size` | `number` | 再生するサンプルの数。指定しない場合は、オーディオ リソースの最後まで再生が続行されます。
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Object.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 すべてのプロパティは静的です。`bitsPerSample`、`numChannels`、および `sampleRate` プロパティのデフォルト値は、`AudioOut` モジュールの構成を反映します。
 
@@ -3640,14 +3639,14 @@ sampleSound.play(0, 1, () => {
 
 ***
 
-### Style Object
+### Styleオブジェクト
 
 - **Source code:** [`piuStyle.c`][14]
 - **Relevant Examples:** [text][28]
 
 `style` オブジェクトは、`label` オブジェクトと `text` オブジェクト内の文字列の外観を定義します。スタイルは、それを含むオブジェクトのスタイルから継承できます。詳細については、以下の [Cascading Styles](#cascading-styles) セクションを参照してください。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Style(dictionary)`
 
@@ -3727,11 +3726,11 @@ application.add(sampleLabel2);
 | `horizo​​ntal` | `string` | このスタイルの水平方向の配置。`left`、`center` (デフォルト)、`right`、または `justify` として表されます
 | `top` | `number` | このスタイルの上余白。ピクセル単位 (作成されたインスタンスの `top` プロパティと、作成されたインスタンスの `margins` プロパティの `top` を設定します)
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Object.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 `style` オブジェクトのすべてのプロパティは読み取り専用ですが、コンテンツ オブジェクトのスタイルはいつでも変更できます。
 
@@ -3773,7 +3772,7 @@ let size = normalStyle.measure("Moddable");	// {"width":134,"height":38}
 
 ***
 
-### Text Object
+### Textオブジェクト
 
 - **Source code:** [`piuText.c`][15]
 - **Relevant Examples:** [text][28]
@@ -3783,7 +3782,7 @@ let size = normalStyle.measure("Moddable");	// {"width":134,"height":38}
 1. `string` プロパティを設定します。これにより、文字列全体が置き換えられます。
 2. `begin` 関数と `end` 関数の呼び出しの間に、ブロックとスパンを使用して文字列を構築します。これにより、文字列に文字が追加されます。この方法では、各スパンに異なるスタイルを設定できるため、最も制御性が向上します。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Text([behaviorData, dictionary])`
 
@@ -3846,18 +3845,18 @@ application.add(new SampleText({ baseStyle: sampleStyle, redText: "Red!", blueTe
 <a id="text-dictionary"></a>
 #### Dictionary
 
-`content` オブジェクトの場合と同じです ([Content Object](#content-object) セクションの [Dictionary](#content-dictionary) を参照)。さらに次のようになります。
+`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Dictionary](#content-dictionary) を参照)。さらに次のようになります。
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
 | `blocks` | `array` | ブロックの配列。ブロックは次のプロパティを持つオブジェクトです:<BR>- `behavior`: オブジェクトまたは `null` (デフォルト)。このテキストがアクティブでブロックに触れると、ブロックはその動作の対応する関数プロパティを呼び出します。<BR>- `style`: `style` インスタンスまたは `null` (デフォルト)。<BR>- `spans`: `string` またはスパンの `array`。<BR><BR>ブロックと同様に、スパンは `behavior`、`style`、および `spans` プロパティを持つオブジェクトです。
 | `string` | `string` | このテキストの文字列。この文字列を設定すると、このテキストのスタイルを使用する 1 つのスパンを含む 1 つのブロックが作成されます。     
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Content.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Read Only | Description |
 | --- | --- | --- | --- |
@@ -3927,16 +3926,16 @@ application.add(new SampleText({ baseStyle: sampleStyle, redText: "Red!", blueTe
 <a id="text-events"></a>
 #### Events
 
-`content` オブジェクトの場合と同じです ([Content Object](#content-object) セクションの [Events](#content-events) を参照してください)。
+`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Events](#content-events) を参照してください)。
 
-### Texture Object
+### Textureオブジェクト
 
 - **Source code:** [`piuTexture.c`][16]
 - **Relevant Examples:** [balls][18], [cards][24]
 
 `texture` オブジェクトは、画像ファイルを参照するアセットです。アプリケーションは、`skin` オブジェクトの定義に `texture` オブジェクトを使用します。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Texture(path)`
 
@@ -3990,18 +3989,18 @@ const AnotherLogoSkin = Skin.template({ texture: new AnotherLogoTexture(), x: 0,
 | --- | --- | :--- |
 | `path` | `string` | 画像ファイルの URL。ファイル URL である必要があります。
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Object.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Read Only | Description |
 | --- | --- | --- | :--- |
 | `height` | `number` | ✓ | このテクスチャの高さ（物理ピクセル単位）          
 | `width` | `number` | ✓ | このテクスチャの幅（物理ピクセル単位）
 
-### Timeline Object
+### Timelineオブジェクト
 
 - **Source code:** [`piuTimeline.js`][36]
 - **Relevant Examples:** [timeline][35], [easing-equations][34]
@@ -4020,7 +4019,7 @@ Piu Timeline の実装は、GreenSock によって開発された [TimelineLite 
 import Timeline from "piu/Timeline";`
 ```
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Timeline()`
 
@@ -4030,9 +4029,9 @@ import Timeline from "piu/Timeline";`
 let timeline = new Timeline();
 ```
 
-#### Prototype Description
+#### プロトタイプの説明
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | --- |
@@ -4189,14 +4188,14 @@ application.add(sampleColumn);
 
 ![](../assets/piu/timelineTo.gif)
 
-### Transition Object
+### Transitionオブジェクト
 
 - **Source code:** [`piuTransition.c`][17]
 - **Relevant Examples:** N/A
 
 `transition` オブジェクトは、包含階層の変更をアニメーション化するために使用されます。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 アプリケーションは、`Transition.prototype` から継承し、`onBegin`、`onEnd`、および `onStep` 関数をオーバーライドする `transition` オブジェクトの独自のコンストラクターを定義します。
 
@@ -4255,11 +4254,11 @@ application.add(new ColoredScreen({ color: "red", nextColor: "blue" }));
 
 ![](../assets/piu/transition.gif)
 
-#### Prototype Description
+#### プロトタイプの説明
 
 プロトタイプは `Object.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
