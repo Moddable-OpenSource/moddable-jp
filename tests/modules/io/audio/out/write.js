@@ -33,7 +33,7 @@ let out = new AudioOut({
 	}
 });
 
-const {sampleRate, numChannels, bitsPerSample} = out;
+const {sampleRate, channels, bitsPerSample} = out;
 
 assert.sameValue(bitsPerSample, 16, "test assumes 16-bit samples");
 

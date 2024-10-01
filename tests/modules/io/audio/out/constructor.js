@@ -13,11 +13,11 @@ import AudioOut from "embedded:io/audioout";
 	out.close();
 });
 
-[1, 2].forEach(numChannels => {
+[1, 2].forEach(channels => {
 	let out = new AudioOut({
-		numChannels
+		channels
 	});
-	assert.sameValue(out.numChannels, numChannels, "numChannels option " + numChannels);
+	assert.sameValue(out.channels, channels, "channels option " + channels);
 	out.close();
 });
 
@@ -32,11 +32,11 @@ import AudioOut from "embedded:io/audioout";
 
 let out = new AudioOut({
 	bitsPerSample: "16",
-	numChannels: "2",
+	channels: "2",
 	sampleRate: "44100"
 });
 assert.sameValue(out.bitsPerSample, 16, "bitsPerSample option 16");
-assert.sameValue(out.numChannels, 2, "numChannels option 2");
+assert.sameValue(out.channels, 2, "channels option 2");
 assert.sameValue(out.sampleRate, 44100, "sampleRate option 44100");
 
 assert.throws(RangeError, () => new AudioOut({bitsPerSample: -1}), "bitsPerSample -1");
@@ -45,11 +45,11 @@ assert.throws(RangeError, () => new AudioOut({bitsPerSample: 17}), "bitsPerSampl
 assert.throws(RangeError, () => new AudioOut({bitsPerSample: 65536 + 8}), "bitsPerSample 65536 + 8");
 assert.throws(TypeError, () => new AudioOut({bitsPerSample: Symbol()}), "bitsPerSample symbol");
 
-assert.throws(RangeError, () => new AudioOut({numChannels: -1}), "numChannels -1");
-assert.throws(RangeError, () => new AudioOut({numChannels: 0}), "numChannels 0");
-assert.throws(RangeError, () => new AudioOut({numChannels: 3}), "numChannels 3");
-assert.throws(RangeError, () => new AudioOut({numChannels: 65537}), "numChannels 65537");
-assert.throws(TypeError, () => new AudioOut({numChannels: Symbol()}), "numChannels symbol");
+assert.throws(RangeError, () => new AudioOut({channels: -1}), "channels -1");
+assert.throws(RangeError, () => new AudioOut({channels: 0}), "channels 0");
+assert.throws(RangeError, () => new AudioOut({channels: 3}), "channels 3");
+assert.throws(RangeError, () => new AudioOut({channels: 65537}), "channels 65537");
+assert.throws(TypeError, () => new AudioOut({channels: Symbol()}), "channels symbol");
 
 assert.throws(RangeError, () => new AudioOut({sampleRate: -1}), "sampleRate -1");
 assert.throws(RangeError, () => new AudioOut({sampleRate: 0}), "sampleRate 0");

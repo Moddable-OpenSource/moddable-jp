@@ -15,7 +15,7 @@ assert.throws(SyntaxError, () => out.write(), "write");
 assert.throws(SyntaxError, () => out.start(), "start");
 assert.throws(SyntaxError, () => out.stop(), "stop");
 assert.throws(SyntaxError, () => out.sampleRate, "sampleRate");
-assert.throws(SyntaxError, () => out.numChannels, "numChannels");
+assert.throws(SyntaxError, () => out.channels, "channels");
 assert.throws(SyntaxError, () => out.bitsPerSample, "bitsPerSample");
 assert.throws(SyntaxError, () => out.format, "format");
 
