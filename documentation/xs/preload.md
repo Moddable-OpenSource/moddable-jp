@@ -259,19 +259,13 @@ These objects cannot be stored in flash memory:
 
 In the future XS may support storing additional built-in objects in flash memory. For details on built-in objects stored in flash memory see the [XS Linker Warnings](./XS%20linker%20warnings.md) document.
 
-These objects cannot be stored in flash. However, they maybe used during preload as long as they do
-not need to be stored. For example, code that executes a part of preload can safely use `RegExp` as
-long as there are no regular expression instances remaining when the preload phase ends.
+These objects cannot be stored in flash. However, they maybe used during preload as long as they do not need to be stored. For example, code that executes a part of preload can safely use `RegExp` as long as there are no regular expression instances remaining when the preload phase ends.
 
 ## Modifying Built-in Objects Behavior
 
-It is possible to modify the behavior of built-in objects before they are frozen by using a
-preloaded module since built-in objects are not frozen until preload is complete.  This allows for
-the extension of built-in object behavior.
+It is possible to modify the behavior of built-in objects before they are frozen by using a preloaded module since built-in objects are not frozen until preload is complete.  This allows for the extension of built-in object behavior.
 
-For example, the `Error.protoype.name` property is an ordinary property (as specified by
-[ECMA-262](https://tc39.es/ecma262/#sec-error.prototype.name)), which when frozen will result in
-throwing an error when attempting to write to `name`:
+For example, the `Error.protoype.name` property is an ordinary property (as specified by [ECMA-262](https://tc39.es/ecma262/#sec-error.prototype.name)), which when frozen will result in throwing an error when attempting to write to `name`:
 
 
 ```js
@@ -285,10 +279,7 @@ class MyError extends Error {
 const err = new MyError("My error message");
 ```
 
-You can address this in your implementation of `MyError` by adding a name property to your
-class. However, if you need the prototype of `Error` to have `name` writable (such as when using some
-third-party NPM modules), you can create a preloaded module that modifies the behavior of `name`
-before it is frozen:
+You can address this in your implementation of `MyError` by adding a name property to your class. However, if you need the prototype of `Error` to have `name` writable (such as when using some third-party NPM modules), you can create a preloaded module that modifies the behavior of `name` before it is frozen:
 
 ```js
 Object.defineProperty(Error.prototype, "name", {
