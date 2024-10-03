@@ -154,6 +154,15 @@
 					"$(MODULES)/base/timer/timer",
 					"$(MODULES)/base/timer/lin/*"
 				]
+			},
+			"defines": {
+				"audioOut": {
+					"bitsPerSample": 16,
+					"numChannels": 1,
+					"sampleRate": 12000,
+					"streams": 2,
+					"queueLength": 4
+				}
 			}
 		},
 		"mac": {
@@ -199,6 +208,15 @@
 					"$(MODULES)/base/timer/*",
 					"$(MODULES)/base/timer/win/*"
 				]
+			},
+			"defines": {
+				"audioOut": {
+					"bitsPerSample": 16,
+					"numChannels": 1,
+					"sampleRate": 12000,
+					"streams": 2,
+					"queueLength": 4
+				}
 			}
 		}
 	}
