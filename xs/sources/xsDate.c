@@ -1050,7 +1050,7 @@ void fx_Date_prototype_toDateString(txMachine* the)
 		*p = 0;
 	}
 	else
-		c_strcpy(buffer, "invalid Date instance");
+		c_strcpy(buffer, "Invalid Date");
 	fxCopyStringC(the, mxResult, buffer);
 }
 
@@ -1074,7 +1074,7 @@ void fx_Date_prototype_toISOString(txMachine* the)
 		*p = 0;
 	}
 	else
-        mxRangeError("invalid Date instance");
+        mxRangeError("Invalid Date");
 	fxCopyStringC(the, mxResult, buffer);
 }
 
@@ -1170,7 +1170,7 @@ void fx_Date_prototype_toString(txMachine* the)
 		*p = 0;
 	}
 	else
-		c_strcpy(buffer, "invalid Date instance");
+		c_strcpy(buffer, "Invalid Date");
 	fxCopyStringC(the, mxResult, buffer);
 }
 
@@ -1187,7 +1187,7 @@ void fx_Date_prototype_toTimeString(txMachine* the)
 		*p = 0;
 	}
 	else
-		c_strcpy(buffer, "invalid Date instance");
+		c_strcpy(buffer, "Invalid Date");
 	fxCopyStringC(the, mxResult, buffer);
 }
 
@@ -1211,7 +1211,7 @@ void fx_Date_prototype_toUTCString(txMachine* the)
 		*p = 0;
 	}
 	else
-		c_strcpy(buffer, "invalid Date instance");
+		c_strcpy(buffer, "Invalid Date");
 	fxCopyStringC(the, mxResult, buffer);
 }
 
