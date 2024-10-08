@@ -56,7 +56,6 @@
 			"hz": 20000000,
 			"dc_pin": 21,
 			"pclk_pin": 18,
-			"read_pin": 17,
 			"data0_pin": 6,
 			"data1_pin": 7,
 			"data2_pin": 8,
