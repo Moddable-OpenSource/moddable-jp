@@ -8,7 +8,8 @@
 	"include": [
 		"$(MODULES)/io/manifest.json",
 		"$(MODULES)/drivers/button/manifest.json",
-		"$(MODULES)/drivers/led/manifest.json"
+		"$(MODULES)/drivers/led/manifest.json",
+		"$(MODULES)/drivers/gc9a01/manifest.json"
 	],
 	"modules": {
 		"setup/target": "./setup-target"
@@ -17,7 +18,7 @@
 		"setup/target"
 	],
 	"config": {
-		"screen": "",
+		"screen": "ili9341",
 		"led": {
 			"pin": 25
 		}
@@ -33,7 +34,7 @@
 			"sck_pin": 18
 		},
 		"ili9341": {
-			"cs_pin": 21,
+			"cs_pin": 17,
 			"dc_pin": 16
 		}
 	}
