@@ -1235,6 +1235,9 @@ enum {
 	_toHex,
 	_written,
 #endif
+#if mxModuleStuff
+	_ModuleStuff,
+#endif
 	XS_ID_COUNT
 };
 #define XS_SYMBOL_ID_COUNT _AggregateError

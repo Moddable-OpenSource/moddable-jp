@@ -197,6 +197,14 @@ void fxBuildModule(txMachine* the)
 	slot = fxBuildHostConstructor(the, mxCallback(fx_ModuleSource), 1, mxID(_ModuleSource));
 	mxModuleSourceConstructor = *the->stack;
 	mxPop();
+	
+	mxPush(mxObjectPrototype);
+	slot = fxLastProperty(the, fxNewObjectInstance(the));
+	slot = fxNextStringXProperty(the, slot, "ModuleStuff", mxID(_Symbol_toStringTag), XS_DONT_ENUM_FLAG | XS_DONT_SET_FLAG);
+	mxModuleStuffPrototype = *the->stack;
+	slot = fxBuildHostConstructor(the, mxCallback(fx_ModuleStuff), 1, mxID(_ModuleStuff));
+	mxModuleStuffConstructor = *the->stack;
+	mxPop();
 }
 
 void fxCompleteModule(txMachine* the, txSlot* module, txSlot* exception)

@@ -1824,6 +1824,9 @@ const txString gxIDStrings[XS_ID_COUNT] = {
 	"toHex",
 	"written",
 #endif
+#if mxModuleStuff
+	"ModuleStuff",
+#endif
 };
 
 #if mxCanonicalNaN

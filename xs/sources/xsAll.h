@@ -2115,6 +2115,7 @@ enum {
 	XS_DISPOSABLE_STACK_KIND,
 	XS_ASYNC_DISPOSABLE_STACK_KIND,
 	XS_BREAKPOINT_KIND,
+	XS_MODULE_STUFF_KIND,
 };
 
 #if mxBigEndian
@@ -2585,6 +2586,7 @@ enum {
 	mxBigIntPrototypeStackIndex,
 	mxCompartmentPrototypeStackIndex,
 	mxModuleSourcePrototypeStackIndex,
+	mxModuleStuffPrototypeStackIndex,
 	mxWeakRefPrototypeStackIndex,
 	mxFinalizationRegistryPrototypeStackIndex,
 
@@ -2702,6 +2704,7 @@ enum {
 #define mxSetConstructor the->stackIntrinsics[-1 - _Set]
 #define mxSharedArrayBufferConstructor the->stackIntrinsics[-1 - _SharedArrayBuffer]
 #define mxModuleSourceConstructor the->stackIntrinsics[-1 - _ModuleSource]
+#define mxModuleStuffConstructor the->stackIntrinsics[-1 - _ModuleStuff]
 #define mxStringConstructor the->stackIntrinsics[-1 - _String]
 #define mxSymbolConstructor the->stackIntrinsics[-1 - _Symbol]
 #define mxSyntaxErrorConstructor the->stackIntrinsics[-1 - _SyntaxError]
@@ -2767,6 +2770,7 @@ enum {
 #define mxBigIntPrototype the->stackIntrinsics[-1 - mxBigIntPrototypeStackIndex]
 #define mxCompartmentPrototype the->stackIntrinsics[-1 - mxCompartmentPrototypeStackIndex]
 #define mxModuleSourcePrototype the->stackIntrinsics[-1 - mxModuleSourcePrototypeStackIndex]
+#define mxModuleStuffPrototype the->stackIntrinsics[-1 - mxModuleStuffPrototypeStackIndex]
 #define mxWeakRefPrototype the->stackIntrinsics[-1 - mxWeakRefPrototypeStackIndex]
 #define mxFinalizationRegistryPrototype the->stackIntrinsics[-1 - mxFinalizationRegistryPrototypeStackIndex]
 
