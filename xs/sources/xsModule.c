@@ -198,6 +198,7 @@ void fxBuildModule(txMachine* the)
 	mxModuleSourceConstructor = *the->stack;
 	mxPop();
 	
+#if mxModuleStuff	
 	mxPush(mxObjectPrototype);
 	slot = fxLastProperty(the, fxNewObjectInstance(the));
 	slot = fxNextStringXProperty(the, slot, "ModuleStuff", mxID(_Symbol_toStringTag), XS_DONT_ENUM_FLAG | XS_DONT_SET_FLAG);
@@ -205,6 +206,7 @@ void fxBuildModule(txMachine* the)
 	slot = fxBuildHostConstructor(the, mxCallback(fx_ModuleStuff), 1, mxID(_ModuleStuff));
 	mxModuleStuffConstructor = *the->stack;
 	mxPop();
+#endif
 }
 
 void fxCompleteModule(txMachine* the, txSlot* module, txSlot* exception)
@@ -2730,6 +2732,17 @@ void fx_Compartment(txMachine* the)
 			slot = fxNextSlotProperty(the, slot, the->stack, mxID(_Function), XS_DONT_ENUM_FLAG);
 			mxPop();
 			
+		#if mxModuleStuff		
+			callback = mxFunctionInstanceCode(mxModuleStuffConstructor.value.reference);
+			instance = fxBuildHostFunction(the, callback->value.callback.address, 1, mxID(_ModuleStuff));
+			instance->flag |= XS_CAN_CONSTRUCT_FLAG;
+			property = fxLastProperty(the, instance);
+			fxNextSlotProperty(the, property, &mxModuleStuffPrototype, mxID(_prototype), XS_GET_ONLY);
+			fxPrepareCompartmentFunction(the, program, instance);
+			slot = fxNextSlotProperty(the, slot, the->stack, mxID(_ModuleStuff), XS_DONT_ENUM_FLAG);
+			mxPop();
+		#endif
+			
 			callback = mxFunctionInstanceCode(mxEvalFunction.value.reference);
 			instance = fxBuildHostFunction(the, callback->value.callback.address, 1, mxID(_eval));
 			fxPrepareCompartmentFunction(the, program, instance);
@@ -3208,3 +3221,87 @@ void fx_ModuleSource_prototype_get_needsImportMeta(txMachine* the)
 	mxResult->value.boolean = (flag & XS_IMPORT_META_FLAG) ? 1 : 0;
 	mxResult->kind = XS_BOOLEAN_KIND;
 }
+
+#if mxModuleStuff
+
+txSlot* fxNewModuleStuffInstance(txMachine* the)
+{
+	txSlot* instance;
+	txSlot* slot;
+	txSlot* meta;
+	instance = fxNewSlot(the);
+	instance->kind = XS_INSTANCE_KIND;
+	instance->value.instance.garbage = C_NULL;
+	instance->value.instance.prototype = the->stack->value.reference;
+	the->stack->kind = XS_REFERENCE_KIND;
+	the->stack->value.reference = instance;
+	/* HOST */
+	slot = instance->next = fxNewSlot(the);
+	slot->flag = XS_INTERNAL_FLAG;
+	slot->kind = XS_MODULE_SOURCE_KIND;
+	slot->value.module.realm = C_NULL;
+	slot->value.module.id = XS_NO_ID;
+	/* EXPORTS */
+	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
+	/* META */
+	meta = fxNewInstance(the);
+	slot = fxNextReferenceProperty(the, slot, meta, XS_NO_ID, XS_INTERNAL_FLAG);
+	mxPop();
+	/* TRANSFERS */
+	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
+	/* INITIALIZE */
+	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
+	/* FUNCTION */
+	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
+	/* HOSTS */
+	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
+ 	/* LOADER */
+	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
+	return instance;
+}
+
+void fx_ModuleStuff(txMachine* the)
+{
+	txSlot* instance;
+	txSlot* record;
+	if (mxIsUndefined(mxTarget))
+		mxTypeError("call: ModuleStuff");
+	if (mxArgc < 1)
+		mxTypeError("no source");
+	record = fxCheckModuleSourceInstance(the, mxArgv(0));
+	if ((mxArgc < 2) || mxIsIndefined(mxArgv(1))) 	{
+		mxPushUndefined();
+		mxPushUndefined();
+		mxPushUndefined();
+	}
+	else if (mxIsReference(mxArgv(1))) {
+		mxPushSlot(mxArgv(1));
+		mxPushSlot(mxArgv(1));
+		mxGetID(fxID(the, "importHook"));
+		if (!mxIsUndefined(the->stack) && !fxIsCallable(the, the->stack))
+			mxTypeError("handler.importHook: not a function");
+		mxPushSlot(mxArgv(1));
+		mxGetID(fxID(the, "importHook"));
+		if (!mxIsUndefined(the->stack) && !fxIsCallable(the, the->stack))
+			mxTypeError("handler.importMetaHook: not a function");
+	}
+	else {
+		mxTypeError("handler: not an object");
+	}
+	handler = the->stack + 2;
+	importHook = the->stack + 1;
+	importMetaHook = the->stack;
+	
+	mxPushSlot(mxTarget);
+	fxGetPrototypeFromConstructor(the, &mxModuleStuffPrototype);
+	instance = fxNewModuleSourceInstance(the);
+	mxPullSlot(mxResult);
+	
+	fxDuplicateModuleTransfers(the, mxArgv(0), mxResult);
+	slot = fxLastProperty(instance);
+	slot = fxNextSlotProperty(the, slot, handler, XS_NO_ID, XS_INTERNAL_FLAG);
+	slot = fxNextSlotProperty(the, slot, importHook, XS_NO_ID, XS_INTERNAL_FLAG);
+	slot = fxNextSlotProperty(the, slot, importMetaHook, XS_NO_ID, XS_INTERNAL_FLAG);
+}
+
+#endif

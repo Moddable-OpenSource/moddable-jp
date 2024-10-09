@@ -1926,6 +1926,10 @@ mxExport void fx_ModuleSource_prototype_get_bindings(txMachine* the);
 mxExport void fx_ModuleSource_prototype_get_needsImport(txMachine* the);
 mxExport void fx_ModuleSource_prototype_get_needsImportMeta(txMachine* the);
 
+#if mxModuleStuff
+mxExport void fx_ModuleStuff(txMachine* the);
+#endif
+
 mxExport void fxExecuteVirtualModuleSource(txMachine* the);
 mxExport void fxExecuteVirtualModuleSourceImport(txMachine* the);
 
@@ -2115,7 +2119,9 @@ enum {
 	XS_DISPOSABLE_STACK_KIND,
 	XS_ASYNC_DISPOSABLE_STACK_KIND,
 	XS_BREAKPOINT_KIND,
+#if mxModuleStuff
 	XS_MODULE_STUFF_KIND,
+#endif
 };
 
 #if mxBigEndian
@@ -2462,14 +2468,14 @@ enum {
 #define mxRealmParent(REALM)			((REALM)->next->next->next->next->next->next->next->next->next->next->next)
 
 #define mxModuleInstanceInternal(MODULE)		((MODULE)->next)
-#define mxModuleInstanceExports(MODULE)		((MODULE)->next->next)
+#define mxModuleInstanceExports(MODULE)			((MODULE)->next->next)
 #define mxModuleInstanceMeta(MODULE)			((MODULE)->next->next->next)
 #define mxModuleInstanceTransfers(MODULE)		((MODULE)->next->next->next->next)
 #define mxModuleInstanceInitialize(MODULE)		((MODULE)->next->next->next->next->next)
-#define mxModuleInstanceExecute(MODULE)		((MODULE)->next->next->next->next->next->next)
+#define mxModuleInstanceExecute(MODULE)			((MODULE)->next->next->next->next->next->next)
 #define mxModuleInstanceHosts(MODULE)			((MODULE)->next->next->next->next->next->next->next)
 #define mxModuleInstanceLoader(MODULE)			((MODULE)->next->next->next->next->next->next->next->next)
-#define mxModuleInstanceFulfill(MODULE)		((MODULE)->next->next->next->next->next->next->next->next->next)
+#define mxModuleInstanceFulfill(MODULE)			((MODULE)->next->next->next->next->next->next->next->next->next)
 #define mxModuleInstanceReject(MODULE)			((MODULE)->next->next->next->next->next->next->next->next->next->next)
 
 #define mxModuleInternal(MODULE) 	mxModuleInstanceInternal((MODULE)->value.reference)
@@ -2586,7 +2592,6 @@ enum {
 	mxBigIntPrototypeStackIndex,
 	mxCompartmentPrototypeStackIndex,
 	mxModuleSourcePrototypeStackIndex,
-	mxModuleStuffPrototypeStackIndex,
 	mxWeakRefPrototypeStackIndex,
 	mxFinalizationRegistryPrototypeStackIndex,
 
@@ -2650,6 +2655,9 @@ enum {
 	mxDisposableStackPrototypeStackIndex,
 	mxAsyncDisposableStackPrototypeStackIndex,
 #endif
+#if mxModuleStuff	
+	mxModuleStuffPrototypeStackIndex,
+#endif
 
 	mxStackIndexCount
 };
@@ -2704,7 +2712,6 @@ enum {
 #define mxSetConstructor the->stackIntrinsics[-1 - _Set]
 #define mxSharedArrayBufferConstructor the->stackIntrinsics[-1 - _SharedArrayBuffer]
 #define mxModuleSourceConstructor the->stackIntrinsics[-1 - _ModuleSource]
-#define mxModuleStuffConstructor the->stackIntrinsics[-1 - _ModuleStuff]
 #define mxStringConstructor the->stackIntrinsics[-1 - _String]
 #define mxSymbolConstructor the->stackIntrinsics[-1 - _Symbol]
 #define mxSyntaxErrorConstructor the->stackIntrinsics[-1 - _SyntaxError]
@@ -2735,6 +2742,9 @@ enum {
 #define mxAsyncDisposableStackConstructor the->stackIntrinsics[-1 - _AsyncDisposableStack]
 #define mxDisposableStackConstructor the->stackIntrinsics[-1 - _DisposableStack]
 #define mxSuppressedErrorConstructor the->stackIntrinsics[-1 - _SuppressedError]
+#endif	
+#if mxModuleStuff	
+#define mxModuleStuffConstructor the->stackIntrinsics[-1 - _ModuleStuff]
 #endif	
 
 #define mxObjectPrototype the->stackIntrinsics[-1 - mxObjectPrototypeStackIndex]
@@ -2770,7 +2780,6 @@ enum {
 #define mxBigIntPrototype the->stackIntrinsics[-1 - mxBigIntPrototypeStackIndex]
 #define mxCompartmentPrototype the->stackIntrinsics[-1 - mxCompartmentPrototypeStackIndex]
 #define mxModuleSourcePrototype the->stackIntrinsics[-1 - mxModuleSourcePrototypeStackIndex]
-#define mxModuleStuffPrototype the->stackIntrinsics[-1 - mxModuleStuffPrototypeStackIndex]
 #define mxWeakRefPrototype the->stackIntrinsics[-1 - mxWeakRefPrototypeStackIndex]
 #define mxFinalizationRegistryPrototype the->stackIntrinsics[-1 - mxFinalizationRegistryPrototypeStackIndex]
 
@@ -2832,6 +2841,10 @@ enum {
 #define mxSuppressedErrorPrototype the->stackIntrinsics[-1 - mxSuppressedErrorPrototypeStackIndex]
 #define mxDisposableStackPrototype the->stackIntrinsics[-1 - mxDisposableStackPrototypeStackIndex]
 #define mxAsyncDisposableStackPrototype the->stackIntrinsics[-1 - mxAsyncDisposableStackPrototypeStackIndex]
+#endif
+
+#if mxModuleStuff	
+#define mxModuleStuffPrototype the->stackIntrinsics[-1 - mxModuleStuffPrototypeStackIndex]
 #endif
 
 #define mxID(ID) ((txID)(ID))
