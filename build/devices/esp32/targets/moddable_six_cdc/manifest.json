@@ -93,6 +93,18 @@
 				"PDM_PIN": 45,
 				"bitsPerSample": 16
 			}
+		},
+		"audioIn": {
+			"sampleRate": 11025,
+			"bitsPerSample": 16,
+			"i2s": {
+				"pdm": 1,
+				"num": 0,
+				"bias": 0,
+				"lr_pin": 45,
+				"datain": 15,
+				"multiplier": 1
+			}
 		}
 	}
 }
