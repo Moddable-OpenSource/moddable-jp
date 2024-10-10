@@ -13,18 +13,15 @@
  */
 
 import AudioIn from "embedded:io/audioin";
-import Timer from "timer";
 
 const input = new AudioIn({
 	onReadable(size) {
-		const sampleCount = size/2;
-        const buffer = new SharedArrayBuffer(size);
-        input.read(buffer);
-
-		const samples = new Int16Array(buffer);
+		const sampleCount = size / 2;
+        const samples = new Int16Array(sampleCount);
+        this.read(samples.buffer);
 	
 		let total = 0;
-		for (let i=0; i<sampleCount; i++) {
+		for (let i = 0; i < sampleCount; i++) {
 			const sample = samples[i];
 			if (sample < 0)
 				total -= sample;
