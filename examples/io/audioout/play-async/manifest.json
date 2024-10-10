@@ -31,8 +31,8 @@
 	],
     "resources": {
 		"*": [
-    		"../../../assets/sounds/one",
-    		"../../../assets/sounds/two"
+    		"$(MODDABLE)/examples/assets/sounds/one",
+    		"$(MODDABLE)/examples/assets/sounds/two"
 		]
     }
 }
