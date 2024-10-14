@@ -31,7 +31,7 @@ declare module "wifi" {
     rssi: number,
     bssid: ArrayBuffer,
   } | null) => void;
-  export type WiFiMode = -5 | 0 | 1 | 2;
+  export type WiFiMode = -5 | 0 | 1 | 2 | 3;
   export type ScanOptions = {hidden?: boolean, channel?: number}
   export type AccessPointOptions = {
     ssid: string,
