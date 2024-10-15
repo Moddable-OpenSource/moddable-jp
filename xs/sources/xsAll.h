@@ -125,7 +125,7 @@ typedef struct {
 	void (*terminateSharedCluster)(txMachine* the);
 	txSlot* (*newFunctionLength)(txMachine* the, txSlot* instance, txNumber length);
 	txSlot* (*newFunctionName)(txMachine* the, txSlot* instance, txID id, txIndex index, txID former, txString prefix);
-    void (*runImport)(txMachine* the, txSlot* realm, txID id);
+    void (*runImport)(txMachine* the, txSlot* realm, txSlot* referrer);
 	txBoolean (*definePrivateProperty)(txMachine* the, txSlot* instance, txSlot* check, txID id, txSlot* slot, txFlag mask);
 	txSlot* (*getPrivateProperty)(txMachine* the, txSlot* instance, txSlot* check, txID id);
 	txSlot* (*setPrivateProperty)(txMachine* the, txSlot* instance, txSlot* check, txID id);
@@ -1911,7 +1911,7 @@ extern void fxLoadModulesRejected(txMachine* the);
 extern void fxPrepareModule(txMachine* the, txFlag flag);
 extern void fxPrepareTransfer(txMachine* the);
 extern void fxResolveModule(txMachine* the, txSlot* module, txID moduleID, txScript* script, void* data, txDestructor destructor);
-extern void fxRunImport(txMachine* the, txSlot* realm, txID id);
+extern void fxRunImport(txMachine* the, txSlot* realm, txSlot* referrer);
 
 mxExport void fxModuleGetter(txMachine* the);
 
@@ -2469,17 +2469,19 @@ enum {
 
 #define mxModuleInstanceInternal(MODULE)		((MODULE)->next)
 #define mxModuleInstanceExports(MODULE)			((MODULE)->next->next)
-#define mxModuleInstanceMeta(MODULE)			((MODULE)->next->next->next)
-#define mxModuleInstanceTransfers(MODULE)		((MODULE)->next->next->next->next)
-#define mxModuleInstanceInitialize(MODULE)		((MODULE)->next->next->next->next->next)
-#define mxModuleInstanceExecute(MODULE)			((MODULE)->next->next->next->next->next->next)
-#define mxModuleInstanceHosts(MODULE)			((MODULE)->next->next->next->next->next->next->next)
-#define mxModuleInstanceLoader(MODULE)			((MODULE)->next->next->next->next->next->next->next->next)
-#define mxModuleInstanceFulfill(MODULE)			((MODULE)->next->next->next->next->next->next->next->next->next)
-#define mxModuleInstanceReject(MODULE)			((MODULE)->next->next->next->next->next->next->next->next->next->next)
+#define mxModuleInstanceHook(MODULE)			((MODULE)->next->next->next)
+#define mxModuleInstanceMeta(MODULE)			((MODULE)->next->next->next->next)
+#define mxModuleInstanceTransfers(MODULE)		((MODULE)->next->next->next->next->next)
+#define mxModuleInstanceInitialize(MODULE)		((MODULE)->next->next->next->next->next->next)
+#define mxModuleInstanceExecute(MODULE)			((MODULE)->next->next->next->next->next->next->next)
+#define mxModuleInstanceHosts(MODULE)			((MODULE)->next->next->next->next->next->next->next->next)
+#define mxModuleInstanceLoader(MODULE)			((MODULE)->next->next->next->next->next->next->next->next->next)
+#define mxModuleInstanceFulfill(MODULE)			((MODULE)->next->next->next->next->next->next->next->next->next->next)
+#define mxModuleInstanceReject(MODULE)			((MODULE)->next->next->next->next->next->next->next->next->next->next->next)
 
 #define mxModuleInternal(MODULE) 	mxModuleInstanceInternal((MODULE)->value.reference)
 #define mxModuleExports(MODULE) 	mxModuleInstanceExports((MODULE)->value.reference)
+#define mxModuleHook(MODULE) 		mxModuleInstanceHook((MODULE)->value.reference)
 #define mxModuleMeta(MODULE) 		mxModuleInstanceMeta((MODULE)->value.reference)
 #define mxModuleTransfers(MODULE) 	mxModuleInstanceTransfers((MODULE)->value.reference)
 #define mxModuleInitialize(MODULE) 	mxModuleInstanceInitialize((MODULE)->value.reference)
@@ -2488,6 +2490,24 @@ enum {
 #define mxModuleLoader(MODULE) 		mxModuleInstanceLoader((MODULE)->value.reference)
 #define mxModuleFulfill(MODULE) 	mxModuleInstanceFulfill((MODULE)->value.reference)
 #define mxModuleReject(MODULE) 		mxModuleInstanceReject((MODULE)->value.reference)
+
+#if mxModuleStuff	
+#define mxModuleStuffInstanceInternal(MODULE_STUFF)			((MODULE_STUFF)->next)
+#define mxModuleStuffInstanceModule(MODULE_STUFF)			((MODULE_STUFF)->next->next)
+#define mxModuleStuffInstanceModules(MODULE_STUFF)			((MODULE_STUFF)->next->next->next)
+#define mxModuleStuffInstanceSource(MODULE_STUFF)			((MODULE_STUFF)->next->next->next->next)
+#define mxModuleStuffInstanceHandler(MODULE_STUFF)			((MODULE_STUFF)->next->next->next->next->next)
+#define mxModuleStuffInstanceImportHook(MODULE_STUFF)		((MODULE_STUFF)->next->next->next->next->next->next)
+#define mxModuleStuffInstanceImportMetaHook(MODULE_STUFF)	((MODULE_STUFF)->next->next->next->next->next->next->next)
+
+#define mxModuleStuffInternal(MODULE_STUFF)		 	mxModuleStuffInstanceInternal((MODULE_STUFF)->value.reference)
+#define mxModuleStuffModule(MODULE_STUFF)		 	mxModuleStuffInstanceModule((MODULE_STUFF)->value.reference)
+#define mxModuleStuffModules(MODULE_STUFF) 			mxModuleStuffInstanceModules((MODULE_STUFF)->value.reference)
+#define mxModuleStuffSource(MODULE_STUFF) 			mxModuleStuffInstanceSource((MODULE_STUFF)->value.reference)
+#define mxModuleStuffHandler(MODULE_STUFF) 			mxModuleStuffInstanceHandler((MODULE_STUFF)->value.reference)
+#define mxModuleStuffImportHook(MODULE_STUFF) 		mxModuleStuffInstanceImportHook((MODULE_STUFF)->value.reference)
+#define mxModuleStuffImportMetaHook(MODULE_STUFF) 	mxModuleStuffInstanceImportMetaHook((MODULE_STUFF)->value.reference)
+#endif
 
 #define mxTransferLocal(TRANSFER)	(TRANSFER)->value.reference->next
 #define mxTransferFrom(TRANSFER) 	(TRANSFER)->value.reference->next->next

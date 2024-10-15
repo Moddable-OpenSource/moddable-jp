@@ -1392,6 +1392,9 @@ const txString gxIDStrings[XS_ID_COUNT] = {
 	"undefined",
 	"Compartment",
 	"Function",
+#if mxModuleStuff
+	"ModuleStuff",
+#endif
 	"eval",
 	"AsyncFunction",
 	"AsyncGeneratorFunction",
@@ -1823,9 +1826,6 @@ const txString gxIDStrings[XS_ID_COUNT] = {
 	"toBase64",
 	"toHex",
 	"written",
-#endif
-#if mxModuleStuff
-	"ModuleStuff",
 #endif
 };
 

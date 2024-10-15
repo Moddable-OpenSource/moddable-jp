@@ -4119,11 +4119,11 @@ XS_CODE_JUMP:
 	/* MODULE */		
 		mxCase(XS_CODE_IMPORT)
 			slot = mxFunctionInstanceHome(mxFrameFunction->value.reference)->value.home.module;
-			slot = mxModuleInstanceInternal(slot);
-			variable = slot->value.module.realm;
+			variable = mxModuleInstanceInternal(slot);
+			variable = variable->value.module.realm;
 			if (!variable) variable = mxModuleInstanceInternal(mxProgram.value.reference)->value.module.realm;
 			mxSaveState;
-			gxDefaults.runImport(the, variable, slot->value.module.id);
+			gxDefaults.runImport(the, variable, slot);
 			mxRestoreState;
 			mxNextCode(1);
 			mxBreak;
