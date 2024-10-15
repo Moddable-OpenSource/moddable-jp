@@ -1659,6 +1659,7 @@ void fxEchoInstance(txMachine* the, txSlot* theInstance, txInspectorNameList* th
 			aProperty = aProperty->next;
 			fxEchoProperty(the, aProperty, theList, "(module)", -1, C_NULL);
 			aProperty = aProperty->next;
+			fxEchoProperty(the, aProperty, theList, "(modules)", -1, C_NULL);
 			aProperty = aProperty->next;
 			fxEchoProperty(the, aProperty, theList, "(source)", -1, C_NULL);
 			aProperty = aProperty->next;
