@@ -181,6 +181,13 @@ void xs_audioout_constructor_(xsMachine *the)
 	if ((8 != bitsPerSample) && (16 != bitsPerSample))
 		xsRangeError("bad bitsPerSample");
 
+	if (xsmcHas(xsArg(0), xsID_type)) {
+		xsmcGet(xsVar(0), xsArg(0), xsID_type);
+		type = xsmcToString(xsVar(0));
+		if (c_strcmp(type, "LPCM"))
+			xsRangeError("invalid type");
+	}
+
 	onWritable = builtinGetCallback(the, xsID_onWritable);
 
 	builtinInitializeTarget(the);
