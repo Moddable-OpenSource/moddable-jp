@@ -4128,10 +4128,10 @@ XS_CODE_JUMP:
 			mxNextCode(1);
 			mxBreak;
 		mxCase(XS_CODE_IMPORT_META)
-			variable = mxFunctionInstanceHome(mxFrameFunction->value.reference);
-			slot = mxModuleInstanceMeta(variable->value.home.module);
-			mxPushKind(XS_REFERENCE_KIND);
-			mxStack->value.reference = slot->value.reference;
+			slot = mxFunctionInstanceHome(mxFrameFunction->value.reference)->value.home.module;
+			mxSaveState;
+			fxRunImportMeta(the, slot);
+			mxRestoreState;
 			mxNextCode(1);
 			mxBreak;
 		mxCase(XS_CODE_TRANSFER)

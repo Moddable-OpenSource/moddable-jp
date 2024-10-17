@@ -1912,6 +1912,7 @@ extern void fxPrepareModule(txMachine* the, txFlag flag);
 extern void fxPrepareTransfer(txMachine* the);
 extern void fxResolveModule(txMachine* the, txSlot* module, txID moduleID, txScript* script, void* data, txDestructor destructor);
 extern void fxRunImport(txMachine* the, txSlot* realm, txSlot* referrer);
+extern void fxRunImportMeta(txMachine* the, txSlot* module);
 
 mxExport void fxModuleGetter(txMachine* the);
 

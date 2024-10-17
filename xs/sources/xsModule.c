@@ -1769,6 +1769,11 @@ importMeta:
 		if (!mxIsReference(property))
 			mxTypeError("descriptor.importMeta: not an object");
 		txSlot* meta = mxModuleMeta(module);
+		if (mxIsNull(meta)) {
+			txSlot* instance = fxNewInstance(the);
+			meta->value.reference = instance;
+			meta->kind = XS_REFERENCE_KIND;
+		}
 		meta->value.reference->flag &= ~XS_DONT_PATCH_FLAG;
 		mxPushUndefined();
 		mxPush(mxAssignObjectFunction);
@@ -1803,7 +1808,6 @@ done:
 void fxNewModule(txMachine* the, txSlot* realm, txID moduleID, txSlot* module)
 {
 	txSlot* slot;
-	txSlot* meta;
 	
 	mxPush(mxModulePrototype);
 	slot = fxNewObjectInstance(the);
@@ -1820,10 +1824,7 @@ void fxNewModule(txMachine* the, txSlot* realm, txID moduleID, txSlot* module)
 	/* STUFF */
 	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
 	/* META */
-	meta = fxNewInstance(the);
-	meta->flag |= XS_DONT_PATCH_FLAG;
-	slot = fxNextReferenceProperty(the, slot, meta, XS_NO_ID, XS_INTERNAL_FLAG);
-	mxPop();
+	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
 	/* TRANSFERS */
 	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
 	/* INITIALIZE */
@@ -2019,7 +2020,13 @@ void fxResolveModule(txMachine* the, txSlot* module, txID moduleID, txScript* sc
 		if (moduleID != XS_NO_ID) {
 			txSlot* key = fxGetKey(the, moduleID);
 			txSlot* meta = mxModuleMeta(module);
-			txSlot* slot = fxLastProperty(the, meta->value.reference);
+			txSlot* slot;
+			if (mxIsNull(meta)) {
+				txSlot* instance = fxNewInstance(the);
+				meta->value.reference = instance;
+				meta->kind = XS_REFERENCE_KIND;
+			}
+			slot = fxLastProperty(the, meta->value.reference);
 			slot = slot->next = fxNewSlot(the);
 			slot->value.string = key->value.key.string;
 			if (key->kind == XS_KEY_KIND)
@@ -2134,13 +2141,15 @@ void fxRunImport(txMachine* the, txSlot* realm, txSlot* referrer)
 			fxToString(the, stack);
 			if (referrer) {
 #if mxModuleStuff
-				txSlot* reference = mxModuleInstanceHook(referrer);
-				if (mxIsReference(reference)) {
-					txSlot* handler = mxModuleStuffHandler(reference);
-					txSlot* importHook = mxModuleStuffImportHook(reference);
-					if (mxIsReference(handler) && mxIsReference(importHook)) {
-						module = fxImportModuleStuff(the, realm, mxModuleQueue.value.reference, reference, stack);
-						goto STATUS;
+				if (referrer->next->kind == XS_MODULE_KIND) {
+					txSlot* reference = mxModuleInstanceHook(referrer);
+					if (mxIsReference(reference)) {
+						txSlot* handler = mxModuleStuffHandler(reference);
+						txSlot* importHook = mxModuleStuffImportHook(reference);
+						if (mxIsReference(handler) && mxIsReference(importHook)) {
+							module = fxImportModuleStuff(the, realm, mxModuleQueue.value.reference, reference, stack);
+							goto STATUS;
+						}
 					}
 				}
 #endif
@@ -2253,6 +2262,38 @@ void fxRunImportRejected(txMachine* the, txSlot* module, txSlot* with)
 		}
 		the->stack = stack;
 	}
+}
+
+/* META */
+
+void fxRunImportMeta(txMachine* the, txSlot* module)
+{
+	txSlot* meta = mxModuleInstanceMeta(module);
+	if (mxIsNull(meta)) {
+		fxNewInstance(the);
+		mxPullSlot(meta);
+#if mxModuleStuff
+		{
+			txSlot* reference = mxModuleInstanceHook(module);
+			if (mxIsReference(reference)) {
+				txSlot* handler = mxModuleStuffHandler(reference);
+				txSlot* importMetaHook = mxModuleStuffImportMetaHook(reference);
+				if (mxIsReference(handler) && mxIsReference(importMetaHook)) {
+					fxBeginHost(the);
+					mxPushSlot(handler);
+					mxPushSlot(importMetaHook);
+					mxCall();
+					mxPushSlot(meta);
+					mxRunCount(1);
+					mxPop();
+					fxEndHost(the);
+				}
+			}
+		}
+#endif
+		meta->value.reference->flag |= XS_DONT_PATCH_FLAG;
+	}
+	mxPushSlot(meta);
 }
 
 /* NOW */
@@ -3063,7 +3104,6 @@ txSlot* fxNewModuleSourceInstance(txMachine* the)
 {
 	txSlot* instance;
 	txSlot* slot;
-	txSlot* meta;
 	instance = fxNewSlot(the);
 	instance->kind = XS_INSTANCE_KIND;
 	instance->value.instance.garbage = C_NULL;
@@ -3081,9 +3121,7 @@ txSlot* fxNewModuleSourceInstance(txMachine* the)
 	/* STUFF */
 	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
 	/* META */
-	meta = fxNewInstance(the);
-	slot = fxNextReferenceProperty(the, slot, meta, XS_NO_ID, XS_INTERNAL_FLAG);
-	mxPop();
+	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
 	/* TRANSFERS */
 	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
 	/* INITIALIZE */
