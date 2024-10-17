@@ -1655,6 +1655,7 @@ void fxEchoInstance(txMachine* the, txSlot* theInstance, txInspectorNameList* th
 			fxEchoProperty(the, aProperty, theList, "(export)", -1, C_NULL);
 			aProperty = aProperty->next;
 			break;
+#if mxModuleStuff
 		case XS_MODULE_STUFF_KIND:
 			aProperty = aProperty->next;
 			fxEchoProperty(the, aProperty, theList, "(module)", -1, C_NULL);
@@ -1670,6 +1671,7 @@ void fxEchoInstance(txMachine* the, txSlot* theInstance, txInspectorNameList* th
 			fxEchoProperty(the, aProperty, theList, "(importMetaHook)", -1, C_NULL);
 			aProperty = aProperty->next;
 			break;
+#endif
 		case XS_PROGRAM_KIND:
 			aSlot = aProperty->value.module.realm;
 			fxEchoProperty(the, mxRealmGlobal(aSlot), theList, "(globals)", -1, C_NULL);

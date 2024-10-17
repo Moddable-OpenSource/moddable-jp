@@ -2114,6 +2114,7 @@ void fxRunImport(txMachine* the, txSlot* realm, txSlot* referrer)
 	rejectFunction = the->stack;
 	{
 		mxTry(the) {
+#if mxModuleStuff
 			if (mxIsReference(stack)) {
 				txSlot* internal = stack->value.reference->next;
 				if (internal && (internal->kind == XS_MODULE_STUFF_KIND)) {
@@ -2129,8 +2130,10 @@ void fxRunImport(txMachine* the, txSlot* realm, txSlot* referrer)
 					goto STATUS;
 				}
 			}
+#endif
 			fxToString(the, stack);
 			if (referrer) {
+#if mxModuleStuff
 				txSlot* reference = mxModuleInstanceHook(referrer);
 				if (mxIsReference(reference)) {
 					txSlot* handler = mxModuleStuffHandler(reference);
@@ -2140,6 +2143,7 @@ void fxRunImport(txMachine* the, txSlot* realm, txSlot* referrer)
 						goto STATUS;
 					}
 				}
+#endif
 				moduleID = fxResolveSpecifier(the, realm, mxModuleInstanceInternal(referrer)->value.module.id, stack);
 			}
 			else
