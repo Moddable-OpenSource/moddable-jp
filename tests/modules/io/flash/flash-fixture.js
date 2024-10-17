@@ -1,8 +1,7 @@
-import Flash from "embedded:x-flash"
+import flash from "embedded:x-flash"
 
 const path = "xs_test";
 
-let flash = globalThis.device?.flash;
-flash ??= new Flash({});
+const f = globalThis.device?.flash ?? flash;
 
-export {flash as default, path}
+export {f as default, path}

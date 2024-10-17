@@ -24,11 +24,7 @@ assert.throws(RangeError, () => flash.open({path, format: "xyzzy"}), "invalid fo
 
 assert.throws(Error, () => flash.open({}), "no path");
 assert.throws(Error, () => flash.open({path: "xyzzy"}), "invalid path");
-assert.throws(SyntaxError, () => flash.open()), "no options object";
+assert.throws(TypeError, () => flash.open()), "no options object";
 
 assert.throws(TypeError, () => flash.open({path: Symbol()}), "symbol path");
 assert.throws(TypeError, () => flash.open({path, mode: Symbol()}), "symbol mode");
-
-f = flash.open({path});
-assert.throws(Error, () => f.open({path}), "recursive open");
-f.close();

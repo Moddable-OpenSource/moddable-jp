@@ -15,7 +15,6 @@ function callWithInvalidReceivers(obj, functionName, ...args)
 
 import {path} from "./flash-fixture.js";
 
-callWithInvalidReceivers(flash, "open", {path});
 let f = flash.open({path}); 
 
 callWithInvalidReceivers(f, "write", Uint8Array.of(1), 0);
