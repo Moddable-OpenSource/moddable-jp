@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -1913,6 +1913,8 @@ void fx_Array_prototype_join(txMachine* the)
 		}
 		mxPop();
 		index++;
+
+		mxCheckMetering();
 	}
 	mxPop();
 	string = mxResult->value.string = fxNewChunk(the, fxAddChunkSizes(the, size, 1));
@@ -2568,6 +2570,8 @@ void fx_Array_prototype_toLocaleString(txMachine* the)
 		}
 		mxPop();
 		index++;
+		
+		mxCheckMetering();
 	}
 	string = mxResult->value.string = fxNewChunk(the, fxAddChunkSizes(the, size, 1));
 	slot = list->next;

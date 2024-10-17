@@ -43,6 +43,13 @@
 		"piu/Sound"
 	],
 	"platforms": {
+		"mac": {
+			"config": {
+				"flash": {
+					"xs_test": { "blocks":10, "blockLength":1024 }
+				}
+			}
+		},
 		"pico": {
 			"defines": {
 				"audioOut": {
