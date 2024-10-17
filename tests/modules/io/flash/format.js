@@ -15,7 +15,7 @@ f = flash.open({path, format: "buffer"});
 assert.sameValue(f.format, "buffer");
 
 f.format = "buffer";
-assert.throws(Error, () => f.format = "xyzzy");
+assert.throws(RangeError, () => f.format = "xyzzy");
 assert.sameValue(f.format, "buffer", "should remain buffer");
 
 f.close();
