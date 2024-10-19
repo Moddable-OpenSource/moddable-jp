@@ -1,6 +1,6 @@
-# Moddable SDKのテスト
-著作権2020-2022 Moddable Tech, Inc.<BR>
-改訂： 2022年8月31日
+# Testing the Moddable SDK
+Copyright 2020-2024 Moddable Tech, Inc.<BR>
+改訂： 2024年9月16日
 
 ## 目次
 
@@ -585,6 +585,13 @@ await $NETWORK.connected;
 
 #### `invalidDomain`
 `invalidDomain` プロパティは、解決に失敗することが保証されているDNSホスト名を含む文字列です。これはネットワークコードのエラーハンドリングをテストするのに役立ちます。
+
+#### `resolve(hostname)`
+The `resolve` function returns a promise which resolves to the IP address corresponding to the DNS hostname provided.
+
+```js
+const address = await $NETWORK.resolve("www.example.com");
+```
 
 #### `wifi()`
 `wifi` 関数は、テスト用のWi-Fi接続を確立するオプションオブジェクトを解決するPromiseを返します。

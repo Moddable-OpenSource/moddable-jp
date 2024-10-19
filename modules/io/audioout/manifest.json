@@ -1,0 +1,39 @@
+{
+	"preload": [
+		"embedded:*"
+	],
+	"platforms": {
+		"lin": {
+			"modules": {
+				"*": "$(MODDABLE)/modules/io/common/builtinCommon",
+				"embedded:io/audioout": "./lin/audioout_"
+			}
+		},
+		"mac": {
+			"modules": {
+				"*": "$(MODDABLE)/modules/io/common/builtinCommon",
+				"embedded:io/audioout": "./mac/audioout"
+			}
+		},
+		"win": {
+			"modules": {
+				"*": "$(MODDABLE)/modules/io/common/builtinCommon",
+				"embedded:io/audioout": "./win/audioout"
+			}
+		},
+		"esp32": {
+			"modules": {
+				"*": "$(MODDABLE)/modules/io/common/builtinCommon",
+				"embedded:io/audioout": "./esp32/audioout-esp32"
+			}
+		},
+		"...": {
+			"include": [
+				"$(MODDABLE)/modules/pins/i2s/manifest.json"
+			],
+			"modules": {
+				"embedded:io/audioout": "./pins/_audioout"
+			}
+		}
+	}
+}

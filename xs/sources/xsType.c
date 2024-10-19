@@ -261,7 +261,7 @@ txSlot* fxToInstance(txMachine* the, txSlot* theSlot)
 		} break;
 #endif
 	default:
-		mxTypeError("cannot coerce to instance");
+		mxTypeError("cannot coerce to object");
 		break;
 	}
 	return anInstance;
@@ -976,7 +976,7 @@ txFlag fxDescriptorToSlot(txMachine* the, txSlot* descriptor)
 	txSlot* setFunction = C_NULL;
 	txFlag mask = 0;
 	if (!mxIsReference(descriptor))
-		mxTypeError("descriptor is no object");
+		mxTypeError("descriptor: not an object");
 	mxPushSlot(descriptor);
 	if (mxHasID(mxID(_enumerable))) {
 		mxPushSlot(descriptor);
@@ -1015,25 +1015,25 @@ txFlag fxDescriptorToSlot(txMachine* the, txSlot* descriptor)
 	}
 	if (get) {
 		if (value)
-			mxTypeError("get and value");
+			mxTypeError("descriptor: get and value properties");
 		if (writable)
-			mxTypeError("get and writable");
+			mxTypeError("descriptor: get and writable properties");
 		if (get->kind != XS_UNDEFINED_KIND) {
 			getFunction = fxToInstance(the, get);
 			if (!getFunction || !mxIsFunction(getFunction))
-				mxTypeError("get is no function");
+				mxTypeError("descriptor.get: not a function");
 		}
 		mask |= XS_GETTER_FLAG;
 	}
 	if (set) {
 		if (value)
-			mxTypeError("set and value");
+			mxTypeError("descriptor: set and value properties");
 		if (writable)
-			mxTypeError("set and writable");
+			mxTypeError("descriptor: set and writable properties");
 		if (set->kind != XS_UNDEFINED_KIND) {
 			setFunction = fxToInstance(the, set);
 			if (!setFunction || !mxIsFunction(setFunction))
-				mxTypeError("set is no function");
+				mxTypeError("descriptor.set: not a function");
 		}
 		mask |= XS_SETTER_FLAG;
 	}

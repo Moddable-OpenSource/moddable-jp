@@ -405,7 +405,7 @@ void xs_tcp_get_remotePort(xsMachine *the)
 	const UInt8 *bytes = CFDataGetBytePtr((__bridge CFDataRef)address);
 	struct sockaddr_in addr = *(struct sockaddr_in *)bytes;
 
-	xsmcSetInteger(xsResult, htons(addr.sin_port));
+	xsmcSetInteger(xsResult, ntohs(addr.sin_port));
 }
 
 void xs_tcp_get_format(xsMachine *the)
@@ -601,14 +601,16 @@ static const xsHostHooks xsListenerHooks = {
 void xs_listener_constructor(xsMachine *the)
 {
 	Listener listener;
-	uint16_t port = 0;
+	int port = 0;
 	xsSlot *onReadable;
 
 	xsmcVars(1);
 
 	if (xsmcHas(xsArg(0), xsID_port)) {
 		xsmcGet(xsVar(0), xsArg(0), xsID_port);
-		port = (uint16_t)xsmcToInteger(xsVar(0));
+		port = builtinGetSignedInteger(the, &xsVar(0)); 
+		if ((port < 0) || (port > 65535))
+			xsRangeError("invalid port");
 	}
 
 	onReadable = builtinGetCallback(the, xsID_onReadable);
@@ -728,6 +730,17 @@ void xs_listener_read(xsMachine *the)
 
 	tcp->cfRunLoopSource = CFSocketCreateRunLoopSource(NULL, tcp->cfSkt, 0);
 	CFRunLoopAddSource(CFRunLoopGetCurrent(), tcp->cfRunLoopSource, kCFRunLoopCommonModes);
+}
+
+void xs_listener_get_port(xsMachine *the)
+{
+	Listener listener = xsmcGetHostDataValidate(xsThis, (void *)&xsListenerHooks);
+	if (!listener->cfSkt) return;
+	CFDataRef address = CFSocketCopyAddress(listener->cfSkt);
+	const UInt8 *bytes = CFDataGetBytePtr((__bridge CFDataRef)address);
+	struct sockaddr_in addr = *(struct sockaddr_in *)bytes;
+
+	xsmcSetInteger(xsResult, ntohs(addr.sin_port));
 }
 
 void xs_listener_mark(xsMachine* the, void* it, xsMarkRoot markRoot)

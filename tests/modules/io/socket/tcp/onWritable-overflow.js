@@ -14,8 +14,8 @@ new TCP({
 	port: 80,
 	onWritable(bytes) {
 		// "bytes" is the minumum numbers of bytes that can be written.
-		// thea ctual number ma be larger because the network buffers may 
-		// drain during the excecution of this function freeing up more space
+		// the actual number may be larger because the network buffers may 
+		// drain during the execution of this function, freeing up more space
 		$DO(() => {
 			assert.throws(Error, () => this.write(new ArrayBuffer(bytes + 1)), "overflow 1");
 

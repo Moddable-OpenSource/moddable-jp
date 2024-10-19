@@ -1,6 +1,6 @@
-# マニフェスト
-著作権2017-2023 Moddable Tech, Inc.<BR>
-改訂： 2023年9月13日
+# Manifest
+Copyright 2017-2024 Moddable Tech, Inc.<BR>
+改訂： 2024年9月16日
 
 マニフェストは、Moddableアプリを構築するために必要なモジュールとリソースを記述するJSONファイルです。このドキュメントでは、JSONオブジェクトのプロパティと、マニフェストがModdable SDKビルドツールによってどのように処理されるかについて説明します。
 
@@ -109,7 +109,7 @@
 "build": {
 	"SDKCONFIGPATH": "$(MODDABLE)/contributed/modClock/sdkconfig",
 	"PARTITIONS_FILE": "$(MODDABLE)/contributed/modClock/sdkconfig/partitions.csv"
-},
+}
 ```
 
 この例では、modClockの [partitions.csv](https://github.com/Moddable-OpenSource/moddable/blob/public/contributed/modClock/sdkconfig/partitions.csv) ファイルがビルド時に基本のModdable SDK [partitions.csv](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/partitions.csv) ファイルを完全に置き換え、OTAアップデート用の追加パーティションを提供します。`sdkconfig` ディレクトリには、基本のModdable SDK [sdkconfig.defaults](https://github.com/Moddable-OpenSource/moddable/blob/public/build/devices/esp32/xsProj-esp32/sdkconfig.defaults) エントリを上書きおよび補完するsdkconfigファイルが含まれています。次のセクションでは、Moddable ESP32ビルドがsdkconfigファイルをどのように処理するかを説明します。
@@ -119,7 +119,7 @@
 ```json
 "build": {
 	"C_FLAGS_SUBPLATFORM": "-mfix-esp32-psram-cache-issue -mfix-esp32-psram-cache-strategy=memw"
-},
+}
 ```
 
 #### partitions.csv の処理方法 {/*examples*/}
@@ -270,7 +270,7 @@ Moddable SDKの各サンプルアプリケーションは、[examples directory]
 		"git":"$(URL)/test2.git",
 		"tag":"3.5.0",
 		"branch":"feature-test"
-	},
+	}
 ```
 
 ホスト名、パス名、ブランチ、およびタグは、クローンされたリポジトリが保存されるパスに含まれており、競合を避けます。
@@ -387,9 +387,9 @@ if (!config.ssid) {
 
 - `"*"` はアプリケーションによって使用されていないものは何でも削除できることを意味します。これは `manifest_base.json` に使用される値です。
 
-```json
-"strip": "*",
-```
+	```json
+	"strip": "*"
+	```
 
 - 特定のオブジェクトや関数のみを削除したい場合は、JavaScriptのクラス名と関数名の配列を渡します。配列内の項目が削除されます。配列に含まれていないものは削除されません。
 
@@ -433,7 +433,7 @@ if (!config.ssid) {
 		"./main",
 		"./assets"
 	]
-},
+}
 ```
 
 これらのモジュールは、ファイル名を使用して他のスクリプトモジュールにインポートされます。
@@ -447,10 +447,10 @@ import ASSETS from "assets"
 ```json
 "modules": {
 	"*": [
-		"./main",
+		"./main"
 	],
 	"newNameForAssets": "./assets"
-},
+}
 ```
 
 これらのモジュールは、マニフェストによって与えられた名前を使用して他のスクリプトモジュールにインポートされます。
@@ -493,7 +493,7 @@ GIFおよびJPEGファイルは `*` 配列に含めるべきです。
 	"*": [
 		"$(MODDABLE)/examples/assets/images/screen2"
 	]
-},
+}
 ```
 
 PNGファイルは `png2bmp` によって変換されます。これにより、Moddableアプリがフラッシュストレージから直接使用できるBMPファイルに変換されます。`png2bmp` はアルファビットマップとカラービットマップに変換することができます。
@@ -515,7 +515,7 @@ Moddable SDKはビットマップフォントを使用します。メトリッ�
 	"*-mask": [
 		"$(MODDABLE)/examples/assets/fonts/OpenSans-Semibold-28"
 	]
-},
+}
 ```
 
 Moddableアプリケーション用のフォントを作成する方法についての詳細は、[fontドキュメント](../commodetto/Creating%20fonts%20for%20Moddable%20applications.md)を参照してください。
@@ -596,7 +596,7 @@ TLS証明書は `*` 配列に含めるべきです。
 
 たとえば、マニフェストの `platforms` オブジェクトが以下のようである場合、`esp` プラットフォームでのビルドは警告/エラーを生成せず、`esp32` プラットフォームでのビルドは警告を生成し、他のプラットフォームでのビルドはエラーを生成します。
 
-```json
+```jsonc
 "platforms":{
 	"esp": {
 		/* modules and resources for ESP8266 go here */
@@ -718,7 +718,7 @@ The [onewire module](https://github.com/Moddable-OpenSource/moddable/tree/public
 
 同じ名前のプロパティを結合する際には、結合された値は2つの値の連結になります。例えば、アプリケーションのマニフェストの以下のスニペットを考えてみましょう。`include`オブジェクトは`manifest_base.json`からのプロパティを含めることを指定しています。`modules`オブジェクトは`main`と呼ばれるモジュールをただ一つ指定しています。
 
-```json
+```jsonc
 {
 	"include": [
 		"$(MODDABLE)/examples/manifest_base.json"
@@ -738,7 +738,7 @@ The [onewire module](https://github.com/Moddable-OpenSource/moddable/tree/public
 			"$(MODULES)/files/resource/*",
 			"$(MODULES)/base/instrumentation/*"
 		]
-	},
+	}
 ```
 
 2つの`modules`オブジェクトの連結には、アプリケーションの`main`モジュールと、`manifest_base.json`で指定されたresourceおよびinstrumentationモジュールが含まれます。

@@ -547,14 +547,16 @@ static const xsHostHooks xsListenerHooks = {
 void xs_listener_constructor(xsMachine *the)
 {
 	Listener listener;
-	uint16_t port = 0;
+	int port = 0;
 	xsSlot *onReadable;
 
 	xsmcVars(1);
 
 	if (xsmcHas(xsArg(0), xsID_port)) {
 		xsmcGet(xsVar(0), xsArg(0), xsID_port);
-		port = (uint16_t)xsmcToInteger(xsVar(0));
+		port = builtinGetSignedInteger(the, &xsVar(0)); 
+		if ((port < 0) || (port > 65535))
+			xsRangeError("invalid port");
 	}
 
 	onReadable = builtinGetCallback(the, xsID_onReadable);
@@ -656,6 +658,16 @@ void xs_listener_read(xsMachine *the)
 
 	tcp->skt = pending->skt;
 	c_free(pending);
+}
+
+void xs_listener_get_port(xsMachine *the)
+{
+	Listener listener = xsmcGetHostDataValidate(xsThis, (void *)&xsListenerHooks);
+	struct sockaddr_in sin;
+	socklen_t len = sizeof(sin);
+	if (!listener->skt) return;
+	if (getsockname(listener->skt, (struct sockaddr *)&sin, &len) == -1)return;
+	xsmcSetInteger(xsResult, ntohs(sin.sin_port));
 }
 
 void xs_listener_mark(xsMachine* the, void* it, xsMarkRoot markRoot)

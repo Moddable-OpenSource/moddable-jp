@@ -7,7 +7,7 @@ import UDP from "embedded:io/socket/udp";
 
 await $NETWORK.connected;
 
-const address = await $NETWORK.resolve("www.example.com");
+const address = "127.0.0.1";
 const port = 80;
 
 $TESTMC.timeout(5_000);
