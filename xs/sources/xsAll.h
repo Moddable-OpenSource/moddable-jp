@@ -2500,6 +2500,7 @@ enum {
 #define mxModuleStuffInstanceHandler(MODULE_STUFF)			((MODULE_STUFF)->next->next->next->next->next)
 #define mxModuleStuffInstanceImportHook(MODULE_STUFF)		((MODULE_STUFF)->next->next->next->next->next->next)
 #define mxModuleStuffInstanceImportMetaHook(MODULE_STUFF)	((MODULE_STUFF)->next->next->next->next->next->next->next)
+#define mxModuleStuffInstanceImportNowHook(MODULE_STUFF)	((MODULE_STUFF)->next->next->next->next->next->next->next->next)
 
 #define mxModuleStuffInternal(MODULE_STUFF)		 	mxModuleStuffInstanceInternal((MODULE_STUFF)->value.reference)
 #define mxModuleStuffModule(MODULE_STUFF)		 	mxModuleStuffInstanceModule((MODULE_STUFF)->value.reference)
@@ -2508,6 +2509,7 @@ enum {
 #define mxModuleStuffHandler(MODULE_STUFF) 			mxModuleStuffInstanceHandler((MODULE_STUFF)->value.reference)
 #define mxModuleStuffImportHook(MODULE_STUFF) 		mxModuleStuffInstanceImportHook((MODULE_STUFF)->value.reference)
 #define mxModuleStuffImportMetaHook(MODULE_STUFF) 	mxModuleStuffInstanceImportMetaHook((MODULE_STUFF)->value.reference)
+#define mxModuleStuffImportNowHook(MODULE_STUFF) 	mxModuleStuffInstanceImportNowHook((MODULE_STUFF)->value.reference)
 #endif
 
 #define mxTransferLocal(TRANSFER)	(TRANSFER)->value.reference->next

@@ -71,7 +71,7 @@ static txID fxResolveSpecifier(txMachine* the, txSlot* realm, txID moduleID, txS
 static void fxRunImportFulfilled(txMachine* the, txSlot* module, txSlot* with);
 static void fxRunImportRejected(txMachine* the, txSlot* module, txSlot* with);
 
-static void fxRunImportNow(txMachine* the, txSlot* realm, txID id);
+static void fxRunImportNow(txMachine* the, txSlot* realm, txSlot* referrer);
 
 static txBoolean fxModuleDefineOwnProperty(txMachine* the, txSlot* instance, txID id, txIndex index, txSlot* slot, txFlag mask);
 static txBoolean fxModuleDeleteProperty(txMachine* the, txSlot* instance, txID id, txIndex index);
@@ -97,10 +97,10 @@ static txSlot* fxNewModuleSourceInstance(txMachine* the);
 
 #if mxModuleStuff
 static txSlot* fxCheckModuleStuffInstance(txMachine* the, txSlot* slot);
-static txSlot* fxImportModuleStuff(txMachine* the, txSlot* realm, txSlot* queue, txSlot* reference, txSlot* name);
+static txSlot* fxImportModuleStuff(txMachine* the, txSlot* realm, txSlot* queue, txSlot* reference, txSlot* name, txBoolean now);
 static void fxImportModuleStuffFulfilled(txMachine* the);
 static void fxImportModuleStuffRejected(txMachine* the);
-static txBoolean fxLoadModuleFromStuff(txMachine* the, txSlot* queue, txSlot* module);
+static txBoolean fxLoadModuleFromStuff(txMachine* the, txSlot* queue, txSlot* module, txBoolean now);
 #endif
 
 const txBehavior ICACHE_FLASH_ATTR gxModuleBehavior = {
@@ -1029,7 +1029,7 @@ void fxLoadModules(txMachine* the, txSlot* queue)
 		else if (mxModuleStatus(module) == XS_MODULE_STATUS_LOADED) {
 			mxTry(the) {
 			#if mxModuleStuff
-				if (!fxLoadModuleFromStuff(the, queue, module->value.reference))
+				if (!fxLoadModuleFromStuff(the, queue, module->value.reference, 0))
 			#endif
 					fxLoadModulesFrom(the, queue, module->value.reference, 0);
 				mxModuleStatus(module) = XS_MODULE_STATUS_LINKING;
@@ -2147,7 +2147,7 @@ void fxRunImport(txMachine* the, txSlot* realm, txSlot* referrer)
 						txSlot* handler = mxModuleStuffHandler(reference);
 						txSlot* importHook = mxModuleStuffImportHook(reference);
 						if (mxIsReference(handler) && mxIsReference(importHook)) {
-							module = fxImportModuleStuff(the, realm, mxModuleQueue.value.reference, reference, stack);
+							module = fxImportModuleStuff(the, realm, mxModuleQueue.value.reference, reference, stack, 0);
 							goto STATUS;
 						}
 					}
@@ -2316,7 +2316,7 @@ void fxAwaitImport(txMachine* the, txBoolean defaultFlag)
 				gxDefaults.runImport(the, realm, C_NULL);
 			}
 			else {
-				fxRunImportNow(the, realm, XS_NO_ID);
+				fxRunImportNow(the, realm, C_NULL);
 				if (defaultFlag & XS_IMPORT_DEFAULT) {
 					defaultID = mxID(_default);
 					export = mxModuleExports(stack)->value.reference->next;
@@ -2343,22 +2343,58 @@ void fxImportNow(txMachine* the)
 {
 	txSlot* realm = mxModuleInstanceInternal(mxProgram.value.reference)->value.module.realm;
 	fxToString(the, the->stack);
-	fxRunImportNow(the, realm, XS_NO_ID);
+	fxRunImportNow(the, realm, C_NULL);
 }
 
-void fxRunImportNow(txMachine* the, txSlot* realm, txID moduleID)
+void fxRunImportNow(txMachine* the, txSlot* realm, txSlot* referrer)
 {
 	txSlot* stack = the->stack;
 	txSlot* module;
+	txID moduleID;
 	txID status;
 	txSlot* slot;
+#if mxModuleStuff
+	if (mxIsReference(stack)) {
+		txSlot* internal = stack->value.reference->next;
+		if (internal && (internal->kind == XS_MODULE_STUFF_KIND)) {
+			module = mxModuleStuffModule(stack);
+			if (mxIsNull(module)) {
+				fxNewModule(the, realm, XS_NO_ID, module);
+				fxDuplicateModuleTransfers(the, mxModuleStuffSource(stack), module);
+				slot = mxModuleHook(module);
+				slot->kind = stack->kind;
+				slot->value = stack->value;
+				mxModuleStatus(module) = XS_MODULE_STATUS_LOADED;
+			}
+			goto STATUS;
+		}
+	}
+#endif
 	fxToString(the, stack);
-	moduleID = fxResolveSpecifier(the, realm, moduleID, stack);
+	if (referrer) {
+#if mxModuleStuff
+		if (referrer->next->kind == XS_MODULE_KIND) {
+			txSlot* reference = mxModuleInstanceHook(referrer);
+			if (mxIsReference(reference)) {
+				txSlot* handler = mxModuleStuffHandler(reference);
+				txSlot* importNowHook = mxModuleStuffImportNowHook(reference);
+				if (mxIsReference(handler) && mxIsReference(importNowHook)) {
+					module = fxImportModuleStuff(the, realm, mxModuleQueue.value.reference, reference, stack, 1);
+					goto STATUS;
+				}
+			}
+		}
+#endif
+		moduleID = fxResolveSpecifier(the, realm, mxModuleInstanceInternal(referrer)->value.module.id, stack);
+	}
+	else
+		moduleID = fxResolveSpecifier(the, realm, XS_NO_ID, stack);
 	module = fxGetModule(the, realm, moduleID);
 	if (!module) {
 		module = mxBehaviorSetProperty(the, mxOwnModules(realm)->value.reference, moduleID, 0, XS_OWN);
 		fxNewModule(the, realm, moduleID, module);
 	}
+STATUS:
 	status = mxModuleStatus(module);
 	if ((status == XS_MODULE_STATUS_NEW) || (status == XS_MODULE_STATUS_LOADED)) {
 		txSlot* result = stack;
@@ -2368,10 +2404,11 @@ void fxRunImportNow(txMachine* the, txSlot* realm, txID moduleID)
 			result->kind = module->kind;
 			result->value = module->value;
 
-			slot = mxBehaviorSetProperty(the, queue, moduleID, 0, XS_OWN);;
-			slot->flag |= XS_BASE_FLAG;
-			slot->kind = XS_REFERENCE_KIND;
-			slot->value.reference = module->value.reference;
+			fxQueueModule(the, queue, module);
+// 			slot = mxBehaviorSetProperty(the, queue, moduleID, 0, XS_OWN);;
+// 			slot->flag |= XS_BASE_FLAG;
+// 			slot->kind = XS_REFERENCE_KIND;
+// 			slot->value.reference = module->value.reference;
 		
 			mxReportModuleQueue("LOAD");
 			module = queue->next;
@@ -2412,6 +2449,9 @@ void fxRunImportNow(txMachine* the, txSlot* realm, txID moduleID)
 					done = 0;
 				}
 				else if (mxModuleStatus(module) == XS_MODULE_STATUS_LOADED) {
+				#if mxModuleStuff
+					if (!fxLoadModuleFromStuff(the, queue, module->value.reference, 1))
+				#endif
 						fxLoadModulesFrom(the, queue, module->value.reference, 1);
 					mxModuleStatus(module) = XS_MODULE_STATUS_LINKING;
 					module = queue;
@@ -3084,7 +3124,7 @@ void fx_Compartment_prototype_importNow(txMachine* the)
 		mxPushSlot(mxArgv(0));
 	else
 		mxPushUndefined();
-	fxRunImportNow(the, realm, XS_NO_ID);
+	fxRunImportNow(the, realm, C_NULL);
 	mxPullSlot(mxResult);
 }
 
@@ -3379,89 +3419,146 @@ void fxImportModuleStuffRejected(txMachine* the)
 	fxLoadModules(the, queue);
 }
 
-txSlot* fxImportModuleStuff(txMachine* the, txSlot* realm, txSlot* queue, txSlot* reference, txSlot* name)
+txSlot* fxImportModuleStuff(txMachine* the, txSlot* realm, txSlot* queue, txSlot* reference, txSlot* name, txBoolean now)
 {
 	txID moduleID = (name->kind == XS_STRING_X_KIND) ? fxNewNameX(the, name->value.string) : fxNewName(the, name);
 	txSlot* list = mxModuleStuffModules(reference)->value.reference;
 	txSlot* module = mxBehaviorGetProperty(the, list, moduleID, 0, XS_ANY);
 	if (!module) {
 		txSlot* handler = mxModuleStuffHandler(reference);
-		txSlot* importHook = mxModuleStuffImportHook(reference);
-		txSlot* loader;
-		txSlot* promise;
-		txSlot* function;
-		txSlot* home;
-		txSlot* resolveLoadFunction;
-		txSlot* rejectLoadFunction;
-		
-		module = mxBehaviorSetProperty(the, list, moduleID, 0, XS_OWN);
-		fxNewModule(the, realm, XS_NO_ID, module);
-		mxModuleStatus(module) = XS_MODULE_STATUS_LOADING;
-		fxQueueModule(the, queue, module);
-		
-		loader = mxModuleLoader(module);
-		loader->kind = reference->kind;
-		loader->value = reference->value;
-		
-		mxPushSlot(handler);
-		mxPushSlot(importHook);
-		mxCall();
-		mxPushSlot(name);
-		mxRunCount(1);
-		promise = the->stack;
-		
-		mxPushUndefined();
-		mxPush(mxPromiseConstructor);
-		mxPushSlot(promise);
-		fx_Promise_resolveAux(the);
-		mxPop();
-		mxPop();
-		promise = the->stack;
+		if (now) {
+			txSlot* importNowHook = mxModuleStuffImportNowHook(reference);
+			txSlot* instance;
+			txSlot* record;
+			module = mxBehaviorSetProperty(the, list, moduleID, 0, XS_OWN);
+			fxNewModule(the, realm, XS_NO_ID, module);
+			mxModuleStatus(module) = XS_MODULE_STATUS_LOADING;
+			
+			mxPushSlot(handler);
+			mxPushSlot(importNowHook);
+			mxCall();
+			mxPushSlot(name);
+			mxRunCount(1);
+			
+			instance = fxCheckModuleStuffInstance(the, the->stack);
+			record = mxModuleStuffInstanceModule(instance);
+			if (mxIsReference(record)) {
+				fxOverrideModule(the, queue, mxModuleStuffModules(reference), C_NULL, module->value.reference, record->value.reference);
+			}
+			else {
+				txSlot* hook;
+				fxDuplicateModuleTransfers(the, mxModuleStuffInstanceSource(instance), module);
+				record->value.reference = module->value.reference;
+				record->kind = XS_REFERENCE_KIND;
+				hook = mxModuleHook(module);
+				hook->value.reference = instance;
+				hook->kind = XS_REFERENCE_KIND;
+				mxModuleStatus(module) = XS_MODULE_STATUS_LOADED;
+			}
 
-		function = fxNewHostFunction(the, fxImportModuleStuffFulfilled, 1, XS_NO_ID, mxLoadModulesFulfilledProfileID);
-		home = mxFunctionInstanceHome(function);
-		home->value.home.object = queue;
-		home->value.home.module = module->value.reference;
-		resolveLoadFunction = the->stack;
-
-		function = fxNewHostFunction(the, fxImportModuleStuffRejected, 1, XS_NO_ID, mxLoadModulesRejectedProfileID);
-		home = mxFunctionInstanceHome(function);
-		home->value.home.object = queue;
-		home->value.home.module = module->value.reference;
-		rejectLoadFunction = the->stack;
+		}
+		else {
+			txSlot* importHook = mxModuleStuffImportHook(reference);
+			txSlot* loader;
+			txSlot* promise;
+			txSlot* function;
+			txSlot* home;
+			txSlot* resolveLoadFunction;
+			txSlot* rejectLoadFunction;
+			
+			module = mxBehaviorSetProperty(the, list, moduleID, 0, XS_OWN);
+			fxNewModule(the, realm, XS_NO_ID, module);
+			mxModuleStatus(module) = XS_MODULE_STATUS_LOADING;
+			fxQueueModule(the, queue, module);
+			
+			loader = mxModuleLoader(module);
+			loader->kind = reference->kind;
+			loader->value = reference->value;
+			
+			mxPushSlot(handler);
+			mxPushSlot(importHook);
+			mxCall();
+			mxPushSlot(name);
+			mxRunCount(1);
+			promise = the->stack;
+			
+			mxPushUndefined();
+			mxPush(mxPromiseConstructor);
+			mxPushSlot(promise);
+			fx_Promise_resolveAux(the);
+			mxPop();
+			mxPop();
+			promise = the->stack;
 	
-		fxPromiseThen(the, promise->value.reference, resolveLoadFunction, rejectLoadFunction, C_NULL, C_NULL);
+			function = fxNewHostFunction(the, fxImportModuleStuffFulfilled, 1, XS_NO_ID, mxLoadModulesFulfilledProfileID);
+			home = mxFunctionInstanceHome(function);
+			home->value.home.object = queue;
+			home->value.home.module = module->value.reference;
+			resolveLoadFunction = the->stack;
+	
+			function = fxNewHostFunction(the, fxImportModuleStuffRejected, 1, XS_NO_ID, mxLoadModulesRejectedProfileID);
+			home = mxFunctionInstanceHome(function);
+			home->value.home.object = queue;
+			home->value.home.module = module->value.reference;
+			rejectLoadFunction = the->stack;
 		
-		mxPop();
-		mxPop();
-		mxPop();
+			fxPromiseThen(the, promise->value.reference, resolveLoadFunction, rejectLoadFunction, C_NULL, C_NULL);
+			
+			mxPop();
+			mxPop();
+			mxPop();
+		}
 	}
 	return module;
 }
 
-txBoolean fxLoadModuleFromStuff(txMachine* the, txSlot* queue, txSlot* module)
+txBoolean fxLoadModuleFromStuff(txMachine* the, txSlot* queue, txSlot* module, txBoolean now)
 {
 	txSlot* realm = mxModuleInstanceInternal(module)->value.module.realm;
 	txSlot* reference = mxModuleInstanceHook(module);
 	if (mxIsReference(reference)) {
 		txSlot* handler = mxModuleStuffHandler(reference);
-		txSlot* importHook = mxModuleStuffImportHook(reference);
-		if (mxIsReference(handler) && mxIsReference(importHook)) {
-			txSlot* transfer = mxModuleInstanceTransfers(module)->value.reference->next;
-			while (transfer) {
-				txSlot* from = mxTransferFrom(transfer);
-				if (from->kind != XS_NULL_KIND) {
-					txSlot* importModule = fxImportModuleStuff(the, realm, queue, reference, from);
-					txID status = mxModuleStatus(importModule);
-					from->value.reference = importModule->value.reference;
-					from->kind = XS_REFERENCE_KIND;
-					if ((status == XS_MODULE_STATUS_NEW) || (status == XS_MODULE_STATUS_LOADED)) {
-						fxQueueModule(the, queue, importModule);
+		if (mxIsReference(handler)) {
+			if (now) {
+				txSlot* importNowHook = mxModuleStuffImportNowHook(reference);
+				if (mxIsReference(importNowHook)) {
+					txSlot* transfer = mxModuleInstanceTransfers(module)->value.reference->next;
+					while (transfer) {
+						txSlot* from = mxTransferFrom(transfer);
+						if (from->kind != XS_NULL_KIND) {
+							txSlot* importModule = fxImportModuleStuff(the, realm, queue, reference, from, 1);
+							txID status = mxModuleStatus(importModule);
+							from->value.reference = importModule->value.reference;
+							from->kind = XS_REFERENCE_KIND;
+							if ((status == XS_MODULE_STATUS_NEW) || (status == XS_MODULE_STATUS_LOADED)) {
+								fxQueueModule(the, queue, importModule);
+							}
+						}
+						transfer = transfer->next;
 					}
+					return 1;
 				}
-				transfer = transfer->next;
 			}
-			return 1;
+			else {
+				txSlot* importHook = mxModuleStuffImportHook(reference);
+				if (mxIsReference(importHook)) {
+					txSlot* transfer = mxModuleInstanceTransfers(module)->value.reference->next;
+					while (transfer) {
+						txSlot* from = mxTransferFrom(transfer);
+						if (from->kind != XS_NULL_KIND) {
+							txSlot* importModule = fxImportModuleStuff(the, realm, queue, reference, from, 0);
+							txID status = mxModuleStatus(importModule);
+							from->value.reference = importModule->value.reference;
+							from->kind = XS_REFERENCE_KIND;
+							if ((status == XS_MODULE_STATUS_NEW) || (status == XS_MODULE_STATUS_LOADED)) {
+								fxQueueModule(the, queue, importModule);
+							}
+						}
+						transfer = transfer->next;
+					}
+					return 1;
+				}
+			}
 		}
 	}
 	return 0;
@@ -3497,6 +3594,7 @@ void fx_ModuleStuff(txMachine* the)
 	txSlot* handler;
 	txSlot* importHook;
 	txSlot* importMetaHook;
+	txSlot* importNowHook;
 	txSlot* slot;
 	if (mxIsUndefined(mxTarget))
 		mxTypeError("call: ModuleStuff");
@@ -3504,6 +3602,7 @@ void fx_ModuleStuff(txMachine* the)
 		mxTypeError("no source");
 	fxCheckModuleSourceInstance(the, mxArgv(0));
 	if ((mxArgc < 2) || mxIsUndefined(mxArgv(1))) {
+		mxPushUndefined();
 		mxPushUndefined();
 		mxPushUndefined();
 		mxPushUndefined();
@@ -3518,13 +3617,18 @@ void fx_ModuleStuff(txMachine* the)
 		mxGetID(fxID(the, "importMetaHook"));
 		if (!mxIsUndefined(the->stack) && !fxIsCallable(the, the->stack))
 			mxTypeError("handler.importMetaHook: not a function");
+		mxPushSlot(mxArgv(1));
+		mxGetID(fxID(the, "importNowHook"));
+		if (!mxIsUndefined(the->stack) && !fxIsCallable(the, the->stack))
+			mxTypeError("handler.importNowHook: not a function");
 	}
 	else {
 		mxTypeError("handler: not an object");
 	}
-	handler = the->stack + 2;
-	importHook = the->stack + 1;
-	importMetaHook = the->stack;
+	handler = the->stack + 3;
+	importHook = the->stack + 2;
+	importMetaHook = the->stack + 1;
+	importNowHook = the->stack;
 	
 	mxPushSlot(mxTarget);
 	fxGetPrototypeFromConstructor(the, &mxModuleStuffPrototype);
@@ -3536,6 +3640,12 @@ void fx_ModuleStuff(txMachine* the)
 	slot = fxNextSlotProperty(the, slot, handler, XS_NO_ID, XS_INTERNAL_FLAG);
 	slot = fxNextSlotProperty(the, slot, importHook, XS_NO_ID, XS_INTERNAL_FLAG);
 	slot = fxNextSlotProperty(the, slot, importMetaHook, XS_NO_ID, XS_INTERNAL_FLAG);
+	slot = fxNextSlotProperty(the, slot, importNowHook, XS_NO_ID, XS_INTERNAL_FLAG);
+	
+	mxPop();
+	mxPop();
+	mxPop();
+	mxPop();
 }
 
 #endif
