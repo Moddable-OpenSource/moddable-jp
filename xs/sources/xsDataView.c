@@ -61,6 +61,7 @@ static txSlot* fxTypedArrayGetProperty(txMachine* the, txSlot* instance, txID id
 static txBoolean fxTypedArrayGetPropertyValue(txMachine* the, txSlot* instance, txID id, txIndex index, txSlot* value, txSlot* receiver);
 static txBoolean fxTypedArrayHasProperty(txMachine* the, txSlot* instance, txID id, txIndex index);
 static void fxTypedArrayOwnKeys(txMachine* the, txSlot* instance, txFlag flag, txSlot* keys);
+static txBoolean fxTypedArrayPreventExtensions(txMachine* the, txSlot* instance);
 static txSlot* fxTypedArraySetProperty(txMachine* the, txSlot* instance, txID id, txIndex index, txFlag flag);
 static txBoolean fxTypedArraySetPropertyValue(txMachine* the, txSlot* instance, txID id, txIndex index, txSlot* value, txSlot* receiver);
 
@@ -79,7 +80,7 @@ const txBehavior ICACHE_FLASH_ATTR gxTypedArrayBehavior = {
 	fxTypedArrayHasProperty,
 	fxOrdinaryIsExtensible,
 	fxTypedArrayOwnKeys,
-	fxOrdinaryPreventExtensions,
+	fxTypedArrayPreventExtensions,
 	fxTypedArraySetPropertyValue,
 	fxOrdinarySetPrototype,
 };
@@ -1296,6 +1297,20 @@ void fxTypedArrayOwnKeys(txMachine* the, txSlot* instance, txFlag flag, txSlot* 
 		}
 	}
 	fxOrdinaryOwnKeys(the, instance, flag, keys);
+}
+
+txBoolean fxTypedArrayPreventExtensions(txMachine* the, txSlot* instance)
+{
+	txSlot* dispatch = instance->next;
+	txSlot* view = dispatch->next;
+	txSlot* buffer = view->next;
+	txSlot* arrayBuffer = buffer->value.reference->next;
+	txSlot* bufferInfo = arrayBuffer->next;
+	if (view->value.dataView.size < 0)
+		return 0;
+	if ((arrayBuffer->kind == XS_ARRAY_BUFFER_KIND) && (bufferInfo->value.bufferInfo.maxLength >= 0))
+		return 0;
+	return fxOrdinaryPreventExtensions(the, instance);
 }
 
 txSlot* fxTypedArraySetProperty(txMachine* the, txSlot* instance, txID id, txIndex index, txFlag flag)
