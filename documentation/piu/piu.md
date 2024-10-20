@@ -4,14 +4,14 @@ Copyright 2017-2023 Moddable Tech, Inc.<BR>
 
 ## このドキュメントについて
 
-Piu は、マイクロコントローラ上で実行するように設計されたユーザー インターフェイス フレームワークです。Piu のプログラミング インターフェイスは、アプリケーションの包含階層、外観、動作、フローを定義するグローバル コンストラクター、関数、およびオブジェクトの JavaScript API です。このドキュメントでは、Piu API を定義するオブジェクトと重要な関連概念について詳しく説明します。
+Piu は、マイクロコントローラ上で実行するように設計されたユーザー インターフェイス フレームワークです。Piu のプログラミング インターフェイスは、アプリケーションのコンテンツ階層、外観、動作、フローを定義するグローバル コンストラクター、関数、およびオブジェクトの JavaScript API です。このドキュメントでは、Piu API を定義するオブジェクトと重要な関連概念について詳しく説明します。
 
 ## Table of Contents
 
   * [継承階層](#継承階層)
   * [重要な概念の紹介](#重要な概念の紹介)
-    * [包含階層と外観](#包含階層と外観)
-    * [Behavior and Flow](#behavior-and-flow)
+    * [コンテンツ階層と外観](#コンテンツ階層と外観)
+    * [振る舞いとフロー](#behavior-and-flow)
   * [グローバルプロパティ](#global-properties)
  	 * [ビルトインプロパティ](#built-in-properties)
  	 * [プロパティの追加](#adding-additional-properties)
@@ -65,21 +65,21 @@ Piu アプリケーションのコンテキストにおけるこれらのオブ�
 
 このセクションでは、Piu アプリケーションに関連する重要な概念について説明し、このドキュメントの残りの部分で使用されるいくつかの用語を定義します。
 
-### 包含階層と外観
+### コンテンツ階層と外観
 
 Piu アプリケーションのグラフィカル ユーザー インターフェイス要素は、`content` オブジェクトの階層で構成されています。基本構造は次のとおりです。
 
-- `application`オブジェクトは包含階層のルートである
-- `container`オブジェクトは包含階層のブランチである
-- `content`オブジェクトは包含階層のリーフである
+- `application`オブジェクトはコンテンツ階層のルートである
+- `container`オブジェクトはコンテンツ階層のブランチである
+- `content`オブジェクトはコンテンツ階層のリーフである
 
-アプリケーションはコンストラクタを使用して `content` オブジェクトと `container` オブジェクトを定義します。これらのオブジェクトは、`add`、`insert`、および `replace` 関数を使用して包含階層にアタッチされ、`remove` および `replace` 関数を使用して包含階層から削除されます。 これらのプロパティの説明については、[Containerオブジェクト](#container-object) セクションの [Functions](#container-functions) を参照してください。
+アプリケーションはコンストラクタを使用して `content` オブジェクトと `container` オブジェクトを定義します。これらのオブジェクトは、`add`、`insert`、および `replace` 関数を使用してコンテンツ階層にアタッチされ、`remove` および `replace` 関数を使用してコンテンツ階層から削除されます。 これらのプロパティの説明については、[Containerオブジェクト](#container-object) セクションの [Functions](#container-functions) を参照してください。
 
 #### BoundコンテンツとUnboundコンテンツ
 
-包含階層にアタッチされていないcontentsは*unbound* contentsと呼ばれ、包含階層にアタッチされているcontentsは*bound* contentsと呼ばれます。包含階層の一部であるオブジェクトのみが画面に表示されます。
+コンテンツ階層にアタッチされていないコンテンツは*unbound* コンテンツと呼ばれ、コンテンツ階層にアタッチされているコンテンツは*bound* コンテンツと呼ばれます。コンテンツ階層の一部であるオブジェクトのみが画面に表示されます。
 
-unbound contentsはレイアウトには参加しません。測定も調整も行われないため、位置とサイズは「未定義」となり、変更できません。
+unbound コンテンツはレイアウトには参加しません。測定も調整も行われないため、位置とサイズは「未定義」となり、変更できません。
 
 ```javascript
 let content = new Content();
@@ -114,7 +114,7 @@ let unconstrainedContent = new Content(null, {
 <a id="measured-size"></a>
 ##### Measured size
 
-すべてのコンテンツには *measured width* と *measured height* があり、これらはcontent自体によって計算されたデフォルトの幅と高さです。 たとえば、次のcontentオブジェクトのmeasured widthは 100 になります。
+すべてのコンテンツには *measured width* と *measured height* があり、これらはコンテンツ自体によって計算されたデフォルトの幅と高さです。 たとえば、次のcontentオブジェクトのmeasured widthは 100 になります。
 
 ```javascript
 let sampleContent = new Content(null, {
@@ -143,9 +143,9 @@ sampleContent.coordinates = {
 <a id="fitted-size"></a>
 ##### Fitted size
 
-すべてのcontentには *fitted width* と *fitted height* もあり、これらはcontainerによって計算されたcontentの有効な幅と高さです。
+すべてのコンテンツには *fitted width* と *fitted height* もあり、これらはコンテナによって計算されたコンテンツの有効な幅と高さです。
 
-`left` 座標と `right` 座標の両方が定義されている場合、contentはcontainerとともに水平方向に伸縮し、contentのfitted widthはcontainerのfitted widthに依存します。 同様に、`top`座標と`bottom`座標の両方が定義されている場合、contentはcontainerに合わせて垂直方向に伸縮し、contentのfitted heightはcontainerのfitted heightに依存します。 たとえば、ここでの`sampleContent`オブジェクトのfitted widthとfitted heightは両方とも 100 になります。
+`left` 座標と `right` 座標の両方が定義されている場合、コンテンツはコンテナとともに水平方向に伸縮し、コンテンツのfitted widthはコンテナのfitted widthに依存します。 同様に、`top`座標と`bottom`座標の両方が定義されている場合、コンテンツはコンテナに合わせて垂直方向に伸縮し、コンテンツのfitted heightはコンテナのfitted heightに依存します。 たとえば、ここでの`sampleContent`オブジェクトのfitted widthとfitted heightは両方とも 100 になります。
 
 ```javascript
 let sampleContent = new Content(null, {
@@ -173,7 +173,7 @@ let sampleContainer = new Container(null, {
 });
 ```
 
-`content`オブジェクトの`width`プロパティと`height`プロパティは、contentのfitted sizeを反映します。 contentのmeasured widthとmeasured heightは、contentの作成直後に利用可能になります。 fitted widthとfitted heightは、`onDisplaying`イベントがトリガーされるまで利用できません。
+`content`オブジェクトの`width`プロパティと`height`プロパティは、コンテンツのfitted sizeを反映します。 コンテンツのmeasured widthとmeasured heightは、コンテンツの作成直後に利用可能になります。 fitted widthとfitted heightは、`onDisplaying`イベントがトリガーされるまで利用できません。
 
 ```javascript
 let sampleContent = new Content(null, {
@@ -196,7 +196,7 @@ application.add(sampleContent)
 
 ##### テンプレート
 
-*テンプレート* は、contentをインスタンス化し、包含階層を構築するために必要なスクリプト コードを削減するツールです。テンプレートは、似ているものの、いくつかのわずかに異なるプロパティを持つオブジェクトを作成するためによく使用されます。
+*テンプレート* は、コンテンツをインスタンス化し、コンテンツ階層を構築するために必要なスクリプト コードを削減するツールです。テンプレートは、似ているものの、いくつかのわずかに異なるプロパティを持つオブジェクトを作成するためによく使用されます。
 
 たとえば、次の画面を考えてみましょう。
 
@@ -258,7 +258,7 @@ let screen1 = new BasicScreen({ title: "Screen 1", headerColor: "blue" });
 let screen2 = new BasicScreen({ title: "Screen 2", headerColor: "red" });
 ```
 
-上の例で見られるように、コンストラクタには 1 つのパラメーター `$` があり、アプリケーションはこれを使用してデータをテンプレートに渡します。データには任意のプロトタイプが含まれる場合があります。多くの場合、これは「文字列」、「数値」、または JSON オブジェクトです。属性内で、「content」オブジェクトと「container」オブジェクトは「$」を使用してデータ プロパティにアクセスします。 `$` パラメータは、「データ」または「インスタンス化データ」と呼ばれます。
+上の例で見られるように、コンストラクタには 1 つのパラメーター `$` があり、アプリケーションはこれを使用してデータをテンプレートに渡します。データには任意のプロトタイプが含まれる場合があります。多くの場合、これは`文字列`、`数値`、または JSON オブジェクトです。属性内で、`content`オブジェクトと`container`オブジェクトは`$`を使用してデータ プロパティにアクセスします。 `$` パラメータは、`データ`または`インスタンス化データ`と呼ばれます。
 
 ほとんどの Piu オブジェクトの `template` 関数は、コンストラクターと `template` 関数を返します。唯一の例外は、単にコンストラクターを返す `Skin` オブジェクトと `Texture` オブジェクトです。これらの `template` 関数を使用すると、コンストラクターをさらに特殊化できます。以下の例では、`HeaderWithBehavior` インスタンスは、アクティブで動作することに加えて、`BasicHeader` インスタンスのすべてのプロパティを持ちます。
 
@@ -279,11 +279,11 @@ let HeaderWithBehavior = BasicHeader.template($ => ({
 	active: true, Behavior: HeaderBehavior
 }));
 ```
-### Behavior and Flow
+### 振る舞いとフロー
 
 #### イベント
 
-Piu は *イベント* をアプリケーションの包含階層に配信し、`content` オブジェクトはイベントに応答する関数を含む`behavior`オブジェクトを参照できます。 Piu はイベントを広範囲に使用します。
+Piu は *イベント* をアプリケーションのコンテンツ階層に配信し、`content` オブジェクトはイベントに応答する関数を含む`behavior`オブジェクトを参照できます。 Piu はイベントを広範囲に使用します。
 
 `content`オブジェクトがイベントを受け取ると、その `behavior`オブジェクトがそのイベントに応答する対応する関数を (プロトタイプ チェーン内で直接的または間接的に) 持っているかどうかをチェックします。存在する場合、`content` オブジェクトは関数を呼び出し、それ自体を最初のパラメーターとして渡します。そうでない場合は、何も起こりません。
 
@@ -301,7 +301,7 @@ Piu は、幅広いターゲット デバイスで役立つ低レベルのイベ
 
 複数のコンテンツやプロパティをアニメーション化する複雑な動作を作成する最も簡単な方法は、`timeline` オブジェクトを使用することです。`timeline` オブジェクトは、一連のトゥイーンアニメーションのシーケンスと実行のメカニズムを提供するため、複数のコンテンツ オブジェクトの段階的なアニメーション (画面のグラフィック要素の切り替えなど) に最適な方法です。詳細については、このドキュメントの [Timelineオブジェクト](#timeline-object) セクションを参照してください。
 
-Piu の `transition` オブジェクトは、画面間を移動したり、コンテンツ オブジェクトを入れ替えたりする単純なアニメーションに最適です。多くの場合、コンテンツを追加または削除することで、包含階層を変更します。`timeline` オブジェクトと同様にオブジェクトのプロパティを変更することもできますが、アニメーションのシーケンスを作成するのはより複雑です。詳細については、このドキュメントの [Transitionオブジェクト](#transition-object) セクションを参照してください。
+Piu の `transition` オブジェクトは、画面間を移動したり、コンテンツ オブジェクトを入れ替えたりする単純なアニメーションに最適です。多くの場合、コンテンツを追加または削除することで、コンテンツ階層を変更します。`timeline` オブジェクトと同様にオブジェクトのプロパティを変更することもできますが、アニメーションのシーケンスを作成するのはより複雑です。詳細については、このドキュメントの [Transitionオブジェクト](#transition-object) セクションを参照してください。
 
 ##### Easing方程式
 
@@ -357,7 +357,7 @@ export default global.application;
 
 各 `content` オブジェクトには、オプションの `anchor` プロパティを設定できます。テンプレートがインスタンス化されると、作成された `content` オブジェクトへの参照がインスタンス化データのプロパティに割り当てられます。プロパティの識別子は `anchor` プロパティの値です。
 
-アンカーを使用すると、アプリケーションは、テンプレートからインスタンス化された包含階層内の特定のcontentとcontainerに直接アクセスできます。これにより、アプリケーションの実行中に変更するオブジェクトへのアクセスが容易になります。たとえば、文字列のラベルを変更したり、ボタンを無効にしたり、テーブルの列に行を追加したりできます。
+アンカーを使用すると、アプリケーションは、テンプレートからインスタンス化されたコンテンツ階層内の特定のコンテンツとcontainerに直接アクセスできます。これにより、アプリケーションの実行中に変更するオブジェクトへのアクセスが容易になります。たとえば、文字列のラベルを変更したり、ボタンを無効にしたり、テーブルの列に行を追加したりできます。
 
 ```javascript
 let sampleStyle = new Style({ font:"600 28px Open Sans", color: "white" });
@@ -420,23 +420,23 @@ const halfCyanSkin = new Skin({ fill:hsla(180, 1, 0.5, 0.5) });
 
 ### Coordinates
 
-すべての `content` オブジェクトには `coordinates` プロパティがあります。coordinates プロパティは、`left`、`width`、`right`、`top`、`height`、および `bottom` プロパティを持つオブジェクトで、これらはすべて `undefined` にすることができます。contentの座標は、containerと `previous` および `next` プロパティ (同じcontainer内の他の `content` オブジェクト) に対する相対的な位置とサイズを決定します。
+すべての `content` オブジェクトには `coordinates` プロパティがあります。coordinates プロパティは、`left`、`width`、`right`、`top`、`height`、および `bottom` プロパティを持つオブジェクトで、これらはすべて `undefined` にすることができます。コンテンツの座標は、containerと `previous` および `next` プロパティ (同じcontainer内の他の `content` オブジェクト) に対する相対的な位置とサイズを決定します。
 
-contentのcontainerが `application`、`container`、`scroller`、または `layout` オブジェクトの場合:
+コンテンツのcontainerが `application`、`container`、`scroller`、または `layout` オブジェクトの場合:
 
 - `top`、`bottom`、`left`、`right` 座標はすべてcontainerに対する相対座標です。
 - `width`、`left`、`right` 座標がすべて指定されている場合、`left` と `right` 座標は無視されます。
-- `left` と `right` の両方が指定されていない場合、contentは指定された幅（指定されていない場合は幅 0）でcontainer内で水平方向に中央揃えされます。
+- `left` と `right` の両方が指定されていない場合、コンテンツは指定された幅（指定されていない場合は幅 0）でcontainer内で水平方向に中央揃えされます。
 - `height`、`top`、`bottom` 座標がすべて指定されている場合、`top` と `bottom` 座標は無視されます。
-- `top` と `bottom` の両方が指定されていない場合、contentは指定された高さ（指定されていない場合は高さ 0）でcontainer内で垂直方向に中央揃えされます。
+- `top` と `bottom` の両方が指定されていない場合、コンテンツは指定された高さ（指定されていない場合は高さ 0）でcontainer内で垂直方向に中央揃えされます。
 
-contentのcontainerが `column` オブジェクトの場合:
+コンテンツのcontainerが `column` オブジェクトの場合:
 
 - `top` と `bottom` の座標は、`previous` と `next` プロパティを基準とします
 - `left` と `right` の座標は、containerを基準とします
 - `width`、`left`、`right` の座標がすべて指定されている場合、`left` と `right` の座標は無視されます
 
-contentのcontainerが `row` オブジェクトの場合:
+コンテンツのcontainerが `row` オブジェクトの場合:
 
 - `left` と `right` の座標は、`previous` と `next` プロパティを基準とします
 - `top` と `bottom` の座標は、containerを基準とします
@@ -444,7 +444,7 @@ contentのcontainerが `row` オブジェクトの場合:
 
 ### Duration, Fraction, Interval, Loop, and Time
 
-包含階層内のすべてのcontentは、`duration`、`fraction`、`interval`、および `time` プロパティを使用して時間ベースのアニメーション動作を制御するクロックとして使用できます。
+コンテンツ階層内のすべてのコンテンツは、`duration`、`fraction`、`interval`、および `time` プロパティを使用して時間ベースのアニメーション動作を制御するクロックとして使用できます。
 
 - `duration` プロパティはアニメーションの継続時間で、ミリ秒単位で表されます。
 - `time` プロパティはコンテンツの時計の現在の時刻を提供します。
@@ -591,7 +591,7 @@ const appStyle = new Style({ font:"16px Fira Sans" });
 const menuStyle = new Style({ font:"bold" });
 ```
 
-スタイルは、それを使用する `label` または `text` オブジェクトが、表示される包含階層にバインドされている場合にのみカスケードされます。
+スタイルは、それを使用する `label` または `text` オブジェクトが、表示されるコンテンツ階層にバインドされている場合にのみカスケードされます。
 
 Piu がアセット内の対応するビットマップ フォント ファイルを見つけるには、一般的な方法に基づいて次の規則を採用する必要があります：
 
@@ -742,7 +742,7 @@ application.add(new WiFiStatusIcon({ passwordProtected: true }, { top: 58, right
 - **Source code:** [`piuApplication.c`][2]
 - **Relevant Examples:** all
 
-すべての Piu アプリケーションは、包含階層のルートに `application` オブジェクトを持っている必要があります。他のすべての `content` オブジェクトは、画面に表示されるように `application` に追加する必要があります。
+すべての Piu アプリケーションは、コンテンツ階層のルートに `application` オブジェクトを持っている必要があります。他のすべての `content` オブジェクトは、画面に表示されるように `application` に追加する必要があります。
 
 デフォルトのオブジェクトはないので、自分で作成してメイン モジュールにエクスポートする必要があります。
 
@@ -782,7 +782,7 @@ export default new Application(null, {
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Application.prototype` のインスタンスを作成する関数であるコンストラクターを返します。結果の `prototype` プロパティは `Application.prototype` です。結果には `template` 関数も提供されます。
 
@@ -806,7 +806,7 @@ export default new BallApplication(null, { displayListLength:4096, touchCount:0 
 
 #### Dictionary
 
-`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Dictionary](#container-dictionary) を参照)。さらに次のようになります。
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Dictionary](#container-dictionary) を参照)。さらに次のプロパティを含みます。
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
@@ -894,7 +894,7 @@ application.add(sampleColumn);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Column.prototype` のインスタンスを作成する関数であるコンストラクターを返します。結果の `prototype` プロパティは `Column.prototype` です。結果には `template` 関数も提供されます。
 
@@ -930,7 +930,7 @@ application.add(new SampleColumn({ firstColor:"red", secondColor:"blue" }));
 - **Source code:** [`piuContainer.c`][5]
 - **Relevant Examples:** [drag][19], [transitions][23]
 
-`container` オブジェクトは、他の `content` オブジェクトを含むことができる `content` オブジェクトです。コンテナでは、`content` オブジェクトは二重リンク リストに格納されます。`content` オブジェクトには、`content` プロパティを使用してインデックスまたは名前でアクセスすることもできます (例: `container.content(0)` または `container.content("foo")`)。
+`container` オブジェクトは、他の `content` オブジェクトを含むことができる `content` オブジェクトです。コンテナでは、`content` オブジェクトは双方向連結リストに格納されます。`content` オブジェクトには、`content` プロパティを使用してインデックスまたは名前でアクセスすることもできます (例: `container.content(0)` または `container.content("foo")`)。
 
 #### コンストラクタの説明
 
@@ -967,7 +967,7 @@ application.add(sampleContainer);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Container.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Container.prototype` です。結果には `template` 関数も提供されます。
 
@@ -992,7 +992,7 @@ application.add(new SampleContainer({ backgroundColor: "white", squareColor: "bl
 <a id="container-dictionary"></a>
 #### Dictionary
 
-`content` オブジェクトの場合と同じです ([コンテンツ オブジェクト](#content-object) セクションの [辞書](#content-dictionary) を参照)。さらに次のようになります。
+`content` オブジェクトの場合と同じです ([コンテンツ オブジェクト](#content-object) セクションの [辞書](#content-dictionary) を参照)。さらに次のプロパティを含みます。
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
@@ -1005,7 +1005,7 @@ application.add(new SampleContainer({ backgroundColor: "white", squareColor: "bl
 <a id="container-properties"></a>
 ##### プロパティ
 
-`content` オブジェクトの場合と同じです ([コンテンツ オブジェクト](#content-object) セクションの [プロパティ](#content-properties) を参照)。さらに次のようになります。
+`content` オブジェクトの場合と同じです ([コンテンツ オブジェクト](#content-object) セクションの [プロパティ](#content-properties) を参照)。さらに次のプロパティを含みます。
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
@@ -1347,7 +1347,7 @@ application.add(sampleContainer);
 <a id="container-events"></a>
 #### Events
 
-`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Events](#content-events) を参照)。さらに次のようになります。
+`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Events](#content-events) を参照)。さらに次のプロパティを含みます。
 
 **`onTransitionBeginning(container)`**
 
@@ -1406,7 +1406,7 @@ application.add(sampleContent);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Content.prototype` のインスタンスを作成する関数であるコンストラクターを返します。結果の `prototype` プロパティは `Content.prototype` です。結果には `template` 関数も提供されます。
 
@@ -1508,7 +1508,7 @@ application.add(new SampleContent({color: "blue"}));
 | `id` | `string` | トリガーするイベントの名前
 | `...` | `*` | 0個以上の追加パラメータ
 
-このコンテンツと、包含階層の上位にあるすべての `container` オブジェクトが、`id` の値で指定されたイベントをトリガーします。バブルされたイベントが `true` を返すと、バブリングは停止します。バブルされたイベントの最初のパラメータは、このコンテンツではなく、イベントをトリガーする `container` オブジェクトであることに注意してください。バブルされたイベントの追加パラメータ (ある場合) は、`bubble` 関数の追加パラメータです。
+このコンテンツと、コンテンツ階層の上位にあるすべての `container` オブジェクトが、`id` の値で指定されたイベントをトリガーします。バブルされたイベントが `true` を返すと、バブリングは停止します。バブルされたイベントの最初のパラメータは、このコンテンツではなく、イベントをトリガーする `container` オブジェクトであることに注意してください。バブルされたイベントの追加パラメータ (ある場合) は、`bubble` 関数の追加パラメータです。
 
 ```javascript
 let NamedContainer = Container.template($ => ({
@@ -1651,7 +1651,7 @@ application.add(outerContainer);
 | `id` | `string` | イベント名
 | `...` | `*` | | 0個以上の追加パラメータ
 
-このコンテナーと、包含階層の下位にあるすべての `content` オブジェクトが、`id` の値で指定されたイベントをトリガーします。トラバーサルの順序は深さ優先です。トリガーされたイベント処理関数の 1 つが `true` を返すと、トラバーサルは停止します。分散イベントの最初のパラメーターは、このコンテナーではなく、イベントをトリガーする `content` オブジェクトであることに注意してください。イベントの追加パラメーター (存在する場合) は、`distribute` 関数の追加パラメーターです。
+このコンテナーと、コンテンツ階層の下位にあるすべての `content` オブジェクトが、`id` の値で指定されたイベントをトリガーします。トラバーサルの順序は深さ優先です。トリガーされたイベント処理関数の 1 つが `true` を返すと、トラバーサルは停止します。分散イベントの最初のパラメーターは、このコンテナーではなく、イベントをトリガーする `content` オブジェクトであることに注意してください。イベントの追加パラメーター (存在する場合) は、`distribute` 関数の追加パラメーターです。
 
 ```javascript
 let NamedContainer = Container.template($ => ({
@@ -1878,7 +1878,7 @@ application.add(sampleContent);
 | --- | --- | :--- |
 | `content` | `content` | イベントをトリガーした`content`オブジェクト
 
-このイベントは、指定された `content` オブジェクトが包含階層に追加され、測定および調整された後、ユーザーに表示される前にトリガーされます。これは、座標が計算された後にオブジェクトが受け取る最初のイベントです。
+このイベントは、指定された `content` オブジェクトがコンテンツ階層に追加され、測定および調整された後、ユーザーに表示される前にトリガーされます。これは、座標が計算された後にオブジェクトが受け取る最初のイベントです。
 
 ***
 
@@ -1984,7 +1984,7 @@ application.add(sampleScreenWithDie);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Die.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Die.prototype` です。結果には `template` 関数も提供されます。
 
@@ -2078,7 +2078,7 @@ application.add(sampleContainer);
 | --- | --- | :--- |
 | `content` | `content` | アタッチする`content`オブジェクト
 
-コンテンツのコンテナ内の指定された `content` オブジェクトをこの `die` オブジェクトに置き換え、`content` オブジェクトをこの `die` オブジェクトに追加することで、`die` オブジェクトを包含階層にバインドします。
+コンテンツのコンテナ内の指定された `content` オブジェクトをこの `die` オブジェクトに置き換え、`content` オブジェクトをこの `die` オブジェクトに追加することで、`die` オブジェクトをコンテンツ階層にバインドします。
 
 ```javascript
 let whiteScreen = new Content(null, {
@@ -2369,7 +2369,7 @@ application.add(sampleImage);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Image.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Image.prototype` です。結果には `template` 関数も提供されます。
 
@@ -2442,7 +2442,7 @@ application.add(sampleLabel)
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Label.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Label.prototype` です。結果には `template` 関数も提供されます。
 
@@ -2545,7 +2545,7 @@ application.add(sampleLayout);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Layout.prototype` のインスタンスを作成する関数であるコンストラクターを返します。結果の `prototype` プロパティは `Layout.prototype` です。結果には `template` 関数も提供されます。
 
@@ -2595,7 +2595,7 @@ application.add(new SampleLayout(null, {bottom: 0, width: 200, right: 0, height:
 
 #### Events
 
-`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照)。さらに次のようになります。:
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照)。さらに次のプロパティを含みます。:
 
 **`onFitHorizontally(layout, width)`**
 
@@ -2680,7 +2680,7 @@ application.add(samplePort);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Port.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Port.prototype` です。結果には `template` 関数も提供されます。
 
@@ -3083,7 +3083,7 @@ application.add(samplePort);
 
 Same as for `content` object (see [Events](#content-events) in the section [Contentオブジェクト](#content-object)), plus:
 
-`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Events](#content-events) を参照)。さらに次のようになります。
+`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Events](#content-events) を参照)。さらに次のプロパティを含みます。
 
 **`onDraw(port, x, y, width, height)`**
 
@@ -3130,7 +3130,7 @@ application.add(sampleRow);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Row.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Row.prototype` です。結果には `template` 関数も提供されます。
 
@@ -3210,7 +3210,7 @@ application.add(scrollerSample);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Scroller.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Scroller.prototype` です。結果には `template` 関数も提供されます。
 
@@ -3249,7 +3249,7 @@ application.add(screenWithScrollerSample);
 <a id="scroller-dictionary"></a>
 #### Dictionary
 
-`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Dictionary](#container-dictionary) を参照)。さらに次のようになります。
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Dictionary](#container-dictionary) を参照)。さらに次のプロパティを含みます。
 
 | Parameter | Type | Definition |
 | --- | --- | :--- |
@@ -3413,7 +3413,7 @@ application.add(scrollerSample);
 <a id="scroller-events"></a>
 #### Events
 
-`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照)。さらに次のようになります。
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照)。さらに次のプロパティを含みます。
 
 ##### `onScrolled(scroller)`
 
@@ -3819,7 +3819,7 @@ application.add(sampleText);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | 結果が作成するインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
 `Text.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Text.prototype` です。結果には `template` 関数も提供されます。
 
@@ -3845,7 +3845,7 @@ application.add(new SampleText({ baseStyle: sampleStyle, redText: "Red!", blueTe
 <a id="text-dictionary"></a>
 #### Dictionary
 
-`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Dictionary](#content-dictionary) を参照)。さらに次のようになります。
+`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Dictionary](#content-dictionary) を参照)。さらに次のプロパティを含みます。
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
@@ -4193,7 +4193,7 @@ application.add(sampleColumn);
 - **Source code:** [`piuTransition.c`][17]
 - **Relevant Examples:** N/A
 
-`transition` オブジェクトは、包含階層の変更をアニメーション化するために使用されます。
+`transition` オブジェクトは、コンテンツ階層の変更をアニメーション化するために使用されます。
 
 #### コンストラクタの説明
 
