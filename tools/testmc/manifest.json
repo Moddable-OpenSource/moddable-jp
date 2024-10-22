@@ -16,11 +16,7 @@
 		"$(MODULES)/data/zlib/manifest_inflate.json",
 		"$(MODULES)/files/preference/manifest.json",
 		"$(MODULES)/crypt/digest/manifest.json",
-		"$(MODDABLE)/modules/crypt/tls.json",
-		"$(MODDABLE)/modules/network/http/manifest.json",
-		"$(MODDABLE)/modules/network/mqtt/manifest.json",
-		"$(MODDABLE)/modules/network/ping/manifest.json",
-		"$(MODDABLE)/modules/network/websocket/manifest.json",
+		"$(MODDABLE)/modules/io/files/manifest.json",
 		"$(MODDABLE)/modules/piu/MC/colorcell/manifest.json",
 		"$(MODDABLE)/modules/io/files/manifest.json"
 	],
@@ -46,19 +42,50 @@
 		"commodetto/*",
 		"piu/Sound"
 	],
-	"config" : {
-		"ble": {
-			"client": {
-				"timeout": 10000,
-				"targetDevice": "Moddable Server"
-			},
-			"server": {
-				"timeout": 20000,
-				"deviceName": "testmc Server"
-			}
-		}
-	},
 	"platforms": {
+		"pico": {
+			"defines": {
+				"audioOut": {
+					"bitsPerSample": 16,
+					"numChannels": 1,
+					"sampleRate": 12000,
+					"streams": 2,
+					"queueLength": 4
+				}
+			},
+			"include": [
+				"$(MODULES)/base/worker/manifest.json",
+				"$(MODULES)/files/flash/manifest.json",
+				"$(MODDABLE)/modules/pins/i2s/manifest.json"
+			],
+			"config": {
+				"digital": [12, 13, 16, 17, 26, 27],
+				"flashPartition": "xs_test",
+				"i2c": {
+					"hz": 100000,
+					"address": 53,
+					"unusedAddress": 99
+				},
+				"pwm": {
+					"from": true,
+					"pins": [18, 12, 13],
+					"ports": [4, 5],
+					"invalidPorts": [0, 1],
+					"resolutions": [10, 11, 12],
+					"hzs": [10000, 200, 17]
+				},
+				"spi": {
+					"select": 18,
+					"ports": [1, 2],
+					"invalidPorts": [3, -1],
+					"hzs": [1000, 10000, 20000]
+				},
+			 	"invalidPins": [
+					-10,
+					500
+				]
+			}
+		},
 		"esp32": {
 			"defines": {
 				"audioOut": {
@@ -72,19 +99,52 @@
 			"include": [
 				"$(MODULES)/base/worker/manifest.json",
 				"$(MODULES)/files/flash/manifest.json",
-				"$(MODDABLE)/modules/network/ble/manifest_client.json",
-				"$(MODDABLE)/modules/network/ble/manifest_server.json",
 				"$(MODDABLE)/modules/pins/i2s/manifest.json"
 			],
-			"modules": {
-				"*": [
-					"./BLE-server/*"
+			"config": {
+				"digital": [0, 1, 2, 3, 18, 19],
+				"flashPartition": "xs_test",
+				"i2c": {
+					"hz": 100000,
+					"address": 53,
+					"unusedAddress": 99
+				},
+				"pwm": {
+					"from": true,
+					"pins": [16, 20, 21],
+					"ports": [4, 5],
+					"invalidPorts": [0, 1],
+					"resolutions": [10, 11, 12],
+					"hzs": [10000, 200, 17]
+				},
+				"spi": {
+					"select": 9,
+					"ports": [0, 1],
+					"invalidPorts": [3, -1],
+					"hzs": [1000, 10000, 20000]
+				},
+			 	"invalidPins": [
+					-10,
+					500
 				]
-			},
-			"ble": {
-				"*": [
-					"./BLE-server/bleservices/*"
-				]
+			}
+		},
+		"esp32": {
+			"include": [
+				"./manifest_net.json",
+				"./manifest_ble.json",
+				"$(MODULES)/base/worker/manifest.json",
+				"$(MODULES)/files/flash/manifest.json",
+				"$(MODDABLE)/modules/pins/i2s/manifest.json"
+			],
+			"defines": {
+				"audioOut": {
+					"bitsPerSample": 16,
+					"numChannels": 1,
+					"sampleRate": 12000,
+					"streams": 2,
+					"queueLength": 4
+				}
 			},
 			"config": {
 				"digital": [12, 13, 16, 17, 26, 27],
@@ -115,6 +175,13 @@
 			}
 		},
 		"esp32/moddable_six": {
+			"include": [
+				"./manifest_net.json",
+				"./manifest_ble.json",
+				"$(MODULES)/base/worker/manifest.json",
+				"$(MODULES)/files/flash/manifest.json",
+				"$(MODDABLE)/modules/pins/i2s/manifest.json"
+			],
 			"defines": {
 				"audioOut": {
 					"bitsPerSample": 16,
@@ -123,23 +190,6 @@
 					"streams": 2,
 					"queueLength": 4
 				}
-			},
-			"include": [
-				"$(MODULES)/base/worker/manifest.json",
-				"$(MODULES)/files/flash/manifest.json",
-				"$(MODDABLE)/modules/network/ble/manifest_client.json",
-				"$(MODDABLE)/modules/network/ble/manifest_server.json",
-				"$(MODDABLE)/modules/pins/i2s/manifest.json"
-			],
-			"modules": {
-				"*": [
-					"./BLE-server/*"
-				]
-			},
-			"ble": {
-				"*": [
-					"./BLE-server/bleservices/*"
-				]
 			},
 			"config": {
 				"digital": [16, 17, 0, 1, 2, 3],
@@ -170,6 +220,13 @@
 			}
 		},
 		"esp32/moddable_six_cdc": {
+			"include": [
+				"./manifest_net.json",
+				"./manifest_ble.json",
+				"$(MODULES)/base/worker/manifest.json",
+				"$(MODULES)/files/flash/manifest.json",
+				"$(MODDABLE)/modules/pins/i2s/manifest.json"
+			],
 			"defines": {
 				"audioOut": {
 					"bitsPerSample": 16,
@@ -178,23 +235,6 @@
 					"streams": 2,
 					"queueLength": 4
 				}
-			},
-			"include": [
-				"$(MODULES)/base/worker/manifest.json",
-				"$(MODULES)/files/flash/manifest.json",
-				"$(MODDABLE)/modules/network/ble/manifest_client.json",
-				"$(MODDABLE)/modules/network/ble/manifest_server.json",
-				"$(MODDABLE)/modules/pins/i2s/manifest.json"
-			],
-			"modules": {
-				"*": [
-					"./BLE-server/*"
-				]
-			},
-			"ble": {
-				"*": [
-					"./BLE-server/bleservices/*"
-				]
 			},
 			"config": {
 				"digital": [16, 17, 0, 1, 2, 3],

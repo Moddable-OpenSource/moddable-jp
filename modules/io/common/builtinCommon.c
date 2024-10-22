@@ -109,8 +109,7 @@ xsSlot *builtinGetCallback(xsMachine *the, xsIdentifier id)
 static const char *gFormats[] = {
 	"number",
 	"buffer",
-	"string;ascii",
-	"string;utf8",
+	"string",
 	"socket/tcp",
 
 	"uint8",
@@ -122,12 +121,12 @@ static const char *gFormats[] = {
 	"uint64",
 	"int64",
 
-	NULL
+	C_NULL
 };
 
 void builtinGetFormat(xsMachine *the, uint8_t format)
 {
-	if ((0 == format) || (format >= kIOFormatInt64))
+	if ((0 == format) || (format > kIOFormatInt64))
 		xsRangeError("bad format");
 
 	xsmcSetString(xsResult, (char *)gFormats[format - 1]);

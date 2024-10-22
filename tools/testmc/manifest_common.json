@@ -29,7 +29,6 @@
 	"include": [
 		"$(MODDABLE)/examples/manifest_base.json",
 		"$(MODULES)/base/modules/manifest.json",
-		"$(MODDABLE)/examples/manifest_net.json",
 		"$(MODULES)/data/url/manifest.json"
 	],
 	"modules": {
@@ -57,7 +56,49 @@
 		"esp": {
 			"error": "testmc is unsupported on esp8266"
 		},
+		"pico": {
+			"defines": {
+				"XS_TEST": 1,
+				"softreset": 1
+			},
+			"modules": {
+				"~": [
+					"$(BUILD)/devices/pico/setup/piu",
+					"$(BUILD)/devices/pico/setup/network"
+				]
+			}
+		},
+		"pico/pico_w": {
+			"include": [
+				"$(MODDABLE)/examples/manifest_net.json"
+			],
+			"defines": {
+				"XS_TEST": 1,
+				"softreset": 1
+			},
+			"modules": {
+				"~": [
+					"$(BUILD)/devices/pico/setup/piu",
+					"$(BUILD)/devices/pico/setup/network"
+				]
+			}
+		},
+		"nrf52": {
+			"defines": {
+				"XS_TEST": 1,
+				"softreset": 1
+			},
+			"modules": {
+				"~": [
+					"$(BUILD)/devices/nrf52/setup/piu",
+					"$(BUILD)/devices/nrf52/setup/network"
+				]
+			}
+		},
 		"esp32": {
+			"include": [
+				"$(MODDABLE)/examples/manifest_net.json"
+			],
 			"defines": {
 				"XS_TEST": 1,
 				"softreset": 1
@@ -70,6 +111,9 @@
 			}
 		},
 		"esp32/moddable_six": {
+			"include": [
+				"$(MODDABLE)/examples/manifest_net.json"
+			],
 			"defines": {
 				"XS_TEST": 1,
 				"softreset": 1
@@ -82,6 +126,9 @@
 			}
 		},
 		"esp32/moddable_six_cdc": {
+			"include": [
+				"$(MODDABLE)/examples/manifest_net.json"
+			],
 			"defines": {
 				"XS_TEST": 1,
 				"softreset": 1
@@ -98,6 +145,7 @@
 				"SIMULATOR": "$(BUILD)/bin/lin/debug/mcsim"
 			},
 			"include": [
+				"$(MODDABLE)/examples/manifest_net.json",
 				"$(MODDABLE)/modules/pins/i2s/manifest.json"
 			],
 			"modules": {
@@ -106,6 +154,15 @@
 					"$(MODULES)/base/timer/timer",
 					"$(MODULES)/base/timer/lin/*"
 				]
+			},
+			"defines": {
+				"audioOut": {
+					"bitsPerSample": 16,
+					"numChannels": 1,
+					"sampleRate": 12000,
+					"streams": 2,
+					"queueLength": 4
+				}
 			}
 		},
 		"mac": {
@@ -113,6 +170,7 @@
 				"SIMULATOR": "$(BUILD)/bin/mac/debug/mcsim.app"
 			},
 			"include": [
+				"$(MODDABLE)/examples/manifest_net.json",
 				"$(MODDABLE)/modules/pins/i2s/manifest.json"
 			],
 			"modules": {
@@ -139,6 +197,7 @@
 				"SIMULATOR": "$(BUILD)/bin/win/debug/mcsim.exe"
 			},
 			"include": [
+				"$(MODDABLE)/examples/manifest_net.json",
 				"$(MODDABLE)/modules/pins/i2s/manifest.json"
 			],
 			"modules": {
@@ -149,6 +208,15 @@
 					"$(MODULES)/base/timer/*",
 					"$(MODULES)/base/timer/win/*"
 				]
+			},
+			"defines": {
+				"audioOut": {
+					"bitsPerSample": 16,
+					"numChannels": 1,
+					"sampleRate": 12000,
+					"streams": 2,
+					"queueLength": 4
+				}
 			}
 		}
 	}

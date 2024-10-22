@@ -128,7 +128,7 @@ txSlot* fxCheckGeneratorInstance(txMachine* the, txSlot* slot)
 		if (slot && (slot->flag & XS_INTERNAL_FLAG) && (slot->kind == XS_STACK_KIND))
 			return instance;
 	}
-	mxTypeError("this is no Generator instance");
+	mxTypeError("this: not a Generator instance");
 	return C_NULL;
 }
 
@@ -176,7 +176,7 @@ void fxNewGeneratorResult(txMachine* the, txBoolean done)
 void fx_Generator(txMachine* the)
 {
 	if (mxTarget->kind != XS_UNDEFINED_KIND)
-		mxTypeError("new Generator");
+		mxTypeError("new: Generator");
 }
 
 void fx_Generator_prototype_aux(txMachine* the, txFlag status)
@@ -508,7 +508,7 @@ txSlot* fxCheckAsyncGeneratorInstance(txMachine* the, txSlot* slot)
 			}
 		}
 	}
-	mxTypeError("this is no AsyncGenerator instance");
+	mxTypeError("this: not an AsyncGenerator instance");
 	return C_NULL;
 }
 
@@ -578,7 +578,7 @@ txSlot* fxNewAsyncGeneratorInstance(txMachine* the)
 void fx_AsyncGenerator(txMachine* the)
 {
 	if (mxTarget->kind != XS_UNDEFINED_KIND)
-		mxTypeError("new AsyncGenerator");
+		mxTypeError("new: AsyncGenerator");
 }
 
 void fx_AsyncGenerator_prototype_aux(txMachine* the, txFlag status)
@@ -790,7 +790,7 @@ txSlot* fxCheckAsyncFromSyncIteratorInstance(txMachine* the, txSlot* slot)
 		if (slot && (slot->flag & XS_INTERNAL_FLAG) && (slot->ID == mxID(_iterator)))
 			return instance;
 	}
-	mxTypeError("this is no AsyncFromSyncIterator instance");
+	mxTypeError("this: not an AsyncFromSyncIterator instance");
 	return C_NULL;
 }
 
@@ -891,7 +891,7 @@ void fx_AsyncFromSyncIterator_prototype_aux(txMachine* the, txFlag status, txSlo
 				}
 				slot = the->stack;
                 if (!mxIsReference(slot)) {
-                    mxTypeError("no object");
+                    mxTypeError("iterator result: not an object");
                 }
 
 				mxPushSlot(slot);

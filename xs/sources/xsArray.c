@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -471,12 +471,8 @@ void fxConstructArrayEntry(txMachine* the, txSlot* entry)
 
 txSlot* fxCreateArray(txMachine* the, txFlag flag, txIndex length)
 {
-    txBoolean resize = 1;
-	if (mxIsReference(mxThis) && mxIsConstructor(mxThis->value.reference)) {
+	if (mxIsReference(mxThis) && mxIsConstructor(mxThis->value.reference))
 		mxPushSlot(mxThis);
-		if (the->stack->value.reference != mxArrayConstructor.value.reference)
-			resize = 0;
-	}
 	else
 		mxPush(mxArrayConstructor);
 	mxNew();
@@ -487,8 +483,6 @@ txSlot* fxCreateArray(txMachine* the, txFlag flag, txIndex length)
 	else
 		mxRunCount(0);
 	mxPullSlot(mxResult);
-	if (resize)
-		fxSetIndexSize(the, mxResult->value.reference->next, length, XS_CHUNK);
 	return fxCheckArray(the, mxResult, XS_MUTABLE);
 }
 
@@ -1196,7 +1190,7 @@ void fx_Array_from(txMachine* the)
 		}
 	}
 	else {
-		fxCreateArray(the, 1, length);
+		fxCreateArray(the, 1, 0);
 	}
 	mxPushUnsigned(length);
 	mxPushSlot(mxResult);
@@ -1919,6 +1913,8 @@ void fx_Array_prototype_join(txMachine* the)
 		}
 		mxPop();
 		index++;
+
+		mxCheckMetering();
 	}
 	mxPop();
 	string = mxResult->value.string = fxNewChunk(the, fxAddChunkSizes(the, size, 1));
@@ -2390,7 +2386,7 @@ void fx_Array_prototype_sort(txMachine* the)
 			if (fxIsCallable(the, slot))
 				function = slot;
 			else
-				mxTypeError("compare is no function");
+				mxTypeError("compare: not a function");
 		}
 	}
 //	if (function)
@@ -2574,6 +2570,8 @@ void fx_Array_prototype_toLocaleString(txMachine* the)
 		}
 		mxPop();
 		index++;
+		
+		mxCheckMetering();
 	}
 	string = mxResult->value.string = fxNewChunk(the, fxAddChunkSizes(the, size, 1));
 	slot = list->next;
@@ -2622,7 +2620,7 @@ void fx_Array_prototype_toSorted(txMachine* the)
 			if (fxIsCallable(the, slot))
 				function = slot;
 			else
-				mxTypeError("compare is no function");
+				mxTypeError("compare: not a function");
 		}
 	}
 	LENGTH = fxGetArrayLength(the, mxThis);

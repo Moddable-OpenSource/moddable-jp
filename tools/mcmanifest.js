@@ -739,22 +739,32 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 		this.line("");
 	}
 	generateDependenciesDefinitions(tool) {
+		if ("mcrun" == tool.toolName)
+			return;
+
 		if ("esp32" == tool.platform) {
 			if (tool.dependencies?.length) {
+				var projBase = `${tool.tmpPath}${tool.slash}xsProj-${tool.environment.ESP32_SUBCLASS}${tool.slash}managed_components${tool.slash}`;
 				this.write("MANAGED_COMPONENT_DIRS = \\\n");
 				for (var dep of tool.dependencies) {
+ 					const depBase = `${projBase}${dep.namespace}__${dep.name}${tool.slash}`;
 					var depLine = "\t";
 					if (tool.windows)
 						depLine += "-I";
-					depLine += tool.tmpPath + tool.slash + "xsProj-" + tool.environment.ESP32_SUBCLASS + tool.slash + "managed_components" + tool.slash + dep.namespace + "__" + dep.name + "/include \\\n";
+					depLine += depBase + "include \\\n";
+					if (dep.includes) {
+						for (var inc of dep.includes) {
+							if (tool.windows)
+								depLine += "-I";
+							depLine += `${depBase}${tool.resolveSlash(inc)} \\\n`;
+						}
+					}
 					this.write(depLine);
 				}
 				this.write("\n");
 			}
 		}
-		if (("esp32" == tool.platform) && 
-			((tool.dependencies) || (tool.environment.USE_USB == 1))) {
-
+		if ("esp32" == tool.platform) {
 			var dep, did = 0;
 			let depStr = "BUILD_DEPENDENCIES = ";
 			for (dep of tool.dependencies) {

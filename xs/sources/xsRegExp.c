@@ -117,7 +117,7 @@ txSlot* fxCheckRegExpInstance(txMachine* the, txSlot* slot)
 		if ((slot->next) && (slot->next->flag & XS_INTERNAL_FLAG) && (slot->next->kind == XS_REGEXP_KIND))
 			return slot;
 	}
-	mxTypeError("this is no RegExp instance");
+	mxTypeError("this: not a RegExp instance");
 	return C_NULL;
 }
 
@@ -278,7 +278,7 @@ void fx_RegExp_prototype_get_flag(txMachine* the, txU4 flag)
 			return;
 		}
 	}
-	mxTypeError("this is no object");
+	mxTypeError("this: not an object");
 #endif
 }
 
@@ -288,7 +288,7 @@ void fx_RegExp_prototype_get_flags(txMachine* the)
 	char flags[9];
 	txIndex index = 0;
 	if (mxThis->kind != XS_REFERENCE_KIND)
-		mxTypeError("this is no object");
+		mxTypeError("this: not an object");
 	mxPushSlot(mxThis);
 	mxGetID(mxID(_hasIndices));
 	if (fxToBoolean(the, the->stack++))
@@ -435,7 +435,7 @@ void fx_RegExp_prototype_get_source(txMachine* the)
 			return;
 		}
 	}
-	mxTypeError("this is no RegExp instance");
+	mxTypeError("this: not a RegExp instance");
 #endif
 }
 
@@ -708,7 +708,7 @@ void fx_RegExp_prototype_matchAll(txMachine* the)
 	txSlot* property;
 	
 	if (!mxIsReference(mxThis))
-		mxTypeError("this is no object");
+		mxTypeError("this: not an object");
 	if (mxArgc == 0)
 		mxPushUndefined();
 	else
@@ -1039,7 +1039,7 @@ void fx_RegExp_prototype_split(txMachine* the)
 	txInteger size, p, q, e, c, i;
 	
 	if (!mxIsReference(mxThis))
-		mxTypeError("this is no object");
+		mxTypeError("this: not an object");
 	if (mxArgc == 0)
 		mxPushUndefined();
 	else
