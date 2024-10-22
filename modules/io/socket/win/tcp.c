@@ -173,7 +173,7 @@ void xs_tcp_constructor(xsMachine *the)
 // #endif
 
   			u_long nonBlocking = 1;
-  			ioctlsocket(the->connection, FIONBIO, &nonBlocking);
+  			ioctlsocket(tcp->skt, FIONBIO, &nonBlocking);
 
 			tcp->task = modTimerAdd(kTaskInterval, kTaskInterval, tcpTask, &tcp, sizeof(tcp));
 
