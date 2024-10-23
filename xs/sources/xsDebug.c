@@ -1658,9 +1658,9 @@ void fxEchoInstance(txMachine* the, txSlot* theInstance, txInspectorNameList* th
 #if mxModuleStuff
 		case XS_MODULE_STUFF_KIND:
 			aProperty = aProperty->next;
-			fxEchoProperty(the, aProperty, theList, "(module)", -1, C_NULL);
+			fxEchoProperty(the, aProperty, theList, "(namespace)", -1, C_NULL);
 			aProperty = aProperty->next;
-			fxEchoProperty(the, aProperty, theList, "(modules)", -1, C_NULL);
+			fxEchoProperty(the, aProperty, theList, "(imports)", -1, C_NULL);
 			aProperty = aProperty->next;
 			fxEchoProperty(the, aProperty, theList, "(source)", -1, C_NULL);
 			aProperty = aProperty->next;
@@ -1669,6 +1669,8 @@ void fxEchoInstance(txMachine* the, txSlot* theInstance, txInspectorNameList* th
 			fxEchoProperty(the, aProperty, theList, "(importHook)", -1, C_NULL);
 			aProperty = aProperty->next;
 			fxEchoProperty(the, aProperty, theList, "(importMetaHook)", -1, C_NULL);
+			aProperty = aProperty->next;
+			fxEchoProperty(the, aProperty, theList, "(importNowHook)", -1, C_NULL);
 			aProperty = aProperty->next;
 			break;
 #endif
