@@ -14,9 +14,7 @@ function callWithInvalidReceivers(obj, functionName, ...args)
 }
 
 const path = "test";
-
-callWithInvalidReceivers(storage, "open", {path});
-let store = storage.open({path}); 
+const store = storage.open({path}); 
 
 callWithInvalidReceivers(store, "write", "key", Uint8Array.of(1));
 callWithInvalidReceivers(store, "read", "key");
