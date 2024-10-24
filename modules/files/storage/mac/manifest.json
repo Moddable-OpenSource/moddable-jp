@@ -1,0 +1,13 @@
+{
+	"platforms": {
+		"mac": {
+			"modules": {
+				"*": "$(MODDABLE)/modules/io/common/builtinCommon",
+				"embedded:x-storage": "./storage-mac"
+			}
+		}
+	},
+	"preload": [
+		"embedded:x-storage"
+	]
+}
