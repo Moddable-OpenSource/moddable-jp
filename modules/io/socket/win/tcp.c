@@ -408,7 +408,7 @@ void tcpTask(modTimer timer, void *refcon, int refconSize)
 	fd_set rfds, wfds;
 	struct timeval tv;
 
-	if ((INVALID_SOCKET == tcp->skt) || tcp->done)
+	if ((INVALID_SOCKET == tcp->skt) || tcp->done || tcp->error)
 		return;		// closed socket
 
 	tcpHold(tcp);
@@ -443,7 +443,7 @@ void tcpTask(modTimer timer, void *refcon, int refconSize)
 				tcpTrigger(tcp, kTCPReadable);
 				modInstrumentationAdjust(NetworkBytesRead, bytesRead);
 			}
-			else if (bytesRead < 0) {
+			else {
 				tcp->error = 1;
 				if (0 == tcp->bytesReadable)
 					tcpTrigger(tcp, kTCPError);
