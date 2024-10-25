@@ -70,6 +70,8 @@ enum {
 	kIOFormatUint64 = 11,
 	kIOFormatInt64 = 12,
 
+	kIOFormatBufferDisposable = 13,
+
 	kIOFormatInvalid = 0xFF,
 };
 
