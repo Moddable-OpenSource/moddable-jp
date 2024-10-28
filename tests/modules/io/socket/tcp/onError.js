@@ -27,7 +27,7 @@ new Listener({
 			},
 			onError() {
 				$DONE("incoming socket failed");
-				}
+			}
 		});
 	},
 });
