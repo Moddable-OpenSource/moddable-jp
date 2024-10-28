@@ -243,6 +243,9 @@ void doClose(xsMachine *the, xsSlot *instance)
 {
 	TCP tcp = xsmcGetHostData(*instance);
 	if (tcp && xsmcGetHostDataValidate(*instance, (void *)&xsTCPHooks)) {
+		if (tcp->triggered)
+			tcpRelease(tcp);
+
 		tcp->done = 1;
 		tcp->triggerable = 0;
 		tcp->triggered = 0;
