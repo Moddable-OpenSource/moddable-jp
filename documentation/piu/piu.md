@@ -92,7 +92,7 @@ let after = content.position;	// {x: 160, y:120} (assuming the application is 32
 
 オブジェクトの座標は、その位置とサイズに対する暗黙的な制約を定義します。
 
-たとえば、中央揃えのコンテンツや、サイズ/位置がコンテナーのサイズ/位置に依存するコンテンツは移動できません。
+たとえば、中央揃えのコンテンツや、サイズ/位置がコンテナのサイズ/位置に依存するコンテンツは移動できません。
 
 ```javascript
 // Cannot move
@@ -447,8 +447,8 @@ const halfCyanSkin = new Skin({ fill:hsla(180, 1, 0.5, 0.5) });
 コンテンツ階層内のすべてのコンテンツは、`duration`、`fraction`、`interval`、および `time` プロパティを使用して時間ベースのアニメーション動作を制御するクロックとして使用できます。
 
 - `duration` プロパティはアニメーションの継続時間で、ミリ秒単位で表されます。
-- `time` プロパティはコンテンツの時計の現在の時刻を提供します。
-- `fraction` プロパティは、コンテンツの継続時間に対する時計の現在の時刻の比率です。
+- `time` プロパティはコンテンツのクロックの現在の時刻を提供します。
+- `fraction` プロパティは、コンテンツの継続時間に対するクロックの現在の時刻の比率です。
 - `interval` プロパティはアニメーションのフレーム間の時間 (フレーム レート) で、ミリ秒単位で表されます。
 
 コンテンツの `start` および `stop` 関数は、クロックの実行を制御します。現在の時刻が期間に達すると、クロックは自動的に停止します。コンテンツの `loop` プロパティが true に設定されている場合、クロックはリスタートします。
@@ -765,7 +765,7 @@ export default function() {
 | Arguments | Type | Description
 | --- | --- | :--- |
 | `behaviorData` | `*` | このコンテナの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Container.prototype` から継承するオブジェクトである `application` インスタンスを返します。
 
@@ -784,7 +784,7 @@ export default new Application(null, {
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Application.prototype` のインスタンスを作成する関数であるコンストラクターを返します。結果の `prototype` プロパティは `Application.prototype` です。結果には `template` 関数も提供されます。
+`Application.prototype` のインスタンスを作成する関数であるコンストラクターを返します。戻り値の `prototype` プロパティは `Application.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 // Taken from the balls example app
@@ -867,7 +867,7 @@ application.add(sampleContent);
 | Arguments | Type | Description
 | --- | --- | :--- |
 | `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[コンテンツ オブジェクト](#container-object) の [辞書](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[コンテンツ オブジェクト](#container-object) の [辞書](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Column .prototype` から継承したオブジェクトである `column` インスタンスを返します。
 
@@ -896,7 +896,7 @@ application.add(sampleColumn);
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Column.prototype` のインスタンスを作成する関数であるコンストラクターを返します。結果の `prototype` プロパティは `Column.prototype` です。結果には `template` 関数も提供されます。
+`Column.prototype` のインスタンスを作成する関数であるコンストラクターを返します。戻り値の `prototype` プロパティは `Column.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -939,7 +939,7 @@ application.add(new SampleColumn({ firstColor:"red", secondColor:"blue" }));
 | Arguments | Type | Description
 | --- | --- | :--- |
 | `behaviorData` | `*` | このコンテナの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#container-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#container-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Container.prototype` から継承するオブジェクトである `container` インスタンスを返します。
 
@@ -969,7 +969,7 @@ application.add(sampleContainer);
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Container.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Container.prototype` です。結果には `template` 関数も提供されます。
+`Container.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Container.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -1022,7 +1022,7 @@ application.add(new SampleContainer({ backgroundColor: "white", squareColor: "bl
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | 追加する `content` オブジェクト。バインドされていない必要があります。つまり、そのコンテナーは `null` である必要があります。
+| `content` | `content` | 追加する `content` オブジェクト。バインドされていない必要があります。つまり、そのコンテナは `null` である必要があります。
 
 指定された `content` オブジェクトをこのコンテナに追加します。`content` オブジェクトは、このコンテナ内の最後の `content` オブジェクトになります。
 
@@ -1140,8 +1140,8 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | 挿入する `content` オブジェクト。そのコンテナーは `null` である必要があります。
-| `before` | `object` | 挿入する前の `content` オブジェクト。そのコンテナーはこのコンテナーである必要があります。
+| `content` | `content` | 挿入する `content` オブジェクト。そのコンテナは `null` である必要があります。
+| `before` | `object` | 挿入する前の `content` オブジェクト。そのコンテナはこのコンテナである必要があります。
 
 パラメータで指定されたとおりに、このコンテナ内の別のオブジェクトの前に 1 つの `content` オブジェクトを挿入します。
 
@@ -1208,7 +1208,7 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | 削除する `content` オブジェクト。そのコンテナーはこのコンテナーである必要があります。
+| `content` | `content` | 削除する `content` オブジェクト。そのコンテナはこのコンテナである必要があります。
 
 指定された `content` オブジェクトをこのコンテナから削除します
 
@@ -1241,8 +1241,8 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | 置き換える `content` オブジェクト。そのコンテナーはこのコンテナーである必要があります。
-| `by` | `content` | 置換する `content` オブジェクト。バインドされていない必要があります。つまり、そのコンテナーは `null` である必要があります。
+| `content` | `content` | 置き換える `content` オブジェクト。そのコンテナはこのコンテナである必要があります。
+| `by` | `content` | 置換する `content` オブジェクト。バインドされていない必要があります。つまり、そのコンテナは `null` である必要があります。
 
 パラメータで指定されたとおりに、コンテナ内の `content` オブジェクトを別のオブジェクトに置き換えます。
 
@@ -1314,7 +1314,7 @@ application.add(new ColoredScreen({ color: "red", nextColor: "blue" }));
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content0, content1` | `content` | 交換する `content` オブジェクト。両方のオブジェクトのコンテナーはこのコンテナーである必要があります。
+| `content0, content1` | `content` | 交換する `content` オブジェクト。両方のオブジェクトのコンテナはこのコンテナである必要があります。
 
 このコンテナ内の指定された `content` オブジェクトを交換します。
 
@@ -1383,7 +1383,7 @@ application.add(sampleContainer);
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Content.prototype` から継承したオブジェクトである `content` インスタンスを返します。
 
@@ -1408,7 +1408,7 @@ application.add(sampleContent);
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Content.prototype` のインスタンスを作成する関数であるコンストラクターを返します。結果の `prototype` プロパティは `Content.prototype` です。結果には `template` 関数も提供されます。
+`Content.prototype` のインスタンスを作成する関数であるコンストラクターを返します。戻り値の `prototype` プロパティは `Content.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let SampleContent = Content.template($ => ({
@@ -1434,7 +1434,7 @@ application.add(new SampleContent({color: "blue"}));
 | `active` | `boolean` | `true` の場合、このコンテンツはタッチ可能であり、つまりタッチ イベントがトリガーされます。 |
 | `anchor` | `string` | インスタンス化データ内に作成された`content`オブジェクトへの参照であるアンカーを作成します。
 | `backgroundTouch ` | `boolean` | `true` の場合、このコンテナはそのコンテンツが受信したすべてのタッチ イベントを受信します。つまり、そのコンテンツの 1 つがタッチされたときにタッチ イベントがトリガーされます。
-| `Behavior` | `function` | `Behavior.prototype` のインスタンスを作成する関数。通常は `Behavior` クラスを拡張するクラスです。このコンテンツは、この `behavior` のインスタンスを作成し、その `behavior` パラメータを作成されたインスタンスに設定し、`onCreate` メソッドをトリガーします。
+| `Behavior` | `function` | `Behavior.prototype` のインスタンスを作成する関数。通常は `Behavior` クラスを継承するクラスです。このコンテンツは、この `behavior` のインスタンスを作成し、その `behavior` パラメータを作成されたインスタンスに設定し、`onCreate` メソッドをトリガーします。
 | `bottom` | `number` | このコンテンツの `bottom` 座標（ピクセル単位）（作成されたインスタンスの `coordinates` プロパティで `bottom` を設定）。
 | `duration` | `number` |このコンテンツの継続時間（ミリ秒単位）。このコンテンツは、クロックが実行され、その時間が継続時間と等しいときに `onFinished` イベントをトリガーします。
 | `exclusiveTouch` | `boolean` | `true` の場合、このコンテンツは常にタッチをキャプチャします。つまり、このコンテンツの `onTouchDown` で `captureTouch` が暗黙的に呼び出されます。`exclusiveTouch` を `true` に設定することは、すべてのタッチ ID の `onTouchDown` イベントに応答して `captureTouch` を呼び出すことと同じです。
@@ -1610,7 +1610,7 @@ application.add(redContainer);
 | `id` | `string` | トリガーするイベントの名前
 | `...` | `*` | 0個以上の追加パラメータ
 
-このコンテンツにより、`id` の値で指定されたイベントがトリガーされます。委任されたイベントの最初のパラメータはこのコンテンツです。委任されたイベントの追加パラメータ (存在する場合) は、`delegate` 関数の追加パラメータです。
+このコンテンツにより、`id` の値で指定されたイベントがトリガーされます。移譲されたイベントの最初のパラメータはこのコンテンツです。移譲されたイベントの追加パラメータ (存在する場合) は、`delegate` 関数の追加パラメータです。
 
 ```javascript
 let NamedContainer = Container.template($ => ({
@@ -1651,7 +1651,7 @@ application.add(outerContainer);
 | `id` | `string` | イベント名
 | `...` | `*` | | 0個以上の追加パラメータ
 
-このコンテナーと、コンテンツ階層の下位にあるすべての `content` オブジェクトが、`id` の値で指定されたイベントをトリガーします。トラバーサルの順序は深さ優先です。トリガーされたイベント処理関数の 1 つが `true` を返すと、トラバーサルは停止します。分散イベントの最初のパラメーターは、このコンテナーではなく、イベントをトリガーする `content` オブジェクトであることに注意してください。イベントの追加パラメーター (存在する場合) は、`distribute` 関数の追加パラメーターです。
+このコンテナと、コンテンツ階層の下位にあるすべての `content` オブジェクトが、`id` の値で指定されたイベントをトリガーします。トラバーサルの順序は深さ優先です。トリガーされたイベント処理関数の 1 つが `true` を返すと、トラバーサルは停止します。分散イベントの最初のパラメーターは、このコンテナではなく、イベントをトリガーする `content` オブジェクトであることに注意してください。イベントの追加パラメーター (存在する場合) は、`distribute` 関数の追加パラメーターです。
 
 ```javascript
 let NamedContainer = Container.template($ => ({
@@ -1796,7 +1796,7 @@ constrainedContent.sizeBy(100,100);	// Does nothing
 
 **`start()`**
 
-このコンテンツの時計を開始します。
+このコンテンツのクロックを開始します。
 
 ```javascript
 class SampleBehavior extends Behavior {
@@ -1826,7 +1826,7 @@ application.add(sampleContent);
 
 **`stop()`**
 
-このコンテンツの時計を停止します。
+このコンテンツのクロックを停止します。
 
 ```javascript
 class SampleBehavior extends Behavior {
@@ -1940,7 +1940,7 @@ application.add(sampleContent);
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | このダイスの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Die.prototype.` から継承したオブジェクトである `die` インスタンスを返します。
 
@@ -1986,7 +1986,7 @@ application.add(sampleScreenWithDie);
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Die.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Die.prototype` です。結果には `template` 関数も提供されます。
+`Die.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Die.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let SampleDie = Die.template($ => ({
@@ -2114,7 +2114,7 @@ application.add(whiteScreen);
 
 **`detach()`**
 
-この `die` オブジェクトから最初の `content` オブジェクトを削除し、そのコンテナー内のこの `die` オブジェクトを削除した `content` オブジェクトに置き換えることで、この `die` オブジェクトをコンテンツ階層からアンバインドします。
+この `die` オブジェクトから最初の `content` オブジェクトを削除し、そのコンテナ内のこの `die` オブジェクトを削除した `content` オブジェクトに置き換えることで、この `die` オブジェクトをコンテンツ階層からアンバインドします。
 
 ```
 let whiteScreen = new Content(null, {
@@ -2350,7 +2350,7 @@ GIF のフレーム レートはファイル自体に設定されており、ア
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | この画像の `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#image-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#image-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Image.prototype` から継承したオブジェクトである `image` インスタンスを返します。
 
@@ -2371,7 +2371,7 @@ application.add(sampleImage);
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Image.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Image.prototype` です。結果には `template` 関数も提供されます。
+`Image.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Image.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 class ImageBehavior extends Behavior {
@@ -2423,7 +2423,7 @@ application.add(new SampleImage("street.cs"));
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` |このラベルの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#label-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#label-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Label.prototype` から継承したオブジェクトである `label` インスタンスを返します。
 
@@ -2444,7 +2444,7 @@ application.add(sampleLabel)
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Label.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Label.prototype` です。結果には `template` 関数も提供されます。
+`Label.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Label.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let blueStyle = new Style({ font:"600 28px Open Sans", color: "blue" });
@@ -2483,7 +2483,7 @@ application.add(new SampleLabel({ string: "Hello, World!", style: redStyle }, { 
 - **Source code:** [`piuLayout.c`][9]
 - **Relevant Examples:** N/A
 
-`layout` オブジェクトは、その動作においてその内容の配置とサイズ設定をスクリプトに委任する `container` オブジェクトです。
+`layout` オブジェクトは、その動作においてその内容の配置とサイズ設定をスクリプトに移譲する `container` オブジェクトです。
 
 幅が測定されると、`layout` オブジェクトは `onMeasureHorizo​​ntally` イベントをトリガーし、この動作によって `layout` オブジェクトの測定された幅またはそのコンテンツの座標を変更できます。
 
@@ -2496,7 +2496,7 @@ application.add(new SampleLabel({ string: "Hello, World!", style: redStyle }, { 
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | このレイアウトの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Layout.prototype/` から継承したオブジェクトである `layout` インスタンスを返します。
 
@@ -2547,7 +2547,7 @@ application.add(sampleLayout);
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Layout.prototype` のインスタンスを作成する関数であるコンストラクターを返します。結果の `prototype` プロパティは `Layout.prototype` です。結果には `template` 関数も提供されます。
+`Layout.prototype` のインスタンスを作成する関数であるコンストラクターを返します。戻り値の `prototype` プロパティは `Layout.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -2646,7 +2646,7 @@ application.add(new SampleLayout(null, {bottom: 0, width: 200, right: 0, height:
 - **Source code:** [`piuPort.c`][10]
 - **Relevant Examples:** [countdown][25], [list][26], [spinner][27]
 
-`port` オブジェクトは、単純な Piu グラフィック コマンドを使用して描画する動作で、描画をスクリプトに委任する `content` オブジェクトです。
+`port` オブジェクトは、単純な Piu グラフィック コマンドを使用して描画する動作で、描画をスクリプトに移譲する `content` オブジェクトです。
 
 `port` オブジェクトには、すべての描画に影響するClip Rectangle (最初は `port` オブジェクトの境界) があります。
 
@@ -2657,7 +2657,7 @@ application.add(new SampleLayout(null, {bottom: 0, width: 200, right: 0, height:
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Port.prototype` から継承したオブジェクトである `port` インスタンスを返します。
 
@@ -2682,7 +2682,7 @@ application.add(samplePort);
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Port.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Port.prototype` です。結果には `template` 関数も提供されます。
+`Port.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Port.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let SamplePort = Port.template($ => ({
@@ -3108,7 +3108,7 @@ Same as for `content` object (see [Events](#content-events) in the section [Cont
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Row.prototype` から継承したオブジェクトである `row` インスタンスを返します。
 
@@ -3132,7 +3132,7 @@ application.add(sampleRow);
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Row.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Row.prototype` です。結果には `template` 関数も提供されます。
+`Row.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Row.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -3175,7 +3175,7 @@ application.add(new SampleRow({ firstColor:"red", secondColor:"blue" }));
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#scroller-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#scroller-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Scroller.prototype` から継承したオブジェクトである `scroller` インスタンスを返します。
 
@@ -3212,7 +3212,7 @@ application.add(scrollerSample);
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Scroller.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Scroller.prototype` です。結果には `template` 関数も提供されます。
+`Scroller.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Scroller.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 import { VerticalScrollerBehavior } from "scroller";	// See "scroller.js" from the scroller example
@@ -3438,7 +3438,7 @@ application.add(scrollerSample);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#skin-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#skin-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Skin.prototype` から継承したオブジェクトである `skin` インスタンスを返します。
 
@@ -3467,9 +3467,9 @@ application.add(borderedContent);
 
 | Arguments | Type | Description
 | --- | --- | ---
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#skin-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#skin-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-`Skin.prototype` のインスタンスを作成する関数であるコンストラクターを返します。結果の `prototype` プロパティは `Skin.prototype` です。
+`Skin.prototype` のインスタンスを作成する関数であるコンストラクターを返します。戻り値の `prototype` プロパティは `Skin.prototype` です。
 
 ```javascript
 // Texture skin
@@ -3570,7 +3570,7 @@ application.add(borderedContent);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#sound-dictionary) セクションで指定されたパラメータのみが効果を持ち、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#sound-dictionary) セクションで指定されたパラメータのみが効果を持ち、他のパラメータは無視されます。
 
 `Sound.prototype` から継承したオブジェクトである `sound` インスタンスを返します。
 
@@ -3652,7 +3652,7 @@ sampleSound.play(0, 1, () => {
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#style-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#style-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Style.prototype` から継承したオブジェクトである `style` インスタンスを返します。
 
@@ -3672,9 +3672,9 @@ application.add(sampleLabel)
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#style-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#style-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-`Style.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Style` です。結果には `template` 関数も提供されます。
+`Style.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Style` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let RedStyle = Style.template({ font:"600 28px Open Sans", color: "red" });
@@ -3789,7 +3789,7 @@ let size = normalStyle.measure("Moddable");	// {"width":134,"height":38}
 | Argument | Type | Description |
 | --- | --- | :--- |
 | `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#text-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#text-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Text.prototype` から継承したオブジェクトである `text` インスタンスを返します。
 
@@ -3821,7 +3821,7 @@ application.add(sampleText);
 | --- | --- | :--- |
 | `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-`Text.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Text.prototype` です。結果には `template` 関数も提供されます。
+`Text.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Text.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let sampleStyle = new Style({ font:"600 28px Open Sans"});
@@ -3954,7 +3954,7 @@ const logoSkin = new Skin({ texture: logoTexture, x: 0, y: 0, width: 100, height
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#texture-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#texture-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
 `Object.prototype` から継承したオブジェクトである `texture` インスタンスを返します。
 
@@ -3967,9 +3967,9 @@ const logoSkin = new Skin({ texture: logoTexture, x: 0, y: 0, width: 100, height
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | 結果を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#texture-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#texture-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-`Texture.prototype` のインスタンスを作成する関数であるコンストラクタを返します。結果の `prototype` プロパティは `Texture.prototype` です。
+`Texture.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Texture.prototype` です。
 
 ```javascript
 const LogoTexture = Texture.template({ path: "logo.png" });
