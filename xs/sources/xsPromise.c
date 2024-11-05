@@ -210,6 +210,7 @@ void fxAddUnhandledRejection(txMachine* the, txSlot* promise)
 	while ((slot = *address)) {
 		if (slot->value.weakRef.target == promise)
 			break;
+		mxMeterSome(1);
 		slot = slot->next;
 		address = &slot->next;
 	}
