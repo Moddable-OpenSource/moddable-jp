@@ -328,6 +328,8 @@ class Connection {
 						if (writable <= 0)
 							return;
 					}
+					else if ((undefined !== this.#remaining) && (writable > this.#remaining))
+						writable = this.#remaining;
 					this.#options.onWritable?.call(this, writable);
 					return;
 					}
@@ -375,7 +377,7 @@ class Connection {
 
 		this.#options.status = response.status;
 		this.#options.headers = response.headers.entries();
-		this.#remaining = 0;
+		this.#remaining = undefined;
 
 		this.#onWritable(this.#writable);
 	}
