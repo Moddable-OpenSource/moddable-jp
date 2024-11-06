@@ -47,9 +47,8 @@ Bitmap.JPEG = 15;
 Bitmap.PNG = 16;
 Bitmap.CLUT256 = 17;
 Bitmap.CLUT32 = 18;
+Bitmap.YUV422 = 20;
 
 Bitmap.RLE = 0x80;	// flag applied to pixel types
-
-Object.freeze(Bitmap.prototype);
 
 export default Bitmap;
