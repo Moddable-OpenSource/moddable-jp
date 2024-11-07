@@ -435,6 +435,9 @@ class HTTPServer {
 		this.#listener?.close();
 		this.#listener = undefined;
 	}
+	get port() {
+		return this.#listener.port;
+	}
 }
 
 export default HTTPServer;
