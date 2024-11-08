@@ -740,8 +740,8 @@ void cc32RGBAtoBGRA32(uint32_t pixelCount, void *srcPixels, void *dstPixels, voi
 // https://learn.microsoft.com/en-us/previous-versions/aa904813(v=vs.80)?redirectedfrom=MSDN#example-converting-8-bit-yuv-to-rgb888
 void cc32YUV422toRGB565LE(uint32_t pixelCount, void *srcPixels, void *dstPixels, void *clut)
 {
-#define CLIP5(COMPONENT) (TMP = (COMPONENT), (TMP < 0) ? 0 : (TMP > 32) ? 32 : TMP)
-#define CLIP6(COMPONENT) (TMP = (COMPONENT), (TMP < 0) ? 0 : (TMP > 64) ? 64 : TMP)
+#define CLIP5(COMPONENT) (TMP = (COMPONENT), (TMP < 0) ? 0 : (TMP > 31) ? 31 : TMP)
+#define CLIP6(COMPONENT) (TMP = (COMPONENT), (TMP < 0) ? 0 : (TMP > 63) ? 63 : TMP)
 	int Y0, U, Y1, V, C, D, E, TMP;
 	uint8_t r, g, b;
 	uint32_t *src = (uint32_t *)srcPixels;
