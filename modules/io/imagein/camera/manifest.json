@@ -6,7 +6,8 @@
 		"mac": {
 			"modules": {
 				"*": "$(MODDABLE)/modules/io/common/builtinCommon",
-				"embedded:x-io/imagein/camera": "./mac/camera"
+				"embedded:x-io/imagein/camera": "./mac/camera",
+				"commodetto/Convert": "$(MODDABLE)/modules/commodetto/commodettoConvert"
 			}
 		},
 		"lin": {
