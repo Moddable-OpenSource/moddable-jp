@@ -22,6 +22,7 @@
 #include "mc.defines.h"
 #include "commodettoBitmapFormat.h"
 #include "builtinCommon.h"
+#include "commodettoConvert.h"
 
 #include <fcntl.h>
 #include <linux/videodev2.h>
@@ -74,6 +75,8 @@ struct CameraRecord {
 	uint32_t height;
 	uint32_t imageType;
 	
+	CommodettoConverter yuvToRGB;
+	
 	uint32_t size;
 	uint8_t* data;
 	
@@ -82,7 +85,6 @@ struct CameraRecord {
 };
 
 static void xs_camera_mark(xsMachine* the, void* it, xsMarkRoot markRoot);
-static void YUYVtoRGB565LE(uint8_t* src, uint16_t* dst, uint16_t width, uint16_t height);
 
 static const xsHostHooks xsCameraHooks = {
 	xs_camera_destructor,
@@ -227,7 +229,7 @@ static gpointer xs_camera_loop(gpointer it)
         }
         
         buffer = &(camera->queueBuffers[buf.index]);
-        YUYVtoRGB565LE(buffer->data, (uint16_t*)buffer->data, (uint16_t)camera->width, (uint16_t)camera->height);
+		(camera->yuvToRGB)(camera->width * camera->height, buffer->data, buffer->data, NULL);
 			
 		g_mutex_lock(&(camera->mainMutex));
 		if (camera->mainBuffer == C_NULL) {
@@ -356,8 +358,9 @@ void xs_camera_constructor(xsMachine *the)
 		camera->width = width;
 		camera->height = height;
 		camera->imageType = imageType;
-		camera->queueLength = queueLength;
+		camera->yuvToRGB = CommodettoPixelsConverterGet(kCommodettoBitmapYUV422, kCommodettoBitmapRGB565LE);
 		
+		camera->queueLength = queueLength;
 		for (index = 0; index < queueLength; index++) {
 			memset(&buf, 0, sizeof(buf));
 			buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -515,43 +518,3 @@ void xs_camera_get_imageType(xsMachine *the)
 	Camera camera = (Camera)xsmcGetHostDataValidate(xsThis, (void *)&xsCameraHooks);
 	xsmcSetInteger(xsResult, camera->imageType);
 }
-
-// https://learn.microsoft.com/en-us/previous-versions/aa904813(v=vs.80)?redirectedfrom=MSDN#example-converting-8-bit-yuv-to-rgb888
-
-void YUYVtoRGB565LE(uint8_t* src, uint16_t* dst, uint16_t width, uint16_t height) 
-{
-#define CLIP(COMPONENT) (TMP = (COMPONENT), (TMP < 0) ? 0 : (TMP > 255) ? 255 : TMP)
-	int Y0, U, Y1, V, C, D, E, TMP;
-	uint16_t r, g, b, x, y;
-	for (y = 0; y < height; y++) {
-		for (x = 0; x < width; x += 2) {
-			Y0 = *src++;
-			U =  *src++;
-			Y1 = *src++;
-			V =  *src++;
-			D = U - 128;
-			E = V - 128;
-			
-			C = (298 * (Y0 - 16)) + 128;
-			r = CLIP(( C           + 409 * E) >> 8);
-			g = CLIP(( C - 100 * D - 208 * E) >> 8);
-			b = CLIP(( C + 516 * D          ) >> 8);
-			r >>= 3;
-			g >>= 2;
-			b >>= 3;
-			*dst = ((r & 0x1F) << 11) | ((g & 0x3F) << 5) | ((b & 0x1F) << 0);
-			dst++;
-			
-			C = (298 * (Y1 - 16)) + 128;
-			r = CLIP(( C           + 409 * E) >> 8);
-			g = CLIP(( C - 100 * D - 208 * E) >> 8);
-			b = CLIP(( C + 516 * D          ) >> 8);
-			r >>= 3;
-			g >>= 2;
-			b >>= 3;
-			*dst = ((r & 0x1F) << 11) | ((g & 0x3F) << 5) | ((b & 0x1F) << 0);
-			dst++;
-		}
-	}
-}
-

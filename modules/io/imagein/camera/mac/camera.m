@@ -315,9 +315,9 @@ void xs_camera_constructor(xsMachine *the)
 		camera->width = width;
 		camera->height = height;
 		camera->imageType = imageType;
-		camera->queueLength = queueLength;
 		camera->yuvToRGB = CommodettoPixelsConverterGet(kCommodettoBitmapYUV422, kCommodettoBitmapRGB565LE);
 
+		camera->queueLength = queueLength;
 		for (index = 0; index < queueLength; index++)
 			xs_camera_enqueueBuffer(&(camera->threadBuffer), &(camera->queueBuffers[index]));
 		 

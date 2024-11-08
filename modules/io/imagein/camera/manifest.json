@@ -13,13 +13,15 @@
 		"lin": {
 			"modules": {
 				"*": "$(MODDABLE)/modules/io/common/builtinCommon",
-				"embedded:x-io/imagein/camera": "./lin/camera"
+				"embedded:x-io/imagein/camera": "./lin/camera",
+				"commodetto/Convert": "$(MODDABLE)/modules/commodetto/commodettoConvert"
 			}
 		},
 		"win": {
 			"modules": {
 				"*": "$(MODDABLE)/modules/io/common/builtinCommon",
-				"embedded:x-io/imagein/camera": "./win/camera"
+				"embedded:x-io/imagein/camera": "./win/camera",
+				"commodetto/Convert": "$(MODDABLE)/modules/commodetto/commodettoConvert"
 			}
 		},
 		"esp32": {
