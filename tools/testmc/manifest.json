@@ -18,7 +18,8 @@
 		"$(MODULES)/crypt/digest/manifest.json",
 		"$(MODDABLE)/modules/io/files/manifest.json",
 		"$(MODDABLE)/modules/piu/MC/colorcell/manifest.json",
-		"$(MODDABLE)/modules/io/files/manifest.json"
+		"$(MODDABLE)/modules/io/files/manifest.json",
+		"$(MODDABLE)/modules/io/audioout/manifest.json"
 	],
 	"modules": {
 		"*": [
