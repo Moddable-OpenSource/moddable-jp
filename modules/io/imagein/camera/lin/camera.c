@@ -229,7 +229,8 @@ static gpointer xs_camera_loop(gpointer it)
         }
         
         buffer = &(camera->queueBuffers[buf.index]);
-		(camera->yuvToRGB)(camera->width * camera->height, buffer->data, buffer->data, NULL);
+        if (camera->yuvToRGB)
+			(camera->yuvToRGB)(camera->width * camera->height, buffer->data, buffer->data, NULL);
 			
 		g_mutex_lock(&(camera->mainMutex));
 		if (camera->mainBuffer == C_NULL) {
@@ -271,6 +272,7 @@ void xs_camera_constructor(xsMachine *the)
 	uint32_t width = 320;
 	uint32_t height = 240;
 	uint32_t imageType = kCommodettoBitmapRGB565LE;
+	CommodettoConverter yuvToRGB = NULL;
 	uint16_t queueLength = 3;
 	
   	int fd;
@@ -299,9 +301,11 @@ void xs_camera_constructor(xsMachine *the)
 		if (xsmcHas(xsArg(0), xsID_imageType)) {
 			xsmcGet(xsVar(0), xsArg(0), xsID_imageType);
 			imageType = xsmcToInteger(xsVar(0));
-			if (imageType != kCommodettoBitmapRGB565LE)
-				xsRangeError("invalid image format");
 		}
+		if (imageType == kCommodettoBitmapRGB565LE)
+			yuvToRGB = CommodettoPixelsConverterGet(kCommodettoBitmapYUV422, kCommodettoBitmapRGB565LE);
+		else if (imageType != kCommodettoBitmapYUV422)
+			xsRangeError("invalid imageType");
 		
 		fd = open("/dev/video0", O_RDWR);
 		if (fd < 0)
@@ -358,7 +362,7 @@ void xs_camera_constructor(xsMachine *the)
 		camera->width = width;
 		camera->height = height;
 		camera->imageType = imageType;
-		camera->yuvToRGB = CommodettoPixelsConverterGet(kCommodettoBitmapYUV422, kCommodettoBitmapRGB565LE);
+		camera->yuvToRGB = yuvToRGB;
 		
 		camera->queueLength = queueLength;
 		for (index = 0; index < queueLength; index++) {

@@ -211,7 +211,8 @@ unsigned int __stdcall xs_camera_loop(void* it)
 							buffer->mediaBuffer = pBuffer;
 							buffer->size = length;
 							buffer->data = data;
-							(camera->yuvToRGB)(camera->width * camera->height, buffer->data, buffer->data, NULL);
+							if (camera->yuvToRGB)
+								(camera->yuvToRGB)(camera->width * camera->height, buffer->data, buffer->data, NULL);
 							EnterCriticalSection(&(camera->mainMutex));
 							if (camera->mainBuffer == C_NULL) {
 								camera->mainBuffer = buffer;
@@ -256,6 +257,7 @@ void xs_camera_constructor(xsMachine *the)
 	uint32_t width = 320;
 	uint32_t height = 240;
 	uint32_t imageType = kCommodettoBitmapRGB565LE;
+	CommodettoConverter yuvToRGB = NULL;
 	uint16_t queueLength = 3;
 	
 	HRESULT hr;
@@ -284,9 +286,11 @@ void xs_camera_constructor(xsMachine *the)
 		if (xsmcHas(xsArg(0), xsID_imageType)) {
 			xsmcGet(xsVar(0), xsArg(0), xsID_imageType);
 			imageType = xsmcToInteger(xsVar(0));
-			if (imageType != kCommodettoBitmapRGB565LE)
-				xsRangeError("invalid image format");
 		}
+		if (imageType == kCommodettoBitmapRGB565LE)
+			yuvToRGB = CommodettoPixelsConverterGet(kCommodettoBitmapYUV422, kCommodettoBitmapRGB565LE);
+		else if (imageType != kCommodettoBitmapYUV422)
+			xsRangeError("invalid imageType");
 		
 		xsResultThrow(MFCreateAttributes(&attributes, 1), "cannot create attributes");
 		xsResultThrow(attributes->SetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID), "cannot set source type attribute");
@@ -341,7 +345,7 @@ void xs_camera_constructor(xsMachine *the)
 		camera->width = width;
 		camera->height = height;
 		camera->imageType = imageType;
-		camera->yuvToRGB = CommodettoPixelsConverterGet(kCommodettoBitmapYUV422, kCommodettoBitmapRGB565LE);
+		camera->yuvToRGB = yuvToRGB;
 		
 		camera->queueLength = queueLength;
 		for (int i = 0; i < camera->queueLength; i++)

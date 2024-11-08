@@ -203,7 +203,8 @@ xsBooleanValue xs_camera_releaseBuffer(Camera camera, void* data)
 	buffer->pixelBuffer = pixelBuffer;
 	buffer->data = CVPixelBufferGetBaseAddress(pixelBuffer);
 	buffer->size = CVPixelBufferGetDataSize(pixelBuffer);
-	(camera->yuvToRGB)(camera->width * camera->height, buffer->data, buffer->data, NULL);
+	if (camera->yuvToRGB)
+		(camera->yuvToRGB)(camera->width * camera->height, buffer->data, buffer->data, NULL);
 		
 	pthread_mutex_lock(&(camera->mainMutex));
 	if (camera->mainBuffer == C_NULL) {
@@ -235,6 +236,7 @@ void xs_camera_constructor(xsMachine *the)
 	int32_t height = 240;
 	uint8_t format = kIOFormatBuffer;
 	uint8_t imageType = kCommodettoBitmapRGB565LE;
+	CommodettoConverter yuvToRGB = NULL;
 	uint16_t queueLength = 3;
 	
 	Camera camera = NULL;
@@ -256,9 +258,11 @@ void xs_camera_constructor(xsMachine *the)
 		if (xsmcHas(xsArg(0), xsID_imageType)) {
 			xsmcGet(xsVar(0), xsArg(0), xsID_imageType);
 			imageType = xsmcToInteger(xsVar(0));
-			if (imageType != kCommodettoBitmapRGB565LE)
-				xsRangeError("invalid image format");
 		}
+		if (imageType == kCommodettoBitmapRGB565LE)
+			yuvToRGB = CommodettoPixelsConverterGet(kCommodettoBitmapYUV422, kCommodettoBitmapRGB565LE);
+		else if (imageType != kCommodettoBitmapYUV422)
+			xsRangeError("invalid imageType");
 	
 		AVCaptureDevice *device = [[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] autorelease];
 		if (!device)
@@ -315,7 +319,7 @@ void xs_camera_constructor(xsMachine *the)
 		camera->width = width;
 		camera->height = height;
 		camera->imageType = imageType;
-		camera->yuvToRGB = CommodettoPixelsConverterGet(kCommodettoBitmapYUV422, kCommodettoBitmapRGB565LE);
+		camera->yuvToRGB = yuvToRGB;
 
 		camera->queueLength = queueLength;
 		for (index = 0; index < queueLength; index++)
