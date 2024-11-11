@@ -11,6 +11,7 @@ This document provides a guide to building apps for the ESP32 line of SoCs from 
 	* [ESP32](#platforms-esp32)
 	* [ESP32-S2](#platforms-esp32-s2)
 	* [ESP32-S3](#platforms-esp32-s3)
+	* [ESP32-S3 Cameras](#platforms-esp32-s3-cameras)
 	* [ESP32-C3](#platforms-esp32-c3)
 	* [ESP32-C6](#platforms-esp32-c6)
 	* [ESP32-H2](#platforms-esp32-h2)
@@ -111,7 +112,7 @@ The Moddable SDK supports two ESP32-S2 development kits from Espressif. The foll
 | Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
 |  <img src="https://dl.espressif.com/dl/schematics/pictures/esp32-s2-kaluga-1-kit-v1.0-3d.png" width=125><BR>Kaluga | `esp32/kaluga` | **3.2" LCD display**<BR>320 x 240 QVGA<BR>16-bit color<BR><BR>2 MB SRAM<BR>Speaker and Audio Playback<BR>Touch Pad Panel<BR>NeoPixel LED | <li>[Moddable blog post](https://blog.moddable.com/blog/espidf42/)</li><li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/hw-reference/esp32s2/user-guide-esp32-s2-kaluga-1-kit.html)</li> |
-|  <img src="https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/_images/esp32-s2-saola-1-v1.2-isometric.png" width=125><BR>Saola<BR>(WROOM & WROVER versions) | `esp32/saola_wroom` <BR> `esp32/saola_wrover`| NeoPixel LED<BR>2 MB SRAM (WROVER version only)| <li>[Moddable blog post](https://blog.moddable.com/blog/espidf42/)</li><li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/hw-reference/esp32s2/user-guide-saola-1-v1.2.html)</li> |
+|  <img src="./../assets/devices/esp32s2-saola.jpg" width=125><BR>Saola<BR>(WROOM & WROVER versions) | `esp32/saola_wroom` <BR> `esp32/saola_wrover`| NeoPixel LED<BR>2 MB SRAM (WROVER version only)| <li>[Moddable blog post](https://blog.moddable.com/blog/espidf42/)</li><li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/hw-reference/esp32s2/user-guide-saola-1-v1.2.html)</li> |
 | <img src="./../assets/devices/adafruit-qtpys2.png" width=125><BR>Adafruit<BR>QT Py ESP32-S2 | `esp32/qtpys2` |  Neopixel, 1 button, STEMMA/QWIIC | <li>[Product page](https://www.adafruit.com/product/5325)</li>|
 | <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `esp32/qtpys2_ili9341` | ili9341 QVGA display<BR>320 x 240<BR>16-bit color | <li>[Wiring Guide](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
 | <img src="./../assets/devices/lolin-s2-mini.png" width=100><BR>Lolin<BR>S2 Mini | `esp32/lolin_s2mini` |  1 button | <li>[Product guide](https://www.wemos.cc/en/latest/s2/s2_mini.html)</li>
@@ -133,9 +134,9 @@ The Moddable SDK supports devices built on ESP32-S3. The following table lists e
 
 | Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
-| <img src="./../assets/devices/moddable-six.png" width=125><BR>Moddable Six | `esp32/moddable_six`<BR>`esp32/moddable_six_cdc`<br>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit parallel display bus<BR>Capacitive touch<BR>Neopixel<BR>Qwiic connector<BR>Optional speaker<br><BR>20 External pins  | <li>[Moddable Six developer guide](./moddable-six.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
-| <img src="./../assets/devices/moddable-display-6.png" width=125><BR>Moddable Display 2 | `esp32/moddable_display_6`<BR>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit parallel display bus<BR>Capacitive touch<BR>Neopixel<BR>Qwiic connector<BR>Optional speaker<br><BR>20 External pins  | <li>[Moddable Display developer guide](./moddable-display.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
-|  <img src="https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/_images/esp32-s3-devkitc-1-v1.1-isometric.png" width=125><BR>ESP32-S3-DevKitC-1-N8 | `esp32/esp32s3` | |<li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html)</li> |
+| <img src="./../assets/devices/moddable-six.jpg" width=200><BR>Moddable Six | `esp32/moddable_six`<BR>`esp32/moddable_six_cdc`<br>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit parallel display bus<BR>Capacitive touch<BR>Neopixel<BR>Qwiic connector<BR>Optional speaker<br><BR>20 External pins  | <li>[Moddable Six developer guide](./moddable-six.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
+| <img src="./../assets/devices/moddable-display-6.png" width=125><BR>Moddable Display 6 | `esp32/moddable_display_6`<BR>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit parallel display bus<BR>Capacitive touch<BR>Neopixel<BR>Qwiic connector<BR>Optional speaker<br><BR>20 External pins  | <li>[Moddable Display developer guide](./moddable-display.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
+|  <img src="./../assets/devices/esp32s3-devkitc.jpg" width=125><BR>ESP32-S3-DevKitC-1-N8 | `esp32/esp32s3` | |<li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html)</li> |
 |  <img src="./../assets/devices/adafruit-qt-py-eps32-s3.png" width=125><BR>Adafruit QT Py ESP32-S3 | `esp32/qtpys3` | Neopixel, 1 button, STEMMA/QWIIC  | <li>[Product page](https://www.adafruit.com/product/5426)</li> |
 |  <img src="./../assets/devices/adafruit-esp32-s3-tft-feather.png" width=125><BR>Adafruit ESP32-S3 TFT Feather | `esp32/feather_s3_tft` | 1.14" TFT display<BR> 240 x 135 16-bit color | <li>[Product page](https://www.adafruit.com/product/5483)</li>|
 |<img src="./../assets/devices/atoms3.png" width=125><BR>AtomS3| `esp32/m5atom_s3` |  0.85" IPS display<BR> 128 x 128 16-bit color<BR> 1 button<BR> IMU |<li>[Product page](https://docs.m5stack.com/en/core/AtomS3)</li>| 
@@ -147,6 +148,15 @@ The Moddable SDK supports devices built on ESP32-S3. The following table lists e
 | <img src="./../assets/devices/xiao-esp32c3.png" width=125><BR>Seeed Studio<BR>XIAO ESP32S3 | `esp32/xiao_esp32s3` | 1 button | <li>[Product page](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html)</li>|
 | <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `esp32/qtpys3_ili9341`<br>`esp32/xiao_esp32s3_ili9341` | ili9341 QVGA display<BR>320 x 240<BR>16-bit color | <li>[Wiring Guide](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
 
+<a id="platforms-esp32-s3-cameras"></a>
+### ESP32-S3 Cameras
+
+| Name | Platform identifier | Key features | Links |
+| :---: | :--- | :--- | :--- |
+| <img src="../assets/devices/lilygo_t_camera_plus_s3.jpg" width=140></a><BR>Lilygo T Camera Plus S3 | `esp32/lilygo_t_camera_plus_s3` | OV2640 Camera<br>1.3" IPS display<br>240 x 240 Touchscreen<br>Microphone<br>Speaker<br> | <li>[Product info](https://www.lilygo.cc/products/t-camera-plus-s3)</li> |
+| <img src="../assets/devices/m5atom_s3r.jpg" width=140></a><BR>M5 Atom S3R M12 | `esp32/m5atom_s3r` | OV3660 Camera<br>Microphone<br>BMI270 IMU<Br>8MB PSRAM| <li>[Product info](https://shop.m5stack.com/products/atoms3r-camera-kit-m12-version-ov3660)</li> |
+| <img src="../assets/devices/m5stack_cores3.jpg" width=140></a><BR>M5Stack Core S3 | `esp32/m5stack_cores3` | GC0308 Camera<br>Microphone<br>Speaker<br>ili9341 QVGA Touchscreen<BR>320 x 240<BR>BMI270 IMU<Br>BM8563 RTC<BR>8MB PSRAM | <li>[Product info](https://shop.m5stack.com/products/m5stack-cores3-esp32s3-lotdevelopment-kit)</li> |
+| <img src="../assets/devices/xiao_esp32s3_sense.jpg" width=140></a><BR>Seed Studio<br>XIAO ESP32S3 Sense | `esp32/xiao_esp32s3_sense` | OV2640 Camera<br>Microphone<br>8MB PSRAM | <li>[Getting Started](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/)</li><li>[Display Wiring Guide](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
 
 <a id="platforms-esp32-c3"></a>
 ### ESP32-C3
@@ -163,7 +173,7 @@ The Moddable SDK supports three ESP32-C3 development kits:
 
 | Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
-|  <img src="https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/_images/esp32-c3-devkitm-1-v1-isometric.png" width=125><BR>ESP32-C3-DevKitM-1 | `esp32/esp32c3` |  | <li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)</li> |
+|  <img src="./../assets/devices/esp32c3-devkit-m.jpg" width=125><BR>ESP32-C3-DevKitM-1 | `esp32/esp32c3` |  | <li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)</li> |
 |  <img src="./../assets/devices/esp32c3-dual.png" width=125><BR>ESP32 C3 DevKit clone| `esp32/esp32c3_cdc` |  | <li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)</li> |
 |  <img src="./../assets/devices/c3_devkit_rust.png" width=125><BR>ESP32-C3-DevKit-RUST-1 | `esp32/c3_devkit_rust` |  | <li>[Product page](https://www.espressif.com/en/dev-board/esp32-c3-devkit-rust-1-en)</li> |
 | <img src="./../assets/devices/xiao-esp32c3.png" width=125><BR>Seeed Studio<BR>XIAO ESP32C3 | `esp32/xiao_esp32c3` | 1 button | <li>[Product page](https://www.seeedstudio.com/Seeed-XIAO-ESP32C3-p-5431.html)</li>|
