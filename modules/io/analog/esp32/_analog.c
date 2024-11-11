@@ -327,7 +327,6 @@ void xs_analog_read_(xsMachine *the)
 
 	if (ESP_OK != adc_oneshot_read(analog->handle, analog->channel, &raw))
 		modLog("analog onshot_read failed");
-	
 #if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED || ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
 	if (analog->port == 1) {
 		adc_cali_raw_to_voltage(gADC1_cali_handle, raw, &millivolts);
@@ -338,10 +337,13 @@ void xs_analog_read_(xsMachine *the)
 	}
 #endif
 #endif
-	if (-1 == millivolts)
-		millivolts = (raw * ((1 << ADC_RESOLUTION) - 1)) / 3300;
-
-	xsmcSetInteger(xsResult, millivolts);
+	if (-1 != millivolts) {
+		// convert calibrated analog back to ADC range
+		raw = millivolts * ((1 << ADC_RESOLUTION)-1) / 3300;
+		if (raw > (1 << ADC_RESOLUTION) - 1)
+			raw = (1 << ADC_RESOLUTION) - 1;
+	}
+	xsmcSetInteger(xsResult, raw);
 }
 
 void xs_analog_get_resolution_(xsMachine *the)
