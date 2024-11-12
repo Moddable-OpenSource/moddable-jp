@@ -197,11 +197,11 @@ void xs_audioin_constructor(xsMachine *the)
 		xsRangeError("invalid number of channels");
 	if ((sampleRate < 8000) || (sampleRate > 48000))
 		xsRangeError("invalid sample rate");
-	if (xsmcHas(xsArg(0), xsID_type)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_type);
+	if (xsmcHas(xsArg(0), xsID_audioType)) {
+		xsmcGet(xsVar(0), xsArg(0), xsID_audioType);
 		char *type = xsmcToString(xsArg(0));
 		if (c_strcmp(type, "LPCM"))
-			xsRangeError("invalid type");
+			xsRangeError("invalid audioType");
 	}
 
 

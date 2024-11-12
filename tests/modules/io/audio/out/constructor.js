@@ -34,7 +34,7 @@ let out = new AudioOut({
 	bitsPerSample: "16",
 	channels: "2",
 	sampleRate: "44100",
-	type: "LPCM"
+	audioType: "LPCM"
 });
 assert.sameValue(out.bitsPerSample, 16, "bitsPerSample option 16");
 assert.sameValue(out.channels, 2, "channels option 2");
@@ -57,4 +57,4 @@ assert.throws(RangeError, () => new AudioOut({sampleRate: 0}), "sampleRate 0");
 assert.throws(RangeError, () => new AudioOut({sampleRate: 100_000}), "sampleRate 100_000");
 assert.throws(TypeError, () => new AudioOut({sampleRate: Symbol()}), "sampleRate symbol");
 
-assert.throws(RangeError, () => new AudioOut({type: "xyzzy"}), "type xyzzy");
+assert.throws(RangeError, () => new AudioOut({audioType: "xyzzy"}), "audioType xyzzy");

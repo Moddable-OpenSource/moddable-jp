@@ -296,11 +296,11 @@ void xs_audioout_constructor_(xsMachine* the)
 	format = builtinInitializeFormat(the, format);
 	if (kIOFormatBuffer != format)
 		xsRangeError("invalid format");
-	if (xsmcHas(xsArg(0), xsID_type)) {
-		xsmcGet(xsVar(0), xsArg(0), xsID_type);
+	if (xsmcHas(xsArg(0), xsID_audioType)) {
+		xsmcGet(xsVar(0), xsArg(0), xsID_audioType);
 		type = xsmcToString(xsVar(0));
 		if (c_strcmp(type, "LPCM"))
-			xsRangeError("invalid type");
+			xsRangeError("invalid audioType");
 	}
 	if (xsmcHas(xsArg(0), xsID_bitsPerSample)) {
 		xsmcGet(xsVar(0), xsArg(0), xsID_bitsPerSample);
