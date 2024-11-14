@@ -296,7 +296,7 @@ Object.defineProperty(Error.prototype, "name", {
 以下は、起動時にデジタルピンを使用して1つのLEDを点灯させ、繰り返しタイマーを設定して別のLEDの状態を切り替える簡単なアプリケーションの例です。
 
 ```js
-import Digital from "pins/digital:
+import Digital from "pins/digital";
 
 let toggle = false;
 
@@ -310,7 +310,7 @@ Timer.repeat(() => {
 Moddable SDKランタイムでは、`main` モジュールが関数を返す場合、その関数は直ちに実行されます。これを利用して、`main` がプリロードをサポートするようにすることができます。ここにそのような単純な例を示します：
 
 ```js
-import Digital from "pins/digital:
+import Digital from "pins/digital";
 
 export default function() {
 	let toggle = false;
@@ -326,7 +326,7 @@ export default function() {
 時には、`main` をエクスポートされた関数からインスタンス化されるシンプルなクラスで整理すると便利です。これにより、コードがよりクリーンに構造化され、上記の例の `toggle` のように必要な状態がインスタンスの状態の一部として `this` を使用してアクセスされます。
 
 ```js
-import Digital from "pins/digital:
+import Digital from "pins/digital";
 
 class App {
 	constructor() {

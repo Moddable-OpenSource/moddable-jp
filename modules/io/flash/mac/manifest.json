@@ -1,0 +1,13 @@
+{
+	"platforms": {
+		"mac": {
+			"modules": {
+				"*": "$(MODDABLE)/modules/io/common/builtinCommon",
+				"embedded:x-flash": "./flash-mac"
+			}
+		}
+	},
+	"preload": [
+		"embedded:x-flash"
+	]
+}

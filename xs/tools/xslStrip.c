@@ -520,7 +520,7 @@ void fxStripDefaults(txLinker* linker, FILE* file)
 	if (!fxIsCodeUsed(XS_CODE_ASYNC_GENERATOR_FUNCTION))
 		fprintf(file, "static txSlot* fxNewAsyncGeneratorFunctionInstanceDeadStrip(txMachine* the, txID name) { mxUnknownError(\"dead strip\"); return NULL; }\n");
 	if (!fxIsCodeUsed(XS_CODE_IMPORT) && fxIsCallbackStripped(linker, fx_Compartment_prototype_import))
-		fprintf(file, "static void fxRunImportDeadStrip(txMachine* the, txSlot* realm, txID id) { mxUnknownError(\"dead strip\"); }\n");
+		fprintf(file, "static void fxRunImportDeadStrip(txMachine* the, txSlot* realm, txSlot* referrer) { mxUnknownError(\"dead strip\"); }\n");
 	if (!fxIsCodeUsed(XS_CODE_NEW_PRIVATE_1) && !fxIsCodeUsed(XS_CODE_NEW_PRIVATE_2))
 		fprintf(file, "static txBoolean fxDefinePrivatePropertyDeadStrip(txMachine* the, txSlot* instance, txSlot* check, txID id, txSlot* slot, txFlag mask) { mxUnknownError(\"dead strip\"); return 0; }\n");
 	if (!fxIsCodeUsed(XS_CODE_GET_PRIVATE_1) && !fxIsCodeUsed(XS_CODE_GET_PRIVATE_2))

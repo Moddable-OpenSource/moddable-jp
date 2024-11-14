@@ -605,7 +605,7 @@ TLS証明書は `*` 配列に含めるべきです。
 		"warning": "module XYZ not fully tested on esp32",
 		/* modules and resources for ESP32 go here */
 	},
-	"..." {
+	"...": {
 		"error": "module XYZ unsupported"
 	}
 }
@@ -787,7 +787,7 @@ makeフラグメントは、プラットフォームの`build`セクションで
 	"gecko/*": {
 		"build": {
 			"MAKE_FRAGMENT": "$(BUILD)/devices/gecko/targets/$(SUBPLATFORM)/make.$(SUBPLATFORM).mk"
-		}
+		},
 		"include": "./targets/$(SUBPLATFORM)/manifest.json"
 	}
 }

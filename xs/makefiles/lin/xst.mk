@@ -55,6 +55,7 @@ C_OPTIONS = \
 	-DmxKeysGarbageCollection=1 \
 	-DmxLockdown=1 \
 	-DmxMinusZero=1 \
+	-DmxModuleStuff=1 \
 	-DmxNoConsole=1 \
 	-DmxParse=1 \
 	-DmxProfile=1 \

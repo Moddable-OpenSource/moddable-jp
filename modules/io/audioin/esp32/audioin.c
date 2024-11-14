@@ -197,6 +197,13 @@ void xs_audioin_constructor(xsMachine *the)
 		xsRangeError("invalid number of channels");
 	if ((sampleRate < 8000) || (sampleRate > 48000))
 		xsRangeError("invalid sample rate");
+	if (xsmcHas(xsArg(0), xsID_audioType)) {
+		xsmcGet(xsVar(0), xsArg(0), xsID_audioType);
+		char *type = xsmcToString(xsArg(0));
+		if (c_strcmp(type, "LPCM"))
+			xsRangeError("invalid audioType");
+	}
+
 
 #if MODDEF_AUDIOIN_I2S_PDM
 	if (gPDMAudioInBusy)
@@ -711,7 +718,7 @@ void xs_audioin_get_bitsPerSample(xsMachine *the)
 	xsmcSetInteger(xsResult, input->bitsPerSample);
 }
 
-void xs_audioin_get_numChannels(xsMachine *the)
+void xs_audioin_get_channels(xsMachine *the)
 {
 	AudioInput input = xsmcGetHostDataValidate(xsThis, (void *)&xsAudioInHooks);
 	xsmcSetInteger(xsResult, input->numChannels);
