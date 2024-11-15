@@ -20,15 +20,14 @@
 
 import Bitmap from "commodetto/Bitmap";
 
+function initialize() @ "xs_JPEG_initialize";
+
 export default class JPEG @ "xs_JPEG_destructor" {
-	constructor(buffer) @ "xs_JPEG_constructor"
-	close() {}
-	read() @ "xs_JPEG_read"
-	push(buffer) @ "xs_JPEG_push"
-	get ready() @ "xs_JPEG_get_ready"
-
-	initialize(pixelFormat) {
-		this.bitmap = new Bitmap(0, 0, pixelFormat, this.pixels, 0);
+	constructor(buffer, options) {
+		initialize.call(this, buffer, options, Bitmap)
 	}
+	close() @ "xs_JPEG_close"
+	push() {throw new Error("ESP32 JPEG decoder doesn't spool");}
+	read() @ "xs_JPEG_read"
+	get ready() @ "xs_JPEG_get_ready"
 }
-

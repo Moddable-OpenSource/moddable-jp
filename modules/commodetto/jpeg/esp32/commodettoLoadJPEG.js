@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2024  Moddable Tech, Inc.
+ * Copyright (c) 2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -18,17 +18,11 @@
  *
  */
 
-import Bitmap from "commodetto/Bitmap";
+import JPEG from "commodetto/readJPEG";
 
-export default class JPEG @ "xs_JPEG_destructor" {
-	constructor(buffer) @ "xs_JPEG_constructor"
-	close() {}
-	read() @ "xs_JPEG_read"
-	push(buffer) @ "xs_JPEG_push"
-	get ready() @ "xs_JPEG_get_ready"
-
-	initialize(pixelFormat) {
-		this.bitmap = new Bitmap(0, 0, pixelFormat, this.pixels, 0);
-	}
+export default function decompress(data, options) {
+	const jpeg = new JPEG(data, {...options, all: true});
+	const bitmap = jpeg.read();
+	jpeg.close();
+	return bitmap;
 }
-
