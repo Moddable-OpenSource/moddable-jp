@@ -52,6 +52,7 @@ C_OPTIONS = \
 	/D mxKeysGarbageCollection=1 \
 	/D mxLockdown=1 \
 	/D mxMinusZero=1 \
+	/D mxModuleStuff=1 \
 	/D mxNoConsole=1 \
 	/D mxParse=1 \
 	/D mxProfile=1 \

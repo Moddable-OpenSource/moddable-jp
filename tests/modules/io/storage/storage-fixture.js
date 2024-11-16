@@ -1,7 +1,6 @@
-import Storage from "embedded:x-storage"
+import bootstrap from "embedded:x-storage"
 
-let storage = globalThis.device?.storage;
-storage ??= new Storage({});
+const storage = globalThis.device?.storage ?? bootstrap;
 
 function keys(store) {
 	return Array.from(store).sort();

@@ -2116,7 +2116,7 @@ application.add(whiteScreen);
 
 この `die` オブジェクトから最初の `content` オブジェクトを削除し、そのコンテナ内のこの `die` オブジェクトを削除した `content` オブジェクトに置き換えることで、この `die` オブジェクトをコンテンツ階層からアンバインドします。
 
-```
+```javascript
 let whiteScreen = new Content(null, {
 	active: true, left:0, right:0, top:0, bottom:0,
 	skin: new Skin({ fill: "white" }),
@@ -2318,7 +2318,7 @@ application.add(sampleContainer);
 
 アセットはマニフェストのリソースで定義する必要があります。JPEG ファイルと PNG ファイルの品質は 1 ～ 100 の値に設定できます。数値が大きいほど品質が高くなります。
 
-```javascript
+```json
 "resources":{
 	"*-image(100)": [
 		"$(MODDABLE)/examples/assets/images/screen1",
@@ -2331,7 +2331,7 @@ application.add(sampleContainer);
 
 フォルダー内の画像は、1 つのアニメーション画像のフレームとして使用されます。フレーム レートはフォルダーの名前によって決まります。たとえば、[サンプル画像フォルダー](../../examples/assets/images) の `fish.15fps` フォルダーは、アプリケーションに 1 秒あたり 15 フレームで実行するように指示します。マニフェストでは、パスから `.15fps` が削除されます。
 
-```javascript
+```json
 "resources":{
 	"*-image": [
 		"$(MODDABLE)/examples/assets/images/fish",

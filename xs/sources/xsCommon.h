@@ -803,6 +803,9 @@ enum {
 	_undefined,
 	_Compartment,
 	_Function,
+#if mxModuleStuff
+	_ModuleStuff,
+#endif
 	_eval,
 	_AsyncFunction,
 	_AsyncGeneratorFunction,
@@ -1272,6 +1275,10 @@ extern const txString gxIDStrings[XS_ID_COUNT];
 #else
 	extern float* gxCanonicalNaN32;
 	extern double* gxCanonicalNaN64;
+#endif
+
+#ifndef mxModuleStuff
+	#define mxModuleStuff 0
 #endif
 
 #ifdef __cplusplus

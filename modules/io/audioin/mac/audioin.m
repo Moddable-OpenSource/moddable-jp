@@ -35,6 +35,7 @@ struct AudioInputRecord {
 	void* data;
 	uint8_t calling;
 	uint16_t running;
+	uint16_t bytesPerFrame;
 	uint16_t queueLength;
 	AudioQueueBufferRef queueBuffers[1];
 };
@@ -52,7 +53,7 @@ static void AudioInputCallback(void *it, AudioQueueRef queue, AudioQueueBufferRe
 		input->calling = 1;
 		xsBeginHost(input->the);
 		xsResult = xsAccess(input->object);
-		xsCallFunction1(xsReference(input->onReadable), xsResult, xsInteger(input->size));
+		xsCallFunction2(xsReference(input->onReadable), xsResult, xsInteger(input->size), xsInteger(input->size / input->bytesPerFrame));
 		xsEndHost(input->the);
 		if (input->calling)
 			input->calling = 0;
@@ -76,6 +77,7 @@ static const xsHostHooks xsAudioInHooks = {
 void xs_audioin_constructor(xsMachine *the)
 {
 	uint8_t format = kIOFormatBuffer;
+	xsStringValue type;
 	uint8_t bitsPerSample = 0;
 	uint8_t numChannels = 0;
 	uint16_t sampleRate = 0;
@@ -102,6 +104,12 @@ void xs_audioin_constructor(xsMachine *the)
 	format = builtinInitializeFormat(the, format);
 	if (kIOFormatBuffer != format)
 		xsRangeError("invalid format");
+	if (xsmcHas(xsArg(0), xsID_type)) {
+		xsmcGet(xsVar(0), xsArg(0), xsID_type);
+		type = xsmcToString(xsVar(0));
+		if (c_strcmp(type, "LPCM"))
+			xsRangeError("invalid type");
+	}
 	if (xsmcHas(xsArg(0), xsID_bitsPerSample)) {
 		xsmcGet(xsVar(0), xsArg(0), xsID_bitsPerSample);
 		bitsPerSample = xsmcToInteger(xsVar(0));
@@ -149,6 +157,7 @@ void xs_audioin_constructor(xsMachine *the)
 	if (AudioQueueNewInput(&desc, AudioInputCallback, input, CFRunLoopGetCurrent(), NULL, 0, &(input->queue)) != noErr)
 		xsUnknownError("cannot create audio queue");
 	   
+	input->bytesPerFrame = bytesPerFrame;
 	input->queueLength = queueLength;
 	for (i = 0; i < queueLength; i++) {
 		if (AudioQueueAllocateBuffer(input->queue, bufferSize, &input->queueBuffers[i]) != noErr)

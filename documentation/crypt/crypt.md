@@ -100,7 +100,7 @@ import Transform from "crypt/transform";
 
 この関数は、以下の `openssl` コマンドラインに似ています：
 
-```
+```shell
 openssl x509 -inform pem -in data.pem -out data.der -outform der
 ```
 
@@ -114,6 +114,6 @@ openssl x509 -inform pem -in data.pem -out data.der -outform der
 
 `pemToDER` と `privateKeyToPrivateKeyInfo` を一緒に使用することは、次の `openssl` コマンドラインに似ています：
 
-```
+```shell
 openssl pkcs8 -topk8 -in private_key.pem -inform pem -out private_key.pk8.der -outform der -nocrypt
 ```
