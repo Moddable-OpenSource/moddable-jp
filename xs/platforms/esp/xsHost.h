@@ -205,6 +205,10 @@ extern uint8_t ESP_setBaud(int baud);
 */
 
 #if ESP32
+	#if CONFIG_FREERTOS_HZ != 1000
+		#error CONFIG_FREERTOS_HZ must be 1000
+	#endif
+
 	#define modMilliseconds() ((uint32_t)xTaskGetTickCount())
 	#define modMicroseconds() ((uint32_t)esp_timer_get_time())
 
