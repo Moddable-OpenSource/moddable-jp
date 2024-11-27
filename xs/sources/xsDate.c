@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017  Moddable Tech, Inc.
+ * Copyright (c) 2016-2024  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -244,9 +244,15 @@ txInteger fx_Date_parse_number(txByte* theCharacter, txString* theString, txBool
 	txInteger aResult = c - '0';
 	c = c_read8(p++);
 	while (('0' <= c) && (c <= '9')) {
+#if __has_builtin(__builtin_add_overflow) && __has_builtin(__builtin_mul_overflow)
+		if (__builtin_mul_overflow(aResult, 10, &aResult) ||
+			__builtin_add_overflow(aResult, c - '0', &aResult))
+			*overflow = 1;
+#else
 		aResult = (aResult * 10) + c - '0';
 		if (aResult < 0)
 			*overflow = 1;
+#endif
 		c = c_read8(p++);
 	}
 	*theCharacter = c;
