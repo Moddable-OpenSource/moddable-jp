@@ -1910,7 +1910,7 @@ export class Tool extends TOOL {
 			this.includeManifestPath(this.resolveVariable(it));
 		}
 		else {
-			let { git, branch, tag, include, manifest } = it;
+			let { git, branch, tag, manifest = [ "mnifest.json" ] } = it;
 			if (!git)
 				throw new Error("no git!");
 			let repo = this.resolveVariable(git);
@@ -1958,17 +1958,14 @@ export class Tool extends TOOL {
 // 				this.spawn("git", "pull");
 // 			}
 			if (this.isDirectoryOrFile(directory) < 0) {
-				if (manifest) {
+				if (typeof manifest == "string") {
+					this.includeManifestPath(directory + this.slash + this.resolveVariable(manifest));
+				}
+				else {
 					this.currentDirectory = directory;
 					manifest = this.parseManifest(null, manifest);
 					manifest.directory = directory;
 				}
-				else if (!include)
-					include = "manifest.json"
-				if (include instanceof Array)
-					include.forEach(it => this.includeManifestPath(directory + this.slash + this.resolveVariable(it)));
-				else if (include)
-					this.includeManifestPath(directory + this.slash + this.resolveVariable(include));
 			}
 		}
 		this.currentDirectory = currentDirectory;
