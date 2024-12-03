@@ -93,6 +93,7 @@ The Moddable SDK supports devices built with the Pico. The following table lists
 | <img src="../assets/devices/pico-xiao-ili9341.png" width=140></a><BR>ili9341 | `pico/xiao_ili9341` | ili9341 QVGA display<BR>320 x 240<BR>16-bit color | <li>[Wiring Guide - Pico](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
 | <img src="../assets/devices/pico-ili9341.png" width=140></a><BR>ili9341 | `pico/ili9341` | ili9341 QVGA display<BR>320 x 240<BR>16-bit color | <li>[Generic 2.4" & 2.8" Displays (Resistive Touch) Wiring Guide - Pico](../displays/wiring-guide-generic-2.4-spi-pico.md)</li> |
 | <img src="../assets/devices/pico-ili9341-i2s-thumb.png" width=140></a><BR>ili9341 | `pico/ili9341_i2s` | ili9341 QVGA display<BR>320 x 240<BR>16-bit color<br>potentiometer, buttons<br>i2s audio | [Wiring Guide](../displays/images/pico-ili9341-i2s-wiring.png) |
+| <img src="../assets/devices/pico4ml.jpg" width=140></a><BR>ili9341 | `pico/pico4ml` | ST7735 0.96 inch display<BR>160 x 180<BR>16-bit color<br>HM01B0 Mono Camera<br>IMU<br>PDM Mic | [Product page](https://www.arducam.com/pico4ml-an-rp2040-based-platform-for-tiny-machine-learning/) |
 
 ### Pico 2
 
