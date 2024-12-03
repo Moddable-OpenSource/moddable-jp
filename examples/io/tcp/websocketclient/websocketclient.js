@@ -124,15 +124,21 @@ class WebSocketClient {
 		Logical.xor(data, mask.buffer);
 		const format = this.#socket.format;
 		this.#socket.format = "buffer";
+		let prefix;
 		if (byteLength < 126) {
-			this.#socket.write(Uint8Array.of(type, byteLength | 0x80, mask[0], mask[1], mask[2], mask[3]));
+			prefix = Uint8Array.of(type, byteLength | 0x80, mask[0], mask[1], mask[2], mask[3]);
 			this.#writable -= (6 + byteLength);
 		}
 		else {
-			this.#socket.write(Uint8Array.of(type, 126 | 0x80, byteLength >> 8, byteLength, mask[0], mask[1], mask[2], mask[3]));
+			prefix = Uint8Array.of(type, 126 | 0x80, byteLength >> 8, byteLength, mask[0], mask[1], mask[2], mask[3]);
 			this.#writable -= (8 + byteLength);
 		}
-		this.#socket.write(data);
+		if (ArrayBuffer.isView(data))
+			data = data.buffer.slice(data.byteOffset, data.byteOffset + byteLength);
+		data = prefix.buffer.concat(data);
+		const writable = this.#socket.write(data);
+		this.#writable = (writable === undefined) ? this.#writable - data.byteLength : writable;
+		
 		this.#socket.format = format;
 
 		if (0x88 === type) {		// close
