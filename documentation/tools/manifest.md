@@ -224,10 +224,12 @@ Moddable SDKの各サンプルアプリケーションは、[examples directory]
 
 各gitリポジトリの取得は、マニフェストの`include`配列に指定されたオブジェクトによって指定されます：
 
-- オブジェクトには、リポのgit URLを示す`"git"`プロパティが必要です。
-- オブジェクトには、含めるマニフェストのパスを示す`"include"`プロパティがあることができます。
+- オブジェクトには、リポジトリのgit URLを示す`"git"`プロパティが必要です。
+- オブジェクトには"`manifest`"プロパティを持つことができ、これは含めるマニフェストファイルのパス、またはマニフェストオブジェクトそのものです。
 
-`"include"`プロパティのデフォルト値は`"manifest.json"`です。`"include"`プロパティは、同じリポジトリから複数のマニフェストを含めるために、パスの配列も可能です。
+`"manifest"`プロパティのデフォルト値は `"manifest.json"`です。
+
+> **注意**: mcconfigやmcrunがマニフェストファイルやオブジェクトを評価する時、カレントディレクトリはgitリポジトリのディレクトリです。
 
 ```json
 {
@@ -240,14 +242,27 @@ Moddable SDKの各サンプルアプリケーションは、[examples directory]
 		},
 		{
 			"git":"$(URL)/test1.git",
-			"include":"modules/test1/manifest.json"
+			"manifest":"./modules/test1/manifest.json"
 		},
 		{
 			"git":"$(URL)/test23.git",
-			"include": [
-				"test2/module.json",
-				"test3/module.json"
-			]
+			"manifest": {
+				"includes": [
+					"./modules/test2/manifest.json",
+					"./modules/test3/manifest.json"
+				]
+			}
+		},
+		{
+			"git":"$(URL)/test45.git",
+			"manifest": {
+				"modules": {
+					"*" :[
+						"./modules/test4/module",
+						"./modules/test5/module"
+					]
+				}
+			}
 		}
 	]
 }
