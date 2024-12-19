@@ -41,7 +41,7 @@ export class BLEServer @ "xs_ble_server_destructor" {
 	}
 	startAdvertising(params) {
 		let {fast = true, scanResponseData = null, filterPolicy = GAP.AdvFilterPolicy.NONE, advertisingData, notify = false} = params;
-		let flags = "flags" in advertisingData ? advertisingData.flags : GAP.ADFlag.NO_BR_EDR;
+		let flags = advertisingData.flags ?? GAP.ADFlag.NO_BR_EDR;
 		let interval;
 		if (undefined !== params.interval)
 			interval = params.interval;

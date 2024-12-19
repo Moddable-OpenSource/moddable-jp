@@ -38,6 +38,8 @@
 				]
 			}]
 		},
+		"pico": {
+		},
 		"...": {
 			"error": "Experimental TC53 IO modules"
 		}

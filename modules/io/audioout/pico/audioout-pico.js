@@ -7,32 +7,38 @@
  *   it under the terms of the GNU Lesser General Public License as published by
  *   the Free Software Foundation, either version 3 of the License, or
  *   (at your option) any later version.
- *
+ *  
  *   The Moddable SDK Runtime is distributed in the hope that it will be useful,
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU Lesser General Public License for more details.
- * 
+ *
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with the Moddable SDK Runtime.  If not, see <http://www.gnu.org/licenses/>.  
  *
  */
 
-class AudioIn @ "xs_audioin_destructor" {
-	constructor(dictionary) @ "xs_audioin_constructor";
-	close() @ "xs_audioin_close";
-	read(samples) @ "xs_audioin_read";
-	level(samples) @ "xs_audioin_level";
-	start() @ "xs_audioin_start";
-	stop() @ "xs_audioin_stop";
-	
-	get format() @ "xs_audioin_get_format";
-	set format(it) @ "xs_audioin_set_format";
+class AudioOut @ "xs_audioout_destructor_" {
+	constructor(dictionary) @ "xs_audioout_constructor_";
+	close() @ "xs_audioout_close_";
+	start() @ "xs_audioout_start_";
+	stop() @ "xs_audioout_stop_";
+	write(samples) @ "xs_audioout_writeSync_";
 
-	get bitsPerSample() @ "xs_audioin_get_bitsPerSample";
-	get channels() @ "xs_audioin_get_channels";
-	get sampleRate() @ "xs_audioin_get_sampleRate";
+	get format() @ "xs_audioout_get_format_";
+	set format(it) @ "xs_audioout_set_format_";
+
+	get bitsPerSample() @ "xs_audioout_get_bitsPerSample_";
+	get channels() @ "xs_audioout_get_numChannels_";
+	get sampleRate() @ "xs_audioout_get_sampleRate_";
 	get audioType() {return "LPCM"}
+
+	get volume() @ "xs_audioout_get_volume_";
+	set volume(it) @ "xs_audioout_set_volume_";
 }
 
-export default AudioIn;
+AudioOut.Async = class extends AudioOut {
+	write(samples, callback) @ "xs_audioout_writeAsync_";
+}
+
+export default AudioOut;

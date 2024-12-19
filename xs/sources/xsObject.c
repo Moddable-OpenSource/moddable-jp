@@ -511,6 +511,7 @@ void fx_Object_copy(txMachine* the)
 				mxPop();
 			}
 		}
+		mxCheckMetering();
 	}
 	mxPop(); // property
 	mxPop(); // at

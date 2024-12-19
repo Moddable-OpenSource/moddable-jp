@@ -92,6 +92,7 @@ Moddable SDKはPicoで構築されたデバイスをサポートしています�
 | <img src="../assets/devices/pico-xiao-ili9341.png" width=140></a><BR>ili9341 | `pico/xiao_ili9341` | ili9341 QVGAディスプレイ<BR>320 x 240<BR>16ビットカラー | <li>[配線ガイド - Pico](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
 | <img src="../assets/devices/pico-ili9341.png" width=140></a><BR>ili9341 | `pico/ili9341` | ili9341 QVGAディスプレイ<BR>320 x 240<BR>16ビットカラー | <li>[汎用2.4" & 2.8"ディスプレイ（抵抗タッチ）配線ガイド - Pico](../displays/wiring-guide-generic-2.4-spi-pico.md)</li> |
 | <img src="../assets/devices/pico-ili9341-i2s-thumb.png" width=140></a><BR>ili9341 | `pico/ili9341_i2s` | ili9341 QVGAディスプレイ<BR>320 x 240<BR>16ビットカラー<br>ポテンショメータ、ボタン<br>i2sオーディオ | [配線ガイド](../displays/images/pico-ili9341-i2s-wiring.png) |
+| <img src="../assets/devices/pico4ml.jpg" width=140></a><BR>ili9341 | `pico/pico4ml` | ST7735 0.96インチディスプレイ<BR>160 x 180<BR>16ビットカラー<br>HM01B0 モノカメラ<br>IMU<br>PDMマイク | [製品ページ](https://www.arducam.com/pico4ml-an-rp2040-based-platform-for-tiny-machine-learning/) |
 
 ### Pico 2
 
