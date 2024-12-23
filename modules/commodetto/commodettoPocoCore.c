@@ -491,7 +491,7 @@ void xs_poco_drawBitmap(xsMachine *the)
 	bits.format = cb->format;
 #if COMMODETTO_BITMAP_ID
 	bits.id = cb->id;
-	bits.byteLength = (cb->flags & kCommodettoBitmapHaveByteLength) ? cb->byteLength : 0;
+	bits.byteLength = cb->byteLength;
 #endif
 	bits.pixels = pocoGetBitmapPixels(the, poco, cb, 0);
 

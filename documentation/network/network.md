@@ -751,7 +751,7 @@ trace(`Connected to Wi-Fi access point: ${Net.get("SSID")}\n`);
 
 ESP32では、オプションの第2引数を使用して、値 `"ethernet"` を提供することでイーサネットインターフェースに関する情報を明示的に要求することもできます。
 
-```
+```js
 trace(`IP default ${Net.get("IP")}\n`);
 trace(`IP station ${Net.get("IP", "station")}\n`);
 trace(`IP AP ${Net.get("IP", "ap")}\n`);
@@ -1379,7 +1379,7 @@ import Ping from "ping";
 let ping = new Ping({host: "example.com", id: 1, interval: 1000}, (message, value, etc) => {
 	if (1 == message)
 		trace(`${value} bytes from ${etc.address}: icmp_seq=${etc.icmp_seq}\n`);
-}
+})
 ```
 
 ***

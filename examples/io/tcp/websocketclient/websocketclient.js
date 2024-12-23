@@ -124,15 +124,21 @@ class WebSocketClient {
 		Logical.xor(data, mask.buffer);
 		const format = this.#socket.format;
 		this.#socket.format = "buffer";
+		let prefix;
 		if (byteLength < 126) {
-			this.#socket.write(Uint8Array.of(type, byteLength | 0x80, mask[0], mask[1], mask[2], mask[3]));
+			prefix = Uint8Array.of(type, byteLength | 0x80, mask[0], mask[1], mask[2], mask[3]);
 			this.#writable -= (6 + byteLength);
 		}
 		else {
-			this.#socket.write(Uint8Array.of(type, 126 | 0x80, byteLength >> 8, byteLength, mask[0], mask[1], mask[2], mask[3]));
+			prefix = Uint8Array.of(type, 126 | 0x80, byteLength >> 8, byteLength, mask[0], mask[1], mask[2], mask[3]);
 			this.#writable -= (8 + byteLength);
 		}
-		this.#socket.write(data);
+		if (ArrayBuffer.isView(data))
+			data = data.buffer.slice(data.byteOffset, data.byteOffset + byteLength);
+		data = prefix.buffer.concat(data);
+		const writable = this.#socket.write(data);
+		this.#writable = (writable === undefined) ? this.#writable - data.byteLength : writable;
+		
 		this.#socket.format = format;
 
 		if (0x88 === type) {		// close
@@ -289,6 +295,11 @@ class WebSocketClient {
 						count--;
 						continue;
 					}
+					if ((127 === options.length[0]) && (options.length.length < 9)) {
+						options.length.push(this.#socket.read());
+						count--;
+						continue;
+					}
 					if (options.mask && options.mask.length < 4) {
 						//@@ it is an error for client to receieve a mask. this code applies to future server. client should fail here.
 						options.mask.push(this.#socket.read());
@@ -366,10 +377,21 @@ class WebSocketClient {
 					if (!options.ready) {
 						options.ready = true;
 						this.#socket.format = "buffer";
-						if (126 === options.length[0])
-							options.length = (options.length[1] << 8) | options.length[2];
-						else
-							options.length = options.length[0];
+						let length = options.length[0];
+						if (127 === length) {
+							let i = 1;
+							while (i < 9) {
+								length = options.length[i++];
+								if (length)
+									break;
+							}
+							while (i < 9)
+								length = (length << 8) | options.length[i++];
+						}
+						else if (126 === length)
+							length = (options.length[1] << 8) | options.length[2];
+// 						trace(`LENGTH ${ options.length[0] } ${ length }\n`);
+						options.length = length;
 					}
 
 					let read, more, binary = options.binary;

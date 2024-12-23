@@ -739,22 +739,32 @@ otadata, data, ota, , ${OTADATA_SIZE},`;
 		this.line("");
 	}
 	generateDependenciesDefinitions(tool) {
+		if ("mcrun" == tool.toolName)
+			return;
+
 		if ("esp32" == tool.platform) {
 			if (tool.dependencies?.length) {
+				var projBase = `${tool.tmpPath}${tool.slash}xsProj-${tool.environment.ESP32_SUBCLASS}${tool.slash}managed_components${tool.slash}`;
 				this.write("MANAGED_COMPONENT_DIRS = \\\n");
 				for (var dep of tool.dependencies) {
+ 					const depBase = `${projBase}${dep.namespace}__${dep.name}${tool.slash}`;
 					var depLine = "\t";
 					if (tool.windows)
 						depLine += "-I";
-					depLine += tool.tmpPath + tool.slash + "xsProj-" + tool.environment.ESP32_SUBCLASS + tool.slash + "managed_components" + tool.slash + dep.namespace + "__" + dep.name + "/include \\\n";
+					depLine += depBase + "include \\\n";
+					if (dep.includes) {
+						for (var inc of dep.includes) {
+							if (tool.windows)
+								depLine += "-I";
+							depLine += `${depBase}${tool.resolveSlash(inc)} \\\n`;
+						}
+					}
 					this.write(depLine);
 				}
 				this.write("\n");
 			}
 		}
-		if (("esp32" == tool.platform) && 
-			((tool.dependencies) || (tool.environment.USE_USB == 1))) {
-
+		if ("esp32" == tool.platform) {
 			var dep, did = 0;
 			let depStr = "BUILD_DEPENDENCIES = ";
 			for (dep of tool.dependencies) {
@@ -1899,8 +1909,8 @@ export class Tool extends TOOL {
 		if ("string" == typeof it) {
 			this.includeManifestPath(this.resolveVariable(it));
 		}
-		else if (this.buildTarget != "clean") {
-			let { git, branch, tag, include = "manifest.json" } = it;
+		else {
+			let { git, branch, tag, manifest = [ "manifest.json" ] } = it;
 			if (!git)
 				throw new Error("no git!");
 			let repo = this.resolveVariable(git);
@@ -1920,24 +1930,26 @@ export class Tool extends TOOL {
 			let path = this.createDirectories(this.outputPath, "tmp", this.environment.NAME);
 			directory = path + this.slash + parts.join(this.slash);
 			
-			if (this.isDirectoryOrFile(directory) == 0) {
-				for (let part of parts) {
-					path += this.slash + part;
-					this.createDirectory(path);
-				}
-				this.currentDirectory = path;
-				this.report("# git clone " + repo + " to path " + path);
-				let result;
-				if (branch)
-					result = this.spawn("git", "clone", "-b", branch, repo, ".");
-				else
-					result = this.spawn("git", "clone", repo, ".");
-				if (result != 0)
-					throw new Error("git failed!");
-				if (tag) {
-					result = this.spawn("git", "-c", "advice.detachedHead=false", "checkout", tag);
+			if (this.buildTarget != "clean") {
+				if (this.isDirectoryOrFile(directory) == 0) {
+					for (let part of parts) {
+						path += this.slash + part;
+						this.createDirectory(path);
+					}
+					this.currentDirectory = path;
+					this.report("# git clone " + repo + " to path " + path);
+					let result;
+					if (branch)
+						result = this.spawn("git", "clone", "-b", branch, repo, ".");
+					else
+						result = this.spawn("git", "clone", repo, ".");
 					if (result != 0)
 						throw new Error("git failed!");
+					if (tag) {
+						result = this.spawn("git", "-c", "advice.detachedHead=false", "checkout", tag);
+						if (result != 0)
+							throw new Error("git failed!");
+					}
 				}
 			}
 // 			else {
@@ -1945,10 +1957,16 @@ export class Tool extends TOOL {
 // 				this.report("# git pull " + name);
 // 				this.spawn("git", "pull");
 // 			}
-			if (include instanceof Array)
-				include.forEach(it => this.includeManifestPath(directory + this.slash + this.resolveVariable(it)));
-			else
-				this.includeManifestPath(directory + this.slash + this.resolveVariable(include));
+			if (this.isDirectoryOrFile(directory) < 0) {
+				if (typeof manifest == "string") {
+					this.includeManifestPath(directory + this.slash + this.resolveVariable(manifest));
+				}
+				else {
+					this.currentDirectory = directory;
+					manifest = this.parseManifest(null, manifest);
+					manifest.directory = directory;
+				}
+			}
 		}
 		this.currentDirectory = currentDirectory;
 	}
@@ -2190,7 +2208,8 @@ export class Tool extends TOOL {
 				throw new Error("'" + path + "': invalid manifest!");;
 			}
 		}
-		this.manifests.already[path] = manifest;
+		if (path)
+			this.manifests.already[path] = manifest;
 		this.parseBuild(manifest);
 		if ("platforms" in manifest) {
 			let platforms = manifest.platforms;

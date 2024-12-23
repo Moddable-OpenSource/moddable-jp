@@ -392,13 +392,11 @@ export class Advertisement {
 	get manufacturerSpecific() {
 		const index = this.findIndex(GAP.ADType.MANUFACTURER_SPECIFIC_DATA);
 		if (-1 != index) {
-			let start = index + 2;
 			const data = this.#data;
-			const adLength = data[index];
-			const identifier = data[start] | (data[start+1] << 8);
-			start += 2;
-			let end = start + adLength - 1
-			return { identifier, data: new Uint8Array(this.#buffer.slice(start, end)) };
+			const start = index + 2;
+			const end = start + data[index] - 1
+			const identifier = data[start] | (data[start + 1] << 8);
+			return {identifier, data: data.slice(start + 2, end)};
 		}
 	}
 	get flags() {

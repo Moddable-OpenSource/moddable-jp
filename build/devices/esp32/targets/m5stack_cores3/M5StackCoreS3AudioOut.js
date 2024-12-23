@@ -18,7 +18,8 @@
  *
  */
 
-import AudioOut from "pins/audioout-original";
+//import AudioOut from "pins/audioout-original";
+import AudioOut from "embedded:io/audioout-original";
 
 /**
  * A special AudioOut implementation for M5Stack CoreS3

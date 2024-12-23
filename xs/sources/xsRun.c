@@ -859,7 +859,7 @@ XS_CODE_JUMP:
 						mxSaveState;
 			#ifdef mxLink
 						if ((txU1*)slot->value.callback.address - (txU1*)the->fakeCallback < 0)
-							mxRunDebug(XS_TYPE_ERROR, "not available");
+							mxRunDebug(XS_TYPE_ERROR, "link: unavailable function");
 			#endif
 						if (slot->flag & XS_BASE_FLAG)
 							fxRunBase(the);
@@ -921,7 +921,7 @@ XS_CODE_JUMP:
 				mxSaveState;
 #ifdef mxLink
 				if ((txU1*)slot->value.hostFunction.builder->callback - (txU1*)the->fakeCallback < 0)
-					mxRunDebug(XS_TYPE_ERROR, "not available");
+					mxRunDebug(XS_TYPE_ERROR, "link: unavailable function");
 #endif
 				(*(slot->value.hostFunction.builder->callback))(the);
 				mxRestoreState;
@@ -1009,10 +1009,10 @@ XS_CODE_JUMP:
 			slot = mxFrameResult;
 			if (slot->kind != XS_REFERENCE_KIND) {
 				if ((slot->kind != XS_UNDEFINED_KIND) && (slot->kind != XS_CLOSURE_KIND))
-					mxRunDebug(XS_TYPE_ERROR, "invalid result");
+					mxRunDebug(XS_TYPE_ERROR, "result: invalid constructor");
 				slot = mxFrameThis->value.closure;
 				if (slot->kind < 0)
-					mxRunDebug(XS_REFERENCE_ERROR, "this is not initialized");
+					mxRunDebug(XS_REFERENCE_ERROR, "this: not initialized");
 			}
 			goto XS_CODE_END_ALL;
 		mxCase(XS_CODE_END)
@@ -1100,7 +1100,7 @@ XS_CODE_JUMP:
 		mxCase(XS_CODE_START_ASYNC_GENERATOR)
 			mxSkipCode(1);
             if (mxFrameTarget->kind != XS_UNDEFINED_KIND)
-				mxRunDebug(XS_TYPE_ERROR, "new async generator");
+				mxRunDebug(XS_TYPE_ERROR, "new: async generator");
 			slot = mxBehaviorGetProperty(the, mxFrameFunction->value.reference, mxID(_prototype), 0, XS_ANY);
 			mxPushKind(slot->kind);
 			mxStack->value = slot->value;
@@ -1141,7 +1141,7 @@ XS_CODE_JUMP:
 		mxCase(XS_CODE_START_GENERATOR)
 			mxSkipCode(1);
             if (mxFrameTarget->kind != XS_UNDEFINED_KIND)
-				mxRunDebug(XS_TYPE_ERROR, "new generator");
+				mxRunDebug(XS_TYPE_ERROR, "new: generator");
 			slot = mxBehaviorGetProperty(the, mxFrameFunction->value.reference, mxID(_prototype), 0, XS_ANY);
 			mxPushKind(slot->kind);
 			mxStack->value = slot->value;
@@ -1302,7 +1302,7 @@ XS_CODE_JUMP:
 			slot = mxFrameThis;
 			variable = slot->value.closure;
 			if (variable->kind < 0)
-				mxRunDebug(XS_REFERENCE_ERROR, "this is not initialized yet");
+				mxRunDebug(XS_REFERENCE_ERROR, "this: not initialized yet");
 			mxPushKind(variable->kind);
 			mxStack->value = variable->value;
 			mxNextCode(1);
@@ -1311,7 +1311,7 @@ XS_CODE_JUMP:
 			slot = mxFrameThis;
 			variable = slot->value.closure;
 			if (variable->kind >= 0)
-				mxRunDebug(XS_REFERENCE_ERROR, "this is already initialized");
+				mxRunDebug(XS_REFERENCE_ERROR, "this: already initialized");
 			variable->kind = mxStack->kind;
 			variable->value = mxStack->value;
 			mxNextCode(1);
@@ -2110,7 +2110,7 @@ XS_CODE_JUMP:
 	/* PROPERTIES */	
 		mxCase(XS_CODE_CHECK_INSTANCE)
 			if (mxStack->kind != XS_REFERENCE_KIND)
-				mxRunDebug(XS_TYPE_ERROR, "result: no instance");
+				mxRunDebug(XS_TYPE_ERROR, "iterator result: not an object");
 			mxNextCode(1);
 			mxBreak;
 		mxCase(XS_CODE_TO_INSTANCE)
@@ -2247,10 +2247,10 @@ XS_CODE_JUMP:
 		XS_CODE_GET_SUPER_ALL:	
 			slot = mxFunctionInstanceHome(mxFrameFunction->value.reference);
 			if (!slot->value.home.object)
-				mxRunDebugID(XS_TYPE_ERROR, "get super %s: no home", (txID)offset);
+				mxRunDebugID(XS_TYPE_ERROR, "get super.%s: no home", (txID)offset);
 			slot = fxGetPrototype(the, slot->value.home.object);
 			if (!slot)
-				mxRunDebugID(XS_TYPE_ERROR, "get super %s: no prototype", (txID)offset);
+				mxRunDebugID(XS_TYPE_ERROR, "get super.%s: no prototype", (txID)offset);
 			slot = mxBehaviorGetProperty(the, slot, (txID)offset, index, XS_ANY);
 			goto XS_CODE_GET_ALL;
 		mxCase(XS_CODE_GET_PRIVATE_2)
@@ -2420,10 +2420,10 @@ XS_CODE_JUMP:
 		XS_CODE_SET_SUPER_ALL:
 			slot = mxFunctionInstanceHome(mxFrameFunction->value.reference);
 			if (!slot->value.home.object)
-				mxRunDebugID(XS_TYPE_ERROR, "set super %s: no home", (txID)offset);
+				mxRunDebugID(XS_TYPE_ERROR, "set super.%s: no home", (txID)offset);
 			slot = fxGetPrototype(the, slot->value.home.object);
 			if (!slot)
-				mxRunDebugID(XS_TYPE_ERROR, "set super %s: no prototype", (txID)offset);
+				mxRunDebugID(XS_TYPE_ERROR, "set super.%s: no prototype", (txID)offset);
 			slot = mxBehaviorGetProperty(the, slot, (txID)offset, index, XS_ANY);
 			if (!slot || (slot->kind != XS_ACCESSOR_KIND)) {
 				mxSaveStateKeepStack;
@@ -2535,7 +2535,7 @@ XS_CODE_JUMP:
 			if (mxStack->kind == XS_REFERENCE_KIND)
 				variable = mxStack->value.reference; 
 			else
-				mxRunDebug(XS_TYPE_ERROR, "in: no instance");
+				mxRunDebug(XS_TYPE_ERROR, "in: not an object");
 			offset = slot->ID;
 			index = 0;
 			if (slot->value.closure->kind < 0)
@@ -2666,7 +2666,7 @@ XS_CODE_JUMP:
 				variable = fxGetPrototype(the, variable->value.reference);
 			}
             if (!mxIsConstructor(variable))
-				mxRunDebug(XS_TYPE_ERROR, "super: no constructor");
+				mxRunDebug(XS_TYPE_ERROR, "super: not a constructor");
 			mxAllocStack(6);
 			slot = mxStack;
 			mxInitSlotKind(slot++, XS_UNINITIALIZED_KIND);
@@ -4015,7 +4015,7 @@ XS_CODE_JUMP:
 		mxCase(XS_CODE_IN)
 			mxNextCode(1);
 			if (!mxIsReference(mxStack))
-				mxRunDebug(XS_TYPE_ERROR, "in: no reference");
+				mxRunDebug(XS_TYPE_ERROR, "in: not an object");
 			mxSaveState;
 			fxRunIn(the);
 			mxRestoreState;
@@ -4119,19 +4119,19 @@ XS_CODE_JUMP:
 	/* MODULE */		
 		mxCase(XS_CODE_IMPORT)
 			slot = mxFunctionInstanceHome(mxFrameFunction->value.reference)->value.home.module;
-			slot = mxModuleInstanceInternal(slot);
-			variable = slot->value.module.realm;
+			variable = mxModuleInstanceInternal(slot);
+			variable = variable->value.module.realm;
 			if (!variable) variable = mxModuleInstanceInternal(mxProgram.value.reference)->value.module.realm;
 			mxSaveState;
-			gxDefaults.runImport(the, variable, slot->value.module.id);
+			gxDefaults.runImport(the, variable, slot);
 			mxRestoreState;
 			mxNextCode(1);
 			mxBreak;
 		mxCase(XS_CODE_IMPORT_META)
-			variable = mxFunctionInstanceHome(mxFrameFunction->value.reference);
-			slot = mxModuleInstanceMeta(variable->value.home.module);
-			mxPushKind(XS_REFERENCE_KIND);
-			mxStack->value.reference = slot->value.reference;
+			slot = mxFunctionInstanceHome(mxFrameFunction->value.reference)->value.home.module;
+			mxSaveState;
+			fxRunImportMeta(the, slot);
+			mxRestoreState;
 			mxNextCode(1);
 			mxBreak;
 		mxCase(XS_CODE_TRANSFER)
@@ -4441,7 +4441,7 @@ void fxRunExtends(txMachine* the)
 	
 	constructor = fxGetInstance(the, the->stack);
 	if (!mxIsConstructor(constructor))
-		mxTypeError("extends: no constructor");
+		mxTypeError("extends: class is not a constructor");
 	mxPushUndefined();
 	prototype = the->stack;
 	fxBeginHost(the);
@@ -4455,11 +4455,11 @@ void fxRunExtends(txMachine* the)
 	}
 	else if (the->stack->kind == XS_REFERENCE_KIND) {
 		if (the->stack->value.reference->value.instance.prototype == mxGeneratorPrototype.value.reference)
-			mxTypeError("extends: generator");
+			mxTypeError("extends: class is a generator");
 		fxNewHostInstance(the);
 	}
 	else
-		mxTypeError("extends: no prototype");
+		mxTypeError("extends: class prototype is not an object");
 }
 
 void fxRunEval(txMachine* the)
@@ -4611,7 +4611,7 @@ void fxRunProxy(txMachine* the, txSlot* instance)
 	else if (instance->flag & XS_CAN_CONSTRUCT_FLAG)
 		mxBehaviorConstruct(the, instance, the->stack, mxTarget);
 	else
-		mxTypeError("no constructor");
+		mxTypeError("new: proxy is not a constructor");
 	mxPop();
 }
 
@@ -4842,10 +4842,10 @@ txBoolean fxToNumericIntegerBinary(txMachine* the, txSlot* a, txSlot* b, txBigIn
 	if (ra) {
 		if (rb)
 			return 1;
-		mxTypeError("Cannot coerce left operand to bigint");
+		mxTypeError("cannot coerce left operand to bigint");
 	}
 	else if (rb)
-		mxTypeError("Cannot coerce right operand to bigint");
+		mxTypeError("cannot coerce right operand to bigint");
 	a->value.bigint = *(*op)(the, C_NULL, &a->value.bigint, &b->value.bigint);
 	a->kind = XS_BIGINT_KIND;
 	the->stack = b;
@@ -4879,10 +4879,10 @@ txBoolean fxToNumericNumberBinary(txMachine* the, txSlot* a, txSlot* b, txBigInt
 	if (ra) {
 		if (rb)
 			return 1;
-		mxTypeError("Cannot coerce left operand to bigint");
+		mxTypeError("cannot coerce left operand to bigint");
 	}
 	else if (rb)
-		mxTypeError("Cannot coerce right operand to bigint");
+		mxTypeError("cannot coerce right operand to bigint");
 	a->value.bigint = *(*op)(the, C_NULL, &a->value.bigint, &b->value.bigint);
 	a->kind = XS_BIGINT_KIND;
 	the->stack = b;
@@ -4997,7 +4997,7 @@ void fxRunUsed(txMachine* the, txSlot* selector)
 	}
 	fxEndHost(the);
 #else
-	mxTypeError("not available");
+	mxTypeError("using: unavailable feature");
 #endif
 }
 
@@ -5010,14 +5010,14 @@ void fxRunUsing(txMachine* the)
 	if (!mxIsNull(resource) && !mxIsUndefined(resource)) {
 		mxGetID(mxID(_Symbol_dispose));
 		if (!fxIsCallable(the, the->stack))
-			mxTypeError("no [Symbol.dispose] method");
+			mxTypeError("using: [Symbol.dispose] is not a function");
 	}
 	else
 		the->stack->kind = XS_NULL_KIND;
 	mxPullSlot(resource);
 	fxEndHost(the);
 #else
-	mxTypeError("not available");
+	mxTypeError("using: unavailable feature");
 #endif
 }
 
@@ -5035,14 +5035,14 @@ void fxRunUsingAsync(txMachine* the)
 			mxGetID(mxID(_Symbol_dispose));
 		}
 		if (!fxIsCallable(the, the->stack))
-			mxTypeError("no [Symbol.asyncDispose] method, no [Symbol.dispose] method");
+			mxTypeError("using: neither [Symbol.asyncDispose] nor [Symbol.dispose] are function");
 	}
 	else
 		the->stack->kind = XS_NULL_KIND;
 	mxPullSlot(resource);
 	fxEndHost(the);
 #else
-	mxTypeError("not available");
+	mxTypeError("using: unavailable feature");
 #endif
 }
 

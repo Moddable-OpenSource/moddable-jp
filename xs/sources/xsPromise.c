@@ -155,18 +155,18 @@ txSlot* fxNewPromiseCapability(txMachine* the, txSlot* resolveFunction, txSlot* 
 		mxTypeError("executor not called");
 	slot = slot->next;
 	if (!mxIsReference(slot))
-		mxTypeError("resolve is no object");
+		mxTypeError("resolve: not an object");
 	function = slot->value.reference;	
 	if (!mxIsFunction(function))
-		mxTypeError("resolve is no function");
+		mxTypeError("resolve: not a function");
 	resolveFunction->kind = XS_REFERENCE_KIND;
 	resolveFunction->value.reference = function;
 	slot = slot->next;
 	if (!mxIsReference(slot))
-		mxTypeError("reject is no object");
+		mxTypeError("reject: not an object");
 	function = slot->value.reference;	
 	if (!mxIsFunction(function))
-		mxTypeError("reject is no function");
+		mxTypeError("reject: not a function");
 	rejectFunction->kind = XS_REFERENCE_KIND;
 	rejectFunction->value.reference = function;
 	return the->stack->value.reference;
@@ -210,6 +210,7 @@ void fxAddUnhandledRejection(txMachine* the, txSlot* promise)
 	while ((slot = *address)) {
 		if (slot->value.weakRef.target == promise)
 			break;
+		mxMeterSome(1);
 		slot = slot->next;
 		address = &slot->next;
 	}
@@ -287,7 +288,7 @@ void fxCombinePromises(txMachine* the, txInteger which)
 	txInteger index;
 	
 	if (!mxIsReference(mxThis))
-		mxTypeError("this is no object");
+		mxTypeError("this: not an object");
 	mxTemporary(resolveFunction);
 	mxTemporary(rejectFunction);
 	mxPushSlot(mxThis);
@@ -314,7 +315,7 @@ void fxCombinePromises(txMachine* the, txInteger which)
 			mxGetID(mxID(_resolve));	
 			resolve = the->stack;
 			if (!fxIsCallable(the, resolve))
-				mxTypeError("resolve is no function");
+				mxTypeError("resolve: not a function");
 			mxTemporary(iterator);
 			mxTemporary(next);
 			fxGetIterator(the, mxArgv(0), iterator, next, 0);
@@ -808,10 +809,10 @@ void fx_Promise(txMachine* the)
 	if (mxIsUndefined(mxTarget))
 		mxTypeError("call: Promise");
 	if (mxArgc < 1)
-		mxTypeError("no executor parameter");
+		mxTypeError("no executor");
 	argument = mxArgv(0);
 	if (!fxIsCallable(the, argument))
-		mxTypeError("executor is no function");
+		mxTypeError("executor: not a function");
 	mxPushSlot(mxTarget);
 	fxGetPrototypeFromConstructor(the, &mxPromisePrototype);
 	promise = fxNewPromiseInstance(the);
@@ -869,7 +870,7 @@ void fx_Promise_reject(txMachine* the)
 	txSlot* rejectFunction;
 
 	if (!mxIsReference(mxThis))
-		mxTypeError("this is no object");
+		mxTypeError("this: not an object");
 	mxTemporary(resolveFunction);
 	mxTemporary(rejectFunction);
 	mxPushSlot(mxThis);
@@ -892,7 +893,7 @@ void fx_Promise_reject(txMachine* the)
 void fx_Promise_resolve(txMachine* the)
 {
 	if (!mxIsReference(mxThis))
-		mxTypeError("this is no object");
+		mxTypeError("this: not an object");
 	mxPushUndefined();
 	mxPushSlot(mxThis);
 	if (mxArgc > 0)
@@ -1008,7 +1009,7 @@ void fx_Promise_prototype_finally(txMachine* the)
 {
 	txSlot* constructor;
 	if (!mxIsReference(mxThis))
-		mxTypeError("this is no object");
+		mxTypeError("this: not an object");
 	mxPushSlot(mxThis);
 	mxGetID(mxID(_constructor));
 	fxToSpeciesConstructor(the, &mxPromiseConstructor);
@@ -1143,10 +1144,10 @@ void fx_Promise_prototype_then(txMachine* the)
 	txSlot* rejectFunction;
 
 	if (!mxIsReference(mxThis))
-		mxTypeError("this is no object");
+		mxTypeError("this: not an object");
 	promise = mxThis->value.reference;
 	if (!mxIsPromise(promise))
-		mxTypeError("this is no promise");
+		mxTypeError("this: not a Promise instance");
 #ifdef mxPromisePrint
 	fprintf(stderr, "fx_Promise_prototype_then %d\n", promise->next->ID);
 #endif

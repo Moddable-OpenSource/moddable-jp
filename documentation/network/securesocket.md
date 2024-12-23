@@ -182,7 +182,7 @@ let request = new Request({
 可能であれば、プロジェクトに追加する前にPEMファイルをDER形式に変換してください。変換を行うツールは多数ありますが、信頼できる選択肢として`openssl`があります。以下のコマンドラインは多くの証明書に対して機能します（PEMファイルのパスを`data.pem`に、出力ファイルのパスを`data.der`に置き換えてください）:
 
 
-```
+```shell
 openssl x509 -inform pem -in data.pem -out data.der -outform der
 ```
 

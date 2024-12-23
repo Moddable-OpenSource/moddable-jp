@@ -90,7 +90,12 @@ static void fxWriteStack(txMachine* the, txSnapshot* snapshot);
 #else
 	#define mxUint8ArrayBase64Additions 0
 #endif
-#define mxCallbacksLength (496 + mxECMAScript2023Additions + mxExplicitResourceManagementAdditions + mxECMAScript2024Additions + mxUint8ArrayBase64Additions)
+#if mxModuleStuff
+	#define mxModuleStuffAdditions 1
+#else
+	#define mxModuleStuffAdditions 0
+#endif
+#define mxCallbacksLength (496 + mxECMAScript2023Additions + mxExplicitResourceManagementAdditions + mxECMAScript2024Additions + mxUint8ArrayBase64Additions + mxModuleStuffAdditions)
 
 static txCallback gxCallbacks[mxCallbacksLength] = {
 	fx_AggregateError,
@@ -637,7 +642,10 @@ static txCallback gxCallbacks[mxCallbacksLength] = {
 	fx_Uint8Array_prototype_setFromBase64,
 	fx_Uint8Array_prototype_setFromHex,
 	fx_Uint8Array_prototype_toBase64,
-	fx_Uint8Array_prototype_toHex
+	fx_Uint8Array_prototype_toHex,
+#endif
+#if mxModuleStuff
+	fx_ModuleStuff,
 #endif
 };
 extern const txTypeDispatch gxTypeDispatches[];

@@ -87,7 +87,7 @@ again:
 			return slot;
 #endif
 	}
-	mxTypeError("callback is no function");
+	mxTypeError("callback: not a function");
 	return C_NULL;
 }
 

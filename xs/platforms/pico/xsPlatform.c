@@ -46,6 +46,10 @@
 #include "xsHost.h"
 #include "pico/sem.h"
 
+#if SFE_ALLOC
+	#include "sparkfun_pico/sfe_pico_alloc.h"
+#endif
+
 #ifdef mxDebug
 	#include "modPreference.h"
 #endif
@@ -754,7 +758,13 @@ uint8_t fxInNetworkDebugLoop(txMachine *the)
 }
 
 uint32_t pico_memory_remaining() {
+#if SFE_ALLOC
+	uint32_t max = sfe_mem_size();
+	uint32_t cur = sfe_mem_used();
+	return (max - cur);
+#else
 	return (1024);
+#endif
 }
 
 

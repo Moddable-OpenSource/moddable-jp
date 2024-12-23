@@ -1,6 +1,6 @@
 # XSプリロードを使用してアプリケーションを最適化する
 Copyright 2019-2023 Moddable Tech, Inc.<BR>
-改訂： 2023年6月8日
+改訂： 2024年10月1日
 
 モジュールのプリロードは、XS JavaScriptエンジンのユニークな機能です。プリロードは、アプリケーションが対象デバイスにダウンロードされる前のビルドプロセス中に、JavaScriptアプリケーションの一部を実行します。これには2つの主な利点があります：
 
@@ -261,13 +261,42 @@ Example.aNativeFunction();
 
 これらのオブジェクトはフラッシュに保存できません。しかし、保存する必要がない限り、プリロード中に使用することは可能です。例えば、プリロードの一部として実行されるコードは、プリロードフェーズが終了する時に正規表現のインスタンスが残っていない限り、安全に`RegExp`を使用できます。
 
+## 組み込みオブジェクトの振る舞いの変更
+
+組み込みオブジェクトはプリロードが完了するまで凍結されないため、プリロードされたモジュールを使用してその挙動を変更することが可能です。これにより、組み込みオブジェクトの動作を拡張できます。
+
+例えば、`Error.protoype.name` プロパティは通常のプロパティであり（[ECMA-262](https://tc39.es/ecma262/#sec-error.prototype.name)で指定されているように）, 凍結されると、`name`に書き込みを試みた際にエラーが発生します。
+
+
+```js
+class MyError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "MyError"; // throws "# Exception: set name: not writable (in MyError)!"
+    }
+}
+
+const err = new MyError("My error message");
+```
+
+これに対処するために、クラス `MyError` の実装にnameプロパティを追加できます。ただし、`Error` のプロトタイプで `name` を書き込み可能にする必要がある場合（たとえば、サードパーティのNPMモジュールを使用する際など）、`name` が凍結される前にその挙動を変更するプリロードされたモジュールを作成することができます。
+
+```js
+Object.defineProperty(Error.prototype, "name", {
+	get: function() {return "Error";},
+	set: function(value) {
+		Object.defineProperty(this, "name", {value, writable: true, configurable: true});
+	}
+});
+```
+
 ## プリロード `main`
 `main`モジュールは最初に実行されるアプリケーションスクリプトです。その作業を行うために、`main`モジュールは通常他のモジュールをインポートします。プロジェクトの`main`モジュールは、通常、プリロードに設定されていない唯一のモジュールです。これは便宜上行われ、Moddable SDKの例のような小さなプロジェクトでは、通常問題にはなりません。アプリケーションの`main`モジュールは必ずネイティブ関数を呼び出し、Wi-Fiに接続したり、画像を表示したり、デジタルピンを切り替えたりします。上記のように、ネイティブ関数はプリロード中には呼び出せません。
 
 以下は、起動時にデジタルピンを使用して1つのLEDを点灯させ、繰り返しタイマーを設定して別のLEDの状態を切り替える簡単なアプリケーションの例です。
 
 ```js
-import Digital from "pins/digital:
+import Digital from "pins/digital";
 
 let toggle = false;
 
@@ -281,7 +310,7 @@ Timer.repeat(() => {
 Moddable SDKランタイムでは、`main` モジュールが関数を返す場合、その関数は直ちに実行されます。これを利用して、`main` がプリロードをサポートするようにすることができます。ここにそのような単純な例を示します：
 
 ```js
-import Digital from "pins/digital:
+import Digital from "pins/digital";
 
 export default function() {
 	let toggle = false;
@@ -297,7 +326,7 @@ export default function() {
 時には、`main` をエクスポートされた関数からインスタンス化されるシンプルなクラスで整理すると便利です。これにより、コードがよりクリーンに構造化され、上記の例の `toggle` のように必要な状態がインスタンスの状態の一部として `this` を使用してアクセスされます。
 
 ```js
-import Digital from "pins/digital:
+import Digital from "pins/digital";
 
 class App {
 	constructor() {

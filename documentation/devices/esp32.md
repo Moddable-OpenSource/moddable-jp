@@ -11,6 +11,7 @@ Copyright 2016-2024 Moddable Tech, Inc.<BR>
 	* [ESP32](#platforms-esp32)
 	* [ESP32-S2](#platforms-esp32-s2)
 	* [ESP32-S3](#platforms-esp32-s3)
+	* [ESP32-S3 Cameras](#platforms-esp32-s3-cameras)
 	* [ESP32-C3](#platforms-esp32-c3)
 	* [ESP32-C6](#platforms-esp32-c6)
 	* [ESP32-H2](#platforms-esp32-h2)
@@ -108,7 +109,7 @@ Moddable SDKはEspressifの2つのESP32-S2開発キットをサポートして�
 | 名前 | プラットフォーム識別子 | 主要機能 | リンク |
 | :---: | :--- | :--- | :--- |
 |  <img src="https://dl.espressif.com/dl/schematics/pictures/esp32-s2-kaluga-1-kit-v1.0-3d.png" width=125><BR>Kaluga | `esp32/kaluga` | **3.2インチLCDディスプレイ**<BR>320 x 240 QVGA<BR>16ビットカラー<BR><BR>2 MB SRAM<BR>スピーカーとオーディオ再生<BR>タッチパッドパネル<BR>NeoPixel LED | <li>[Moddableブログ記事](https://blog.moddable.com/blog/espidf42/)</li><li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/hw-reference/esp32s2/user-guide-esp32-s2-kaluga-1-kit.html)</li> |
-|  <img src="https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/_images/esp32-s2-saola-1-v1.2-isometric.png" width=125><BR>Saola<BR>(WROOM & WROVERバージョン) | `esp32/saola_wroom` <BR> `esp32/saola_wrover`| NeoPixel LED<BR>2 MB SRAM (WROVERバージョンのみ)| <li>[Moddableブログ記事](https://blog.moddable.com/blog/espidf42/)</li><li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/hw-reference/esp32s2/user-guide-saola-1-v1.2.html)</li> |
+|  <img src="./../assets/devices/esp32s2-saola.jpg" width=125><BR>Saola<BR>(WROOM & WROVERバージョン) | `esp32/saola_wroom` <BR> `esp32/saola_wrover`| NeoPixel LED<BR>2 MB SRAM (WROVERバージョンのみ)| <li>[Moddableブログ記事](https://blog.moddable.com/blog/espidf42/)</li><li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/hw-reference/esp32s2/user-guide-saola-1-v1.2.html)</li> |
 | <img src="./../assets/devices/adafruit-qtpys2.png" width=125><BR>Adafruit<BR>QT Py ESP32-S2 | `esp32/qtpys2` |  Neopixel、1ボタン、STEMMA/QWIIC | <li>[製品ページ](https://www.adafruit.com/product/5325)</li>|
 | <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `esp32/qtpys2_ili9341` | ili9341 QVGAディスプレイ<BR>320 x 240<BR>16ビットカラー | <li>[配線ガイド](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
 | <img src="./../assets/devices/lolin-s2-mini.png" width=100><BR>Lolin<BR>S2 Mini | `esp32/lolin_s2mini` |  1ボタン | <li>[製品ガイド](https://www.wemos.cc/en/latest/s2/s2_mini.html)</li>
@@ -129,7 +130,7 @@ Moddable SDKはESP32-S3上に構築されたデバイスをサポートしてい
 
 | 名前 | プラットフォーム識別子 | 主要機能 | リンク |
 | :---: | :--- | :--- | :--- |
-| <img src="./../assets/devices/moddable-six.png" width=125><BR>Moddable Six | `esp32/moddable_six`<BR>`esp32/moddable_six_cdc`<br>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit 並列ディスプレイバス<BR>静電容量式タッチ<BR>Neopixel<BR>Qwiic コネクタ<BR>追加のスピーカー<br><BR>20個の外部ピン  | <li>[Moddable Six 開発者ガイド](./moddable-six.md)</li><li>[Moddable製品ページ](https://www.moddable.com/hardware)</li> |
+| <img src="./../assets/devices/moddable-six.jpg" width=200><BR>Moddable Six | `esp32/moddable_six`<BR>`esp32/moddable_six_cdc`<br>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit 並列ディスプレイバス<BR>静電容量式タッチ<BR>Neopixel<BR>Qwiic コネクタ<BR>追加のスピーカー<br><BR>20個の外部ピン  | <li>[Moddable Six 開発者ガイド](./moddable-six.md)</li><li>[Moddable製品ページ](https://www.moddable.com/hardware)</li> |
 | <img src="./../assets/devices/moddable-display-6.png" width=125><BR>Moddable Display 6 | `esp32/moddable_display_6`<BR>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit parallel display bus<BR>静電容量式タッチ<BR>Neopixel<BR>Qwiic コネクター<BR>追加のスピーカー<br><BR>20個の外部ピン  | <li>[Moddable Display  開発者ガイド](./moddable-display.md)</li><li>[Moddable製品ページ](https://www.moddable.com/hardware)</li> |
 |  <img src="https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/_images/esp32-s3-devkitc-1-v1.1-isometric.png" width=125><BR>ESP32-S3-DevKitC-1-N8 | `esp32/esp32s3` | |<li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html)</li> |
 |  <img src="./../assets/devices/adafruit-qt-py-eps32-s3.png" width=125><BR>Adafruit QT Py ESP32-S3 | `esp32/qtpys3` | Neopixel、1ボタン、STEMMA/QWIIC  | <li>[製品ページ](https://www.adafruit.com/product/5426)</li> |
@@ -142,6 +143,16 @@ Moddable SDKはESP32-S3上に構築されたデバイスをサポートしてい
 | <img src="./../assets/devices/lilygo-t-display-s3.png" width=100><BR>Lilygo T-Display-S3 | `esp32/lilygo_tdisplay_s3` | 1.9インチLCDディスプレイ<br>170 x 320 16ビットカラー<br>8ビットパラレルディスプレイ<br>タッチ<br>2ボタン<br>Qwiicコネクタ<br> | <li>[製品ページ](https://www.lilygo.cc/products/t-display-s3)</li>|
 | <img src="./../assets/devices/xiao-esp32c3.png" width=125><BR>Seeed Studio<BR>XIAO ESP32S3 | `esp32/xiao_esp32s3` | 1ボタン | <li>[製品ページ](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html)</li>|
 | <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `esp32/qtpys3_ili9341`<br>`esp32/xiao_esp32s3_ili9341` | ili9341 QVGAディスプレイ<BR>320 x 240<BR>16ビットカラー | <li>[配線ガイド](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
+
+<a id="platforms-esp32-s3-cameras"></a>
+### ESP32-S3 カメラ
+
+| 名前 | プラットフォーム識別子 | 主要機能 | リンク |
+| :---: | :--- | :--- | :--- |
+| <img src="../assets/devices/lilygo_t_camera_plus_s3.jpg" width=140></a><BR>Lilygo T Camera Plus S3 | `esp32/lilygo_t_camera_plus_s3` | OV2640 カメラ<br>1.3" IPSディスプレイ<br>240 x 240 タッチスクリーン<br>マイク<br>スピーカー<br> | <li>[製品ページ](https://www.lilygo.cc/products/t-camera-plus-s3)</li> |
+| <img src="../assets/devices/m5atom_s3r.jpg" width=140></a><BR>M5 Atom S3R M12 | `esp32/m5atom_s3r` | OV3660 カメラ<br>マイク<br>BMI270 IMU<Br>8MB PSRAM| <li>[製品ページ](https://shop.m5stack.com/products/atoms3r-camera-kit-m12-version-ov3660)</li> |
+| <img src="../assets/devices/m5stack_cores3.jpg" width=140></a><BR>M5Stack Core S3 | `esp32/m5stack_cores3` | GC0308 カメラ<br>マイク<br>スピーカー<br>ili9341 QVGA タッチスクリーン<BR>320 x 240<BR>BMI270 IMU<Br>BM8563 RTC<BR>8MB PSRAM | <li>[製品ページ](https://shop.m5stack.com/products/m5stack-cores3-esp32s3-lotdevelopment-kit)</li> |
+| <img src="../assets/devices/xiao_esp32s3_sense.jpg" width=140></a><BR>Seed Studio<br>XIAO ESP32S3 Sense | `esp32/xiao_esp32s3_sense` | OV2640 カメラ<br>マイク<br>8MB PSRAM | <li>[Getting Started](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/)</li><li>[Display Wiring Guide](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
 
 <a id="platforms-esp32-c3"></a>
 ### ESP32-C3
@@ -158,7 +169,7 @@ Moddable SDKは3つのESP32-C3開発キットをサポートしています：
 
 | 名前 | プラットフォーム識別子 | 主な機能 | リンク |
 | :---: | :--- | :--- | :--- |
-|  <img src="https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/_images/esp32-c3-devkitm-1-v1-isometric.png" width=125><BR>ESP32-C3-DevKitM-1 | `esp32/esp32c3` |  | <li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)</li> |
+|  <img src="./../assets/devices/esp32c3-devkit-m.jpg" width=125><BR>ESP32-C3-DevKitM-1 | `esp32/esp32c3` |  | <li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)</li> |
 |  <img src="./../assets/devices/esp32c3-dual.png" width=125><BR>ESP32 C3 DevKitクローン| `esp32/esp32c3_cdc` |  | <li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)</li> |
 |  <img src="./../assets/devices/c3_devkit_rust.png" width=125><BR>ESP32-C3-DevKit-RUST-1 | `esp32/c3_devkit_rust` |  | <li>[製品ページ](https://www.espressif.com/en/dev-board/esp32-c3-devkit-rust-1-en)</li> |
 | <img src="./../assets/devices/xiao-esp32c3.png" width=125><BR>Seeed Studio<BR>XIAO ESP32C3 | `esp32/xiao_esp32c3` | 1ボタン | <li>[製品ページ](https://www.seeedstudio.com/Seeed-XIAO-ESP32C3-p-5431.html)</li>|
@@ -249,7 +260,7 @@ instrumentedビルドはネイティブコードのデバッグに使用され�
 <a id="mac"></a>
 ## macOS
 
-Moddable SDKのESP32用ビルドは現在、ESP-IDF v5.3（コミット `e0991fac`）およびEspressifの[`idf.py`ツール](https://github.com/espressif/esp-idf/blob/master/tools/idf.py)のCMakeオプションを使用しています。
+Moddable SDKのESP32用ビルドは現在、ESP-IDF v5.3.1（コミット `c8fc5f64`）およびEspressifの[`idf.py`ツール](https://github.com/espressif/esp-idf/blob/master/tools/idf.py)のCMakeオプションを使用しています。
 
 <a id="mac-instructions"></a>
 ### インストール
@@ -265,11 +276,11 @@ Moddable SDKのESP32用ビルドは現在、ESP-IDF v5.3（コミット `e0991fa
 
 もし、macOS 10.16 (Big Sur) 以降を使用している場合、VCPドライバをインストールする必要はありません。
 
-4. 初めてインストールする場合は、`ESP-IDF` GitHubリポジトリを `~/esp32` ディレクトリにクローンします。必ず `--recursive` オプションを指定してください。`v5.3` タグをチェックアウトすることを忘れないでください：
+4. 初めてインストールする場合は、`ESP-IDF` GitHubリポジトリを `~/esp32` ディレクトリにクローンします。必ず `--recursive` オプションを指定してください。`v5.3.1` タグをチェックアウトすることを忘れないでください：
 
 	```text
 	cd ~/esp32
-	git clone -b v5.3 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.3
+	git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.3.1
 	```
 
 5. (オプション）Homebrewを更新し、Python、cmake、ninja、pipパッケージ管理システム、およびpyserialをインストールします。すでに古いバージョンがインストールされている場合は、それらのパッケージを `brew upgrade` でアップグレードします：
@@ -301,7 +312,7 @@ Moddable SDKのESP32用ビルドは現在、ESP-IDF v5.3（コミット `e0991fa
 8. 開いたファイルに次の行を追加して保存します。これにより、`IDF_PATH` 環境変数がESP-IDFディレクトリを指すように設定されます。
 
 	```text
-	export IDF_PATH=$HOME/esp32/esp-idf-v5.3
+	export IDF_PATH=$HOME/esp32/esp-idf-v5.3.1
 	```
 
 	<a id="upload_port_mac"></a>
@@ -423,7 +434,7 @@ pip install cryptography
 	```text
 	cd ~/esp32
 	rm -rf esp-idf
-	git clone -b v5.3 --recursive https://github.com/espressif/esp-idf.git
+	git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git
 	```
 
 2. （オプション - おそらくこれを行う必要はありません）Homebrewを更新し、必要なツールがすべて揃っていることと、それらが最新であることを確認します：
@@ -481,7 +492,7 @@ pip install cryptography
 <a id="win"></a>
 ## Windows
 
-Moddable SDKのESP32用ビルドは現在、ESP-IDF v5.3（コミット `e0991fac`）およびEspressifの[`idf.py`ツール](https://github.com/espressif/esp-idf/blob/master/tools/idf.py)のCMakeオプションを使用しています。
+Moddable SDKのESP32用ビルドは現在、ESP-IDF v5.3.1（コミット `c8fc5f64`）およびEspressifの[`idf.py`ツール](https://github.com/espressif/esp-idf/blob/master/tools/idf.py)のCMakeオプションを使用しています。
 
 <a id="win-instructions"></a>
 ### インストール
@@ -490,13 +501,13 @@ Moddable SDKのESP32用ビルドは現在、ESP-IDF v5.3（コミット `e0991fa
 
 2. Silicon Labsの[CP210x USB to UART VCPドライバ](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)をダウンロードしてインストールします。ドライバのzipファイルには、x64およびx86バージョンのインストーラが含まれています。ほとんどの最新のPCは64ビット版のWindowsを実行しているため、x64バージョンのVCPドライバを使用する必要があります。32ビット版のWindowsを実行している場合は、x86バージョンのドライバを使用してください。（コンピュータが64ビット版のWindowsを実行しているかどうかは、システム設定の「PCの情報」で確認できます）
 
-3. Espressifの[ESP-IDF Windowsインストーラ](https://dl.espressif.com/dl/esp-idf/?idf=5.3)をダウンロードして実行します。これにより、ESP32 Xtensa gccツールチェーン、Ninja Build、OpenOCD、およびKConfigフロントエンドがインストールされます。このツールは、必要に応じて新しくダウンロードされたツールを含むように`PATH`を設定します。
+3. Espressifの[ESP-IDF Windowsインストーラ](https://dl.espressif.com/dl/esp-idf/?idf=5.3.1)をダウンロードして実行します。これにより、ESP32 Xtensa gccツールチェーン、Ninja Build、OpenOCD、およびKConfigフロントエンドがインストールされます。このツールは、必要に応じて新しくダウンロードされたツールを含むように`PATH`を設定します。
 
 インストーラーのデフォルトオプションをすべて受け入れるか、必要に応じてインストール場所を変更しても安全です。
 
 CMakeやPythonがまだインストールされていない場合、インストーラーはそれらのツールをダウンロードしてインストールするように促します（必要に応じてインストールしてください）。
 
-インストーラーはESP-IDFのgitリポジトリをクローンするオプションを提供します。このオプションを選択する場合は、「v5.3（リリースバージョン）」オプションを選択し、ホームフォルダ内の`esp32\esp-idf`というディレクトリにクローンしてください。
+インストーラーはESP-IDFのgitリポジトリをクローンするオプションを提供します。このオプションを選択する場合は、「v5.3.1（リリースバージョン）」オプションを選択し、ホームフォルダ内の`esp32\esp-idf`というディレクトリにクローンしてください。
 
 4. ESP-IDFをESP-IDF Windowsインストーラーを使用してクローンしなかった場合、ホームフォルダに`esp32`ディレクトリを作成します。これは、ファイルエクスプローラーまたはコマンドプロンプトから行います：
 
@@ -505,14 +516,14 @@ CMakeやPythonがまだインストールされていない場合、インスト
     mkdir esp32
     ```
 
-5. ESP-IDFをESP-IDF Windowsインストーラーを使用してクローンしなかった場合、`ESP-IDF` Githubリポジトリを`~/esp32`ディレクトリにクローンします。必ず`--recursive`オプションを指定してください。その後、`v5.3`タグをチェックアウトします：
+5. ESP-IDFをESP-IDF Windowsインストーラーを使用してクローンしなかった場合、`ESP-IDF` Githubリポジトリを`~/esp32`ディレクトリにクローンします。必ず`--recursive`オプションを指定してください。その後、`v5.3.1`タグをチェックアウトします：
 
     ```text
     cd %USERPROFILE%\esp32
-    git clone -b v5.3 --recursive https://github.com/espressif/esp-idf.git
+    git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git
     ```
 
-既にESP-IDFのクローンコピーを持っている場合、最も簡単な更新方法は既存の`esp-idf`フォルダーを削除して再度クローンすることです。[EspressifのESP-IDFの取得方法を参照](https://docs.espressif.com/projects/esp-idf/en/v5.3/esp32/get-started/index.html#get-started-get-esp-idf)
+既にESP-IDFのクローンコピーを持っている場合、最も簡単な更新方法は既存の`esp-idf`フォルダーを削除して再度クローンすることです。[EspressifのESP-IDFの取得方法を参照](https://docs.espressif.com/projects/esp-idf/en/v5.3.1/esp32/get-started/index.html#get-started-get-esp-idf)
 
 6. USBケーブルを使ってESP32デバイスをWindowsホストに接続します。
 
@@ -538,13 +549,13 @@ CMakeやPythonがまだインストールされていない場合、インスト
     install.bat
     ```
 
-10. ESP-IDF Windowsインストーラーは、重要な環境変数とパスを自動的に設定する「ESP-IDF 5.3 CMD」と呼ばれるコマンドプロンプトを提供します。「ESP-IDF 5.3 CMD」でESP32プロジェクトをビルドすることをお勧めします。新しいコマンドプロンプトインスタンスごとに、Visual Studio x86初期化バッチファイルを手動で実行する必要があります。システムに応じてパスを調整してください。
+10. ESP-IDF Windowsインストーラーは、重要な環境変数とパスを自動的に設定する「ESP-IDF 5.3.1 CMD」と呼ばれるコマンドプロンプトを提供します。「ESP-IDF 5.3.1 CMD」でESP32プロジェクトをビルドすることをお勧めします。新しいコマンドプロンプトインスタンスごとに、Visual Studio x86初期化バッチファイルを手動で実行する必要があります。システムに応じてパスを調整してください。
 
 ```text
 "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"
 ```
 
-**専門家向けの注意:** Windowsのショートカットを編集することに慣れている場合、この手動プロセスの便利な代替手段として、「ESP-IDF 5.3 CMD」ショートカットを変更して、ESP-IDF環境とVisual Studio x86環境の両方を初期化することができます。これを行うには、「ESP-IDF 5.3 CMD」ショートカットを右クリックして「プロパティ」を選択します。プロパティウィンドウの「ターゲット」フィールドには、次のようなコマンドが表示されます。
+**専門家向けの注意:** Windowsのショートカットを編集することに慣れている場合、この手動プロセスの便利な代替手段として、「ESP-IDF 5.3.1 CMD」ショートカットを変更して、ESP-IDF環境とVisual Studio x86環境の両方を初期化することができます。これを行うには、「ESP-IDF 5.3.1 CMD」ショートカットを右クリックして「プロパティ」を選択します。プロパティウィンドウの「ターゲット」フィールドには、次のようなコマンドが表示されます。
 
 ```text
 C:\WINDOWS\system32\cmd.exe /k "C:\Users\<username>\.espressif\idf_cmd_init.bat"
@@ -558,9 +569,9 @@ C:\WINDOWS\system32\cmd.exe /k "C:\Users\<username>\.espressif\idf_cmd_init.bat"
 
 また、ショートカットの「作業フォルダー」フィールドを `%MODDABLE%` に更新して、Moddable SDKディレクトリでコマンドプロンプトセッションを開始することも便利です。
 
-	> 注: これらの指示は、ESP-IDF が1つだけインストールされていることを前提としています。必要に応じて、`idf_cmd_init.bat` に特定の ESP-IDF インストールを指定する引数を渡すこともできます。この引数は、デフォルトの "ESP-IDF 5.3 CMD" ショートカットで設定する必要があります。
+	> 注: これらの指示は、ESP-IDF が1つだけインストールされていることを前提としています。必要に応じて、`idf_cmd_init.bat` に特定の ESP-IDF インストールを指定する引数を渡すこともできます。この引数は、デフォルトの "ESP-IDF 5.3.1 CMD" ショートカットで設定する必要があります。
 
-11. "ESP-IDF 5.3 CMD" コマンドプロンプトで、デバイスターゲット用に `helloworld` をビルドしてセットアップを確認します：
+11. "ESP-IDF 5.3.1 CMD" コマンドプロンプトで、デバイスターゲット用に `helloworld` をビルドしてセットアップを確認します：
 
 	```text
 	cd %MODDABLE%\examples\helloworld
@@ -581,7 +592,7 @@ Windows 10および11に含まれている組み込みのウイルス対策ソ�
 
 #### Python バージョン
 
-Espressifは、ESP-IDF v5.3でビルドする際にPython 3.9以降の使用を推奨しています。Python 3.9はESP-IDF Windowsインストーラーによってインストールされます。
+Espressifは、ESP-IDF v5.3.1でビルドする際にPython 3.9以降の使用を推奨しています。Python 3.9はESP-IDF Windowsインストーラーによってインストールされます。
 
 以前のバージョンのPython（例えばPython 2.7）がシステムにインストールされていた場合、Python 3.9がデフォルトで選択されるようにするために、システムPATHからそれを削除する必要があるかもしれません。PATH内の`C:\Python27\`や`C:\Python27\Scripts\`のようなエントリを探し、ビルドプロセス中にPythonエラーが発生した場合はそれらを削除してください。
 
@@ -630,15 +641,15 @@ Espressifツールを更新するには、最新の[ESP-IDF Windows Installer](h
 
 CMakeやPythonがまだインストールされていない場合、インストーラーはそれらのツールをダウンロードしてインストールするように促します（必要に応じてインストールしてください）。
 
-ESP-IDFをクローンする場合は、`v5.3 (release version)`のesp-idfを選択してください。
+ESP-IDFをクローンする場合は、`v5.3.1 (release version)`のesp-idfを選択してください。
 
-インストーラーを使用してESP-IDFをクローンする場合は、次のステップの指示に従って`v5.3`タグに更新してください。
+インストーラーを使用してESP-IDFをクローンする場合は、次のステップの指示に従って`v5.3.1`タグに更新してください。
 
-2. ESP-IDF Windows Installerを使用してESP-IDFをクローンしなかった場合、`ESP-IDF` Githubリポジトリを`~/esp32`ディレクトリにクローンします。`--recursive`オプションとブランチ`v5.3`タグを指定してください：
+2. ESP-IDF Windows Installerを使用してESP-IDFをクローンしなかった場合、`ESP-IDF` Githubリポジトリを`~/esp32`ディレクトリにクローンします。`--recursive`オプションとブランチ`v5.3.1`タグを指定してください：
 
     ```text
     cd %USERPROFILE%\esp32
-	git clone -b v5.3 --recursive https://github.com/espressif/esp-idf.git
+	git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git
     ```
 
 3. コントロールパネルアプリの「環境変数」ダイアログを開き、[これらの指示](https://www.architectryan.com/2018/08/31/how-to-change-environment-variables-on-windows-10/)に従ってください。そのダイアログから、`IDF_PATH` Windows環境変数が正しく設定されていることを確認します。
@@ -696,7 +707,7 @@ ESP-IDFをクローンする場合は、`v5.3 (release version)`のesp-idfを選
 <a id="esp32-linux"></a>
 ## Linux
 
-Moddable SDKのESP32向けビルドは現在、ESP-IDF v5.3（コミット `e0991fac`）およびEspressifの [`idf.py` ツール](https://github.com/espressif/esp-idf/blob/master/tools/idf.py) のCMakeオプションを使用しています。
+Moddable SDKのESP32向けビルドは現在、ESP-IDF v5.3.1（コミット `c8fc5f64`）およびEspressifの [`idf.py` ツール](https://github.com/espressif/esp-idf/blob/master/tools/idf.py) のCMakeオプションを使用しています。
 
 <a id="lin-instructions"></a>
 ### インストール
@@ -728,11 +739,11 @@ Moddable SDKのESP32向けビルドは現在、ESP-IDF v5.3（コミット `e099
 
 3. 必要なサードパーティSDKとツールのために、ホームディレクトリに `esp32` ディレクトリを `~/esp32` に作成します。
 
-4. これが初めてのインストールの場合、`ESP-IDF` GitHubリポジトリを `~/esp32` ディレクトリにクローンします。`--recursive` オプションを指定することを確認してください。その後、`v5.3` タグをチェックアウトします：
+4. これが初めてのインストールの場合、`ESP-IDF` GitHubリポジトリを `~/esp32` ディレクトリにクローンします。`--recursive` オプションを指定することを確認してください。その後、`v5.3.1` タグをチェックアウトします：
 
 ```text
 cd ~/esp32
-git clone -b v5.3 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.3
+git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.3.1
 ```
 
 5. USBケーブルを使ってESP32デバイスをLinuxホストに接続します。
@@ -851,7 +862,7 @@ mv esp-idf esp-idf.old
 ```text
 cd ~/esp32
 rm -rf esp-idf
-git clone -b v5.3 --recursive https://github.com/espressif/esp-idf.git
+git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git
 ```
 
 2. （オプション）aptを更新し、`ESP-IDF`のコンパイルに必要な不足しているパッケージ（および既存のパッケージのアップグレード）をインストールします。インストールするパッケージは、ディストリビューションのデフォルトのPythonバージョンによって異なります。

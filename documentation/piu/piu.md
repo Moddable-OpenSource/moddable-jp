@@ -1,21 +1,21 @@
-# Piu JavaScript Reference
+# Piu JavaScript リファレンス
 Copyright 2017-2023 Moddable Tech, Inc.<BR>
-Revised: August 31, 2023
+改訂： 2023年8月31日
 
-## About This Document
+## このドキュメントについて
 
-Piu is a user interface framework designed to run on microcontrollers. The programming interface to Piu is a JavaScript API of global constructors, functions, and objects that define the containment hierarchy, appearance, behavior, and flow of applications. This document provides details on the objects that define the Piu API and important related concepts.
+Piu は、マイクロコントローラ上で実行するように設計されたユーザー インターフェイス フレームワークです。Piu のプログラミング インターフェイスは、アプリケーションのコンテンツ階層、外観、動作、フローを定義するグローバル コンストラクター、関数、およびオブジェクトの JavaScript API です。このドキュメントでは、Piu API を定義するオブジェクトと重要な関連概念について詳しく説明します。
 
 ## Table of Contents
 
-  * [Inheritance Hierarchy](#inheritance-hierarchy)
-  * [Introduction to Important Concepts](#introduction-to-important-concepts)
-    * [Containment Hierarchy and Appearance](#containment-hierarchy-and-appearance)
-    * [Behavior and Flow](#behavior-and-flow)
-  * [Global Properties](#global-properties)
- 	 * [Built-in Properties](#built-in-properties)
- 	 * [Adding Additional Properties](#adding-additional-properties)
-  * [Descriptions of Properties](#descriptions-of-properties)
+  * [継承階層](#継承階層)
+  * [重要な概念の紹介](#重要な概念の紹介)
+    * [コンテンツ階層と外観](#コンテンツ階層と外観)
+    * [振る舞いとフロー](#behavior-and-flow)
+  * [グローバルプロパティ](#global-properties)
+ 	 * [ビルトインプロパティ](#built-in-properties)
+ 	 * [プロパティの追加](#adding-additional-properties)
+  * [プロパティの説明](#descriptions-of-properties)
   	 * [Anchor](#anchor)
  	 * [Color](#color)
  	 * [Coordinates](#coordinates)
@@ -23,63 +23,63 @@ Piu is a user interface framework designed to run on microcontrollers. The progr
  	 * [Font](#font)
  	 * [Tiles](#tiles)
  	 * [Variant, Variants, State, and States](#variant-variants-state-and-states)
-  * [Piu Object Reference](#piu-object-reference)
- 	 * [Application Object](#application-object)
- 	 * [Behavior Object](#behavior-object)
- 	 * [Column Object](#column-object)
- 	 * [Container Object](#container-object)
- 	 * [Content Object](#content-object)
- 	 * [Die Object](#die-object)
- 	 * [Image Object](#image-object)
- 	 * [Label Object](#label-object)
- 	 * [Layout Object](#layout-object)
- 	 * [Port Object](#port-object)
- 	 * [Row Object](#row-object)
- 	 * [Scroller Object](#scroller-object)
- 	 * [Shape Object](../commodetto/outline/Outlines.md)
- 	 * [Skin Object](#skin-object)
- 	 * [Sound Object](#sound-object)
- 	 * [Style Object](#style-object)
- 	 * [Text Object](#text-object)
- 	 * [Texture Object](#texture-object)
- 	 * [Timeline Object](#timeline-object)
- 	 * [Transition Object](#transition-object)
+  * [Piuオブジェクトリファレンス](#piu-object-reference)
+ 	 * [Applicationオブジェクト](#application-object)
+ 	 * [Behaviorオブジェクト](#behavior-object)
+ 	 * [Columnオブジェクト](#column-object)
+ 	 * [Containerオブジェクト](#container-object)
+ 	 * [Contentオブジェクト](#content-object)
+ 	 * [Dieオブジェクト](#die-object)
+ 	 * [Imageオブジェクト](#image-object)
+ 	 * [Labelオブジェクト](#label-object)
+ 	 * [Layoutオブジェクト](#layout-object)
+ 	 * [Portオブジェクト](#port-object)
+ 	 * [Rowオブジェクト](#row-object)
+ 	 * [Scrollerオブジェクト](#scroller-object)
+ 	 * [Shapeオブジェクト](../commodetto/outline/Outlines.md)
+ 	 * [Skinオブジェクト](#skin-object)
+ 	 * [Soundオブジェクト](#sound-object)
+ 	 * [Styleオブジェクト](#style-object)
+ 	 * [Textオブジェクト](#text-object)
+ 	 * [Textureオブジェクト](#texture-object)
+ 	 * [Timelineオブジェクト](#timeline-object)
+ 	 * [Transitionオブジェクト](#transition-object)
 
-## Inheritance Hierarchy
+## 継承階層
 
-Figure 1 summarizes the inheritance hierarchy for the objects described in this document.
+図1は、このドキュメントで説明するオブジェクトの継承階層をまとめたものです。
 
-**Figure 1.** Piu Inheritance Hierarchy
+**図1.** Piu 継承階層
 
 ![](../assets/piu/inheritanceHierarchy.png)
 
-The basic relationship between these objects in the context of a Piu application is as follows:
+Piu アプリケーションのコンテキストにおけるこれらのオブジェクト間の基本的な関係は次のとおりです。
 
-- Graphical parts of the user interface are all `content` objects
-- `skin`, `style`, and `texture` objects customize the look (colors, fonts, etc.) of `content` objects
-- `behavior` objects are bound to `content` objects to handle events
-- `timeline` and `transition` objects animate `content` objects
+- ユーザーインターフェースのグラフィカル部分はすべて`content`オブジェクトです。
+- `skin`、`style`、`texture` オブジェクトは、`content` オブジェクトの外観 (色、フォントなど) をカスタマイズします。
+- `behavior`オブジェクトはイベントを処理するために`content`オブジェクトにバインドされます。
+- `timeline` および `transition` オブジェクトは `content` オブジェクトをアニメーション化します。
 
 
-## Introduction to Important Concepts
+## 重要な概念の紹介
 
-This section explains important concepts related to Piu applications and defines some of the terms used throughout the rest of this document.
+このセクションでは、Piu アプリケーションに関連する重要な概念について説明し、このドキュメントの残りの部分で使用されるいくつかの用語を定義します。
 
-### Containment Hierarchy and Appearance
+### コンテンツ階層と外観
 
-The graphical user interface elements of Piu applications are composed of a hierarchy of `content` objects. The basic structure is as follows:
+Piu アプリケーションのグラフィカル ユーザー インターフェイス要素は、`content` オブジェクトの階層で構成されています。基本構造は次のとおりです。
 
-- The `application` object is the root of the containment hierarchy
-- `container` objects are branches of the containment hierarchy
-- `content` objects are leaves of the containment hierarchy
+- `application`オブジェクトはコンテンツ階層のルートである
+- `container`オブジェクトはコンテンツ階層のブランチである
+- `content`オブジェクトはコンテンツ階層のリーフである
 
-Applications use constructors to define `content` and `container` objects. These objects are attached to the containment hierarchy using the `add`, `insert`, and `replace` functions, and are removed from the containment hierarchy using the `remove` and `replace` functions. See [Functions](#container-functions) in the section [Container Object](#container-object) for descriptions of these properties.
+アプリケーションはコンストラクタを使用して `content` オブジェクトと `container` オブジェクトを定義します。これらのオブジェクトは、`add`、`insert`、および `replace` 関数を使用してコンテンツ階層にアタッチされ、`remove` および `replace` 関数を使用してコンテンツ階層から削除されます。 これらのプロパティの説明については、[Containerオブジェクト](#container-object) セクションの [Functions](#container-functions) を参照してください。
 
-#### Bound and Unbound Contents
+#### BoundコンテンツとUnboundコンテンツ
 
-Contents that are not attached to the containment hierarchy are called *unbound* contents; contents attached to the containment hierarchy, *bound* contents. Only objects that are part of the containment hierarchy appear on screen.
+コンテンツ階層にアタッチされていないコンテンツは*unbound* コンテンツと呼ばれ、コンテンツ階層にアタッチされているコンテンツは*bound* コンテンツと呼ばれます。コンテンツ階層の一部であるオブジェクトのみが画面に表示されます。
 
-Unbound contents do not participate in layout. They are neither measured nor fitted; consequently, their position and size are `undefined` and cannot be changed.
+unbound コンテンツはレイアウトには参加しません。測定も調整も行われないため、位置とサイズは「未定義」となり、変更できません。
 
 ```javascript
 let content = new Content();
@@ -88,11 +88,11 @@ application.add(content);
 let after = content.position;	// {x: 160, y:120} (assuming the application is 320x240)
 ```
 
-#### Constraints
+#### 制約
 
-The coordinates of an object define implicit constraints on its position and size.
+オブジェクトの座標は、その位置とサイズに対する暗黙的な制約を定義します。
 
-For example, centered content and contents whose sizes/position are dependent on their container's size/position cannot move.
+たとえば、中央揃えのコンテンツや、サイズ/位置がコンテナのサイズ/位置に依存するコンテンツは移動できません。
 
 ```javascript
 // Cannot move
@@ -109,20 +109,19 @@ let unconstrainedContent = new Content(null, {
 });
 ```
 
-#### Measure and Fit
+#### MeasureとFit
 
 <a id="measured-size"></a>
 ##### Measured size
 
-All contents have a *measured width* and *measured height*, which are the default width and height computed by the content itself. For example, the measured width of the following content object will be 100.
+すべてのコンテンツには *measured width* と *measured height* があり、これらはコンテンツ自体によって計算されたデフォルトの幅と高さです。 たとえば、次のcontentオブジェクトのmeasured widthは 100 になります。
 
 ```javascript
 let sampleContent = new Content(null, {
 	width: 100
 });
 ```
-
-The measured width of the following content will be 0, because the content has no default width.
+次のcontentにはデフォルトの幅がないため、measured widthは0になります。
 
 ```javascript
 let sampleContent = new Content(null, {
@@ -130,7 +129,7 @@ let sampleContent = new Content(null, {
 });
 ```
 
-The `coordinates` property of a `content` object reflect the content's measured size. This property can be changed at any time.
+contentオブジェクトの`coordinates`プロパティは、contentのmeasured sizeを反映します。 このプロパティはいつでも変更できます。
 
 ```javascript
 sampleContent.coordinates = {
@@ -144,9 +143,9 @@ sampleContent.coordinates = {
 <a id="fitted-size"></a>
 ##### Fitted size
 
-All contents also have a *fitted width* and *fitted height*, which are the effective width and height of the content computed by its container.
+すべてのコンテンツには *fitted width* と *fitted height* もあり、これらはコンテナによって計算されたコンテンツの有効な幅と高さです。
 
-If both `left` and `right` coordinates are defined, the content stretches horizontally with its container, and the fitted width of the content depends on the fitted width of its container. Similarly, if both `top` and `bottom` coordinates are defined, the content stretches vertically with its container, and the fitted height of the content depends on the fitted height of its container. For example, the fitted width and fitted height of the `sampleContent` object here will both be 100.
+`left` 座標と `right` 座標の両方が定義されている場合、コンテンツはコンテナとともに水平方向に伸縮し、コンテンツのfitted widthはコンテナのfitted widthに依存します。 同様に、`top`座標と`bottom`座標の両方が定義されている場合、コンテンツはコンテナに合わせて垂直方向に伸縮し、コンテンツのfitted heightはコンテナのfitted heightに依存します。 たとえば、ここでの`sampleContent`オブジェクトのfitted widthとfitted heightは両方とも 100 になります。
 
 ```javascript
 let sampleContent = new Content(null, {
@@ -160,7 +159,7 @@ let sampleContainer = new Container(null, {
 });
 ```
 
-If a `left` or `right` coordinate (but not both) is defined, or if neither `left` nor `right` is defined, the fitted width equals the measured width. Similarly, if a `top` or `bottom` coordinate (but not both) is defined, or if neither `top` nor `bottom` is defined, the fitted width equals the measured height. For example, the fitted width and fitted height of the `sampleContent` object here will both be 50.
+`left`座標または`right`座標 (両方ではない) が定義されている場合、または`left`も`right`も定義されていない場合、fitted widthはmeasured widthと等しくなります。 同様に、`top`座標または`bottom`座標 (両方ではない) が定義されている場合、または`top`も`bottom`も定義されていない場合、fitted heightはmeasured heightと等しくなります。 たとえば、ここでの`sampleContent`オブジェクトのfitted widthとfitted heightは両方とも 50 になります。
 
 ```javascript
 let sampleContent = new Content(null, {
@@ -174,7 +173,7 @@ let sampleContainer = new Container(null, {
 });
 ```
 
-The `width` and `height` properties of a `content` object reflect the content's fitted size. A content's measured width and height are available immediately after the content is created; the fitted width and height are not available until its `onDisplaying` event has been triggered.
+`content`オブジェクトの`width`プロパティと`height`プロパティは、コンテンツのfitted sizeを反映します。 コンテンツのmeasured widthとmeasured heightは、コンテンツの作成直後に利用可能になります。 fitted widthとfitted heightは、`onDisplaying`イベントがトリガーされるまで利用できません。
 
 ```javascript
 let sampleContent = new Content(null, {
@@ -195,15 +194,15 @@ let sampleContent = new Content(null, {
 application.add(sampleContent)
 ```
 
-##### Templates
+##### テンプレート
 
-*Templates* are a tool that reduce the script code needed to instantiate contents and build the containment hierarchy. Templates are often used to create objects that are similar, but have a few slightly different properties.
+*テンプレート* は、コンテンツをインスタンス化し、コンテンツ階層を構築するために必要なスクリプト コードを削減するツールです。テンプレートは、似ているものの、いくつかのわずかに異なるプロパティを持つオブジェクトを作成するためによく使用されます。
 
-For example, consider the following screens:
+たとえば、次の画面を考えてみましょう。
 
 ![](../assets/piu/templates.png)
 
-The code for these screens without templates is unnecessarily repetitive. The only difference between `screen1` and `screen2` here is the header background color and string.
+テンプレートを使用しないこれらの画面のコードは、不必要に繰り返しになります。ここでの `screen1` と `screen2` の唯一の違いは、ヘッダーの背景色と文字列です。
 
 ```javascript
 let screen1 = new Column(null, {
@@ -237,7 +236,7 @@ let screen2 = new Column(null, {
 });
 ```
 
-Using templates significantly reduces the amount of code needed to define the two screens.
+テンプレートを使用すると、2 つの画面の定義に必要なコードの量が大幅に削減されます。
 
 ```javascript
 let BasicScreen = Column.template($ => ({
@@ -259,9 +258,9 @@ let screen1 = new BasicScreen({ title: "Screen 1", headerColor: "blue" });
 let screen2 = new BasicScreen({ title: "Screen 2", headerColor: "red" });
 ```
 
-As seen in the example above, the constructor has one parameter, `$`, which applications use to pass data to the template. The data may have any prototype; it is often a `string`, `number`, or JSON object. In their attributes, `content` and `container` objects use `$` to access data properties. The `$` parameter is referred to as “the data” or “the instantiating data.”
+上の例で見られるように、コンストラクタには 1 つのパラメーター `$` があり、アプリケーションはこれを使用してデータをテンプレートに渡します。データには任意のプロトタイプが含まれる場合があります。多くの場合、これは`文字列`、`数値`、または JSON オブジェクトです。属性内で、`content`オブジェクトと`container`オブジェクトは`$`を使用してデータ プロパティにアクセスします。 `$` パラメータは、`データ`または`インスタンス化データ`と呼ばれます。
 
-The `template` function for most Piu objects returns a constructor and a `template` function; the only exceptions are the `Skin` and `Texture` objects, which simply return constructors. These `template` functions allow constructors to be further specialized. In the example below, a `HeaderWithBehavior` instance would have all the properties of a `BasicHeader` instance in addition to being active and having a behavior.
+ほとんどの Piu オブジェクトの `template` 関数は、コンストラクターと `template` 関数を返します。唯一の例外は、単にコンストラクターを返す `Skin` オブジェクトと `Texture` オブジェクトです。これらの `template` 関数を使用すると、コンストラクターをさらに特殊化できます。以下の例では、`HeaderWithBehavior` インスタンスは、アクティブで動作することに加えて、`BasicHeader` インスタンスのすべてのプロパティを持ちます。
 
 ```javascript
 let headerStyle = new Style({ font:"600 28px Open Sans", color: "white", horizontal: "left" });
@@ -280,43 +279,43 @@ let HeaderWithBehavior = BasicHeader.template($ => ({
 	active: true, Behavior: HeaderBehavior
 }));
 ```
-### Behavior and Flow
+### 振る舞いとフロー
 
-#### Events
+#### イベント
 
-Piu delivers *events* to the containment hierarchy of applications, and `content` objects can reference `behavior` objects, which contain functions that respond to events. Piu uses events extensively.
+Piu は *イベント* をアプリケーションのコンテンツ階層に配信し、`content` オブジェクトはイベントに応答する関数を含む`behavior`オブジェクトを参照できます。 Piu はイベントを広範囲に使用します。
 
-When a `content` object receives an event, it checks whether its `behavior` object has a corresponding function to respond to that event (either directly or indirectly in its prototype chain). If it does, the `content` object calls the function, passing itself as the first parameter. If it does not, nothing happens.
+`content`オブジェクトがイベントを受け取ると、その `behavior`オブジェクトがそのイベントに応答する対応する関数を (プロトタイプ チェーン内で直接的または間接的に) 持っているかどうかをチェックします。存在する場合、`content` オブジェクトは関数を呼び出し、それ自体を最初のパラメーターとして渡します。そうでない場合は、何も起こりません。
 
-##### Low-level events
+##### 低レベルのイベント
 
-Piu defines low-level events that are useful on a wide range of target devices. For example, `onTouchBegan` and `onTouchEnded` are useful for target devices with touch screens.
+Piu は、幅広いターゲット デバイスで役立つ低レベルのイベントを定義します。たとえば、`onTouchBegan`と`onTouchEnded`は、タッチ スクリーンを備えたターゲット デバイスに役立ちます。
 
-##### Higher-level events
+##### 高レベルのイベント
 
-Applications can also define their own higher-level events. To help efficiently implement common event propagation patterns, contents have `delegate`, `distribute`, `bubble`, `firstThat`, and `lastThat` properties. See [Functions](#content-functions) in the section [Content Object](#content-object) for descriptions of these properties.
+アプリケーションは独自の高レベルのイベントを定義することもできます。一般的なイベント伝播パターンを効率的に実装するために、コンテンツには `delegate`、`distribute`、`bubble`、`firstThat`、および `lastThat` プロパティがあります。これらのプロパティの説明については、[Contentオブジェクト](#content-object) セクションの [Functions](#content-functions) を参照してください。
 
-#### Animations
+#### アニメーション
 
-There are multiple ways to create time-based animation behaviors. One way is to use `content` objects as clocks, as described in the [Duration, Fraction, Interval, Loop, and Time](#duration-fraction-interval-loop-and-time) section of this document. This method is commonly used to animate a single content in response to events (to show touch feedback, for example) and to animate a single content for long periods of time.
+時間ベースのアニメーション動作を作成するには、複数の方法があります。 1 つの方法は、このドキュメントの [Duration, Fraction, Interval, Loop, and Time](#duration-fraction-interval-loop-and-time) セクションで説明されているように、`content` オブジェクトをクロックとして使用することです。 この方法は、イベントに応じて単一のコンテンツをアニメーション化する場合 (たとえば、タッチ フィードバックを表示する場合) や、単一のコンテンツを長時間アニメーション化する場合などによく使用されます。
 
-The simplest way to create complex behaviors that animate several contents or properties is using the `timeline` object. The `timeline` object provides a mechanism for sequencing and running a collection of tweens, making it the best method for staggered animations of multiple content objects (to transition graphical elements of a screen in and out, for example). For more information, see the [Timeline Object](#timeline-object) section of this document.
+複数のコンテンツやプロパティをアニメーション化する複雑な動作を作成する最も簡単な方法は、`timeline` オブジェクトを使用することです。`timeline` オブジェクトは、一連のトゥイーンアニメーションのシーケンスと実行のメカニズムを提供するため、複数のコンテンツ オブジェクトの段階的なアニメーション (画面のグラフィック要素の切り替えなど) に最適な方法です。詳細については、このドキュメントの [Timelineオブジェクト](#timeline-object) セクションを参照してください。
 
-Piu `transition` objects are best for simple animations to move between screens or swap content objects. They often modify the containment hierarchy by adding or removing contents. They can also modify properties of objects as `timeline` objects do, but creating a sequence of animations is more complicated. For more information, see the [Transition Object](#transition-object) section of this document.
+Piu の `transition` オブジェクトは、画面間を移動したり、コンテンツ オブジェクトを入れ替えたりする単純なアニメーションに最適です。多くの場合、コンテンツを追加または削除することで、コンテンツ階層を変更します。`timeline` オブジェクトと同様にオブジェクトのプロパティを変更することもできますが、アニメーションのシーケンスを作成するのはより複雑です。詳細については、このドキュメントの [Transitionオブジェクト](#transition-object) セクションを参照してください。
 
-##### Easing equations
+##### Easing方程式
 
-Animations that linearly modify the properties of content objects often appear awkward. Using easing equations is a common way to implement animations that feel more natural.
+コンテンツ オブジェクトのプロパティを線形に変更するアニメーションは、見た目がぎこちないことがよくあります。Easing方程式を使用することは、より自然に感じられるアニメーションを実装するための一般的な方法です。
 
-Piu extends the JavaScript `Math` object with Robert Penner’s open source easing equations (see the Easing section of [Robert Penner’s Programming Macromedia Flash MX](http://robertpenner.com/easing/penner_chapter7_tweening.pdf)). The source code is in [`piuTransition.c`][33].
+Piu は、JavaScript の `Math` オブジェクトを Robert Penner のオープンソースのEasing方程式で拡張します ([Robert Penner の Programming Macromedia Flash MX](http://robertpenner.com/easing/penner_chapter7_tweening.pdf) のEasingセクションを参照してください)。ソース コードは [`piuTransition.c`][33] にあります。
 
-The Piu implementations of these easing equations all take a single argument: a `number` in the range [0, 1]. The return value is a `number` in the range [0, 1] that maps the input to the eased output. These equations are used extensively in all types of animations. They are commonly used to map the `fraction` property of `content` objects or the `fraction` argument of a `transition` object's `onStep` function, and as an argument to many `timeline` object functions.
+これらのEasing方程式の Piu 実装はすべて、単一の引数 (範囲 [0, 1] の `number`) を取ります。戻り値は範囲 [0, 1] の `number` で、入力をEasingされた出力にマッピングします。これらの方程式は、あらゆる種類のアニメーションで広く使用されています。一般的には、`content` オブジェクトの `fraction` プロパティまたは `transition` オブジェクトの `onStep` 関数の `fraction` 引数をマッピングするために使用され、多くの `timeline` オブジェクト関数の引数としても使用されます。
 
-## Global Properties
+## グローバルプロパティ
 
-Properties of the Piu global object can be used anywhere in an application.
+Piu グローバル オブジェクトのプロパティは、アプリケーション内のどこでも使用できます。
 
-### Built-in Properties
+### ビルトインプロパティ
 
 - **Source code:** [`xsGlobal.c`][1]
 
@@ -326,9 +325,9 @@ Properties of the Piu global object can be used anywhere in an application.
 | --- | --- |  :--- |
 | `string` | `string` | The string to trace
 
-Traces the specified string in the virtual machine of the hosted application.
+ホストされたアプリケーションの仮想マシンで指定された文字列をトレースします。
 
-> Note: Strings will not be traced until a line break ("\n") has also been traced.
+> Note: 改行 ("\n") もトレースされるまで、文字列はトレースされません。
 
 ```javascript
 trace("Hello world\n");
@@ -339,9 +338,9 @@ trace(`sampleVariable value is: ${sampleVariable}\n`);    // "sampleVariable val
 
 ***
 
-### Adding Additional Properties
+### プロパティの追加
 
-Additional properites can be added by setting a property of the global object.
+グローバル オブジェクトのプロパティを設定することで、プロパティを追加できます。
 
 ```javascript
 global.application = new Application(null, {
@@ -350,15 +349,15 @@ global.application = new Application(null, {
 export default global.application;
 ```
 
-## Descriptions of Properties
+## プロパティの説明
 
-This section provides descriptions of select properties referenced throughout the Piu Object Reference section below.
+このセクションでは、以降の Piu オブジェクト リファレンス セクション全体で参照される特定のプロパティについて説明します。
 
 ### Anchor
 
-Each `content` object can have an optional `anchor` property. When the template is instantiated, a reference to the created `content` object is assigned to a property of the instantiating data; the identifier of the property is the value of the `anchor` property.
+各 `content` オブジェクトには、オプションの `anchor` プロパティを設定できます。テンプレートがインスタンス化されると、作成された `content` オブジェクトへの参照がインスタンス化データのプロパティに割り当てられます。プロパティの識別子は `anchor` プロパティの値です。
 
-Anchors allow applications to directly access specific contents and containers in a containment hierarchy instantiated from a template. This can make it easier to access objects to modify while the application is running—for example, to change the label of a string, disable a button, or add lines to a column in a table.
+アンカーを使用すると、アプリケーションは、テンプレートからインスタンス化されたコンテンツ階層内の特定のコンテンツとcontainerに直接アクセスできます。これにより、アプリケーションの実行中に変更するオブジェクトへのアクセスが容易になります。たとえば、文字列のラベルを変更したり、ボタンを無効にしたり、テーブルの列に行を追加したりできます。
 
 ```javascript
 let sampleStyle = new Style({ font:"600 28px Open Sans", color: "white" });
@@ -388,9 +387,9 @@ application.add(new SampleContainer({ title: "Tap to update", color: "blue" }));
 
 ### Color
 
-A `color` parameter can be passed into the dictionaries of `skin` and `style` constructors.
+`color` パラメータは、`skin` および `style` コンストラクタの辞書に渡すことができます。
 
-To specify a color, you can use CSS names (Level 2) or hexadecimal notations (`"#RGB"`, `"#RGBA"`, `"#RRGGBB"`, `"#RRGGBBAA"`):
+色を指定するには、CSS 名 (レベル 2) または 16 進表記 (`"#RGB"`、`"#RGBA"`、`"#RRGGBB"`、`"#RRGGBBAA"`) を使用できます。
 
 ```javascript
 const whiteSkin = new Skin({ fill:"white" });
@@ -400,14 +399,14 @@ const greenSkin = new Skin({ fill:"#00FF00" });
 const halfGreenSkin = new Skin({ fill:"#00FF0088" });
 ```
 
-To specify a color with an alpha channel, you can also use a mere hexadecimal number `0xRRGGBBAA`:
+アルファ チャネルで色を指定するには、単なる 16 進数 `0xRRGGBBAA` を使用することもできます。
 
 ```javascript
 const blueSkin = new Skin({ fill:0x0000FFFF });
 const halfBlueSkin = new Skin({ fill:0x0000FF88 });
 ```
 
-To build such hexadecimal numbers, Piu exports functions similar to the CSS functional notations:
+このような 16 進数を構築するために、Piu は CSS 関数表記に似た関数をエクスポートします。
 
 ```javascript
 import { rgb, rgba, hsl, hsla } from "piu/All";
@@ -417,44 +416,44 @@ const cyanSkin = new Skin({ fill:hsl(180, 1, 0.5) });
 const halfCyanSkin = new Skin({ fill:hsla(180, 1, 0.5, 0.5) });
 ```
 
-In dictionaries, colors can be a single color or an array of 2, 3, or 4 colors. The `skin` and `style` objects blend a color based on the state of the `content` object that uses them. See [Variant, Variants, State, and States](#variant-variants-state-and-states) for more information.
+辞書では、色は単一の色、または 2、3、または 4 色の配列になります。`skin` オブジェクトと `style` オブジェクトは、それらを使用する `content` オブジェクトの状態に基づいて色をブレンドします。詳細については、[Variant, Variants, State, and States](#variant-variants-state-and-states) を参照してください。
 
 ### Coordinates
 
-All `content` objects have a `coordinates` property. The coordinates property is an object with `left`, `width`, `right`, `top`, `height`, and `bottom` properties, all of which can be `undefined`.  The coordinates of contents determine their position and size relative to their container and their `previous` and `next` properties (other `content` objects in the same container).
+すべての `content` オブジェクトには `coordinates` プロパティがあります。coordinates プロパティは、`left`、`width`、`right`、`top`、`height`、および `bottom` プロパティを持つオブジェクトで、これらはすべて `undefined` にすることができます。コンテンツの座標は、containerと `previous` および `next` プロパティ (同じcontainer内の他の `content` オブジェクト) に対する相対的な位置とサイズを決定します。
 
-When a content's container is an `application`, `container`, `scroller`, or `layout` object:
+コンテンツのcontainerが `application`、`container`、`scroller`、または `layout` オブジェクトの場合:
 
-- `top`, `bottom`, `left`, and `right` coordinates are all relative to their container
-- If `width`, `left`, and `right` coordinates are all specified, the `left` and `right` coordinates will be overruled
-- If `left` and `right` are both unspecified, the content will be centered horizontally in its container with the width specified (or a width of 0, if unspecified)
-- If `height`, `top`, and `bottom` coordinates are all specified, the `top` and `bottom` coordinates will be overruled
-- If `top` and `bottom` are both unspecified, the content will be centered vertically in its container with the height specified (or a height of 0, if unspecified)
+- `top`、`bottom`、`left`、`right` 座標はすべてcontainerに対する相対座標です。
+- `width`、`left`、`right` 座標がすべて指定されている場合、`left` と `right` 座標は無視されます。
+- `left` と `right` の両方が指定されていない場合、コンテンツは指定された幅（指定されていない場合は幅 0）でcontainer内で水平方向に中央揃えされます。
+- `height`、`top`、`bottom` 座標がすべて指定されている場合、`top` と `bottom` 座標は無視されます。
+- `top` と `bottom` の両方が指定されていない場合、コンテンツは指定された高さ（指定されていない場合は高さ 0）でcontainer内で垂直方向に中央揃えされます。
 
-When a content's container is a `column` object:
+コンテンツのcontainerが `column` オブジェクトの場合:
 
--  `top` and `bottom` coordinates are relative to their `previous` and `next` properties
-- `left` and `right` coordinates are relative to their container
-- If `width`, `left`, and `right` coordinates are all specified, the `left` and `right` coordinates will be overruled
+- `top` と `bottom` の座標は、`previous` と `next` プロパティを基準とします
+- `left` と `right` の座標は、containerを基準とします
+- `width`、`left`、`right` の座標がすべて指定されている場合、`left` と `right` の座標は無視されます
 
-When a content's container is a `row` object:
+コンテンツのcontainerが `row` オブジェクトの場合:
 
-- `left` and `right` coordinates are relative to their `previous` and `next` properties
-- `top` and `bottom`  coordinates are relative to their container
-- If `height`, `top`, and `bottom` coordinates are all specified, the `top` and `bottom` coordinates will be overruled
+- `left` と `right` の座標は、`previous` と `next` プロパティを基準とします
+- `top` と `bottom` の座標は、containerを基準とします
+- `height`、`top`、`bottom` の座標がすべて指定されている場合、`top` と `bottom` の座標は無視されます
 
 ### Duration, Fraction, Interval, Loop, and Time
 
-Every content in the containment hierarchy can be used as a clock to control time-based animation behaviors using its `duration`, `fraction`, `interval`, and `time` properties.
+コンテンツ階層内のすべてのコンテンツは、`duration`、`fraction`、`interval`、および `time` プロパティを使用して時間ベースのアニメーション動作を制御するクロックとして使用できます。
 
-- The `duration` property is the duration of the animation, expressed in milliseconds.
-- The `time` property provides the current time of the content’s clock.
-- The `fraction` property is the ratio of the clock’s current time to the content’s duration.
-- The `interval` property is the time between frames (frame rate) of the animation, expressed in milliseconds.
+- `duration` プロパティはアニメーションの継続時間で、ミリ秒単位で表されます。
+- `time` プロパティはコンテンツのクロックの現在の時刻を提供します。
+- `fraction` プロパティは、コンテンツの継続時間に対するクロックの現在の時刻の比率です。
+- `interval` プロパティはアニメーションのフレーム間の時間 (フレーム レート) で、ミリ秒単位で表されます。
 
-The content’s `start` and `stop` functions control when the clock is running. The clock is automatically stopped when its current time reaches its duration. If the content's `loop` property is set to true, the clock will restart.
+コンテンツの `start` および `stop` 関数は、クロックの実行を制御します。現在の時刻が期間に達すると、クロックは自動的に停止します。コンテンツの `loop` プロパティが true に設定されている場合、クロックはリスタートします。
 
-When a clock is running, the `onTimeChanged` function of its content is triggered at the interval specified by the content's `interval` property. When the content's time is equal to its duration, the `onFinished` function is triggered.
+クロックが実行中の場合、そのコンテンツの `onTimeChanged` 関数は、コンテンツの `interval` プロパティで指定された間隔でトリガーされます。コンテンツの時間がその継続時間（`duration`）と等しくなると、`onFinished` 関数がトリガーされます。
 
 ```javascript
 let animatedContent = new Content(null, {
@@ -481,13 +480,13 @@ application.add(animatedContent);
 
 #### Time-based animation
 
-The `interval` property sets the desired frame rate for an object's clock, but be aware that it may not be exact if the application is overloaded.  It is not safe to assume, for instance, that if a content's `interval` is 2 and its `duration` is 100 that it will trigger the `onTimeChanged` event exactly 50 times before it triggers the `onFinished` event. Therefore, it is recommended that applications use the `fraction` or `time` properties to determine which frame to display for animations.
+`interval` プロパティは、オブジェクトのクロックに必要なフレーム レートを設定しますが、アプリケーションが過負荷になっている場合は正確ではない可能性があることに注意してください。たとえば、コンテンツの `interval` が 2 で `duration` が 100 の場合、`onFinished` イベントがトリガーされる前に `onTimeChanged` イベントが正確に 50 回トリガーされると想定するのは安全ではありません。したがって、アプリケーションでは `fraction` プロパティまたは `time` プロパティを使用して、アニメーションに表示するフレームを決定することをお勧めします。
 
-For example, consider two implementations of a button that expands and contracts 10 pixels in both directions  when tapped.
+たとえば、タップすると両方向に 10 ピクセル拡大および縮小するボタンの 2 つの実装について考えてみましょう。
 
 ![](../assets/piu/expandingButton.gif)
 
-The following implementation is **not recommended**, as it assumes that `onTimeChanged` will be triggered exactly 20 times before `onFinished`. While this may work most of the time, it is possible that the content will trigger its `onFinished` event before it shrinks down to its original size.
+次の実装は、`onFinished` の前に `onTimeChanged` が正確に 20 回トリガーされることを前提としているため、**推奨されません**。ほとんどの場合は機能しますが、コンテンツが元のサイズに縮小される前に `onFinished` イベントがトリガーされる可能性があります。
 
 ```javascript
 class ExpandingBehavior extends Behavior {
@@ -512,7 +511,7 @@ let expandingButton = new Content(null, {
 });
 ```
 
-The following implementation is better because it makes no assumptions about the number of frames that will draw and ensures that the content shrinks down to the correct size when `onFinished` is called.
+次の実装は、描画されるフレームの数について想定せず、`onFinished` が呼び出されたときにコンテンツが正しいサイズに縮小されることを保証するため、より優れています。
 
 ```javascript
 class ExpandingBehavior extends Behavior {
@@ -547,36 +546,35 @@ let expandingButton = new Content(null, {
 
 ### Font
 
-A `font` parameter must be passed into the dictionary of `style` constructors.
+`font` パラメータを `style` コンストラクタの辞書に渡す必要があります。
 
-Piu uses bitmap fonts. The metrics are provided by binary FNT files, the glyphs are provided by PNG files.
+Piu はビットマップ フォントを使用します。メトリックはバイナリ FNT ファイルによって提供され、グリフは PNG ファイルによって提供されます。
 
-Fonts are assets and must be defined in the resources of your manifest. Use the default target or the `-alpha` or `-color` pseudo targets for fonts.
+フォントはアセットであり、マニフェストのリソースで定義する必要があります。フォントには、デフォルトのターゲット、または `-alpha` または `-color` 疑似ターゲットを使用します。
 
-The binary FNT file format was defined by
-[AngelCode](http://www.angelcode.com/products/bmfont/doc/file_format.html), which also released the [BMFont](http://www.angelcode.com/products/bmfont/) generator on Windows. On Mac you can for instance use [Glyph Designer](https://71squared.com/glyphdesigner) or [bmGlyph](https://www.bmglyph.com) to generate such files.
+バイナリ FNT ファイル形式は、[AngelCode](http://www.angelcode.com/products/bmfont/doc/file_format.html) によって定義され、Windows 用の [BMFont](http://www.angelcode.com/products/bmfont/) ジェネレーターもリリースされました。Mac では、たとえば [Glyph Designer](https://71squared.com/glyphdesigner) または [bmGlyph](https://www.bmglyph.com) を使用して、このようなファイルを生成できます。
 
-One bitmap font corresponds to one style, one weight, one stretch, one size and one family. You will need separate bitmap fonts for each variation.
+1 つのビットマップ フォントは、1 つのスタイル、1 つの太さ、1 つの伸縮、1 つのサイズ、1 つのファミリに対応します。バリエーションごとに別々のビットマップ フォントが必要になります。
 
-The `Style` constructor uses the `font` property of its dictionary to lookup its font. You can just set the `font` property to the name of a binary FNT file:
+`Style` コンストラクタは、辞書の `font` プロパティを使用してフォントを検索します。`font` プロパティをバイナリ FNT ファイルの名前に設定するだけです。
 
 ```javascript
 const popStyle = new Style({ font:"popFont" });
 ```
 
-The `popStyle` object will use the `popFont.fnt` file in your assets.
+`popStyle` オブジェクトは、アセット内の `popFont.fnt` ファイルを使用します。
 
-The lookup happens only when `label` or `text` objects that use the style are bound to the displayed containment hierarchy, or when the `Style.prototype.measure` method is called.
+ルックアップは、スタイルを使用する `label` または `text` オブジェクトが表示されている包含​​階層にバインドされているとき、または `Style.prototype.measure` メソッドが呼び出されたときにのみ行われます。
 
 #### Cascading Styles
 
-In order to cascade styles, you may want to use something similar to the [CSS font shortcut](https://developer.mozilla.org/en-US/docs/Web/CSS/font). Note that if you use this method of defining fonts in an application, you should not define other fonts in the application using just the font name as described above.
+スタイルをカスケードするには、[CSS フォント ショートカット](https://developer.mozilla.org/en-US/docs/Web/CSS/font) に似たものを使用することをお勧めします。アプリケーションでフォントを定義するこの方法を使用する場合は、上記のようにフォント名だけを使用してアプリケーション内の他のフォントを定義しないでください。
 
 ```javascript
 const style = new Style({ font:"italic bold 16px Open Sans" });
 ```
 
-In Piu, the font property has five optional parts, in that order:
+Piu では、フォント プロパティには次の順序で 5 つのオプション部分があります:
 
 1. style: `italic` | `normal` | `inherit`
 2. weight: `100` | `ultralight` | `200` | `thin` | `300` | `light` | `400` | `normal` | `500` | `medium` | `600` | `semibold` | `700` | `bold` |  `800` | `heavy` | `900` | `black` | `lighter`  | `bolder`  | `inherit `
@@ -584,18 +582,18 @@ In Piu, the font property has five optional parts, in that order:
 4. size: `xx-small` | `x-small` | `small` | `medium` | `large` | `x-large` | `xx-large` | `smaller` | `larger ` | `[1-9][0-9]+px` | `[1-9][0-9]+%` | `inherit `
 5. family: the rest of the font property if any.
 
-The `inherit` value is the default value and is useful only to disambiguate a font property. By default the style of a `content` object inherits the style of its `container` objects.
+`inherit` 値はデフォルト値であり、フォント プロパティの曖昧さを解消する場合にのみ役立ちます。デフォルトでは、`content` オブジェクトのスタイルは、その `container` オブジェクトのスタイルを継承します。
 
-All parts are optional and are cascaded separately. So you can for instance define a generic style for the application and specific styles for its contents:
+すべての部分はオプションであり、個別にカスケードされます。したがって、たとえば、アプリケーションに汎用スタイルを定義し、そのコンテンツに特定のスタイルを定義できます：
 
 ```javascript
 const appStyle = new Style({ font:"16px Fira Sans" });
 const menuStyle = new Style({ font:"bold" });
 ```
 
-Styles are only cascaded when `label` or `text` objects that use them are bound to the displayed containment hierarchy.
+スタイルは、それを使用する `label` または `text` オブジェクトが、表示されるコンテンツ階層にバインドされている場合にのみカスケードされます。
 
-For Piu to find the corresponding bitmap font files in your assets, you have to adopt the following convention, based on common practices:
+Piu がアセット内の対応するビットマップ フォント ファイルを見つけるには、一般的な方法に基づいて次の規則を採用する必要があります：
 
 * the family, without spaces,
 * `-`,
@@ -606,19 +604,18 @@ For Piu to find the corresponding bitmap font files in your assets, you have to 
 * `-`,
 * the computed size in pixels without units.
 
-Here above `style ` will look for `OpenSans-BoldItalic-16.fnt`, `appStyle` will look for `FiraSans-Regular-16.fnt` and `menuStyle` will look for `FiraSans-Bold-16.fnt`.
-
+ここで、`style` は `OpenSans-BoldItalic-16.fnt` を検索し、`appStyle` は `FiraSans-Regular-16.fnt` を検索し、`menuStyle` は `FiraSans-Bold-16.fnt` を検索します。
 
 ### Tiles
 
-Applications can tile skins using their `tiles` property. The size of the tiles is determined by left, right, top, and bottom values, as follows:
+アプリケーションは、`tiles` プロパティを使用してスキンをタイル化できます。タイルのサイズは、次のように左、右、上、下の値によって決まります。：
 
-- If the `tiles` property is undefined or if its `left`, `right`, `top` and `bottom` values are all undefined, the skin is just an image, for instance an icon.
-- Else if only the `left` or `right` values are defined, the skin becomes a horizontal 3-part pattern. The left part is drawn at the left of the content, the right part is drawn at the right of the content, and the center part is repeated to fill the center of the content.
-- Else if only the `top` or `bottom` values are defined, the skin becomes a vertical 3-part pattern. The top part is drawn at the top of the content, the bottom part is drawn at the bottom of the content, and the middle part is repeated to fill the middle of the content.
-- Else the skin becomes a 9-part pattern. Corner parts are drawn in the corresponding corners of the content, side parts are repeated in the sides, and the middle part is repeated to fill the middle. The `left`, `right`, `top` and `bottom` values can all be defined to 0 to fill the content with the skin.
+- `tiles` プロパティが未定義の場合、またはその `left`、`right`、`top`、および `bottom` の値がすべて未定義の場合、スキンはアイコンなどの単なる画像になります。
+- `left` または `right` の値のみが定義されている場合、スキンは水平方向の 3 部構成のパターンになります。左部分はコンテンツの左側に描画され、右部分はコンテンツの右側に描画され、中央部分はコンテンツの中央を埋めるために繰り返されます。
+- `top` または `bottom` 値のみが定義されている場合、スキンは垂直の 3 部パターンになります。上部はコンテンツの上部に描画され、下部はコンテンツの下部に描画され、中央部分はコンテンツの中央を埋めるために繰り返されます。
+- それ以外の場合、スキンは 9 つの部分からなるパターンになります。コーナー部分はコンテンツの対応するコーナーに描画され、サイド部分はサイドに繰り返され、中央部分は中央を埋めるために繰り返されます。`left`、`right`、`top`、`bottom` の値をすべて 0 に定義して、スキンでコンテンツを塗りつぶすことができます。
 
-Tiling skins allows content objects of different sizes to share a single asset. Here is an example that uses this 30x30 pixel background to fill arbitrarily sized contents.
+タイリング スキンを使用すると、さまざまなサイズのコンテンツ オブジェクトで 1 つのアセットを共有できます。次の例では、30 x 30 ピクセルの背景を使用して任意のサイズのコンテンツを塗りつぶします。
 
 ![](../assets/piu/roundedRectangle.png)
 
@@ -649,11 +646,11 @@ application.add(bigText);
 
 ### Variant, Variants, State, and States
 
-Applications often use the `state` and `variant` properties of `content` objects to update their appearance. Because they can change dynamically, they can be used to animate `content` objects and provide visual feedback to touch events, for example.
+アプリケーションでは、`content` オブジェクトの `state` プロパティと `variant` プロパティを使用して外観を更新することがよくあります。これらは動的に変更できるため、たとえば `content` オブジェクトをアニメーション化したり、タッチ イベントに視覚的なフィードバックを提供したりするために使用できます。
 
 #### Colored skins and styles
 
-A common way that the `state` property is used is to update the color of contents. As described in the [Color section](#color) of this document, the `fill` property of a `skin` or `style` object can be an array of colors. The `state` property of a `content` object using the `skin` determines the index of the array. If the state is not an integer, colors from surrounding states are blended.
+`state` プロパティの一般的な使用方法は、コンテンツの色を更新することです。このドキュメントの [Color section](#color) で説明されているように、`skin` または `style` オブジェクトの `fill` プロパティは色の配列にすることができます。`skin` を使用する `content` オブジェクトの `state` プロパティは、配列のインデックスを決定します。状態が整数でない場合は、周囲の状態の色がブレンドされます。
 
 ```javascript
 let multiColoredSkin = new Skin({ fill: ["black", "white", "red"] });
@@ -678,9 +675,9 @@ application.add(grayContent);
 
 #### Reusing textures
 
-It is often convenient to store several icons or other user interface elements in a single image. Specifying `states` and `variants` properties in the dictionary of `skin` constructors enables you to reference different sections of the same texture. This prevents an application from having to reference similar images and create multiple skins.
+多くの場合、複数のアイコンやその他のユーザー インターフェイス要素を 1 つのイメージに保存すると便利です。`skin` コンストラクタのディクショナリで `states` プロパティと `variants` プロパティを指定すると、同じテクスチャの異なるセクションを参照できます。これにより、アプリケーションが類似したイメージを参照して複数のスキンを作成する必要がなくなります。
 
-The `states` and `variants` properties of a skin are numerical values used to define the size of a single element in the texture. The `states` property represents the vertical offset between states, and the `variants` property represents the horizontal offset between variants. Here is an example of an asset that includes ten 28x28 pixel icons in one image, and a `skin` that will allow applications to reference each icon separately.
+スキンの `states` プロパティと `variants` プロパティは、テクスチャ内の単一要素のサイズを定義するために使用される数値です。`states` プロパティは状態間の垂直オフセットを表し、`variants` プロパティはバリアント間の水平オフセットを表します。次の例は、1 つの画像に 10 個の 28x28 ピクセルのアイコンと、アプリケーションが各アイコンを個別に参照できるようにする `skin` を含むアセットの例です。
 
 ![](../assets/piu/wifi-strip.png)
 
@@ -693,11 +690,11 @@ const wiFiSkin = new Skin({
 });
 ```
 
-The `states` and `variants` properties of `texture` objects should not be confused with the `state` and `variant` properties of `content` objects, although they are related. The `state` and `variant` of a `content` object are used to select which area of their `skin` to render. Here is a visualization of the `state` and `variant` properties a `content` would use to reference different portions of the `skin` object from the last example.
+`texture` オブジェクトの `states` プロパティと `variants` プロパティは、`content` オブジェクトの `state` プロパティと `variant` プロパティと関連していますが、混同しないでください。`content` オブジェクトの `state` と `variant` プロパティは、`skin` のどの領域をレンダリングするかを選択するために使用されます。次の図は、最後の例の `skin` オブジェクトのさまざまな部分を参照するために `content` が使用する `state` プロパティと `variant` プロパティを視覚化したものです。
 
 ![](../assets/piu/wifi-strip.gif)
 
-The `state` and `variant` of a `content` can be updated at any time. This is often done when an event is triggered.
+`content` の `state` と `variant` はいつでも更新できます。これは多くの場合、イベントがトリガーされたときに行われます。
 
 ```javscript
 let WiFiStatusIcon = Content.template($ => ({
@@ -722,38 +719,38 @@ application.add(new WiFiStatusIcon({ passwordProtected: true }, { top: 58, right
 
 ![](../assets/piu/stateAndVariant.gif)
 
-## Piu Object Reference
+## Piuオブジェクトリファレンス
 
-This section provides details on the objects that define the Piu API. For each object, the following information is presented if relevant:
+このセクションでは、Piu API を定義するオブジェクトの詳細について説明します。各オブジェクトについて、関連する場合は次の情報が提示されます。:
 
-- **Source Code**: A link to the source code for the object
+- **Source Code**: オブジェクトのソースコードへのリンク
 
-- **Relevant Examples**: Links to example apps that demonstrate how to use the object
+- **Relevant Examples**: オブジェクトの使用方法を示すサンプルアプリへのリンク
 
-- **Constructor Description**: A description of the object's constructor(s)
+- **コンストラクタの説明**: オブジェクトのコンストラクタの説明
 
-- **Dictionary**: Present when additional information is needed regarding the dictionary passed to the object's dictionary-based constructor; describes the properties that the dictionary may contain. Dictionary parameters set properties having the same name (unless noted otherwise) in the created instance.
+- **Dictionary**: オブジェクトの辞書ベースのコンストラクタに渡される辞書に関する追加情報が必要な場合に存在します。辞書に含まれる可能性があるプロパティについて説明します。辞書パラメーターは、作成されたインスタンスで同じ名前を持つプロパティを設定します (特に指定がない限り)。
 
-- **Prototype Description**: The prototype from which this object's prototype inherits and descriptions of any properties and functions specific to this object's prototype
+- **プロトタイプの説明**: このオブジェクトのプロトタイプが継承するプロトタイプと、このオブジェクトのプロトタイプに固有のプロパティと機能の説明
 
-- **Events**: Descriptions of the events that the object triggers
+- **Events**: オブジェクトがトリガーするイベントの説明
 
-For the complete JavaScript programming interface, see [`piuAll.js`][0].
+完全な JavaScript プログラミング インターフェイスについては、[`piuAll.js`][0] を参照してください。
 
-### Application Object
+### Applicationオブジェクト
 
 - **Source code:** [`piuApplication.c`][2]
 - **Relevant Examples:** all
 
-All Piu applications must have an `application` object at the root of their containment hierarchy. All other `content` objects must be added to the `application` to appear on screen.
+すべての Piu アプリケーションは、コンテンツ階層のルートに `application` オブジェクトを持っている必要があります。他のすべての `content` オブジェクトは、画面に表示されるように `application` に追加する必要があります。
 
-There is no default object, so you have to create one yourself and export it in the main module.
+デフォルトのオブジェクトはないので、自分で作成してメイン モジュールにエクスポートする必要があります。
 
 ```javascript
 export default new Application();
 ```
 
-Alternatively, you can export a function that returns an `application` object.
+あるいは、`application` オブジェクトを返す関数をエクスポートすることもできます。
 
 ```javascript
 export default function() {
@@ -761,16 +758,16 @@ export default function() {
 }
 ```
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Application([behaviorData, dictionary])`
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this container's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#dictionary) section below will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | このコンテナの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns an `application` instance, an object that inherits from `Container.prototype`.
+`Container.prototype` から継承するオブジェクトである `application` インスタンスを返します。
 
 ```javascript
 export default new Application(null, {
@@ -785,9 +782,9 @@ export default new Application(null, {
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Application.prototype`. The `prototype` property of the result is `Application.prototype`. The result also provides a `template` function.
+`Application.prototype` のインスタンスを作成する関数であるコンストラクターを返します。戻り値の `prototype` プロパティは `Application.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 // Taken from the balls example app
@@ -809,28 +806,28 @@ export default new BallApplication(null, { displayListLength:4096, touchCount:0 
 
 #### Dictionary
 
-Same as for `container` object (see [Dictionary](#container-dictionary) in the section [Container Object](#container-object)), plus:
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Dictionary](#container-dictionary) を参照)。さらに次のプロパティを含みます。
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `commandListLength ` | `number` | The size of the command list buffer in bytes used for holding Piu drawing operations
-| `displayListLength ` | `number` | The size of the display list buffer in bytes for targets using the Poco rendering engine
-| `touchCount` | `number` | The number of touch events that can trigger at the same time
+| `commandListLength ` | `number` | Piu 描画操作を保持するために使用されるコマンド リスト バッファのサイズ (バイト単位)
+| `displayListLength ` | `number` | Poco レンダリング エンジンを使用するターゲットのディスプレイ リスト バッファのサイズ (バイト単位)
+| `touchCount` | `number` | 同時にトリガーできるタッチイベントの数
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Container.prototype`.
+プロトタイプは `Container.prototype` から継承します。
 
-### Behavior Object
+### Behaviorオブジェクト
 
 - **Source code:** [`piuBehavior.c`][3]
 - **Relevant Examples:** [balls][18], [drag][19]
 
-The `behavior` object contains functions corresponding to events triggered by a `content` object. A `content` object checks whether its behavior owns or inherits a function property with the name of the event, and if so calls that function, passing itself as the first parameter.
+`behavior` オブジェクトには、`content` オブジェクトによってトリガーされるイベントに対応する関数が含まれています。`content` オブジェクトは、その動作がイベントの名前を持つ関数プロパティを所有または継承しているかどうかを確認し、そうである場合は、その関数を呼び出し、最初のパラメータとして自身を渡します。
 
-#### Constructor Description
+#### コンストラクタの説明
 
-Applications define their own constructors for `behavior` objects, which inherit from `Behavior.prototype` and assign them to `content` objects when they are constructed. When a `content` object is constructed, it creates an instance of the behavior class assigned to it and triggers the behavior's `onCreate` event. This function does nothing by default; a behavior can use it to initialize its properties, for example.
+アプリケーションは、`Behavior.prototype` から継承し、構築時に `content` オブジェクトに割り当てた `behavior` オブジェクトの独自のコンストラクタを定義します。`content` オブジェクトが構築されると、割り当てられた動作クラスのインスタンスが作成され、動作の `onCreate` イベントがトリガーされます。この関数はデフォルトでは何も行いません。たとえば、動作はこれを使用してプロパティを初期化できます。
 
 ```javascript
 class SampleBehavior extends Behavior {
@@ -852,27 +849,27 @@ application.add(sampleContent);
 
 ![Behavior Sample](../assets/piu/behaviorSample.gif)
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Object.prototype`.
+プロトタイプは `Object.prototype` から継承します。
 
-### Column Object
+### Columnオブジェクト
 
 - **Source code:** [`piuColumn.c`][4]
 - **Relevant Examples:** [keyboard][20], [weather][21]
 
-The `column` object is a `container` object that arranges its contents vertically.
+`column` オブジェクトは、その内容を垂直に配置する `container` オブジェクトです。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Column([behaviorData, dictionary])`
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this content's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result. The dictionary is the same as for the `content` object. Only parameters specified in the [Dictionary](#content-dictionary) section of the [Content Object](#container-object) will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[コンテンツ オブジェクト](#container-object) の [辞書](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `column` instance, an object that inherits from `Column .prototype`
+`Column .prototype` から継承したオブジェクトである `column` インスタンスを返します。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -897,9 +894,9 @@ application.add(sampleColumn);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Column.prototype`. The `prototype` property of the result is `Column.prototype`. The result also provides a `template` function.
+`Column.prototype` のインスタンスを作成する関数であるコンストラクターを返します。戻り値の `prototype` プロパティは `Column.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -919,32 +916,32 @@ application.add(new SampleColumn({ firstColor:"red", secondColor:"blue" }));
 
 ![](../assets/piu/sampleColumn2.png)
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Container.prototype`.
+プロトタイプは `Container.prototype` から継承します。
 
 <a id="column-events"></a>
 #### Events
 
-Same as for `container` object (see [Events](#container-events) in the section [Container Object](#container-object))
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照してください)
 
-### Container Object
+### Containerオブジェクト
 
 - **Source code:** [`piuContainer.c`][5]
 - **Relevant Examples:** [drag][19], [transitions][23]
 
-The `container` object is a `content` object that can contain other `content` objects. In a container, `content` objects are stored in a doubly linked list. The `content` objects can also be accessed by index or by name using the `content` property, for instance `container.content(0)` or `container.content("foo")`.
+`container` オブジェクトは、他の `content` オブジェクトを含むことができる `content` オブジェクトです。コンテナでは、`content` オブジェクトは双方向連結リストに格納されます。`content` オブジェクトには、`content` プロパティを使用してインデックスまたは名前でアクセスすることもできます (例: `container.content(0)` または `container.content("foo")`)。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Container([behaviorData, dictionary])`
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this container's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result.Only parameters specified in the [Dictionary](#container-dictionary) section below will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | このコンテナの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#container-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `container` instance, an object that inherits from `Container.prototype`.
+`Container.prototype` から継承するオブジェクトである `container` インスタンスを返します。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -970,9 +967,9 @@ application.add(sampleContainer);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Container.prototype`. The `prototype` property of the result is `Container.prototype`. The result also provides a `template` function.
+`Container.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Container.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -995,28 +992,28 @@ application.add(new SampleContainer({ backgroundColor: "white", squareColor: "bl
 <a id="container-dictionary"></a>
 #### Dictionary
 
-Same as for `content` object (see [Dictionary](#content-dictionary) in the section [Content Object](#content-object)), plus:
+`content` オブジェクトの場合と同じです ([コンテンツ オブジェクト](#content-object) セクションの [辞書](#content-dictionary) を参照)。さらに次のプロパティを含みます。
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `clip` | `boolean` | If `true`, this container will clip its contents.
+| `clip` | `boolean` | `true` の場合、このコンテナはその内容をクリップします。
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Content.prototype`.
+プロトタイプは `Content.prototype` から継承します。
 
 <a id="container-properties"></a>
-##### Properties
+##### プロパティ
 
-Same as for `content` object (see [Properties](#content-properties) in the section [Content Object](#content-object)), plus:
+`content` オブジェクトの場合と同じです ([コンテンツ オブジェクト](#content-object) セクションの [プロパティ](#content-properties) を参照)。さらに次のプロパティを含みます。
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
-| `clip` | `boolean` | `false` | | If `true`, this container clips its contents.
-| `first` | `object` |  | ✓ | The first `content` object in this container, or `null` if this container is empty
-| `last` |`object` | | ✓ | The last `content` object in this container, or `null` if this container is empty
-| `length` |`number` | | ✓ | The number of `content` objects in this container
-| `transitioning` | `boolean` | `false` | ✓| If `true`, this container is running a `transition` object.
+| `clip` | `boolean` | `false` | | `true` の場合、このコンテナはその内容をクリップします。
+| `first` | `object` |  | ✓ | このコンテナの最初の `content` オブジェクト、またはこのコンテナが空の場合は `null`
+| `last` |`object` | | ✓ | このコンテナ内の最後の `content` オブジェクト、またはこのコンテナが空の場合は `null`
+| `length` |`number` | | ✓ | このコンテナ内の`content`オブジェクトの数
+| `transitioning` | `boolean` | `false` | ✓| `true` の場合、このコンテナは `transition` オブジェクトを実行しています。
 
 <a id="container-functions"></a>
 ##### Functions
@@ -1025,9 +1022,9 @@ Same as for `content` object (see [Properties](#content-properties) in the secti
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | The `content` object to add. It must be unbound; that is, its container must be `null`.
+| `content` | `content` | 追加する `content` オブジェクト。バインドされていない必要があります。つまり、そのコンテナは `null` である必要があります。
 
-Adds the specified `content` object to this container. The `content` object becomes the last `content` object in this container.
+指定された `content` オブジェクトをこのコンテナに追加します。`content` オブジェクトは、このコンテナ内の最後の `content` オブジェクトになります。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -1053,9 +1050,9 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `at` | `number` or `string` | The `index` or `name` property of the `content` object you want to access
+| `at` | `number` or `string` | アクセスしたい`content`オブジェクトの`index`または`name`プロパティ
 
-Returns the specified `content` object, or `undefined` if no content with the `index` or `name` specified is in this container
+指定された `content` オブジェクトを返します。指定された `index` または `name` を持つコンテンツがこのコンテナにない場合は `undefined` を返します。
 
 ```javascript
 let sampleContainer = new Container(null, {
@@ -1075,10 +1072,10 @@ let nonexistentContent = sampleContainer.content("Nonexistent");	// undefined
 
 | Argument | Type |Description |
 | --- | --- | :--- |
-| `start` | `number` | The starting index
-| `stop` | `number` |The stopping index (`this.length` by default)
+| `start` | `number` | 開始インデックス
+| `stop` | `number` |停止インデックス（デフォルトでは`this.length`）
 
-Removes `content` objects from this container, starting at index `start` and stopping at index `stop`. If `start` or `stop` is less than 0, it is an offset from `this.length`.
+このコンテナから、インデックス `start` から始まり、インデックス `stop` で終わる `content` オブジェクトを削除します。`start` または `stop` が 0 未満の場合、それは `this.length` からのオフセットです。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -1107,10 +1104,10 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `id` | `string` | The name of the event to trigger
-| `...` | `*` | Zero or more extra parameters
+| `id` | `string` | トリガーするイベントの名前
+| `...` | `*` | 0個以上の追加パラメータ
 
-Causes all `content` objects in this container to trigger an event named by the value of `id`. The order of traversal is from the first to the last. Traversal halts when a distributed event returns `true`. Note that the first parameter of a distributed event is the `content` object that triggers the event, not this container. Additional parameters, if any, of the event are the extra parameters of the `firstThat` function.
+このコンテナ内のすべての `content` オブジェクトが `id` の値で指定されたイベントをトリガーします。トラバーサルの順序は最初から最後までです。分散イベントが `true` を返すと、トラバーサルは停止します。分散イベントの最初のパラメータは、このコンテナではなく、イベントをトリガーする `content` オブジェクトであることに注意してください。イベントの追加パラメータ (存在する場合) は、`firstThat` 関数の追加パラメータです。
 
 ```javascript
 class SampleBehavior extends Behavior {
@@ -1143,10 +1140,10 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | The `content` object to insert. Its container must be `null`.
-| `before` | `object` | The `content` object before which to insert. Its container must be this container.
+| `content` | `content` | 挿入する `content` オブジェクト。そのコンテナは `null` である必要があります。
+| `before` | `object` | 挿入する前の `content` オブジェクト。そのコンテナはこのコンテナである必要があります。
 
-Inserts one `content` object before another in this container as specified by the parameters
+パラメータで指定されたとおりに、このコンテナ内の別のオブジェクトの前に 1 つの `content` オブジェクトを挿入します。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -1175,10 +1172,10 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `id` | `string` | The name of the event to trigger
-| `...` | `*` | Zero or more extra parameters
+| `id` | `string` | トリガーするイベントの名前
+| `...` | `*` | 0個以上の追加パラメータ
 
-Causes all `content` objects in this container to trigger an event named by the value of `id`. The order of traversal is from the last to the first. Traversal halts when a distributed event returns `true`. Note that the first parameter of a distributed event is the `content` object that triggers the event, not this container. Additional parameters, if any, of the event are the extra parameters of the `lastThat` function.
+このコンテナ内のすべての `content` オブジェクトが `id` の値で指定されたイベントをトリガーします。トラバーサルの順序は最後から最初です。分散イベントが `true` を返すと、トラバーサルは停止します。分散イベントの最初のパラメータは、このコンテナではなく、イベントをトリガーする `content` オブジェクトであることに注意してください。イベントの追加パラメータ (存在する場合) は、`lastThat` 関数の追加パラメータです。
 
 ```javascript
 class SampleBehavior extends Behavior {
@@ -1211,9 +1208,9 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | The `content` object to remove. Its container must be this container.
+| `content` | `content` | 削除する `content` オブジェクト。そのコンテナはこのコンテナである必要があります。
 
-Removes the specified `content` object from this container
+指定された `content` オブジェクトをこのコンテナから削除します
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -1244,10 +1241,10 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | The `content` object to replace. Its container must be this container.
-| `by` | `content` | The replacing `content` object. It must be unbound; that is, its container must be `null`.
+| `content` | `content` | 置き換える `content` オブジェクト。そのコンテナはこのコンテナである必要があります。
+| `by` | `content` | 置換する `content` オブジェクト。バインドされていない必要があります。つまり、そのコンテナは `null` である必要があります。
 
-Replaces one `content` object with another in this container as specified by the parameters
+パラメータで指定されたとおりに、コンテナ内の `content` オブジェクトを別のオブジェクトに置き換えます。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -1277,10 +1274,10 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `transition` | `transition` | The `transition` object to run
-| `...` | `*` | Zero or more extra parameters
+| `transition` | `transition` | 実行する`transition`オブジェクト
+| `...` | `*` | 0個以上の追加パラメータ
 
-Runs the specified `transition` object in this container, binding that object to this container for the duration of the transition. The extra parameters are passed to the `onBegin` and `onEnd` functions of the `transition` object. The container triggers the `onTransitionBeginning` event before the transition starts and the `onTransitionEnded` event after the transition ends.
+このコンテナで指定された `transition` オブジェクトを実行し、遷移の期間中そのオブジェクトをこのコンテナにバインドします。追加のパラメータは、`transition` オブジェクトの `onBegin` 関数と `onEnd` 関数に渡されます。コンテナは、遷移が開始する前に `onTransitionBeginning` イベントをトリガーし、遷移が終了した後に `onTransitionEnded` イベントをトリガーします。
 
 ```javascript
 import CombTransition from "piu/CombTransition";
@@ -1317,9 +1314,9 @@ application.add(new ColoredScreen({ color: "red", nextColor: "blue" }));
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content0, content1` | `content` | The `content` objects to swap. The container of both objects must be this container.
+| `content0, content1` | `content` | 交換する `content` オブジェクト。両方のオブジェクトのコンテナはこのコンテナである必要があります。
 
-Swaps the specified `content` objects in this container
+このコンテナ内の指定された `content` オブジェクトを交換します。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -1350,15 +1347,15 @@ application.add(sampleContainer);
 <a id="container-events"></a>
 #### Events
 
-Same as for `content` object (see [Events](#content-events) in the section [Content Object](#content-object)), plus:
+`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Events](#content-events) を参照)。さらに次のプロパティを含みます。
 
 **`onTransitionBeginning(container)`**
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `container` | `container` | The `container` object that triggered the event
+| `container` | `container` | イベントをトリガーした`container`オブジェクト
 
-This event is triggered when a `transition` object starts in the specified `container` object.
+このイベントは、指定された `container` オブジェクト内で `transition` オブジェクトが開始されたときにトリガーされます。
 
 ***
 
@@ -1366,29 +1363,29 @@ This event is triggered when a `transition` object starts in the specified `cont
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `container` | `container` | The `container` object that triggered the event
+| `container` | `container` | イベントをトリガーした`container`オブジェクト
 
-This event is triggered when a `transition` object ends in the specified `container` object.
+このイベントは、`transition` オブジェクトが指定された `container` オブジェクト内で終了したときにトリガーされます。
 
 ***
 
-### Content Object
+### Contentオブジェクト
 
 - **Source code:** [`piuContent.c`][6]
 - **Relevant Examples:** [balls][18], [love-js][20]
 
-Applications use `content` objects for graphical parts of their user interface, such as buttons, icons, sliders, switches, and tabs.
+アプリケーションは、ボタン、アイコン、スライダー、スイッチ、タブなどのユーザー インターフェイスのグラフィカル部分に `content` オブジェクトを使用します。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Content([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this content's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#content-dictionary) section below will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `content` instance, an object that inherits from `Content.prototype`
+`Content.prototype` から継承したオブジェクトである `content` インスタンスを返します。
 
 ```javascript
 let sampleContent = new Content("Hello", {
@@ -1409,9 +1406,9 @@ application.add(sampleContent);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Content.prototype`. The `prototype` property of the result is `Content.prototype`. The result also provides a `template` function.
+`Content.prototype` のインスタンスを作成する関数であるコンストラクターを返します。戻り値の `prototype` プロパティは `Content.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let SampleContent = Content.template($ => ({
@@ -1434,72 +1431,72 @@ application.add(new SampleContent({color: "blue"}));
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `active` | `boolean` | If `true`, this content can be touched; that is, it triggers touch events. |
-| `anchor` | `string` | Creates an anchor, a reference to the created `content` object in the instantiating data
-| `backgroundTouch ` | `boolean` | If `true`, this container receives any touch events that are received by its contents; that is, it will trigger touch events when one of its contents has been touched.
-| `Behavior` | `function` | A function that creates instances of `Behavior.prototype`; generally a class that extends the `Behavior` class. This content will create an instance of this `behavior`, set its `behavior` parameter to the created instance, and trigger the `onCreate` method.
-| `bottom` | `number` | This content's `bottom` coordinate, in pixels (setting `bottom` in the created instance's `coordinates` property)
-| `duration` | `number` |This content's duration, in milliseconds. This content triggers the `onFinished` event when its clock is running and its time equals its duration.
-| `exclusiveTouch` | `boolean` | If `true`, this content always captures touches; that is, `captureTouch` is implicitly invoked on `onTouchDown` for this content. Setting `exclusiveTouch` to `true` is equivalent to calling `captureTouch` in response to the `onTouchDown` event for every touch id.
-| `fraction` | `number` | This content's fraction--that is, the ratio of its time to its duration
-| `height` | `number` | This content's height, in pixels (setting `height` in the created instance's `coordinates` property)
-| `interval` | `number` | The time between ticks of this content's clock--that is, number of milliseconds between triggering the `onTimeChanged` events of the content's behavior when its clock is running.
-| `left` | `number` | This content's `left` coordinate, in pixels (setting `left` in the created instance's `coordinates` property)
-| `loop` | `boolean` | If `true`, this content will restart its clock when its time equals its duration
-| `multipleTouch` | `boolean` | If `true`, this content handles multiple touches.
-| `name` | `string` | This content's name
-| `right` | `number` | This content's `right` coordinate, in pixels (setting `right` in the created instance's `coordinates` property)
-| `skin` | `skin` | This content's skin
-| `Skin` | `function` | A function that creates instances of `Skin.prototype`. This content will create an instance of this `skin`, and set its `skin` parameter to the created instance.
-| `state` | `number` | This content's state. If this content's skin defines states, setting the state changes the appearance of this content.
-| `style` | `style` | This content's style
-| `Style` | `function` | A function that creates instances of `Style.prototype`. This content will create an instance of this `style`, and set its `style` parameter to the created instance.
-| `time` | `number` | This content's time, in milliseconds. When its time is set, this content triggers the `onTimeChanged` event.
-| `top` | `number` | This content's `top` coordinate, in pixels (setting `top` in the created instance's `coordinates` property)
-| `variant` | `number` | This content's variant. If this content's skin defines variants, setting the variant changes the appearance of this content.
-| `visible` | `boolean` | If `true`, this content is visible.
-| `width` | `number` | This content's width, in pixels (setting `width` in the created instance's `coordinates` property)
+| `active` | `boolean` | `true` の場合、このコンテンツはタッチ可能であり、つまりタッチ イベントがトリガーされます。 |
+| `anchor` | `string` | インスタンス化データ内に作成された`content`オブジェクトへの参照であるアンカーを作成します。
+| `backgroundTouch ` | `boolean` | `true` の場合、このコンテナはそのコンテンツが受信したすべてのタッチ イベントを受信します。つまり、そのコンテンツの 1 つがタッチされたときにタッチ イベントがトリガーされます。
+| `Behavior` | `function` | `Behavior.prototype` のインスタンスを作成する関数。通常は `Behavior` クラスを継承するクラスです。このコンテンツは、この `behavior` のインスタンスを作成し、その `behavior` パラメータを作成されたインスタンスに設定し、`onCreate` メソッドをトリガーします。
+| `bottom` | `number` | このコンテンツの `bottom` 座標（ピクセル単位）（作成されたインスタンスの `coordinates` プロパティで `bottom` を設定）。
+| `duration` | `number` |このコンテンツの継続時間（ミリ秒単位）。このコンテンツは、クロックが実行され、その時間が継続時間と等しいときに `onFinished` イベントをトリガーします。
+| `exclusiveTouch` | `boolean` | `true` の場合、このコンテンツは常にタッチをキャプチャします。つまり、このコンテンツの `onTouchDown` で `captureTouch` が暗黙的に呼び出されます。`exclusiveTouch` を `true` に設定することは、すべてのタッチ ID の `onTouchDown` イベントに応答して `captureTouch` を呼び出すことと同じです。
+| `fraction` | `number` | このコンテンツの割合、つまりその時間と継続時間の比率。
+| `height` | `number` | このコンテンツの高さ（ピクセル単位）（作成されたインスタンスの `coordinates` プロパティで `height` を設定）。
+| `interval` | `number` | このコンテンツのクロックのティック間の時間、つまり、クロックの実行中にコンテンツの動作の `onTimeChanged` イベントをトリガーする間隔 (ミリ秒数)。
+| `left` | `number` | このコンテンツの `left` 座標（ピクセル単位）（作成されたインスタンスの `coordinates` プロパティで `left` を設定）。
+| `loop` | `boolean` | `true` の場合、このコンテンツは、その時間が継続時間と等しくなったときにクロックを再開します。
+| `multipleTouch` | `boolean` | `true` の場合、このコンテンツは複数のタッチを処理します。
+| `name` | `string` | このコンテンツの名前。
+| `right` | `number` | このコンテンツの `right` 座標（ピクセル単位）（作成されたインスタンスの `coordinates` プロパティで `right` を設定）。
+| `skin` | `skin` | このコンテンツのスキン。
+| `Skin` | `function` | `Skin.prototype` のインスタンスを作成する関数。このコンテンツは、この `skin` のインスタンスを作成し、その `skin` パラメータを作成されたインスタンスに設定します。
+| `state` | `number` | このコンテンツの状態。このコンテンツのスキンが状態を定義している場合、状態を設定すると、このコンテンツの外観が変わります。
+| `style` | `style` | このコンテンツのスタイル。
+| `Style` | `function` | `Style.prototype` のインスタンスを作成する関数。このコンテンツは、この `style` のインスタンスを作成し、その `style` パラメータを作成されたインスタンスに設定します。
+| `time` | `number` | このコンテンツの時間（ミリ秒単位）。時間を設定すると、このコンテンツは `onTimeChanged` イベントをトリガーします。
+| `top` | `number` | このコンテンツの `top` 座標（ピクセル単位）（作成されたインスタンスの `coordinates` プロパティで `top` を設定）。
+| `variant` | `number` | このコンテンツのバリアント。このコンテンツのスキンがバリアントを定義している場合、バリアントを設定すると、このコンテンツの外観が変わります。
+| `visible` | `boolean` | `true` の場合、このコンテンツは表示されます。
+| `width` | `number` | このコンテンツの幅（ピクセル単位）（作成されたインスタンスの `coordinates` プロパティで `width` を設定）。
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Object.prototype`.
+プロトタイプは `Object.prototype` から継承します。
 
 <a id="content-properties"></a>
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
-| `active` | `boolean` | `false` | | If `true`, this content can be touched; that is, it triggers touch events.
-| `anchor` | `string` | The identifier of the property that references this content object in its instantiating data
-| `backgroundTouch ` | `boolean` | `false` | | If `true`, this container receives any touch events that are received by its contents; that is, it will trigger touch events when one of its contents has been touched.
-| `behavior` | `object` | `null` |  | This content's `behavior` object or `null`. When this content triggers an event, it calls the corresponding function property of its behavior, if any.
-| `bounds` | `object` | | | This content's global position and size, as an object with `x`, `y`, `width`, and `height` number properties, specified in pixels. If this content is unbound, the getter returns `undefined` and the setter is ignored.
-| `container` | `object` | |  ✓ | This content's container, or `null` if this content is unbound--that is, if it has no container
-| `coordinates` | `object` | | | This content's coordinates, as an object with `left`, `width`, `right`, `top`, `height`, or `bottom` number properties (specified in pixels), or an empty object if no coordinates are passed into the constructor
-| `duration` | `number` | 0 | | This content's duration, in milliseconds. This content triggers the `onFinished` event when its clock is running and its time equals its duration.
-| `exclusiveTouch` | `boolean` | `false` | | If `true`, this content always captures touches; that is, `captureTouch` is implicitly invoked on `onTouchDown` for this content. Setting `exclusiveTouch` to `true` is equivalent to calling `captureTouch` in response to the `onTouchDown` event for every touch id.
-| `fraction` | `number` | `undefined` | | This content's fraction--that is, the ratio of its time to its duration. If the duration is 0, the getter returns `undefined` and the setter is ignored. This content triggers the `onTimeChanged` event when its fraction is set.
-| `height` | `number` | | | This content's height, in pixels
-| `index` | `number` | | ✓ |The index of this content in its container, or –1 if this content is unbound
-| `interval` | `number` | 1 |  |The time between ticks of this content's clock--that is, number of milliseconds between triggering the `onTimeChanged` events of the content's behavior when its clock is running.
-| `loop` | `boolean` | `false` | | If `true`, this content will restart its clock when its time equals its duration
-| `multipleTouch` | `boolean` | `false`| | If `true`, this content handles multiple touches.
-| `name` | `string` | | | This content's name
-| `next` | `object` | | ✓ | The next `content` object of this content's container; `null` if this content is the last `content` object of this content's container or if this content has no container
-| `offset` | `object` | | | This content's local position, as an object with `x` and `y` number properties, specified in pixels. If this content is unbound, the getter returns `undefined` and the setter is ignored.
-| `position` | `object` | | |  This content's global position, as an object with `x` and `y` number properties, specified in pixels. If this content is unbound, the getter returns `undefined` and the setter is ignored.
-| `previous` | `object` | | ✓ | The previous `content` object in this content's container; `null` if this content is the first `content` object of this content's container or if this content has no container
-| `running` | `boolean` | | ✓ | If `true`, this content's clock is running.
-| `size` | `object` | | | This content's size, as an object with `width` and `height` number properties, specified in pixels
-| `skin` | `skin` | `null` | | This content's skin or `null`
-`state` | `number` | 0 |  | This content's state. If this content's skin defines states, setting the state changes the appearance of this content.
-| `style` | `style` | `null` |  |This content's style or `null`
-| `time` | `number` | 0 |  |This content's time, in milliseconds. When its time is set, this content triggers the `onTimeChanged` event.
-| `variant` | `number` | 0 |  |This content's variant. If this content's skin defines variants, setting the variant changes the appearance of this content.
-| `visible` | `boolean` | `true` | |If `true`, this content is visible.
-| `width` | `number` | |  |This content's width, in pixels
-| `x` | `number` | |  | This content's global x position. If this content is unbound, the getters return `undefined` and the setters are ignored.
-| `y` | `number` | |  |This content's global y position. If this content is unbound, the getters return `undefined` and the setters are ignored.
+| `active` | `boolean` | `false` | | `true` の場合、このコンテンツはタッチ可能であり、つまりタッチ イベントがトリガーされます。
+| `anchor` | `string` | インスタンス化データ内でこのコンテンツ オブジェクトを参照するプロパティの識別子
+| `backgroundTouch ` | `boolean` | `false` | | `true` の場合、このコンテナはそのコンテンツが受信したすべてのタッチ イベントを受信します。つまり、そのコンテンツの 1 つがタッチされたときにタッチ イベントがトリガーされます。
+| `behavior` | `object` | `null` |  | このコンテンツの `behavior` オブジェクトまたは `null`。このコンテンツがイベントをトリガーすると、その動作の対応する関数プロパティ（存在する場合）が呼び出されます。
+| `bounds` | `object` | | | このコンテンツのグローバル位置とサイズは、ピクセル単位で指定された `x`、`y`、`width`、および `height` 数値プロパティを持つオブジェクトとして表されます。このコンテンツがバインドされていない場合、ゲッターは `undefined` を返し、セッターは無視されます。
+| `container` | `object` | |  ✓ | このコンテンツのコンテナ。このコンテンツがバインドされていない場合、つまりコンテナがない場合は `null` になります。
+| `coordinates` | `object` | | | このコンテンツの座標。`left`、`width`、`right`、`top`、`height`、または `bottom` 数値プロパティ（ピクセル単位で指定）を持つオブジェクト、またはコンストラクタに座標が渡されなかった場合は空のオブジェクト
+| `duration` | `number` | 0 | | このコンテンツの継続時間（ミリ秒単位）。このコンテンツは、クロックが実行され、その時間が継続時間と等しいときに `onFinished` イベントをトリガーします。
+| `exclusiveTouch` | `boolean` | `false` | |`true` の場合、このコンテンツは常にタッチをキャプチャします。つまり、このコンテンツの `onTouchDown` で `captureTouch` が暗黙的に呼び出されます。`exclusiveTouch` を `true` に設定することは、すべてのタッチ ID の `onTouchDown` イベントに応答して `captureTouch` を呼び出すことと同じです。
+| `fraction` | `number` | `undefined` | | このコンテンツの割合、つまり、その時間とその継続時間の比率です。継続時間が 0 の場合、ゲッターは `undefined` を返し、セッターは無視されます。このコンテンツの割合が設定されると、`onTimeChanged` イベントがトリガーされます。
+| `height` | `number` | | | このコンテンツの高さ（ピクセル単位）
+| `index` | `number` | | ✓ |コンテナ内のこのコンテンツのインデックス。このコンテンツがバインドされていない場合は -1 になります。
+| `interval` | `number` | 1 |  |このコンテンツのクロックのティック間の時間、つまり、クロックの実行中にコンテンツの動作の `onTimeChanged` イベントをトリガーする間隔 (ミリ秒数)。
+| `loop` | `boolean` | `false` | | `true` の場合、このコンテンツは、その時間が継続時間と等しくなったときにクロックを再開します。
+| `multipleTouch` | `boolean` | `false`| | `true` の場合、このコンテンツは複数のタッチを処理します。
+| `name` | `string` | | | このコンテンツの名前。
+| `next` | `object` | | ✓ | このコンテンツのコンテナの次の `content` オブジェクト。このコンテンツがこのコンテンツのコンテナの最後の `content` オブジェクトである場合、またはこのコンテンツにコンテナがない場合は `null` になります。
+| `offset` | `object` | | | このコンテンツのローカル位置は、ピクセル単位で指定された `x` および `y` 数値プロパティを持つオブジェクトとして表されます。このコンテンツがバインドされていない場合、ゲッターは `undefined` を返し、セッターは無視されます。
+| `position` | `object` | | |  このコンテンツのグローバル位置は、ピクセル単位で指定された `x` および `y` 数値プロパティを持つオブジェクトです。このコンテンツがバインドされていない場合、ゲッターは `undefined` を返し、セッターは無視されます。
+| `previous` | `object` | | ✓ | このコンテンツのコンテナ内の前の `content` オブジェクト。このコンテンツがこのコンテンツのコンテナの最初の `content` オブジェクトである場合、またはこのコンテンツにコンテナがない場合は `null` になります。
+| `running` | `boolean` | | ✓ | `true` の場合、このコンテンツのクロックは実行中です。
+| `size` | `object` | | | このコンテンツのサイズは、ピクセル単位で指定された `width` および `height` 数値プロパティを持つオブジェクトとして表されます。
+| `skin` | `skin` | `null` | | このコンテンツのスキンまたは `null`。
+|`state` | `number` | 0 |  | このコンテンツの状態。このコンテンツのスキンが状態を定義している場合、状態を設定すると、このコンテンツの外観が変わります。
+| `style` | `style` | `null` |  | このコンテンツのスタイルまたは `null`
+| `time` | `number` | 0 |  |このコンテンツの時間（ミリ秒単位）。時間を設定すると、このコンテンツは `onTimeChanged` イベントをトリガーします。
+| `variant` | `number` | 0 |  |このコンテンツのバリアント。このコンテンツのスキンがバリアントを定義している場合、バリアントを設定すると、このコンテンツの外観が変わります。
+| `visible` | `boolean` | `true` | |`true` の場合、このコンテンツは表示されます。
+| `width` | `number` | |  |このコンテンツの幅（ピクセル単位）。
+| `x` | `number` | |  | このコンテンツのグローバル x 位置。このコンテンツがバインドされていない場合、ゲッターは `undefined` を返し、セッターは無視されます。
+| `y` | `number` | |  | このコンテンツのグローバル y 位置。このコンテンツがバインドされていない場合、ゲッターは `undefined` を返し、セッターは無視されます。
 
 <a id="content-functions"></a>
 ##### Functions
@@ -1508,10 +1505,10 @@ Prototype inherits from `Object.prototype`.
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `id` | `string` | The name of the event to trigger
-| `...` | `*` | Zero or more extra parameters
+| `id` | `string` | トリガーするイベントの名前
+| `...` | `*` | 0個以上の追加パラメータ
 
-Causes this content and all `container` objects upward in the containment hierarchy to trigger an event named by the value of `id`. The bubbling halts when a bubbled event returns `true`. Note that the first parameter of a bubbled event is the `container` object that triggers the event, not this content. Additional parameters, if any, of a bubbled event are the extra parameters of the `bubble` function.
+このコンテンツと、コンテンツ階層の上位にあるすべての `container` オブジェクトが、`id` の値で指定されたイベントをトリガーします。バブルされたイベントが `true` を返すと、バブリングは停止します。バブルされたイベントの最初のパラメータは、このコンテンツではなく、イベントをトリガーする `container` オブジェクトであることに注意してください。バブルされたイベントの追加パラメータ (ある場合) は、`bubble` 関数の追加パラメータです。
 
 ```javascript
 let NamedContainer = Container.template($ => ({
@@ -1543,11 +1540,11 @@ application.add(outerContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `id` | `number` | The identifier of the touch
-| `x, y` | `number` | The global position of the touch, in pixels
-| `ticks` | `number` | The global time of the touch
+| `id` | `number` | タッチの識別子
+| `x, y` | `number` | タッチのグローバル位置（ピクセル単位）
+| `ticks` | `number` | タッチのグローバルタイム
 
-Causes this content to capture the touch named `id`, meaning that only this content will trigger the remaining `onTouchMoved` and `onTouchEnded` events related to that touch. Other `content` objects concerned with the captured touch trigger the `onTouchCancelled` event when the `captureTouch` function is called.
+このコンテンツは `id` という名前のタッチをキャプチャします。つまり、このコンテンツのみが、そのタッチに関連する残りの `onTouchMoved` イベントと `onTouchEnded` イベントをトリガーします。キャプチャされたタッチに関連する他の `content` オブジェクトは、`captureTouch` 関数が呼び出されたときに `onTouchCancelled` イベントをトリガーします。
 
 ```javascript
 class BlueBehavior extends Behavior {
@@ -1597,12 +1594,12 @@ application.add(redContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `id` | `string` | The name of the event to trigger
-| `...` | `*` | Zero or more extra parameters
+| `id` | `string` | トリガーするイベントの名前
+| `...` | `*` | 0個以上の追加パラメータ
 
-The `defer` function is similar to the `delegate` function; both cause this content to trigger an event named by the value of `id`. The difference is in their timing. The `delegate` function sends the event immediately while the `defer` functions posts the event. The event will be triggered at the following iteration of the main event loop.
+`defer` 関数は `delegate` 関数に似ています。どちらもこのコンテンツによって `id` の値で指定されたイベントがトリガーされます。違いはタイミングにあります。`delegate` 関数はイベントをすぐに送信しますが、`defer` 関数はイベントをポストします。イベントは、メイン イベント ループの次の反復でトリガーされます。
 
-The first parameter of the deferred event is this content. Additional parameters, if any, of the deferred event are the extra parameters of the `defer` function.
+遅延イベントの最初のパラメータはこのコンテンツです。遅延イベントの追加パラメータ (存在する場合) は、`defer` 関数の追加パラメータです。
 
 ***
 
@@ -1610,10 +1607,10 @@ The first parameter of the deferred event is this content. Additional parameters
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `id` | `string` | The name of the event to trigger
-| `...` | `*` | Zero or more extra parameters
+| `id` | `string` | トリガーするイベントの名前
+| `...` | `*` | 0個以上の追加パラメータ
 
-Causes this content to trigger an event named by the value of `id`. The first parameter of the delegated event is this content. Additional parameters, if any, of the delegated event are the extra parameters of the `delegate` function.
+このコンテンツにより、`id` の値で指定されたイベントがトリガーされます。移譲されたイベントの最初のパラメータはこのコンテンツです。移譲されたイベントの追加パラメータ (存在する場合) は、`delegate` 関数の追加パラメータです。
 
 ```javascript
 let NamedContainer = Container.template($ => ({
@@ -1643,7 +1640,7 @@ application.add(outerContainer);
 
 **`focus()`**
 
-Focuses this content so that it triggers keyboard events. Only one content object at a time is focused.
+このコンテンツにフォーカスを当てて、キーボード イベントをトリガーします。一度にフォーカスされるコンテンツ オブジェクトは 1 つだけです。
 
 ***
 
@@ -1651,10 +1648,10 @@ Focuses this content so that it triggers keyboard events. Only one content objec
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `id` | `string` | The name of the event
-| `...` | `*` | | Zero or more extra parameters
+| `id` | `string` | イベント名
+| `...` | `*` | | 0個以上の追加パラメータ
 
-Causes this container and all `content` objects downward in the containment hierarchy to trigger an event named by the value of `id`. The order of traversal is depth first. Traversal halts when one of the triggered event-handling functions returns `true`. Note that the first parameter of a distributed event is the `content` object that triggers the event, not this container. Additional parameters, if any, of the event are the extra parameters of the `distribute` function.
+このコンテナと、コンテンツ階層の下位にあるすべての `content` オブジェクトが、`id` の値で指定されたイベントをトリガーします。トラバーサルの順序は深さ優先です。トリガーされたイベント処理関数の 1 つが `true` を返すと、トラバーサルは停止します。分散イベントの最初のパラメーターは、このコンテナではなく、イベントをトリガーする `content` オブジェクトであることに注意してください。イベントの追加パラメーター (存在する場合) は、`distribute` 関数の追加パラメーターです。
 
 ```javascript
 let NamedContainer = Container.template($ => ({
@@ -1686,11 +1683,11 @@ application.add(outerContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `x, y` | `number` | The global position to test, in pixels
+| `x, y` | `number` | テストするグローバル位置（ピクセル単位）
 
-Returns this content if this content is active, bound, and contains the position, and `undefined` otherwise. If this content is a `container` instance, returns either one of its contents or itself if the content or itself is active, bound, and contains the position, or `undefined`.
+このコンテンツがアクティブで、バインドされていて、位置を含んでいる場合はこのコンテンツを返し、そうでない場合は `undefined` を返します。このコンテンツが `container` インスタンスである場合、コンテンツまたはそれ自体がアクティブで、バインドされていて、位置を含んでいる場合はそのコンテンツの 1 つまたはそれ自体を返し、そうでない場合は `undefined` を返します。
 
-> Note that this function should only be used after a content has been measured and fitted; otherwise it will always return `undefined`.
+> この関数は、コンテンツが測定され、適合された後にのみ使用する必要があることに注意してください。それ以外の場合は、常に `undefined` が返されます。
 
 ```javascript
 let sampleContent = new Content(null, {
@@ -1709,7 +1706,7 @@ let sampleContent = new Content(null, {
 
 **`measure()`**
 
-Returns the [measured size](#measured-size) of this content, as an object with `width` and `height` parameters.
+このコンテンツの[測定サイズ](#measured-size)を、`width` および `height` パラメータを持つオブジェクトとして返します。
 
 Example 1:
 
@@ -1745,9 +1742,9 @@ let fittedWidth = sampleContent.width;			// 240 (assuming running on 240x320 scr
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `x, y` | `number` | The deltas by which to move this content, in pixels
+| `x, y` | `number` | このコンテンツを移動する差分（ピクセル単位）
 
-Moves this content as specified by the parameters. If the content's coordinates constrain its position, the `moveBy` function ignores the corresponding horizontal or vertical deltas.
+このコンテンツをパラメータで指定されたとおりに移動します。コンテンツの座標によって位置が制約される場合、`moveBy` 関数は対応する水平または垂直の差分を無視します。
 
 ```javascript
 let unconstrainedContent = new Content(null, {
@@ -1773,9 +1770,9 @@ constrainedContent.moveBy(100,100);	// Does nothing
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `width, height` | `number` | The deltas by which to size this content, in pixels
+| `width, height` | `number` | このコンテンツのサイズを決定するための差分（ピクセル単位）
 
-Sizes this content as specified by the parameters. If this content's coordinates constrain its size, the `sizeBy` function ignores the corresponding horizontal or vertical deltas.
+このコンテンツのサイズをパラメータで指定されたとおりに変更します。このコンテンツの座標によってサイズが制限される場合、`sizeBy` 関数は対応する水平または垂直の差分を無視します。
 
 ```javascript
 let unconstrainedContent = new Content(null, {
@@ -1799,7 +1796,7 @@ constrainedContent.sizeBy(100,100);	// Does nothing
 
 **`start()`**
 
-Starts this content's clock
+このコンテンツのクロックを開始します。
 
 ```javascript
 class SampleBehavior extends Behavior {
@@ -1829,7 +1826,7 @@ application.add(sampleContent);
 
 **`stop()`**
 
-Stops this content's clock
+このコンテンツのクロックを停止します。
 
 ```javascript
 class SampleBehavior extends Behavior {
@@ -1862,16 +1859,16 @@ application.add(sampleContent);
 <a id="content-events"></a>
 #### Events
 
-The following standard events are triggered by `content` objects.
+次の標準イベントは、`content` オブジェクトによってトリガーされます。
 
 **`onCreate(content, data, context)`**
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | The `content` object that triggered the event
-| `data, context  ` | `object` | The parameters of the constructor of the `content` object that references or contains the behavior
+| `content` | `content` | イベントをトリガーした`content`オブジェクト
+| `data, context  ` | `object` | 動作を参照または含む`content`オブジェクトのコンストラクタのパラメータ
 
-This event is triggered when the content is constructed.
+このイベントは、コンテンツが構築されたときにトリガーされます。
 
 ***
 
@@ -1879,9 +1876,9 @@ This event is triggered when the content is constructed.
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | The `content` object that triggered the event
+| `content` | `content` | イベントをトリガーした`content`オブジェクト
 
-This event is triggered after the specified `content` object is added to the containment hierarchy and has been measured and fitted, but before it is visible to the user. This is the first event the object receives after its coordinates have been computed.
+このイベントは、指定された `content` オブジェクトがコンテンツ階層に追加され、測定および調整された後、ユーザーに表示される前にトリガーされます。これは、座標が計算された後にオブジェクトが受け取る最初のイベントです。
 
 ***
 
@@ -1889,9 +1886,9 @@ This event is triggered after the specified `content` object is added to the con
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | The `content` object that triggered the event
+| `content` | `content` | イベントをトリガーした`content`オブジェクト
 
-This event is triggered when the specified `content` object is running and its time equals its duration.
+このイベントは、指定された `content` オブジェクトが実行中で、その時間が継続時間と等しいときにトリガーされます。
 
 ***
 
@@ -1899,9 +1896,9 @@ This event is triggered when the specified `content` object is running and its t
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` |  The `content` object that triggered the event
+| `content` | `content` |  イベントをトリガーした`content`オブジェクト
 
-This event is triggered when the time of the specified `content` object changes.
+このイベントは、指定された `content` オブジェクトの時刻が変更されたときにトリガーされます。
 
 ***
 
@@ -1915,37 +1912,37 @@ This event is triggered when the time of the specified `content` object changes.
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` |  The `content` object that triggered the event
-| `id` | `number` | The identifier of the touch
-| `x, y` | `number` | The global coordinates of the event, in pixels
-| `ticks` | `number` | The global time of the event
+| `content` | `content` |  イベントをトリガーした`content`オブジェクト
+| `id` | `number` | タッチの識別子
+| `x, y` | `number` | イベントのグローバル座標（ピクセル単位）
+| `ticks` | `number` | イベントのグローバル時間
 
-These events are triggered when the specified `content` object is active and touched.
+これらのイベントは、指定された `content` オブジェクトがアクティブでタッチされたときにトリガーされます。
 
-### Die Object
+### Dieオブジェクト
 
 - **Source code:** [`piuDie.c`][7]
 - **Relevant Examples:** [cards][24]
 
-The `die` object is a `layout` object that allows you to “die cut” its contents with a region, minimizing the areas to invalidate and to update. These are useful for building animations and transitions on constrained devices that cannot update every screen pixel at every frame.
+`die` オブジェクトは、コンテンツを領域で「ダイカット」して、無効化および更新する領域を最小限に抑えることができる `layout` オブジェクトです。これは、フレームごとにすべての画面ピクセルを更新できない制約のあるデバイスでアニメーションやトランジションを作成する場合に便利です。
 
-The `die` object maintains two regions:
+`die`オブジェクトは2つの領域を維持する:
 
-- the work region that the available operations build,
-- the clip region that clips the contents of the `die` object
+- 利用可能な操作が構築する作業領域、
+- `die` オブジェクトの内容を切り取るクリップ領域
 
-Both regions are initially empty.
+両方の領域は最初は空です。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Die([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this die's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result. The dictionary is the same as for the `content` object. Only parameters specified in the [Dictionary](#content-dictionary) section of the [Content Object](#container-object) will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | このダイスの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `die` instance, an object that inherits from `Die.prototype.`
+`Die.prototype.` から継承したオブジェクトである `die` インスタンスを返します。
 
 ```javascript
 let sampleDie = new Die(null, {
@@ -1987,9 +1984,9 @@ application.add(sampleScreenWithDie);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Die.prototype`. The `prototype` property of the result is `Die.prototype`. The result also provides a `template` function.
+`Die.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Die.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let SampleDie = Die.template($ => ({
@@ -2030,21 +2027,21 @@ application.add(sampleScreenWithDie);
 
 ![](../assets/piu/sampleDie2.png)
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Layout.prototype`.
+Prototypeは `Layout.prototype` から継承します。
 
 ##### Functions
 
-Same as for `layout` object (see [Functions](#layout-functions) in the section [Layout Object](#layout-object)), plus:
+`layout` オブジェクトの場合と同じです（[Layoutオブジェクト](#layout-object)のセクションの[Functions](#layout-functions)を参照）。さらに:
 
 **`and(x, y, width, height)`**
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `x, y, width, height` | `number` | A local rectangle, in pixels
+| `x, y, width, height` | `number` | ピクセル単位のローカル矩形
 
-Intersects the rectangle with the work region and returns `this`.
+四角形を作業領域と交差させて `this` を返します。
 
 ```javascript
 let sampleContainer = new Container(null, {
@@ -2079,9 +2076,9 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `content` | `content` | The `content` object to attach
+| `content` | `content` | アタッチする`content`オブジェクト
 
-Binds the `die` object to the containment hierarchy by replacing the specified `content` object in the content's container with this `die` object and adding the `content` object to this `die` object.
+コンテンツのコンテナ内の指定された `content` オブジェクトをこの `die` オブジェクトに置き換え、`content` オブジェクトをこの `die` オブジェクトに追加することで、`die` オブジェクトをコンテンツ階層にバインドします。
 
 ```javascript
 let whiteScreen = new Content(null, {
@@ -2111,15 +2108,15 @@ application.add(whiteScreen);
 
 **`cut()`**
 
-Copies the work region into the current region, and invalidates only the difference between the work and the clip regions.
+作業領域を現在の領域にコピーし、作業領域とクリップ領域の違いのみを無効にします。
 
 ***
 
 **`detach()`**
 
-Unbind this `die` object from the content hierarchy by removing the first `content` object from this `die` object and replacing this `die` object in its container with the removed `content` object.
+この `die` オブジェクトから最初の `content` オブジェクトを削除し、そのコンテナ内のこの `die` オブジェクトを削除した `content` オブジェクトに置き換えることで、この `die` オブジェクトをコンテンツ階層からアンバインドします。
 
-```
+```javascript
 let whiteScreen = new Content(null, {
 	active: true, left:0, right:0, top:0, bottom:0,
 	skin: new Skin({ fill: "white" }),
@@ -2152,13 +2149,13 @@ application.add(whiteScreen);
 
 **`empty()`**
 
-Empties the work region and returns `this`.
+作業領域を空にして `this` を返します。
 
 ***
 
 **`fill()`**
 
-Sets the work region to the bounds of this `die` object and returns `this`.
+作業領域をこの `die` オブジェクトの境界に設定し、`this` を返します。
 
 ***
 
@@ -2166,9 +2163,9 @@ Sets the work region to the bounds of this `die` object and returns `this`.
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `x, y, width, height` | `number` | A local rectangle, in pixels
+| `x, y, width, height` | `number` | ピクセル単位のローカル矩形
 
-Inclusively unions the rectangle with the work region and returns `this`.
+四角形と作業領域を包括的に結合し、`this` を返します。
 
 ```javascript
 let sampleContainer = new Container(null, {
@@ -2203,9 +2200,9 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `x, y, width, height` | `number` | A local rectangle, in pixels
+| `x, y, width, height` | `number` | ピクセル単位のローカル矩形
 
-Sets the work region to the rectangle and returns `this`.
+作業領域を四角形に設定し、`this` を返します。
 
 ```javascript
 let sampleContainer = new Container(null, {
@@ -2239,10 +2236,10 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `x, y, width, height` | `number` | A local rectangle, in pixels
+| `x, y, width, height` | `number` | ピクセル単位のローカル矩形
 
 
-Subtracts the rectangle from the work region and returns `this`.
+作業領域から四角形を減算し、`this` を返します。
 
 ```javascript
 let sampleContainer = new Container(null, {
@@ -2279,9 +2276,9 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `x, y, width, height` | `number` | A local rectangle, in pixels
+| `x, y, width, height` | `number` | ピクセル単位のローカル矩形
 
-Exclusively unions the work region with the rectangle and returns `this`.
+作業領域と四角形を排他的に結合し、`this` を返します。
 
 ```javascript
 let sampleContainer = new Container(null, {
@@ -2310,18 +2307,18 @@ application.add(sampleContainer);
 
 ![](../assets/piu/dieXor.png)
 
-### Image Object
+### Imageオブジェクト
 
 - **Source code:** [`piuImage.c`][30]
 - **Relevant Examples:** [images][31]
 
-The `image` object is a `content` object that displays images.
+`image` オブジェクトは、画像を表示する `content` オブジェクトです。
 
-Image assets may be a GIF, JPEG, or PNG file, or a folder of JPEG and PNG files. The [images][31] example provides an example for every supported type.
+画像アセットは、GIF、JPEG、PNG ファイル、または JPEG および PNG ファイルのフォルダーです。[images][31] の例では、サポートされているすべてのタイプの例が示されています。
 
-Assets must be defined in the resources of your manifest. The quality of JPEG and PNG files can be set to a value between 1 and 100; higher numbers correspond to higher quality.
+アセットはマニフェストのリソースで定義する必要があります。JPEG ファイルと PNG ファイルの品質は 1 ～ 100 の値に設定できます。数値が大きいほど品質が高くなります。
 
-```javascript
+```json
 "resources":{
 	"*-image(100)": [
 		"$(MODDABLE)/examples/assets/images/screen1",
@@ -2332,9 +2329,9 @@ Assets must be defined in the resources of your manifest. The quality of JPEG an
 },
 ```
 
-Images in a folder are used as frames of a single animated image. The frame rate is determined by the name of the folder. For example, the `fish.15fps` folder from [the example images folder](../../examples/assets/images) tells the application to run at 15 frames per second. In the manifest, the `.15fps` is dropped from the path.
+フォルダー内の画像は、1 つのアニメーション画像のフレームとして使用されます。フレーム レートはフォルダーの名前によって決まります。たとえば、[サンプル画像フォルダー](../../examples/assets/images) の `fish.15fps` フォルダーは、アプリケーションに 1 秒あたり 15 フレームで実行するように指示します。マニフェストでは、パスから `.15fps` が削除されます。
 
-```javascript
+```json
 "resources":{
 	"*-image": [
 		"$(MODDABLE)/examples/assets/images/fish",
@@ -2342,20 +2339,20 @@ Images in a folder are used as frames of a single animated image. The frame rate
 }
 ```
 
-The frame rate of a GIF is set in the file itself and cannot be changed by the application.
+GIF のフレーム レートはファイル自体に設定されており、アプリケーションでは変更できません。
 
-All supported image types are compressed into a single resource with a `.cs` extension. These are the files that should be referenced in the application's script code. For example, to create `image` objects using the assets mentioned above, the application would use the paths `"screen1.cs"`, `"screen2.cs"`, and `"street.cs"`.
+サポートされているすべての画像タイプは、`.cs` 拡張子を持つ単一のリソースに圧縮されます。これらは、アプリケーションのスクリプト コードで参照する必要があるファイルです。たとえば、上記のアセットを使用して `image` オブジェクトを作成するには、アプリケーションはパス `"screen1.cs"`、`"screen2.cs"`、および `"street.cs"` を使用します。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Image([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this image's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#image-dictionary) section below will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | この画像の `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#image-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns an `image` instance, an object that inherits from `Image.prototype`
+`Image.prototype` から継承したオブジェクトである `image` インスタンスを返します。
 
 ```javascript
 let sampleImage = new Image(null, ({
@@ -2364,7 +2361,7 @@ let sampleImage = new Image(null, ({
 application.add(sampleImage);
 ```
 
-> This example uses `screen1.png` from [the example images folder](../../examples/assets/images)
+> この例では、[サンプル画像フォルダ](../../examples/assets/images) の `screen1.png` を使用します。
 
 ![](../assets/piu/imageSample1.png)
 
@@ -2372,9 +2369,9 @@ application.add(sampleImage);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Image.prototype`. The `prototype` property of the result is `Image.prototype`. The result also provides a `template` function.
+`Image.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Image.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 class ImageBehavior extends Behavior {
@@ -2388,47 +2385,47 @@ let SampleImage = Image.template($ => ({
 application.add(new SampleImage("street.cs"));
 ```
 
-> This example uses `street.gif` from [the example images folder](../../examples/assets/images)
+> この例では [the example images folder](../../examples/assets/images)の `street.gif` を使用します。
 
 ![](../assets/piu/sampleImage2.gif)
 
 <a id="image-dictionary"></a>
 #### Dictionary
 
-Same as for `content` object (see [Dictionary](#content-dictionary) in the section [Content Object](#content-object)), plus:
+`content`オブジェクトの場合と同じです（[Contentオブジェクト](#content-object)のセクションの[Dictionary](#content-dictionary)を参照してください）。さらに:
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `path` | `string` | The URL of the image file. It must be a file URL.
+| `path` | `string` | 画像ファイルの URL。ファイル URL である必要があります。
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Content.prototype`.
+プロトタイプは `Content.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
-| `frameCount ` | `number` | | ✓ | The total number of frames in this image
-| `frameIndex ` | `number` | | | The index of the current frame
+| `frameCount ` | `number` | | ✓ | この画像に含まれるフレームの総数
+| `frameIndex ` | `number` | | | 現在のフレームのインデックス
 
-### Label Object
+### Labelオブジェクト
 
 - **Source code:** [`piuLabel.c`][8]
 - **Relevant Examples:** [cards][24], [keyboard][20]
 
-The `label` object is a `content` object that renders a string on a single line with a single style. The string is truncated if it does not fit the bounds of the `label` object.
+`label` オブジェクトは、単一のスタイルで 1 行に文字列をレンダリングする `content` オブジェクトです。文字列が `label` オブジェクトの境界に収まらない場合は切り捨てられます。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Label([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this label's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#label-dictionary) section below will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` |このラベルの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#label-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `label` instance, an object that inherits from `Label.prototype`
+`Label.prototype` から継承したオブジェクトである `label` インスタンスを返します。
 
 ```javascript
 let sampleStyle = new Style({ font:"600 28px Open Sans", color: "blue" });
@@ -2445,9 +2442,9 @@ application.add(sampleLabel)
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Label.prototype`. The `prototype` property of the result is `Label.prototype`. The result also provides a `template` function.
+`Label.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Label.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let blueStyle = new Style({ font:"600 28px Open Sans", color: "blue" });
@@ -2465,43 +2462,43 @@ application.add(new SampleLabel({ string: "Hello, World!", style: redStyle }, { 
 <a id="label-dictionary"></a>
 #### Dictionary
 
-Same as for `content` object (see [Dictionary](#content-dictionary) in the section [Content Object](#content-object)), plus:
+`content`オブジェクトの場合と同じです（[Contentオブジェクト](#content-object)のセクションの[Dictionary](#content-dictionary)を参照してください）。さらに:
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `string` | `string` | This label's string
+| `string` | `string` | このラベルの文字列
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Content.prototype`.
+プロトタイプは `Content.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
-| `string` | `string` | | | This label's string
+| `string` | `string` | | | このラベルの文字列
 
-### Layout Object
+### Layoutオブジェクト
 
 - **Source code:** [`piuLayout.c`][9]
 - **Relevant Examples:** N/A
 
-The `layout` object is a `container` object that delegates positioning and sizing of its contents to a script in its behavior.
+`layout` オブジェクトは、その動作においてその内容の配置とサイズ設定をスクリプトに移譲する `container` オブジェクトです。
 
-When its width is measured, the `layout` object triggers the `onMeasureHorizontally` event, and the behavior can modify the measured width of the `layout` object or the coordinates of its contents.
+幅が測定されると、`layout` オブジェクトは `onMeasureHorizo​​ntally` イベントをトリガーし、この動作によって `layout` オブジェクトの測定された幅またはそのコンテンツの座標を変更できます。
 
-When its height is measured, the `layout` object triggers the `onMeasureVertically` event, and the behavior can modify the measured height of the `layout` object or the coordinates of its contents.
+高さが測定されると、`layout` オブジェクトは `onMeasureVertically` イベントをトリガーし、動作によって `layout` オブジェクトの測定された高さまたはそのコンテンツの座標を変更できます。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Layout([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this layout's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result. The dictionary is the same as for the `content` object. Only parameters specified in the [Dictionary](#content-dictionary) section of the [Content Object](#container-object) will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | このレイアウトの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `layout` instance, an object that inherits from `Layout.prototype/`
+`Layout.prototype/` から継承したオブジェクトである `layout` インスタンスを返します。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -2548,9 +2545,9 @@ application.add(sampleLayout);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Layout.prototype`. The `prototype` property of the result is `Layout.prototype`. The result also provides a `template` function.
+`Layout.prototype` のインスタンスを作成する関数であるコンストラクターを返します。戻り値の `prototype` プロパティは `Layout.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -2592,22 +2589,22 @@ application.add(new SampleLayout(null, {bottom: 0, width: 200, right: 0, height:
 
 ![](../assets/piu/sampleLayout2.png)
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Container.prototype`.
+プロトタイプは `Container.prototype` から継承します。
 
 #### Events
 
-Same as for `container` object (see [Events](#container-events) in the section [Container Object](#container-object)), plus:
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照)。さらに次のプロパティを含みます。:
 
 **`onFitHorizontally(layout, width)`**
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `layout` | `object` | The `layout` object that triggered the event
-| `width` | `number` | The fitted width of the `layout` object, in pixels
+| `layout` | `object` | イベントをトリガーした `layout` オブジェクト
+| `width` | `number` | `layout` オブジェクトのフィットした幅（ピクセル単位）
 
-This event is triggered when the [fitted width](#fitted-size) of the `layout` object is calculated. Once this is triggered, the behavior can modify the coordinates of its contents. Returns the fitted width of the `layout` object, in pixels.
+このイベントは、`layout` オブジェクトの [fitted width](#fitted-size) が計算されたときにトリガーされます。これがトリガーされると、behaviorはそのコンテンツの座標を変更できます。`layout` オブジェクトの適合幅をピクセル単位で返します。
 
 ***
 
@@ -2615,10 +2612,10 @@ This event is triggered when the [fitted width](#fitted-size) of the `layout` ob
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `layout` | `object` | The `layout` object that triggered the event
-| `height` | `number` | The fitted height of the `layout` object, in pixels
+| `layout` | `object` | イベントをトリガーした `layout` オブジェクト
+| `height` | `number` | `layout` オブジェクトのフィットした高さ（ピクセル単位）
 
-This event is triggered when the [fitted height](#fitted-size) of the `layout` object is calculated. Once this is triggered, the behavior can modify the coordinates of its contents.  Returns the height of the `layout` object, in pixels.
+このイベントは、`layout` オブジェクトの [fitted height](#fitted-size) が計算されたときにトリガーされます。これがトリガーされると、behaviorはそのコンテンツの座標を変更できます。`layout` オブジェクトの高さをピクセル単位で返します。
 
 ***
 
@@ -2626,10 +2623,10 @@ This event is triggered when the [fitted height](#fitted-size) of the `layout` o
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `layout` | `object` | The `layout` object that triggered the event
-| `width` | `number` | The measured width of the `layout` object, in pixels
+| `layout` | `object` | イベントをトリガーした `layout` オブジェクト
+| `width` | `number` | `layout` オブジェクトの測定された幅（ピクセル単位）
 
-This event is triggered when the [measured width](#measured-size) of the `layout` object is calculated. Returns the measured width of the `layout` object, in pixels.
+このイベントは、`layout` オブジェクトの [measured width](#measured-size) が計算されたときにトリガーされます。`layout` オブジェクトの測定された幅をピクセル単位で返します。
 
 ***
 
@@ -2637,32 +2634,32 @@ This event is triggered when the [measured width](#measured-size) of the `layout
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `layout` | `object` | The `layout` object that triggered the event
-| `height` | `number` | The measured height of the `layout` object, in pixels
+| `layout` | `object` | イベントをトリガーした `layout` オブジェクト
+| `height` | `number` | `layout` オブジェクトの測定された高さ（ピクセル単位）
 
-This event is triggered when the [measured height](#measured-size) of the `layout` object is calculated. Returns the measured height of the `layout` object, in pixels.
+このイベントは、`layout` オブジェクトの [measured height](#measured-size) が計算されたときにトリガーされます。`layout` オブジェクトの測定された高さをピクセル単位で返します。
 
 ***
 
-### Port Object
+### Portオブジェクト
 
 - **Source code:** [`piuPort.c`][10]
 - **Relevant Examples:** [countdown][25], [list][26], [spinner][27]
 
-The `port` object is a `content` object that delegates drawing to a script in its behavior that draws using simple Piu graphics commands.
+`port` オブジェクトは、単純な Piu グラフィック コマンドを使用して描画する動作で、描画をスクリプトに移譲する `content` オブジェクトです。
 
-The `port` object has a clip rectangle (initially the bounds of the `port` object) that affects all drawing.
+`port` オブジェクトには、すべての描画に影響するClip Rectangle (最初は `port` オブジェクトの境界) があります。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Port([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this content's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result. The dictionary is the same as for the `content` object. Only parameters specified in the [Dictionary](#content-dictionary) section of the [Content Object](#container-object) will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `port` instance, an object that inherits from `Port.prototype`
+`Port.prototype` から継承したオブジェクトである `port` インスタンスを返します。
 
 ```javascript
 let samplePort = new Port(null, {
@@ -2683,9 +2680,9 @@ application.add(samplePort);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Port.prototype`. The `prototype` property of the result is `Port.prototype`. The result also provides a `template` function.
+`Port.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Port.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let SamplePort = Port.template($ => ({
@@ -2711,9 +2708,9 @@ application.add(new SamplePort(["blue", "red", "black"]));
 
 ![](../assets/piu/samplePort2.png)
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Content.prototype`.
+プロトタイプは `Content.prototype` から継承します。
 
 <a id="port-functions"></a>
 ##### Functions
@@ -2722,9 +2719,9 @@ Prototype inherits from `Content.prototype`.
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `x, y, width, height` | `number` | The local position and size of the area in which to draw, in pixels
+| `x, y, width, height` | `number` | 描画する領域のローカル位置とサイズ（ピクセル単位）
 
-Draws this port's skin in the position specified
+指定された位置にこのポートのスキンを描画します
 
 ```javascript
 let heartSkin = new Skin({
@@ -2758,10 +2755,10 @@ application.add(samplePort);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `string ` | `string ` | The string to draw
-| `x, y, width, height` | `number` | The local position and size of the area in which to draw, in pixels
+| `string ` | `string ` | 描画する文字列
+| `x, y, width, height` | `number` | 描画する領域のローカル位置とサイズ（ピクセル単位）
 
-Draws the string the way a label instance would, with the style of this port
+このポートのスタイルで、`label`インスタンスと同じように文字列を描画します。
 
 ```javascript
 let sampleStyle = new Style({ font:"600 28px Open Sans", color: "red" });
@@ -2787,12 +2784,12 @@ application.add(samplePort);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `skin ` | `skin ` | The skin to draw
-| `x, y, width, height` | `number` | The local position and size of the area in which to draw, in pixels
-| `variant` | `number` | The variant of the skin to draw. If the specified skin defines variants, setting the variant changes the appearance.
-| `state` | `number` | The state of the skin to draw. If the specified skin defines states, setting the state changes the appearance.
+| `skin ` | `skin ` | 描画するスキン
+| `x, y, width, height` | `number` | 描画する領域のローカル位置とサイズ（ピクセル単位）
+| `variant` | `number` | 描画するスキンのバリアント。指定されたスキンがバリアントを定義している場合、バリアントを設定すると外観が変わります。
+| `state` | `number` | 描画するスキンの状態。指定されたスキンが状態を定義している場合、状態を設定すると外観が変わります。
 
-Draws the skin the way a `content` instance would, with the state, variant, and position specified.
+状態、バリアント、位置を指定して、`content` インスタンスと同じようにスキンを描画します。
 
 ```javascript
 let heartSkin = new Skin({
@@ -2821,12 +2818,12 @@ application.add(samplePort);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `string` | `string` | The string to draw
-| `style` | `style` | The style to use to draw the string
-| `color` | `string` | The color to draw the string, as a string of the form specified in the [Color](#color) section of this document
-| `x, y, width, height` | `number` | The local position and size of the area in which to draw, in pixels
+| `string` | `string` | 描画する文字列
+| `style` | `style` | 文字列を描画するために使用するスタイル
+| `color` | `string` | 文字列を描画する色。このドキュメントの[Color](#color)セクションで指定された形式の文字列です。
+| `x, y, width, height` | `number` | 描画する領域のローカル位置とサイズ（ピクセル単位）
 
-Draws the string the way a `label` instance would, with the style, color, and position specified.
+指定されたスタイル、色、位置を使用して、`label` インスタンスと同じように文字列を描画します。
 
 ```javascript
 let sampleStyle = new Style({ font:"600 28px Open Sans"});
@@ -2851,13 +2848,13 @@ application.add(samplePort);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `string` | `string` | The string to draw
-| `style` | `style` | The style to use to draw the string
-| `x, y, width, height` | `number` | The local position and size of the area in which to draw, in pixels
-| `ellipsis` | `boolean` | If `true`, the string is truncated to fit the specified bounds. If `false`, the entire string is drawn, even if it extends beyond the specified bounds.
-| `state` | `number` | The state of the style to draw. If the specified style has multiple fill colors, setting the state selects which color to use.
+| `string` | `string` | 描画する文字列
+| `style` | `style` | 文字列を描画するために使用するスタイル
+| `x, y, width, height` | `number` | 描画する領域のローカル位置とサイズ（ピクセル単位）
+| `ellipsis` | `boolean` | `true` の場合、文字列は指定された境界に収まるように切り捨てられます。 `false` の場合、指定された境界を超えていても文字列全体が描画されます。
+| `state` | `number` | 描画するスタイルの状態。指定されたスタイルに複数の塗りつぶし色がある場合は、状態を設定することで使用する色が選択されます。
 
-Draws a string with the style, position, and state specified.
+指定されたスタイル、位置、状態で文字列を描画します。
 
 ```javascript
 let sampleStyle = new Style({ font:"600 28px Open Sans", color: ["red", "yellow", "green", "blue"] });
@@ -2888,12 +2885,12 @@ application.add(samplePort);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `texture` | `texture` | The texture to draw
-| `color` | `string` | If the texture has only an alpha bitmap, the value of the `color` property will be used to colorize the bitmap. Must be a string of the form specified in the [Color](#color) section of this document.
-| `x, y` | `number` | The local position and size of the area in which to draw, in pixels
-| `sx, sy, sw, sh` | `number` | The source area--the position and size of the area to copy pixels from, in pixels. The default is the entire image.  
+| `texture` | `texture` | 描画するテクスチャ
+| `color` | `string` | テクスチャにアルファ ビットマップのみが含まれている場合、ビットマップをカラー化するために `color` プロパティの値が使用されます。このドキュメントの [Color](#color) セクションで指定されている形式の文字列である必要があります。
+| `x, y` | `number` | 描画する領域のローカル位置とサイズ（ピクセル単位）
+| `sx, sy, sw, sh` | `number` | ソース領域 - ピクセルをコピーする領域の位置とサイズ (ピクセル単位)。デフォルトは画像全体です。 
 
-Draws the image referenced by the texture.
+テクスチャによって参照されるイメージを描画します。
 
 ```javascript
 let ballTexture = new Texture("balls.png");
@@ -2921,10 +2918,10 @@ application.add(samplePort);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `color` | `string` | The color to draw the image in, as a string of the form specified in the [Color](#color) section of this document
-| `x, y, width, height` | `number` | The local position and size of the area to fill, in pixels
+| `color` | `string` | 画像を描画する色。このドキュメントの[Color](#color)セクションで指定された形式の文字列です。
+| `x, y, width, height` | `number` | 塗りつぶす領域のローカル位置とサイズ（ピクセル単位）
 
-Fills the area with the color specified.
+指定された色で領域を塗りつぶします。
 
 ```javascript
 let samplePort = new Port(null, {
@@ -2948,11 +2945,11 @@ application.add(samplePort);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `texture ` | `texture` | The filling image
-| `x, y, width, height` | `number` | The destination area--the local position and size of the area to copy pixels to, in pixels
-| `sx, sy, sw, sh` | `number` | The source area--the position and size of the area to copy pixels from, in pixels.
+| `texture ` | `texture` | 塗りつぶしに使用する画像
+| `x, y, width, height` | `number` | コピー先領域 - ピクセルをコピーする領域のローカル位置とサイズ（ピクセル単位）
+| `sx, sy, sw, sh` | `number` | ソース領域 - ピクセルをコピーする領域の位置とサイズ (ピクセル単位)。
 
-Fills the area with the image. The source area of the image is repeated to cover the destination area.
+領域を画像で塗りつぶします。画像のソース領域が繰り返され、目的の領域がカバーされます。
 
 ```javascript
 let alphaHeartTexture = new Texture("heart.png");
@@ -2980,9 +2977,9 @@ application.add(samplePort);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `x, y, width, height` | `number` | The local position and size of the area to invalidate, in pixels
+| `x, y, width, height` | `number` | 無効化する領域のローカル位置とサイズ（ピクセル単位）
 
-Invalidates the specified area of this port (or the entire port if no area is specified), which triggers the `onDraw` event.
+このポートの指定された領域 (領域が指定されていない場合はポート全体) を無効にして、`onDraw` イベントをトリガーします。
 
 ```javascript
 let samplePort = new Port(null, {
@@ -3012,10 +3009,10 @@ application.add(samplePort);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `string` | `string` | The string to measure
-| `style` | `style` | The style to use when measuring the string
+| `string` | `string` | 測定する文字列
+| `style` | `style` | 文字列を測定するときに使用するスタイル
 
-Measures the string the way a `label` instance would, with the style specified
+指定されたスタイルで、`label`インスタンスと同じように文字列を測定します。
 
 ```javascript
 let sampleStyle = new Style({ font:"600 28px Open Sans"});
@@ -3048,7 +3045,7 @@ application.add(samplePort);
 
 **`popClip()`**
 
-Restores the current clip rectangle from this port's clip rectangles stack
+このポートのクリップ矩形スタックから現在のクリップ矩形を復元します
 
 ***
 
@@ -3056,9 +3053,9 @@ Restores the current clip rectangle from this port's clip rectangles stack
 
 | Argument | Type | Description |
 | --- | --- | ---
-| `x, y, width, height` | `number` | The local position and size of the clip rectangle
+| `x, y, width, height` | `number` | クリップ矩形のローカル位置とサイズ
 
-Saves the specified clip rectangle to this port's clip rectangles stack
+指定されたクリップ矩形をこのポートのクリップ矩形スタックに保存します
 
 ```javascript
 let alphaHeartTexture = new Texture("heart.png");
@@ -3084,35 +3081,36 @@ application.add(samplePort);
 <a id="port-events"></a>
 #### Events
 
-Same as for `content` object (see [Events](#content-events) in the section [Content Object](#content-object)), plus:
+Same as for `content` object (see [Events](#content-events) in the section [Contentオブジェクト](#content-object)), plus:
+
+`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Events](#content-events) を参照)。さらに次のプロパティを含みます。
 
 **`onDraw(port, x, y, width, height)`**
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `port` | `port` |The `port` object that triggered the event
-| `x, y, width, height` | `number` | The local position and size of the area to draw, in pixels
+| `port` | `port` |イベントをトリガーした`port`オブジェクト
+| `x, y, width, height` | `number` | 描画する領域のローカル位置とサイズ（ピクセル単位）
 
-This event is triggered when the specified `port` object needs to update the area (when it's invalidated).
+このイベントは、指定された `port` オブジェクトが領域を更新する必要があるとき (無効化されているとき) にトリガーされます。
 
-### Row Object
+### Rowオブジェクト
 
 - **Source code:** [`piuRow.c`][11]
 - **Relevant Examples:** N/A
 
-The `row` object is a `container` object that arranges its contents horizontally.
+`row` オブジェクトは、その内容を水平に配置する `container` オブジェクトです。
 
-
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Row([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this content's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result. The dictionary is the same as for the `content` object. Only parameters specified in the [Dictionary](#content-dictionary) section of the [Content Object](#container-object) will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。辞書は `content` オブジェクトの場合と同じです。[Contentオブジェクト](#container-object) の [Dictionary](#content-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `row` instance, an object that inherits from `Row.prototype`
+`Row.prototype` から継承したオブジェクトである `row` インスタンスを返します。
 
 ```javascript
 let sampleRow = new Row(null, {
@@ -3132,9 +3130,9 @@ application.add(sampleRow);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Row.prototype`. The `prototype` property of the result is `Row.prototype`. The result also provides a `template` function.
+`Row.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Row.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -3154,32 +3152,32 @@ application.add(new SampleRow({ firstColor:"red", secondColor:"blue" }));
 
 ![](../assets/piu/sampleRow2.png)
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Container.prototype`.
+プロトタイプは `Container.prototype` から継承します。
 
 <a id="row-events"></a>
 #### Events
 
-Same as for `container` object (see [Events](#container-events) in the section [Container Object](#container-object))
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照してください)
 
-### Scroller Object
+### Scrollerオブジェクト
 
 - **Source code:** [`piuScroller.c`][12]
 - **Relevant Examples:** [scroller][32], [list][26]
 
-The `scroller` object is a `container` object that scrolls its first `content` object horizontally and vertically.
+`scroller` オブジェクトは、最初の `content` オブジェクトを水平方向および垂直方向にスクロールする `container` オブジェクトです。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Scroller([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this content's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#scroller-dictionary) section below will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#scroller-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `scroller` instance, an object that inherits from `Scroller.prototype`
+`Scroller.prototype` から継承したオブジェクトである `scroller` インスタンスを返します。
 
 ```javascript
 import { VerticalScrollerBehavior } from "scroller";	// See "scroller.js" from the scroller example
@@ -3212,9 +3210,9 @@ application.add(scrollerSample);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Scroller.prototype`. The `prototype` property of the result is `Scroller.prototype`. The result also provides a `template` function.
+`Scroller.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Scroller.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 import { VerticalScrollerBehavior } from "scroller";	// See "scroller.js" from the scroller example
@@ -3251,24 +3249,24 @@ application.add(screenWithScrollerSample);
 <a id="scroller-dictionary"></a>
 #### Dictionary
 
-Same as for `container` object (see [Dictionary](#container-dictionary) in the section [Container Object](#container-object)), plus:
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Dictionary](#container-dictionary) を参照)。さらに次のプロパティを含みます。
 
 | Parameter | Type | Definition |
 | --- | --- | :--- |
-| `loop` | `boolean` | If `true`, this scroller will loop its first `content` object
+| `loop` | `boolean` | `true`の場合、このスクロールバーは最初の`content`オブジェクトをループします。
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Container.prototype`.
+プロトタイプは `Container.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
-| `constraint` | `object` | | ✓| The constrained scroll offsets of this scroller, as an object with `x` and `y` number properties. The scroll offsets when this scroller is tracking may be different from the constrained scroll offsets.
-| `loop` | `boolean` | `false` | | If `true`, this content will restart its clock when its time equals its duration
-| `scroll` | `object` | | |  The scroll offsets of this scroller, as an object with `x` and `y` number properties, specified in pixels
-| `tracking` | `boolean` | `false` | | If `true`, this scroller is tracking. When tracking, the scroller does not constrain its scroll offsets.
+| `constraint` | `object` | | ✓| このスクローラーの制約されたスクロール オフセット (`x` および `y` 数値プロパティを持つオブジェクト)。このスクローラーが追跡しているときのスクロール オフセットは、制約されたスクロール オフセットとは異なる場合があります。
+| `loop` | `boolean` | `false` | | `true` の場合、このコンテンツは、その時間が継続時間と等しくなったときにクロックを再開します。
+| `scroll` | `object` | | |  このスクロールバーのスクロール オフセット。ピクセル単位で指定された `x` および `y` 数値プロパティを持つオブジェクトとして表されます。
+| `tracking` | `boolean` | `false` | | `true` の場合、このスクローラーは追跡しています。追跡中、スクローラーはスクロール オフセットを制限しません。
 
 ##### Functions
 
@@ -3276,9 +3274,9 @@ Prototype inherits from `Container.prototype`.
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `bounds` | `object` | The local position and size of the area to reveal, as an object with `x`, `y`, `width`, and `height` properties, specified in pixels
+| `bounds` | `object` | 表示する領域のローカル位置とサイズ。ピクセル単位で指定された `x`、`y`、`width`、`height` プロパティを持つオブジェクトとして指定します。
 
-Scrolls this scroller to reveal the specified area
+このスクローラーをスクロールして指定された領域を表示します
 
 ```javascript
 class SampleScrollerBehavior extends Behavior {
@@ -3321,9 +3319,9 @@ application.add(scrollerSample);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dx, dy` | `number` | The deltas by which to scroll this scroller, in pixels
+| `dx, dy` | `number` | このスクローラーをスクロールするデルタ（ピクセル単位）
 
-Adds the deltas to the scroll offsets of this scroller
+このスクロールバーのスクロールオフセットにデルタを追加します
 
 ```javascript
 class SampleScrollerBehavior extends Behavior {
@@ -3369,9 +3367,9 @@ application.add(scrollerSample);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `x, y` | `number` | The offsets to which to scroll this scroller, in pixels
+| `x, y` | `number` | このスクローラーをスクロールするオフセット（ピクセル単位）
 
-Changes the scroll offsets of this scroller
+このスクロールバーのスクロールオフセットを変更します
 
 ```javascript
 let ColoredSquare = Content.template($ => ({
@@ -3415,34 +3413,34 @@ application.add(scrollerSample);
 <a id="scroller-events"></a>
 #### Events
 
-Same as for `container` object (see [Events](#container-events) in the section [Container Object](#container-object)), plus:
+`container` オブジェクトの場合と同じです ([Containerオブジェクト](#container-object) セクションの [Events](#container-events) を参照)。さらに次のプロパティを含みます。
 
 ##### `onScrolled(scroller)`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `scroller` | `scroller` | The `scroller` object that triggered the event
+| `scroller` | `scroller` | イベントをトリガーした `scroller` オブジェクト
 
-This event is triggered when the specified `scroller` object scrolls.
+このイベントは、指定された `scroller` オブジェクトがスクロールしたときにトリガーされます。
 
-When triggered by a scroller, this event is also triggered by all the contents of the scroller. This makes it easier to implement scrollbars, for example.
+スクローラーによってトリガーされると、このイベントはスクローラーのすべてのコンテンツによってもトリガーされます。これにより、たとえばスクロールバーの実装が容易になります。
 
-### Skin Object
+### Skinオブジェクト
 
 - **Source code:** [`piuSkin.c`][13]
 - **Relevant Examples:** [balls][18], [cards][24], [drag][19]
 
-The `skin` object defines the appearance of `content` objects. It can draw or fill `content` objects with portions of `texture` objects or fill or stroke `content` objects with colors.
+`skin` オブジェクトは `content` オブジェクトの外観を定義します。`texture` オブジェクトの一部を使用して `content` オブジェクトを描画または塗りつぶしたり、色を使用して `content` オブジェクトを塗りつぶしたりストロークしたりできます。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Skin([dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#skin-dictionary) section below will have an effect; other parameters will be ignored.
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#skin-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `skin` instance, an object that inherits from `Skin.prototype`
+`Skin.prototype` から継承したオブジェクトである `skin` インスタンスを返します。
 
 ```javascript
 // Texture skin
@@ -3469,9 +3467,9 @@ application.add(borderedContent);
 
 | Arguments | Type | Description
 | --- | --- | ---
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#skin-dictionary) section below will have an effect; other parameters will be ignored.
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#skin-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a constructor, a function that creates instances of `Skin.prototype`. The `prototype` property of the result is `Skin.prototype`.
+`Skin.prototype` のインスタンスを作成する関数であるコンストラクターを返します。戻り値の `prototype` プロパティは `Skin.prototype` です。
 
 ```javascript
 // Texture skin
@@ -3497,84 +3495,84 @@ application.add(borderedContent);
 <a id="skin-dictionary"></a>
 #### Dictionary
 
-If there is a `texture` or `Texture` property in the dictionary, the constructor returns a texture skin, otherwise the constructor returns a color skin.
+辞書に `texture` または `Texture` プロパティがある場合、コンストラクタはテクスチャ スキンを返します。それ以外の場合は、コンストラクタはカラー スキンを返します。
 
 **Texture skins only**
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `bottom` | `number` | The skin's bottom tile (setting the `bottom` parameter in the created instance, and `bottom` in the created instance's `tiles` property)
-| `color` | `string` or `array` | If the texture has only an alpha bitmap, the value of the `color` property will be used to colorize the bitmap. Must be a string or array of strings of the form specified in the [Color](#color) section of this document.
-| `left` | `number` | The skin's left tile (setting the `left` parameter in the created instance, and `left` in the created instance's `tiles` property)
-| `right` | `number` | The skin's right tile (setting the `right` parameter in the created instance, and `right` in the created instance's `tiles` property)
-| `states` | `number` | This skin's vertical offset between states, in pixels
-| `texture` | `texture` | This skin's texture
-| `Texture` | `function` | A function that creates instances of `Texture.prototype`. This skin will create an instance of this `texture`, and seet its `texture` parameter to the created instance.
-| `tiles` | `object` |  This skin's tiles, as an object with `left`, `right`, `top`, or `bottom` number properties, specified in pixels. See [Tiles](#tiles) for more information.
-| `top` | `number` | The skin's top tile (setting the `top` parameter in the created instance, and `top` in the created instance's `tiles` property)
-| `variants` | `number` | This skin's horizontal offset between variants, in pixels
-| `x, y, width, height` | `number` | The portion of the `texture` object to extract, in pixels (setting the created instance's `bounds`, `width`, and `height` properties)
+| `bottom` | `number` | スキンの下部タイル (作成されたインスタンスの `bottom` パラメータと、作成されたインスタンスの `tiles` プロパティの `bottom` を設定します)
+| `color` | `string` or `array` | テクスチャにアルファ ビットマップのみが含まれている場合、ビットマップをカラー化するために `color` プロパティの値が使用されます。このドキュメントの [Color](#color) セクションで指定されている形式の文字列または文字列の配列である必要があります。
+| `left` | `number` | スキンの左タイル（作成されたインスタンスの `left` パラメータと、作成されたインスタンスの `tiles` プロパティの `left` を設定します）
+| `right` | `number` | スキンの右タイル (作成されたインスタンスの `right` パラメータと、作成されたインスタンスの `tiles` プロパティの `right` を設定します)
+| `states` | `number` | このスキンの状態間の垂直オフセット（ピクセル単位）
+| `texture` | `texture` | このスキンのテクスチャ
+| `Texture` | `function` | `Texture.prototype` のインスタンスを作成する関数。このスキンは、この `texture` のインスタンスを作成し、作成されたインスタンスに `texture` パラメータを設定します。
+| `tiles` | `object` |  このスキンのタイルは、ピクセル単位で指定された `left`、`right`、`top`、または `bottom` 数値プロパティを持つオブジェクトです。詳細については、[Tiles](#tiles) を参照してください。
+| `top` | `number` | スキンのトップタイル（作成されたインスタンスの `top` パラメータと、作成されたインスタンスの `tiles` プロパティの `top` を設定します）
+| `variants` | `number` | このスキンのバリアント間の水平オフセット（ピクセル単位）
+| `x, y, width, height` | `number` | 抽出する `texture` オブジェクトの部分 (ピクセル単位) (作成されたインスタンスの `bounds`、`width`、および `height` プロパティを設定します)
 
 **Color skins only**
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `borders` | `object` | The borders to stroke `content` objects with, as an object with `left`, `right`, `top`, or `bottom` number properties, specified in pixels. The default is no borders.
-| `fill` | `string` or `array` | The color(s) to fill `content` objects with, as a string or an `array` of strings of the form specified in the [Color](#color) section of this document.
-| `stroke` | `string` or `array` | This skin's stroke color(s), as a string or an `array` of strings of the form specified in the [Color](#color) section of this document.
+| `borders` | `object` | `content` オブジェクトを囲む境界線。ピクセル単位で指定された `left`、`right`、`top`、または `bottom` 数値プロパティを持つオブジェクトです。デフォルトでは境界線はありません。
+| `fill` | `string` or `array` | `content` オブジェクトを塗りつぶす色。このドキュメントの [Color](#color) セクションで指定された形式の文字列または文字列の `array` として指定します。
+| `stroke` | `string` or `array` | このスキンのストロークの色。このドキュメントの[Color](#color)セクションで指定された形式の文字列または文字列の配列です。
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Object.prototype`.
+プロトタイプは `Object.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
-All properties of a `skin` object are read-only, but you can change the style of content objects at any time.
+`skin` オブジェクトのすべてのプロパティは読み取り専用ですが、コンテンツ オブジェクトのスタイルはいつでも変更できます。
 
 **Texture Skins**
 
 | Name | Type | Default Value | Description |
 | --- | --- | --- | --- |
-| `bottom` | `number` | 0 | The skin's bottom tile
-| `color` | `string` | | If the texture has only an alpha bitmap, the value of the `color` property will be used to colorize the bitmap. Must be a string or array of strings of the form specified in the [Color](#color) section of this document.
-| `bounds` | `object` | | The portion of the `texture` object to extract, as an object with `x`, `y`, `width`, and `height` number properties, specified in pixels
-| `height` | `number` | | This skin's height, in pixels
-| `left` | `number` | 0 | The skin's left tile
-| `right` | `number` | 0 | The skin's right tile
-| `states` | `number` | `undefined` | This skin's vertical offset between states, in pixels
-| `texture` | `texture` | | This skin's texture
-| `tiles` | `object` | `undefined` | This skin's tiles, as an object with `left`, `right`, `top`, and `bottom` number properties, specified in pixels
-| `top` | `number` | 0 | The skin's top tile
-| `variants` | `number` | `undefined` | This skin's horizontal offset between variants, in pixels
-| `width` | `number` | | This skin's width, in pixels
+| `bottom` | `number` | 0 | スキンの下部タイル
+| `color` | `string` | | テクスチャにアルファ ビットマップのみが含まれている場合、ビットマップをカラー化するために `color` プロパティの値が使用されます。このドキュメントの [Color](#color) セクションで指定されている形式の文字列または文字列の配列である必要があります。
+| `bounds` | `object` | | `texture` オブジェクトから抽出する部分。`x`、`y`、`width`、`height` の数値プロパティを持つオブジェクトとして、ピクセル単位で指定します。
+| `height` | `number` | | このスキンの高さ（ピクセル単位）
+| `left` | `number` | 0 | スキンの左タイル
+| `right` | `number` | 0 | スキンの右タイル
+| `states` | `number` | `undefined` | このスキンの状態間の垂直オフセット（ピクセル単位）
+| `texture` | `texture` | | このスキンのテクスチャ
+| `tiles` | `object` | `undefined` | このスキンのタイルは、ピクセル単位で指定された `left`、`right`、`top`、`bottom` 数値プロパティを持つオブジェクトとして表されます。
+| `top` | `number` | 0 | スキンのトップタイル
+| `variants` | `number` | `undefined` | このスキンのバリエーション間の水平オフセット（ピクセル単位）
+| `width` | `number` | | このスキンの幅（ピクセル単位）
 
 **Color Skins**
 
 | Name | Type | Default Value | Description |
 | --- | --- | --- | --- |
-| `borders` | `object` | `{left: 0, right: 0, top: 0, bottom: 0}` | This skin's borders, as an object with `left`, `right`, `top`, and `bottom` number properties, specified in pixels
-| `fill` | `object` | | This skin's fill color(s), as an `array` of strings of the form specified in the [Color](#color) section of this document.<BR><BR>The `state` property of the `content` object using the skin determines the index of the array; if `state` is not an integer, colors from surrounding states are blended. If specified as one string instead of an array, it is treated as an array with a single item. The default fill color is `transparent`.
-| `stroke` | `object` | |This skin's stroke color(s), as an `array` of strings of the form specified in the [Color](#color) section of this document.<BR><BR>The `state` property of the `content` object using the skin determines the index of the array; if `state` is not an integer, colors from surrounding states are blended. If specified as one string instead of an array, it is treated as an array with a single item. The default stroke color is `transparent`.
+| `borders` | `object` | `{left: 0, right: 0, top: 0, bottom: 0}` | このスキンの境界は、ピクセル単位で指定された `left`、`right`、`top`、`bottom` 数値プロパティを持つオブジェクトとして表されます。
+| `fill` | `object` | | このスキンの塗りつぶし色は、このドキュメントの [Color](#color) セクションで指定された形式の文字列の `配列` です。<BR><BR>スキンを使用する `content` オブジェクトの `state` プロパティによって配列のインデックスが決まります。`state` が整数でない場合は、周囲の状態の色がブレンドされます。配列ではなく 1 つの文字列として指定された場合は、1 つの項目を持つ配列として扱われます。デフォルトの塗りつぶし色は `transparent` です。
+| `stroke` | `object` | |このスキンのストロークの色は、このドキュメントの [Color](#color) セクションで指定された形式の文字列の `配列` です。<BR><BR>スキンを使用する `content` オブジェクトの `state` プロパティによって配列のインデックスが決まります。`state` が整数でない場合は、周囲の状態の色がブレンドされます。配列ではなく 1 つの文字列として指定された場合は、1 つの項目を持つ配列として扱われます。デフォルトのストロークの色は `transparent` です。
 
 ***
 
-### Sound Object
+### Soundオブジェクト
 
 - **Source code:** [`piuSound.c`][37]
 - **Relevant Examples:** [sound][38]
 
-The `Sound` object plays audio using the [`AudioOut` class](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/pins/audioout.md). It may be used to play all or part of an audio resource once or repeatedly. The `Sound` object is designed to play short sounds to provide audible feedback for user actions. Use the `AudioOut` class directly for other audio playback needs.
+`Sound` オブジェクトは、[`AudioOut` class](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/pins/audioout.md) を使用してオーディオを再生します。オーディオ リソースの全体または一部を 1 回または繰り返し再生するために使用できます。`Sound` オブジェクトは、ユーザーの操作に対する音声フィードバックを提供するために短いサウンドを再生するように設計されています。その他のオーディオ再生のニーズには、`AudioOut` クラスを直接使用してください。
 
-#### Constructor Description
-A separate instance of the Sound class is created for each audio resource to be played.
+#### コンストラクタの説明
+再生されるオーディオ リソースごとに、Sound クラスの個別のインスタンスが作成されます。
 
 ##### `Sound(dictionary)`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#sound-dictionary) section below have an effect; other parameters are ignored.
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#sound-dictionary) セクションで指定されたパラメータのみが効果を持ち、他のパラメータは無視されます。
 
-Returns a `sound` instance, an object that inherits from `Sound.prototype`
+`Sound.prototype` から継承したオブジェクトである `sound` インスタンスを返します。
 
 ```javascript
 let sampleSound = new Sound({ path: "piano.wav" });
@@ -3585,30 +3583,30 @@ let sampleSound = new Sound({ path: "piano.wav" });
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `path` | `string` | The name of the resource containing the audio audio.
-| `offset` | `number` | The number of samples into the audio to begin playback. If not specified, playback begins with the first sample.
-| `size` | `number` | The number of samples to play. If not specified, playback continues to the end of the audio resource.
+| `path` | `string` | オーディオを含むリソースの名前。
+| `offset` | `number` | 再生を開始するオーディオのサンプル数。指定しない場合は、最初のサンプルから再生が始まります。
+| `size` | `number` | 再生するサンプルの数。指定しない場合は、オーディオ リソースの最後まで再生が続行されます。
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Object.prototype`.
+プロトタイプは `Object.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
-All properties are static. The default values for the `bitsPerSample`, `numChannels`, and `sampleRate` properties reflect the configuration of the `AudioOut` module.
+すべてのプロパティは静的です。`bitsPerSample`、`numChannels`、および `sampleRate` プロパティのデフォルト値は、`AudioOut` モジュールの構成を反映します。
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
-| `bitsPerSample` | `number ` | | ✓ | The number of bits (either 8 or 16) for audio playback.
-| `numChannels` | `number ` | | ✓ |  The number of channels for audio playback.
-| `sampleRate` | `number` | | ✓ | The number of samples per second for audio playback.
-| `volume` | `number` | 1 | | The volume of sounds; values range from 0 for silent, to 1 for full volume
+| `bitsPerSample` | `number ` | | ✓ | オーディオ再生のビット数 (8 または 16)。
+| `numChannels` | `number ` | | ✓ |  オーディオ再生のチャンネル数。
+| `sampleRate` | `number` | | ✓ | オーディオ再生の 1 秒あたりのサンプル数。
+| `volume` | `number` | 1 | | 音量。値の範囲は、無音の場合は 0、最大音量の場合は 1 です。
 
 ##### Functions
 
 **`static close() `**
 
-Stops any sounds that are playing and closes the `AudioOut` instance used by the `Sound` object. Instances of the `Sound` class are not closed or otherwise affected by this call.
+再生中のサウンドをすべて停止し、`Sound` オブジェクトによって使用される `AudioOut` インスタンスを閉じます。`Sound` クラスのインスタンスはこの呼び出しによって閉じられたり、その他の影響を受けたりすることはありません。
 
 ```javascript
 Sound.close();
@@ -3620,11 +3618,11 @@ Sound.close();
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `stream` | `number` | The stream to play the sound on. Defaults to `0`.
-| `repeat` | `number` | The number of times to repeat the sound. Defaults to `1`. Set the `repeat` property to `Infinity` to repeat the sound indefinitely.
-| `callback` | `function` | An optional callback function to invoke after the audio resource completes playback.
+| `stream` | `number` | サウンドを再生するストリーム。デフォルトは `0` です。
+| `repeat` | `number` | サウンドを繰り返す回数。デフォルトは `1` です。サウンドを無期限に繰り返すには、`repeat` プロパティを `Infinity` に設定します。
+| `callback` | `function` | オーディオ リソースの再生が完了した後に呼び出すオプションのコールバック関数。
 
-Plays the audio sample on the specified stream `repeat` times. If the `callback` parameter is provided, it is invoked after playback of the audio completes.
+指定されたストリームでオーディオ サンプルを `repeat` 回再生します。`callback` パラメータが指定されている場合は、オーディオの再生が完了した後に呼び出されます。
 
 ```javascript
 // Play sampleSound once
@@ -3641,22 +3639,22 @@ sampleSound.play(0, 1, () => {
 
 ***
 
-### Style Object
+### Styleオブジェクト
 
 - **Source code:** [`piuStyle.c`][14]
 - **Relevant Examples:** [text][28]
 
-The `style` object defines the appearance of strings in `label` and `text` objects. Styles can be inherited from those of containing objects. For more information, see the [Cascading Styles](#cascading-styles) section below.
+`style` オブジェクトは、`label` オブジェクトと `text` オブジェクト内の文字列の外観を定義します。スタイルは、それを含むオブジェクトのスタイルから継承できます。詳細については、以下の [Cascading Styles](#cascading-styles) セクションを参照してください。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Style(dictionary)`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#style-dictionary) section below will have an effect; other parameters will be ignored.
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#style-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns `style` instance, an object that inherits from `Style.prototype`
+`Style.prototype` から継承したオブジェクトである `style` インスタンスを返します。
 
 ```javascript
 let sampleStyle = new Style({ font:"600 28px Open Sans", color: "blue" });
@@ -3674,9 +3672,9 @@ application.add(sampleLabel)
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#style-dictionary) section below will have an effect; other parameters will be ignored.
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#style-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a constructor, a function that creates instances of `Style.prototype`. The `prototype` property of the result is `Style`. The result also provides a `template` function.
+`Style.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Style` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let RedStyle = Style.template({ font:"600 28px Open Sans", color: "red" });
@@ -3704,57 +3702,57 @@ application.add(sampleLabel2);
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `bottom` | `number` | This style's bottom margin, in pixels (setting the `bottom` property of the created instance, and `bottom` in the created instance's `margins` property)
-| `leading` | `number` | This style's line height, or "leading"--the distance between lines of a block, in pixels. If 0 or unspecified, it is automatically calculated. Use a negative value to force a distance even if lines overlap.
-| `left` | `number` | This style's left margin, in pixels (setting the `left` property of the created instance, and `left` in the created instance's `margins` property)
-| `right` | `number` | This style's right margin, in pixels (setting the `right` property of the created instance, and `right` in the created instance's `margins` property)
+| `bottom` | `number` | このスタイルの下余白 (ピクセル単位) (作成されたインスタンスの `bottom` プロパティと、作成されたインスタンスの `margins` プロパティの `bottom` を設定します)
+| `leading` | `number` | このスタイルの行の高さ、または「リーディング」 (ブロックの行間の距離) (ピクセル単位)。0 または指定されていない場合は、自動的に計算されます。行が重なっていても距離を強制するには、負の値を使用します。
+| `left` | `number` | このスタイルの左余白 (ピクセル単位) (作成されたインスタンスの `left` プロパティと、作成されたインスタンスの `margins` プロパティの `left` を設定します)
+| `right` | `number` | このスタイルの右余白 (ピクセル単位) (作成されたインスタンスの `right` プロパティと、作成されたインスタンスの `margins` プロパティの `right` を設定します)
 
 <!-- TO DO:
-| `indentation` | `number` | This style's indentation--the indentation of the first line of a block, in pixels
+| `indentation` | `number` | このスタイルのインデント - ブロックの最初の行のインデント（ピクセル単位）
 -->
 
 ##### Label styles only
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `vertical` | `string` | This style's vertical alignment, as `top`, `middle` (the default), or `bottom`
+| `vertical` | `string` | このスタイルの垂直方向の配置は、`top`、`middle`（デフォルト）、`bottom` のいずれかです。
 
 ##### Text and Label styles
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `color` | `string` or `array` | This style's color(s), as a string or an `array` of strings of the form specified in the [Color](#color) section of this document
-| `font` | `string` | This style's font, as a string of the form specified in the [Cascading Styles](#cascading-styles) section of this document (setting the `style`, `weight`, `stretch`, `size`, and `family` properties of the created instance)
-| `horizontal` | `string` | This style's horizontal alignment, as `left`, `center` (the default), `right`, or `justify`
-| `top` | `number` | This style's top margin, in pixels (setting the `top` property of the created instance, and `top` in the created instance's `margins` property)
+| `color` | `string` or `array` | このスタイルの色。このドキュメントの [Color](#color) セクションで指定された形式の文字列または文字列の `array` として表されます
+| `font` | `string` | このスタイルのフォント。このドキュメントの [Cascading Styles](#cascading-styles) セクションで指定された形式の文字列として表されます (作成されたインスタンスの `style`、`weight`、`stretch`、`size`、および `family` プロパティを設定します)
+| `horizo​​ntal` | `string` | このスタイルの水平方向の配置。`left`、`center` (デフォルト)、`right`、または `justify` として表されます
+| `top` | `number` | このスタイルの上余白。ピクセル単位 (作成されたインスタンスの `top` プロパティと、作成されたインスタンスの `margins` プロパティの `top` を設定します)
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Object.prototype`.
+プロトタイプは `Object.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
-All properties of a `style` object are read-only, but you can change the style of content objects at any time.
+`style` オブジェクトのすべてのプロパティは読み取り専用ですが、コンテンツ オブジェクトのスタイルはいつでも変更できます。
 
 | Name | Type | Default Value | Description |
 | --- | --- | --- | --- |
-| `bottom` | `number` | 0 | The bottom margin of this style
-| `color` | `object` | `undefined` | This style's color(s), as an array of strings, or `undefined` if no color has been specified. The `state` property of the `content` object using the style determines the index of the array; if `state` is not an integer, colors from surrounding states are blended.
-| `family` | `string` | | This style's font family
-| `horizontal` | `string` | | This style's horizontal alignment, as `left`, `center` (the default), `right`, or `justify`
-| `leading` | `number` | | This style's line height (or "leading")--the distance between lines of a block, in pixels. If `0` or unspecified, it is automatically calculated
-| `left` | `number` | 0 | The left margin of this style
-| `margins` | `object` | | This style's margins, as an object with `left`, `right`, `top`, and `bottom` number properties, specified in pixels
-| `right` | `number` | 0 | The right margin of this style
-| `size` | `string` | | This style's font size, in pixels.
-| `stretch` | `string` | | This style's stretch
-| `top` | `number` | 0 | The top margin of this style
-| `vertical` | `string` | 	| This style's vertical alignment, as `top`, `middle` (the default), or `bottom`, specified in pixels
-| `weight` | `number` | | The weight of this style's font
+| `bottom` | `number` | 0 | このスタイルの下余白
+| `color` | `object` | `undefined` | このスタイルの色 (文字列の配列)。色が指定されていない場合は `undefined`。スタイルを使用する `content` オブジェクトの `state` プロパティによって配列のインデックスが決まります。`state` が整数でない場合は、周囲の状態の色がブレンドされます。
+| `family` | `string` | | このスタイルのフォント ファミリ
+| `horizo​​ntal` | `string` | | このスタイルの水平方向の配置 (`left`、`center` (デフォルト)、`right`、または `justify`)
+| `leading` | `number` | | このスタイルの行の高さ (または「leading」)。ブロックの行間の距離 (ピクセル単位)。`0` または指定されていない場合は、自動的に計算されます
+| `left` | `number` | 0 |このスタイルの左余白
+| `margins` | `object` | | このスタイルの余白。`left`、`right`、`top`、`bottom` の数値プロパティを持つオブジェクトとして、ピクセル単位で指定します
+| `right` | `number` | 0 | このスタイルの右余白
+| `size` | `string` | | このスタイルのフォント サイズ (ピクセル単位)。
+| `stretch` | `string` | | このスタイルのストレッチ
+| `top` | `number` | 0 | このスタイルの上余白
+| `vertical` | `string` | | このスタイルの垂直方向の配置。 `top`、`middle` (デフォルト)、または `bottom` として、ピクセル単位で指定します
+| `weight` | `number` | | このスタイルのフォントの太さ
 
 
 <!-- TO DO:
-| `indentation` | `number` | | This style's indentation--the indentation of the first line of a block, in pixels
+| `indentation` | `number` | | このスタイルのインデント - ブロックの最初の行のインデント（ピクセル単位）
 -->
 
 ##### Functions
@@ -3763,9 +3761,9 @@ All properties of a `style` object are read-only, but you can change the style o
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `string` | `string` | The string to measure
+| `string` | `string` | 計測する文字列
 
-Calculates the size of the string rendered with this style (and any inherited styles, if this style is attached to a `content` object), and returns it as an `object` with `width` and `height` properties, specified in pixels
+このスタイル（およびこのスタイルが `content` オブジェクトにアタッチされている場合は継承されたスタイル）でレンダリングされた文字列のサイズを計算し、ピクセル単位で指定された `width` および `height` プロパティを持つ `object` として返します。
 
 ```javascript
 let normalStyle = new Style({ font:"600 28px Open Sans", color: "black" });
@@ -3774,26 +3772,26 @@ let size = normalStyle.measure("Moddable");	// {"width":134,"height":38}
 
 ***
 
-### Text Object
+### Textオブジェクト
 
 - **Source code:** [`piuText.c`][15]
 - **Relevant Examples:** [text][28]
 
-The `text` object is a `content` object that renders a string on multiple lines with multiple styles. There are two ways to modify the string of a `text` object. An application typically uses only one of these approaches for a specific `text` object.
+`text` オブジェクトは、複数のスタイルで複数行の文字列をレンダリングする `content` オブジェクトです。`text` オブジェクトの文字列を変更する方法は 2 つあります。アプリケーションでは通常、特定の `text` オブジェクトに対してこれらの方法の 1 つだけを使用します。
 
-1. Set the `string` property. This replaces the full string.
-2. Build the string with blocks and spans, between calls to the `begin` and `end` functions. This appends characters to the string. This method provides the most control, since each span can have a different style.
+1. `string` プロパティを設定します。これにより、文字列全体が置き換えられます。
+2. `begin` 関数と `end` 関数の呼び出しの間に、ブロックとスパンを使用して文字列を構築します。これにより、文字列に文字が追加されます。この方法では、各スパンに異なるスタイルを設定できるため、最も制御性が向上します。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Text([behaviorData, dictionary])`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `behaviorData` | `*` | A parameter that is passed into the `onCreate` function of this content's `behavior`. This may be any type of object, including `null` or a dictionary with arbitrary parameters.
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#text-dictionary) section below will have an effect; other parameters will be ignored.
+| `behaviorData` | `*` | このコンテンツの `behavior` の `onCreate` 関数に渡されるパラメータ。これは、`null` や任意のパラメータを持つ辞書を含む、任意のタイプのオブジェクトにすることができます。
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#text-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `text` instance, an object that inherits from `Text.prototype`
+`Text.prototype` から継承したオブジェクトである `text` インスタンスを返します。
 
 ```javascript
 let sampleStyle = new Style({ font:"600 28px Open Sans"});
@@ -3821,9 +3819,9 @@ application.add(sampleText);
 
 | Arguments | Type | Description
 | --- | --- | :--- |
-| `anonymous` | `function` | A function that returns an object with properties to initialize the instances that the result creates
+| `anonymous` | `function` | 生成されるインスタンスを初期化するためのプロパティを持つオブジェクトを返す関数
 
-Returns a constructor, a function that creates instances of `Text.prototype`. The `prototype` property of the result is `Text.prototype`. The result also provides a `template` function.
+`Text.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Text.prototype` です。戻り値には `template` 関数も提供されます。
 
 ```javascript
 let sampleStyle = new Style({ font:"600 28px Open Sans"});
@@ -3847,31 +3845,31 @@ application.add(new SampleText({ baseStyle: sampleStyle, redText: "Red!", blueTe
 <a id="text-dictionary"></a>
 #### Dictionary
 
-Same as for `content` object (see [Dictionary](#content-dictionary) in the section [Content Object](#content-object)), plus:
+`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Dictionary](#content-dictionary) を参照)。さらに次のプロパティを含みます。
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `blocks` | `array` | An array of blocks, where a block is an object with the following properties:<BR>- `behavior`: An object or `null` (the default). When this text is active and the block is touched, the block calls the corresponding function properties of its behavior.<BR>- `style`: A `style` instance or `null` (the default).<BR>- `spans`: A `string` or an `array` of spans.<BR><BR>Like a block, a span is an object with `behavior`, `style`, and `spans` properties.
-| `string` | `string` | This text's string. Setting this string creates one block containing one span that uses this text's style.     
+| `blocks` | `array` | ブロックの配列。ブロックは次のプロパティを持つオブジェクトです:<BR>- `behavior`: オブジェクトまたは `null` (デフォルト)。このテキストがアクティブでブロックに触れると、ブロックはその動作の対応する関数プロパティを呼び出します。<BR>- `style`: `style` インスタンスまたは `null` (デフォルト)。<BR>- `spans`: `string` またはスパンの `array`。<BR><BR>ブロックと同様に、スパンは `behavior`、`style`、および `spans` プロパティを持つオブジェクトです。
+| `string` | `string` | このテキストの文字列。この文字列を設定すると、このテキストのスタイルを使用する 1 つのスパンを含む 1 つのブロックが作成されます。     
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Content.prototype`.
+プロトタイプは `Content.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Read Only | Description |
 | --- | --- | --- | --- |
-| `blocks` | `array` | | This text's blocks
-| `string` | `string` | | This text's string. Setting this string creates one block containing one span that uses this text's style.
+| `blocks` | `array` | | このテキストのブロック
+| `string` | `string` | | このテキストの文字列。この文字列を設定すると、このテキストのスタイルを使用する 1 つのスパンを含む 1 つのブロックが作成されます。
 
 ##### Functions
 
-> For sample code that uses all the functions below, see the [text example][28].
+> 以下のすべての関数を使用するサンプルコードについては、[text example][28]を参照してください。
 
 **`begin()`**
 
-Starts the process of defining the string and styles of this text using blocks and spans. The string is reset to empty. The `begin` function must be called before `beginBlock` or `beginSpan`. After defining the string and styles, call `end`.
+ブロックとスパンを使用して、このテキストの文字列とスタイルを定義するプロセスを開始します。文字列は空にリセットされます。`begin` 関数は、`beginBlock` または `beginSpan` の前に呼び出す必要があります。文字列とスタイルを定義した後、`end` を呼び出します。
 
 ***
 
@@ -3879,10 +3877,10 @@ Starts the process of defining the string and styles of this text using blocks a
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `style` | `style` | The style of the block
-| `behavior` | `object` | The behavior of the block
+| `style` | `style` | ブロックのスタイル
+| `behavior` | `object` | ブロックの動作
 
-Creates and opens a new block. The `begin` function must have been already called without a corresponding `end`. There cannot be another block already open.
+新しいブロックを作成して開きます。`begin` 関数は、対応する `end` なしですでに呼び出されている必要があります。別のブロックがすでに開いていることはできません。
 
 ***
 
@@ -3890,10 +3888,10 @@ Creates and opens a new block. The `begin` function must have been already calle
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `style` | `style` | The style of the span
-| `behavior` | `object` | The behavior of the span
+| `style` | `style` | スパンのスタイル
+| `behavior` | `object` | スパンの動作
 
-Creates and opens a new span. There must be an open block. There cannot be another open span.
+新しいスパンを作成して開きます。開いているブロックがなければなりません。別の開いているスパンは存在できません。
 
 ***
 
@@ -3901,51 +3899,51 @@ Creates and opens a new span. There must be an open block. There cannot be anoth
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `string` | `string` | The string to concatenate
+| `string` | `string` | 連結する文字列
 
-Concatenates the specified string to this text. There must be an open span.
+指定された文字列をこのテキストに連結します。オープンなスパンが必要です。
 
 ***
 
 **`end()`**
 
-Completes the process of building this text's string and styles using blocks and spans; must be called after `begin` and before this text can be measured, fit, or rendered
+ブロックとスパンを使用してこのテキストの文字列とスタイルを構築するプロセスを完了します。`begin` の後で、このテキストを測定、フィット、またはレンダリングする前に呼び出す必要があります。
 
 ***
 
 **`endBlock()`**
 
-Closes the open block
+開いているブロックを閉じる
 
 ***
 
 **`endSpan()`**
 
-Closes the open span
+開いているスパンを閉じる
 
 ***
 
 <a id="text-events"></a>
 #### Events
 
-Same as for `content` object (see [Events](#content-events) in the section [Content Object](#content-object)).
+`content` オブジェクトの場合と同じです ([Contentオブジェクト](#content-object) セクションの [Events](#content-events) を参照してください)。
 
-### Texture Object
+### Textureオブジェクト
 
 - **Source code:** [`piuTexture.c`][16]
 - **Relevant Examples:** [balls][18], [cards][24]
 
-The `texture` object is an asset that references an image file. Applications use `texture` objects in defining `skin` objects.
+`texture` オブジェクトは、画像ファイルを参照するアセットです。アプリケーションは、`skin` オブジェクトの定義に `texture` オブジェクトを使用します。
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Texture(path)`
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `path` | `string` | The URL of the image file. It must be a file URL.
+| `path` | `string` | 画像ファイルの URL。ファイル URL である必要があります。
 
-Returns a `texture` instance, an object that inherits from `Object.prototype`
+`Object.prototype` から継承したオブジェクトである `texture` インスタンスを返します。
 
 ```javascript
 const logoTexture = new Texture("logo.png");
@@ -3956,9 +3954,9 @@ const logoSkin = new Skin({ texture: logoTexture, x: 0, y: 0, width: 100, height
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#texture-dictionary) section below will have an effect; other parameters will be ignored.
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#texture-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a `texture` instance, an object that inherits from `Object.prototype`
+`Object.prototype` から継承したオブジェクトである `texture` インスタンスを返します。
 
 ```javascript
 const logoTexture = new Texture({ path: "logo.png" });
@@ -3969,9 +3967,9 @@ const logoSkin = new Skin({ texture: logoTexture, x: 0, y: 0, width: 100, height
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `dictionary` | `object` | An object with properties to initialize the result. Only parameters specified in the [Dictionary](#texture-dictionary) section below will have an effect; other parameters will be ignored.
+| `dictionary` | `object` | 戻り値を初期化するプロパティを持つオブジェクト。以下の [Dictionary](#texture-dictionary) セクションで指定されたパラメータのみが有効になり、他のパラメータは無視されます。
 
-Returns a constructor, a function that creates instances of `Texture.prototype`. The `prototype` property of the result is `Texture.prototype`.
+`Texture.prototype` のインスタンスを作成する関数であるコンストラクタを返します。戻り値の `prototype` プロパティは `Texture.prototype` です。
 
 ```javascript
 const LogoTexture = Texture.template({ path: "logo.png" });
@@ -3989,57 +3987,57 @@ const AnotherLogoSkin = Skin.template({ texture: new AnotherLogoTexture(), x: 0,
 
 | Parameter | Type | Description |
 | --- | --- | :--- |
-| `path` | `string` | The URL of the image file. It must be a file URL.
+| `path` | `string` | 画像ファイルの URL。ファイル URL である必要があります。
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Object.prototype`.
+プロトタイプは `Object.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Read Only | Description |
 | --- | --- | --- | :--- |
-| `height` | `number` | ✓ | This texture's height, in physical pixels          
-| `width` | `number` | ✓ | This texture's width, in physical pixels
+| `height` | `number` | ✓ | このテクスチャの高さ（物理ピクセル単位）          
+| `width` | `number` | ✓ | このテクスチャの幅（物理ピクセル単位）
 
-### Timeline Object
+### Timelineオブジェクト
 
 - **Source code:** [`piuTimeline.js`][36]
 - **Relevant Examples:** [timeline][35], [easing-equations][34]
 
-The `timeline` object provides a mechanism for sequencing and running a collection of tweens. This is useful for managing transitions between Piu screens and other animations.
+`timeline` オブジェクトは、一連のトゥイーンの順序付けと実行を行うメカニズムを提供します。これは、Piu 画面と他のアニメーション間の遷移を管理するのに役立ちます。
 
-Tweens work by taking in a target object and an object that specifies a list of properties and values. When the tween is set to a specific fraction, the appropriate properties of the target object are updated with values between their initial value and the destination value. The specifics of how this works are determined by the type of tween ("on", "from", or "to", as described below) and the easing function used for the tween.
+トゥイーンは、ターゲット オブジェクトと、プロパティと値のリストを指定するオブジェクトを取り込むことで機能します。トゥイーンが特定の割合に設定されると、ターゲット オブジェクトの適切なプロパティが、初期値と宛先値の間の値で更新されます。この動作の詳細は、トゥイーンのタイプ (以下で説明するように、「on」、「from」、または「to」) と、トゥイーンに使用されるイージング関数によって決まります。
 
-The application manages all of the tweens in a timeline at once by seeking to a particular point in the timeline. This is usually driven by the `onTimeChanged` function of a `content` object.
+アプリケーションは、タイムライン内の特定のポイントをシークすることで、タイムライン内のすべてのトゥイーンを一度に管理します。これは通常、`content` オブジェクトの `onTimeChanged` 関数によって実行されます。
 
-The Piu Timeline implementation is based on the [TimelineLite class developed by GreenSock](https://greensock.com/timelinelite).
+Piu Timeline の実装は、GreenSock によって開発された [TimelineLite class developed by GreenSock](https://greensock.com/timelinelite) に基づいています。
 
-Note that the `Timeline` class must be imported into your application to be used:
+`Timeline` クラスを使用するには、アプリケーションにインポートする必要があることに注意してください。
 
 ```javascript
 import Timeline from "piu/Timeline";`
 ```
 
-#### Constructor Description
+#### コンストラクタの説明
 
 ##### `Timeline()`
 
-Returns a timeline object, an instance of the `Timeline` class.
+`Timeline` クラスのインスタンスであるタイムライン オブジェクトを返します。
 
 ```javascript
 let timeline = new Timeline();
 ```
 
-#### Prototype Description
+#### プロトタイプの説明
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | --- |
-| `duration` | `number` | | | How long this timeline will take to complete once started, in ms.
-| `fraction` | `number` | | | The fraction of this timeline that has completed, as a decimal between 0 and 1. Setting the fraction is equivalent to calling `seekTo(fraction * duration)`.
-| `time` | `number` | | | The amount of time the timeline has completed, in ms. This should not be modified directly — use `seekTo(time)` instead.
+| `duration` | `number` | | | このタイムラインが開始してから完了するまでにかかる時間 (ミリ秒)。
+| `fraction` | `number` | | | このタイムラインの完了した割合を 0 から 1 までの小数で表します。割合を設定することは、`seekTo(fraction *duration)` を呼び出すことと同じです。
+| `time` | `number` | | | タイムラインが完了した時間（ミリ秒単位）。これを直接変更しないでください。代わりに `seekTo(time)` を使用してください。
 
 ##### Functions
 
@@ -4051,15 +4049,15 @@ let timeline = new Timeline();
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `target` | `object` | The object that will have its properties tweened by the timeline.
-| `fromProperties` | `object` | The keys of this object are the properties of the `target` object that will be tweened by the timeline. Their values are the starting values the properties of the `target` object will have at the begining of the tween.
-| `duration` | `number` | The duration of the tween in ms.
-| `easing` | `number` | An easing function to use for the tween. If `null` is provided, the tween will use a linear easing function.
-| `delay` | `number` | The number of ms after the previous tween in the timeline completes that this one should begin. If this number is negative, the tween will begin before the prior tween completes. If no duration is provided, the tween will begin immediately upon completion of the prior tween.
+| `target` | `object` | タイムラインによってプロパティがトゥイーンされるオブジェクト。
+| `fromProperties` | `object` | このオブジェクトのキーは、タイムラインによってトゥイーンされる `target` オブジェクトのプロパティです。その値は、トゥイーンの開始時に `target` オブジェクトのプロパティが持つ開始値です。
+| `duration` | `number` | トゥイーンの継続時間（ミリ秒）。
+| `easing` | `number` | トゥイーンに使用するイージング関数。`null` が指定された場合、トゥイーンでは線形イージング関数が使用されます。
+| `delay` | `number` | タイムラインの前のトゥイーンが完了してから、このトゥイーンを開始するまでのミリ秒数。この数値が負の場合、前のトゥイーンが完了する前にトゥイーンが開始されます。期間が指定されていない場合、前のトゥイーンの完了後すぐにトゥイーンが開始されます。
 
-Adds a "from tween" to the timeline. A "from tween" eases the properties of the `target` object from the values specified in the `toProperties` object to the original values of the `target` object over `duration` ms.
+タイムラインに「from トゥイーン」を追加します。「from トゥイーン」は、`target` オブジェクトのプロパティを、`toProperties` オブジェクトで指定された値から `target` オブジェクトの元の値に `duration` ミリ秒かけて変更します。
 
-Returns this timeline, useful for chaining together multiple `to`, `from`, and `on` calls.
+このタイムラインを返します。複数の `to`、`from`、および `on` 呼び出しを連鎖させるのに役立ちます。
 
 ```javascript
 let sampleStyle = new Style({ font: "600 28px Open Sans", color: ["blue", "white"] });
@@ -4094,15 +4092,15 @@ application.add(sampleColumn);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `target` | `object` | The object that will have its properties tweened by the timeline.
-| `onProperties` | `object` | The keys of this object are the properties of the `target` object that will be tweened by the timeline. Their values are arrays of values that the tween will ease between over the duration of the timeline.
-| `duration` | `number` | The duration of the tween in ms.
-| `easing` | `number` | An easing function to use for the tween. If `null` is provided, the tween will use a linear easing function.
-| `delay` | `number` | The number of ms after the previous tween in the timeline completes that this one should begin. If this number is negative, the tween will begin before the prior tween completes. If no duration is provided, the tween will begin immediately upon completion of the prior tween.
+| `target` | `object` | タイムラインによってプロパティがトゥイーンされるオブジェクト。
+| `onProperties` | `object` | このオブジェクトのキーは、タイムラインによってトゥイーンされる `target` オブジェクトのプロパティです。その値は、タイムラインの継続時間中にトゥイーンが遷移する値の配列です。
+| `duration` | `number` | トゥイーンの継続時間（ミリ秒）。
+| `easing` | `number` | トゥイーンに使用するイージング関数。`null` が指定された場合、トゥイーンでは線形イージング関数が使用されます。
+| `delay` | `number` | タイムラインの前のトゥイーンが完了してから、このトゥイーンを開始するまでのミリ秒数。この数値が負の場合、前のトゥイーンが完了する前にトゥイーンが開始されます。期間が指定されていない場合、前のトゥイーンの完了後すぐにトゥイーンが開始されます。
 
-Adds an "on tween" to the timeline. An "on tween" eases the values of the `target` object through a sequence of steps as specified by arrays in the `onProperties` object over `duration` ms.
+タイムラインに「on トゥイーン」を追加します。「on トゥイーンは、`onProperties` オブジェクト内の配列で指定された一連のステップを通じて、`duration` ミリ秒にわたって `target` オブジェクトの値をイージングします。
 
-Returns this timeline, useful for chaining together multiple `to`, `from`, and `on` calls.
+このタイムラインを返します。複数の `to`、`from`、および `on` 呼び出しを連鎖させるのに役立ちます。
 
 ```javascript
 let sampleContainer = new Container(null, {
@@ -4143,23 +4141,23 @@ application.add(sampleContainer);
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `time` | `number` | The position in the Timeline to seek to.
+| `time` | `number` |タイムライン内でシークする位置。
 
-Causes this timeline to jump its tweens to the specified time. This sets the properties of the tweens' target objects.
+このタイムラインのトゥイーンを指定された時間にジャンプさせます。これにより、トゥイーンのターゲット オブジェクトのプロパティが設定されます。
 
 **`to(target, toProperties, duration, [easing, delay])`**
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `target` | `object` | The object that will have its properties tweened by the timeline.
-| `toProperties` | `object` | The keys of this object are the properties of the `target` object that will be tweened by the timeline. Their values are the destination values the properties of the `target` object will have when the tween is complete.
-| `duration` | `number` | The duration of the tween in ms.
-| `easing` | `number` | An easing function to use for the tween. If `null` is provided, the tween will use a linear easing function.
-| `delay` | `number` | The number of ms after the previous tween in the timeline completes that this one should begin. If this number is negative, the tween will begin before the prior tween completes. If no duration is provided, the tween will begin immediately upon completion of the prior tween.
+| `target` | `object` | タイムラインによってプロパティがトゥイーンされるオブジェクト。
+| `toProperties` | `object` | このオブジェクトのキーは、タイムラインによってトゥイーンされる `target` オブジェクトのプロパティです。その値は、トゥイーンが完了したときに `target` オブジェクトのプロパティが持つ宛先値です。
+| `duration` | `number` | トゥイーンの継続時間（ミリ秒）。
+| `easing` | `number` | トゥイーンに使用するイージング関数。`null` が指定された場合、トゥイーンでは線形イージング関数が使用されます。
+| `delay` | `number` | タイムラインの前のトゥイーンが完了してから、このトゥイーンを開始するまでのミリ秒数。この数値が負の場合、前のトゥイーンが完了する前にトゥイーンが開始されます。期間が指定されていない場合、前のトゥイーンの完了後すぐにトゥイーンが開始されます。
 
-Adds a "to tween" to the timeline. A "to tween" eases the properties of the `target` object from its current values to the desired values specified in the `toProperties` object over `duration` ms.
+タイムラインに「to トゥイーン」を追加します。「to トゥイーン」は、`target` オブジェクトのプロパティを、`duration` ミリ秒にわたって現在の値から `toProperties` オブジェクトで指定された目的の値にイージングします。
 
-Returns this timeline, useful for chaining together multiple `to`, `from`, and `on` calls.
+このタイムラインを返します。複数の `to`、`from`、および `on` 呼び出しを連鎖させるのに役立ちます。
 
 ```javascript
 let sampleStyle = new Style({ font: "600 28px Open Sans", color: ["blue", "white"] });
@@ -4190,16 +4188,16 @@ application.add(sampleColumn);
 
 ![](../assets/piu/timelineTo.gif)
 
-### Transition Object
+### Transitionオブジェクト
 
 - **Source code:** [`piuTransition.c`][17]
 - **Relevant Examples:** N/A
 
-The `transition` object is used to animate modifications of the containment hierarchy.
+`transition` オブジェクトは、コンテンツ階層の変更をアニメーション化するために使用されます。
 
-#### Constructor Description
+#### コンストラクタの説明
 
-Applications define their own constructors for `transition` objects, which inherit from `Transition.prototype` and override the `onBegin`, `onEnd`, and `onStep` functions.
+アプリケーションは、`Transition.prototype` から継承し、`onBegin`、`onEnd`、および `onStep` 関数をオーバーライドする `transition` オブジェクトの独自のコンストラクターを定義します。
 
 ```javascript
 class BasicLeftToRightTransition extends Transition {
@@ -4226,7 +4224,7 @@ class BasicLeftToRightTransition extends Transition {
 }
 ```
 
-`Container` objects use instances of `transition` objects as a parameter to their `run` function.
+`Container` オブジェクトは、`transition` オブジェクトのインスタンスを `run` 関数のパラメータとして使用します。
 
 ```javascript
 class SwitchScreenBehavior extends Behavior {
@@ -4256,15 +4254,15 @@ application.add(new ColoredScreen({ color: "red", nextColor: "blue" }));
 
 ![](../assets/piu/transition.gif)
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Object.prototype`.
+プロトタイプは `Object.prototype` から継承します。
 
-##### Properties
+##### プロパティ
 
 | Name | Type | Default Value | Read Only | Description |
 | --- | --- | --- | --- | :--- |
-| `duration ` | `number` | 250 |  | The duration of the transition, in milliseconds
+| `duration ` | `number` | 250 |  | 遷移の継続時間（ミリ秒単位）
 
 ##### Functions
 
@@ -4272,10 +4270,10 @@ Prototype inherits from `Object.prototype`.
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `container` | `container` | The `container` object that is running the transition
-| `...` | `*` | Zero or more extra parameters
+| `container` | `container` | 遷移を実行している`container`オブジェクト
+| `...` | `*` | 0個以上の追加パラメータ
 
-Invoked when this transition starts. The extra parameters are the extra parameters of the call to the `run` function that bound this transition to the specified `container` object.
+この遷移が開始するときに呼び出されます。追加パラメータは、この遷移を指定された `container` オブジェクトにバインドする `run` 関数の呼び出しの追加パラメータです。
 
 ***
 
@@ -4283,11 +4281,10 @@ Invoked when this transition starts. The extra parameters are the extra paramete
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `container` | `container` | The `container` object that is running the transition
-| `...` | `*` | Zero or more extra parameters
+| `container` | `container` | 遷移を実行している`container`オブジェクト
+| `...` | `*` | 0個以上の追加パラメータ
 
-Invoked when this transition ends. The extra parameters are the extra parameters of the call to the `run` function that bound this transition to the specified `container` object.
-
+この遷移が終了したときに呼び出されます。追加パラメータは、この遷移を指定された `container` オブジェクトにバインドする `run` 関数の呼び出しの追加パラメータです。
 
 ***
 
@@ -4295,9 +4292,9 @@ Invoked when this transition ends. The extra parameters are the extra parameters
 
 | Argument | Type | Description |
 | --- | --- | :--- |
-| `fraction` | `number` | The ratio of the time elapsed and the duration of this transition, as a number between 0 and 1 (inclusive)
+| `fraction` | `number` | 経過時間とこの遷移の継続時間の比率（0 から 1 まで（両端を含む）の数値）
 
-Called while this transition is running; called at least twice (with a `fraction` parameter of 0 and 1) and at most at the display refresh rate--for example, 60 times a second
+この遷移の実行中に呼び出されます。少なくとも 2 回 (`fraction` パラメータは 0 と 1)、最大でディスプレイのリフレッシュ レート (たとえば 1 秒あたり 60 回) で呼び出されます。
 
 <!-- Referenced Links -->
 [0]: ../../modules/piu/All/piuAll.js "piuAll.js"

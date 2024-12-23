@@ -97,7 +97,7 @@ void xs_tcp_constructor(xsMachine *the)
 {
 	TCP tcp;
 	uint8_t create = xsmcArgc > 0;
-	uint8_t connect = 0, triggerable = 0, triggered = 0, nodelay = 0, format = kIOFormatBuffer;
+	uint8_t connect = 0, triggerable = 0, triggered = 0, nodelay = 0, format = kIOFormatBuffer, ready = 0;
 	xsSlot *onReadable, *onWritable, *onError;
 	int port;
 	struct tcp_pcb *skt;
@@ -139,6 +139,7 @@ void xs_tcp_constructor(xsMachine *the)
 			skt = from->skt;
 			buffers = from->buffers;
 			triggered = from->triggered;
+			ready = from->ready;
 			if ((triggerable & kTCPWritable) && tcp_sndbuf(skt))
 				triggered |= kTCPWritable;
 			if ((triggerable & kTCPReadable) && buffers)
@@ -207,18 +208,21 @@ void xs_tcp_constructor(xsMachine *the)
 
 	tcp->skt = skt;
 	tcp->buffers = buffers;
+	tcp->ready = ready;
 
 	tcp_arg(skt, tcp);
 	tcp_err(skt, tcpError);
 	tcp_recv(skt, tcpReceive);
 
 	tcp->triggerable = triggerable;
-	tcp->onReadable = onReadable;
-	tcp->onWritable = onWritable;
-	tcp->onError = onError;
+	if (triggerable) {
+		tcp->onReadable = onReadable;
+		tcp->onWritable = onWritable;
+		tcp->onError = onError;
 
-	if (onWritable)
-		tcp_sent(skt, tcpSent);
+		if (onWritable)
+			tcp_sent(skt, tcpSent);
+	}
 
 	if (connect) {
 		if (tcp_connect_safe(skt, &address, port, tcpConnect))
@@ -661,14 +665,16 @@ void xs_listener_constructor(xsMachine *the)
 	Listener listener;
 	struct tcp_pcb *skt;
 	ip_addr_t address = *(IP_ADDR_ANY);
-	uint16_t port = 0;
+	int port = 0;
 	xsSlot *onReadable;
 
 	xsmcVars(1);
 
 	if (xsmcHas(xsArg(0), xsID_port)) {
 		xsmcGet(xsVar(0), xsArg(0), xsID_port);
-		port = (uint16_t)xsmcToInteger(xsVar(0));
+		port = builtinGetSignedInteger(the, &xsVar(0)); 
+		if ((port < 0) || (port > 65535))
+			xsRangeError("invalid port");
 	}
 	//@@ address
 
@@ -683,7 +689,7 @@ void xs_listener_constructor(xsMachine *the)
 		xsUnknownError("no socket");
 
 	skt->so_options |= SOF_REUSEADDR;
-	if (tcp_bind_safe(skt, &address, port)) {
+	if (tcp_bind_safe(skt, &address, (uint16_t)port)) {
 		tcp_close_safe(skt);
 		xsUnknownError("socket bind");
 	}
@@ -750,11 +756,8 @@ void xs_listener_read(xsMachine *the)
 	ListenerPending pending;
 	TCP tcp;
 
-	if (NULL == listener->pending) {
-		xsDebugger();
-		xsCall0(xsArg(0), xsID_close);
+	if (NULL == listener->pending)
 		return;
-	}
 
 	builtinCriticalSectionBegin();
 	pending = listener->pending;
@@ -772,6 +775,15 @@ void xs_listener_read(xsMachine *the)
 	tcp_arg(tcp->skt, tcp);
 	tcp_err(tcp->skt, tcpError);
 	tcp_recv(tcp->skt, tcpReceive);
+	
+	tcp->ready = true;
+}
+
+void xs_listener_get_port(xsMachine *the)
+{
+	Listener listener = xsmcGetHostDataValidate(xsThis, (void *)&xsListenerHooks);
+
+	xsmcSetInteger(xsResult, listener->skt->local_port);
 }
 
 void listenerDeliver(void *the, void *refcon, uint8_t *message, uint16_t messageLength)

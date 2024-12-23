@@ -229,27 +229,27 @@ void fxBuildAtomics(txMachine* the)
 txSlot* fxCheckAtomicsArrayBuffer(txMachine* the, txSlot* slot, txBoolean onlyShared)
 {
 	if ((!slot) || (!mxIsReference(slot)))
-		mxTypeError("typedArray.buffer is no object");
+		mxTypeError("typedArray.buffer: not an object");
 	slot = slot->value.reference->next;
 	if (slot && (slot->kind == XS_HOST_KIND) && (slot->value.host.variant.destructor == fxReleaseSharedChunk))
 		return slot;
 	if (onlyShared)
-		mxTypeError("typedArray.buffer is no SharedArrayBuffer");
+		mxTypeError("typedArray.buffer: not a SharedArrayBuffer instance");
 	if (slot && (slot->flag & XS_INTERNAL_FLAG) && (slot->kind == XS_ARRAY_BUFFER_KIND)) {
 		if (slot->value.arrayBuffer.address == C_NULL)
-			mxTypeError("typedArray.buffer is detached");
+			mxTypeError("typedArray.buffer: detached");
 		return slot;
 	}
-	mxTypeError("typedArray.buffer is no SharedArrayBuffer, no ArrayBuffer");
+	mxTypeError("typedArray.buffer: not a SharedArrayBuffer instance, not an ArrayBuffer instance");
 	return C_NULL;
 }
 
 void* fxCheckAtomicsArrayBufferDetached(txMachine* the, txSlot* slot, txBoolean mutable)
 {
 	if (slot->value.arrayBuffer.address == C_NULL)
-		mxTypeError("typedArray.buffer is detached");
+		mxTypeError("typedArray.buffer: detached");
 	if (mutable && (slot->flag & XS_DONT_SET_FLAG))
-		mxTypeError("typedArray.buffer is read-only");
+		mxTypeError("typedArray.buffer: read-only");
 	return slot->value.arrayBuffer.address;
 }
 
@@ -270,22 +270,22 @@ txSlot* fxCheckAtomicsTypedArray(txMachine* the, txBoolean onlyInt32)
 	txSlot* slot = (mxArgc > 0) ? mxArgv(0) : C_NULL;
 	txID id;
 	if ((!slot) || (!mxIsReference(slot)))
-		mxTypeError("typedArray is no object");
+		mxTypeError("typedArray: not an object");
 	slot = slot->value.reference->next;
 	if ((!slot) || ((slot->kind != XS_TYPED_ARRAY_KIND)))
-		mxTypeError("typedArray is no TypedArray");
+		mxTypeError("typedArray: not a TypedArray instance");
 	id = slot->value.typedArray.dispatch->constructorID;
 	if (onlyInt32) {
 		if ((id != _Int32Array) && (id != _BigInt64Array))
-			mxTypeError("typedArray is no Int32Array");
+			mxTypeError("typedArray: not an Int32Array instance");
 	}
 	else {
 		if (id == _Float32Array)
-			mxTypeError("typedArray is Float32Array");
+			mxTypeError("typedArray: Float32Array instance");
 		else if (id == _Float64Array)
-			mxTypeError("typedArray is Float64Array");
+			mxTypeError("typedArray: Float64Array instance");
 		else if (id == _Uint8ClampedArray)
-			mxTypeError("typedArray is Uint8ClampedArray");
+			mxTypeError("typedArray: Uint8ClampedArray instance");
 	}
 	return slot;
 }
@@ -293,10 +293,10 @@ txSlot* fxCheckAtomicsTypedArray(txMachine* the, txBoolean onlyInt32)
 txSlot* fxCheckSharedArrayBuffer(txMachine* the, txSlot* slot, txString which)
 {
 	if ((!slot) || (!mxIsReference(slot)))
-		mxTypeError("%s is no object", which);
+		mxTypeError("%s: not an object", which);
 	slot = slot->value.reference->next;
 	if ((!slot) || (slot->kind != XS_HOST_KIND) || (slot->value.host.variant.destructor != fxReleaseSharedChunk))
-		mxTypeError("%s is no SharedArrayBuffer", which);
+		mxTypeError("%s: not a SharedArrayBuffer instance", which);
 	return slot;
 }
 
@@ -354,7 +354,7 @@ void fx_SharedArrayBuffer(txMachine* the)
 	property->value.host.data = fxCreateSharedChunk(byteLength);
 	if (!property->value.host.data) {
 		property->value.host.variant.destructor = NULL;
-		mxRangeError("cannot allocate SharedArrayBuffer");
+		mxRangeError("cannot allocate SharedArrayBuffer insatnce");
 	}
 	property->value.host.variant.destructor = fxReleaseSharedChunk;
 	property = property->next = fxNewSlot(the);
@@ -399,14 +399,14 @@ void fx_SharedArrayBuffer_prototype_grow(txMachine* the)
 	txInteger maxByteLength, oldByteLength, newByteLength;
 	maxByteLength = bufferInfo->value.bufferInfo.maxLength;
 	if (maxByteLength < 0)
-		mxTypeError("not resizable");
+		mxTypeError("this: not resizable");
 	oldByteLength = bufferInfo->value.bufferInfo.length;
 	newByteLength = fxArgToByteLength(the, 0, 0);
 	if (newByteLength < oldByteLength)
 		mxRangeError("newLength < byteLength");
 	if (newByteLength > maxByteLength)
 		mxRangeError("newLength > maxByteLength");
-	mxRangeError("cannot grow SharedArrayBuffer");
+	mxRangeError("cannot grow SharedArrayBuffer insatnce");
 }
 
 void fx_SharedArrayBuffer_prototype_slice(txMachine* the)
@@ -429,10 +429,10 @@ void fx_SharedArrayBuffer_prototype_slice(txMachine* the)
 	mxPullSlot(mxResult);
 	result = fxCheckSharedArrayBuffer(the, mxResult, "result");
 	if (result == host)
-		mxTypeError("same SharedArrayBuffer instance");
+		mxTypeError("result: same SharedArrayBuffer instance");
 	bufferInfo = result->next; 
 	if (bufferInfo->value.bufferInfo.length < length)
-		mxTypeError("smaller SharedArrayBuffer instance");
+		mxTypeError("result: smaller SharedArrayBuffer instance");
 	c_memcpy(result->value.host.data, ((txByte*)host->value.host.data + start), stop - start);
 }
 
