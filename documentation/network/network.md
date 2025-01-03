@@ -1189,7 +1189,7 @@ new DNSServer((message, value) => {
 - **ソースコード:** [mdns](../../modules/network/mdns)
 - **関連するサンプル:** [discoverhttp](../../examples/network/mdns/discoverhttp), [httpserver](../../examples/network/mdns/httpserver), [ntpclient](../../examples/network/mdns/ntpclient), [ntpservice](../../examples/network/mdns/ntpservice),
 
-`MDNS` クラスは [Multicast DNS](https://tools.ietf.org/html/rfc6762) のディスカバリーとサービスを扱うためのサービスを実装します。これには `.local` 名のクレーム（取得）、mDNS サービス利用可能のアドバータイズ（通知）、および利用可能な mDNS サービスのスキャンが含まれます。
+`MDNS` クラスは [Multicast DNS](https://tools.ietf.org/html/rfc6762) のディスカバリーとサービスを扱うためのサービスを実装します。これには `.local` 名のクレーム（取得）、mDNS サービス利用可能のアドバタイズ（通知）、および利用可能な mDNS サービスのスキャンが含まれます
 
 ```js
 import MDNS from "mdns";
@@ -1254,7 +1254,7 @@ mdns.monitor("_http._tcp", (service, instance) => {
 
 ### `add(service)`
 
-`add` 関数は、アドバータイズするための mDNS サービス記述を登録します。サービスレコードには次のプロパティが含まれます:
+`add` 関数は、アドバタイズするための mDNS サービス記述を登録します。サービスレコードには次のプロパティが含まれます:
 
 | プロパティ | 説明 |
 | :---: | :--- |
