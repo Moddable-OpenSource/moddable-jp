@@ -1,37 +1,37 @@
-# Networking
+# ネットワーキング
 Copyright 2017-2024 Moddable Tech, Inc.<BR>
-Revised: Febrary 23, 2024
+改訂: 2024年2月23日
 
-## Table of Contents
+## 目次
 
-* [Socket](#socket)
-* [Listener](#listener)
+* [ソケット](#socket)
+* [リスナー](#listener)
 * HTTP
-	* [Request](#http-request)
-	* [Server](#http-server)
+	* [リクエスト](#http-request)
+	* [サーバー](#http-server)
 * WebSocket
-	* [Client](#websocket-client)
-	* [Server](#websocket-server)
-* [Net](#net)
+	* [クライアント](#websocket-client)
+	* [サーバー](#websocket-server)
+* [ネット](#net)
 * [WiFi](#wifi)
 * [SNTP](#sntp)
 * DNS
-	* [Constants](#dns)
-	* [Parser](#dns-parser)
-	* [Serializer](#dns-serializer)
-	* [Server](#dns-server)
+	* [定数](#dns)
+	* [パーサー](#dns-parser)
+	* [シリアライザー](#dns-serializer)
+	* [サーバー](#dns-server)
 * [MDNS](#mdns)
 * [Telnet](#telnet)
 * [Ping](#ping)
 * [MQTT](#mqtt)
 
 <a id="socket"></a>
-## class Socket
+## Socketクラス
 
-- **Source code:** [socket](../../modules/network/socket)
-- **Relevant Examples:** [socket](../../examples/network/socket/socket), [socketreadwrite](../../examples/network/socket/socketreadwrite)
+- **ソースコード:** [socket](../../modules/network/socket)
+- **関連するサンプル:** [socket](../../examples/network/socket/socket), [socketreadwrite](../../examples/network/socket/socketreadwrite)
 
-The `Socket` class implements a non-blocking network connection using a TCP or a UDP socket.
+`Socket` クラスは、TCP または UDP ソケットを使用して非ブロッキングのネットワーク接続を実装します。
 
 ```js
 import {Socket, Listener} from "socket";
@@ -39,15 +39,15 @@ import {Socket, Listener} from "socket";
 
 ### `constructor(dictionary)`
 
-The `Socket` constructor takes a single argument, a dictionary of initialization parameters. The constructor immediately initiates a connection to the remote host.
+`Socket` コンストラクタは、初期化パラメータの辞書を引数として取ります。コンストラクタはリモートホストへの接続を直ちに開始します。
 
-If the IP address is known, use the `address` property in the dictionary.
+IPアドレスが既知の場合、辞書の `address` プロパティを使用します。
 
 ```js
-let socket = new Socket({address "17.172.224.47", port: 80});
+let socket = new Socket({address: "17.172.224.47", port: 80});
 ```
 
-To initiate a connection to a remote server specified by a host name, include `host` and `port` properties in the dictionary. The socket resolves the host name to an IP address.
+ホスト名で指定されたリモートサーバーへの接続を開始するには、辞書に `host` と `port` プロパティを含めます。ソケットはホスト名をIPアドレスに解決します。
 
 ```js
 let host = "www.moddable.tech";
@@ -55,7 +55,7 @@ let port = 80;
 let socket = new Socket({host, port});
 ```
 
-By default a new socket uses TCP. The socket kind can be set in the dictionary:
+デフォルトでは、新しいソケットはTCPを使用します。ソケットの種類は辞書で設定できます：
 
 ```js
 let tcp = new Socket({host: "moddable.tech", port: 1234, kind: "TCP"});
@@ -63,21 +63,22 @@ let udp = new Socket({port: 123, kind: "UDP"});
 let raw = new Socket({kind: "RAW", protocol: 1});
 ```
 
-To accept a new connection request from a `Listener`, specify the `listener` property in the dictionary:
+`Listener` からの新しい接続要求を受け入れるには、辞書に `listener` プロパティを指定します：
 
 ```js
 let listener = new Listener({port: 80});
 let socket = new Socket({listener});
 ```
-For TCP sockets, the dictionary supports two option properties:
 
-- `noDelay` - A Boolean value to control whether the Nagle Algorithm is enabled (`TCP_NODELAY`). It is enabled by default on most platforms. For some situations, better write performance may be achieved by disabling it.
+TCPソケットの場合、辞書は2つのオプションプロパティをサポートします：
+
+- `noDelay` - Nagleアルゴリズムが有効かどうかを制御するブール値 (`TCP_NODELAY`)。ほとんどのプラットフォームではデフォルトで有効になっています。状況によっては、これを無効にすることで書き込みパフォーマンスが向上する場合があります。
 
 ```js
 	{...., noDelay: true}
 ```
 
-- `keepalive` - An object to control the keep alive behavior of the socket. The `idle` and `interval` properties are in milliseconds. For example:
+- `keepalive` - ソケットのキープアライブ動作を制御するオブジェクトです。`idle` と `interval` プロパティはミリ秒単位です。例えば:
 
 ```js
 	{...., keepalive: {idle: 60 * 1000, interval: 30 * 1000, count: 4}}
@@ -87,7 +88,7 @@ For TCP sockets, the dictionary supports two option properties:
 
 ### `close()`
 
-The `close` function immediately terminates the socket, freeing all resources associated with the socket.
+`close` 関数はソケットを即座に終了し、ソケットに関連するすべてのリソースを解放します。
 
 ```js
 socket.close();
@@ -97,55 +98,55 @@ socket.close();
 
 ### `read(type [, until])`
 
-The `read` function receives data from the socket. Data is only available to read inside the callback function when it receives a `data` message; attempts to read data at other times will fail.
+`read` 関数はソケットからデータを受信します。データは `data` メッセージを受信したときにのみコールバック関数内で読み取ることができ、それ以外の時にデータを読み取ろうとすると失敗します。
 
-To read all available data into a `String`:
+すべての利用可能なデータを `String` に読み取るには:
 
 ```js
 let string = this.read(String);
 ```
 
-To read all available data into an `ArrayBuffer`:
+すべての利用可能なデータを `ArrayBuffer` に読み取るには:
 
 ```js
 let buffer = this.read(ArrayBuffer);
 ```
 
-To read one byte into a `Number`:
+1バイトを `Number` に読み取るには:
 
 ```js
 let byte = this.read(Number);
 ```
 
-To read 12 bytes into a `String` or `ArrayBuffer`:
+12バイトを `String` または `ArrayBuffer` に読み取るには:
 
 ```js
 let string = this.read(String, 12);
 let buffer = this.read(ArrayBuffer, 12);
 ```
 
-To read up to the next space character into `String` or `ArrayBuffer`. If there is no space character found, the remainder of the available data is read:
+次のスペース文字までを `String` または `ArrayBuffer` に読み込みます。スペース文字が見つからない場合、利用可能なデータの残りが読み込まれます:
 
 ```js
 let string = this.read(String, " ");
 let buffer = this.read(ArrayBuffer, " ");
 ```
 
-To skip data in the read buffer, read to `null`:
+読み取りバッファ内のデータをスキップするには、`null` を読み込みます:
 
 ```js
-this.read(null, 5);		// skip ahead 5 bytes
+this.read(null, 5);		// 5バイト先にスキップ
 ```
 
-To skip to the next carriage-return (or the end of the buffer, if none found):
+次のキャリッジリターン（または見つからない場合はバッファの終わり）までスキップするには:
 
 ```js
 this.read(null, "\n");
 ```
 
-When reading to `null`, the return value is the count of bytes skipped.
+`null` に読み込む場合、戻り値はスキップされたバイト数です。
 
-To determine the number of available bytes remaining in the buffer, call `read` with no arguments:
+バッファ内に残っている利用可能なバイト数を確認するには、引数なしで `read` を呼び出します:
 
 ```js
 let bytesAvailable = this.read();
@@ -155,9 +156,9 @@ let bytesAvailable = this.read();
 
 ### `write(data [, data1, ...])`
 
-The `write` function sends data on the socket. One or more arguments may be passed to `write` for transmission.
+`write` 関数はソケットにデータを送信します。1つ以上の引数を `write` に渡して送信することができます。
 
-For a TCP socket, all parameters are data to be transmitted.
+TCPソケットの場合、すべてのパラメータは送信されるデータです。
 
 ```js
 socket.write("Hello");
@@ -166,59 +167,59 @@ socket.write("world.", 13);
 socket.write(JSON.stringify(obj));
 ```
 
-`String` and `ArrayBuffer` values are transmitted as-is. A `Number` value is transmitted as a byte.
+`String` と `ArrayBuffer` の値はそのまま送信されます。`Number` の値はバイトとして送信されます。
 
-If the socket has insufficient buffer space to transmit the data, none of the data is sent. To determine the number of bytes that can be transmitted, call `write` with no arguments:
+ソケットにデータを送信するためのバッファスペースが不足している場合、データは一切送信されません。送信可能なバイト数を確認するには、引数なしで `write` を呼び出します:
 
 ```js
 let bytesToSend = socket.write();
 ```
 
-For a UDP socket, the first two parameters are the IP address and port to transmit the packet to. The third parameters is the data to transmit as an `ArrayBuffer`:
+UDPソケットの場合、最初の2つのパラメータはパケットを送信するIPアドレスとポートです。3番目のパラメータは `ArrayBuffer` として送信するデータです:
 
 ```js
 socket.write("1.2.3.4", 1234, packet);
 ```
 
-For a RAW socket, the first parameter is IP address to transmit the packet to. The second parameter is the data to transmit as an `ArrayBuffer`:
+RAWソケットの場合、最初のパラメータはパケットを送信するIPアドレスです。2番目のパラメータは `ArrayBuffer` として送信するデータです:
 
 ```js
 socket.write("1.2.3.4", packet);
 ```
 
-It is more efficient to make a single `write` call with several parameters instead of multiple calls to `write`.
+複数回の `write` 呼び出しを行うよりも、複数のパラメータを持つ単一の `write` 呼び出しを行う方が効率的です。
 
 ***
 
 ### `get(what)`
 
-The `get` method returns state information about the socket. The `what` argument is a string indicating the state requested. If the state is unavailable, `get` returns `undefined`.
+`get` メソッドはソケットの状態情報を返します。`what` 引数は要求された状態を示す文字列です。状態が利用できない場合、`get` は `undefined` を返します。
 
-| `what` | Description |
+| `what` | 説明 |
 | :---: | :--- |
-| `"REMOTE_IP"` | Returns the IP address of the remote endpoint. Only available for TCP sockets. |
+| `"REMOTE_IP"` | リモートエンドポイントのIPアドレスを返します。TCPソケットでのみ利用可能です。 |
 
 ***
 
 ### `callback(message [, value])`
 
-The user of the socket receives status information through the callback function. The first argument to the callback is the messages identifier. Positive `message` values indicate normal operation and negative `message` values indicate an error. Depending on the message, there may be additional arguments.
+ソケットのユーザーはコールバック関数を通じてステータス情報を受け取ります。コールバックの最初の引数はメッセージ識別子です。正の `message` 値は通常の操作を示し、負の `message` 値はエラーを示します。メッセージに応じて、追加の引数がある場合があります。
 
-| `message` | Description |
+| `message` | 説明 |
 | :---: | :--- |
-| -2 | **error:** An error occurred. The socket is no longer usable. |
-| -1 | **disconnect:** The socket disconnected from the remote host. |
-| 1 | **connect:** The socket successfully connected to the remote host.
-| 2 | **dataReceived:** The socket has received data. The `value` argument contains the number of bytes available to read.
-| 3 | **dataSent:** The socket has successfully transmitted some or all of the data written to it. The `value` argument contains the number of bytes that can be safely written.
+| -2 | **エラー:** エラーが発生しました。ソケットはもう使用できません。 |
+| -1 | **切断:** ソケットがリモートホストから切断されました。 |
+| 1 | **接続:** ソケットがリモートホストに正常に接続されました。 |
+| 2 | **データ受信:** ソケットがデータを受信しました。`value` 引数には読み取り可能なバイト数が含まれます。 |
+| 3 | **データ送信:** ソケットが書き込まれたデータの一部または全部を正常に送信しました。`value` 引数には安全に書き込めるバイト数が含まれます。
 
-For UDP sockets, the callback for `dataReceived` has three additional arguments after the message identifier . The first is the number of bytes available to read, as with TCP sockets. The second is a string containing the IP address of the sender. The third is the port number of the sender.
+UDPソケットの場合、`dataReceived` のコールバックにはメッセージ識別子の後に3つの追加引数があります。最初の引数はTCPソケットと同様に読み取り可能なバイト数です。2番目の引数は送信者のIPアドレスを含む文字列です。3番目の引数は送信者のポート番号です。
 
 ```js
 callback(message, byteLength, remoteIP, remotePort) {}
 ```
 
-For RAW sockets, the callback for `dataReceived` has two additional arguments after the message identifier . The first is the number of bytes available to read, as with TCP sockets. The second is a string containing the IP address of the sender.
+RAWソケットの場合、`dataReceived`のコールバックにはメッセージ識別子の後に2つの追加引数があります。最初の引数はTCPソケットと同様に読み取り可能なバイト数です。2番目の引数は送信者のIPアドレスを含む文字列です。
 
 ```js
 callback(message, byteLength, remoteIP) {}
@@ -226,9 +227,9 @@ callback(message, byteLength, remoteIP) {}
 
 ***
 
-### Example: HTTP GET
+### 例: HTTP GET
 
-The following sample shows using the `Socket` object to make a simple HTTP GET request and trace the response, including headers, to the console. This example is not intended as a useful HTTP client.
+以下の例は、`Socket`オブジェクトを使用してシンプルなHTTP GETリクエストを行い、ヘッダーを含むレスポンスをコンソールにトレースする方法を示しています。この例は有用なHTTPクライアントとして意図されたものではありません。
 
 ```js
 let host = "www.example.com";
@@ -251,12 +252,12 @@ socket.callback = function(message, value)
 ***
 
 <a id="listener"></a>
-## class Listener
+## Listenerクラス
 
-- **Source code:** [socket](../../modules/network/socket)
-- **Relevant Examples:** [socketlistener](../../examples/network/socket/socketlistener)
+- **ソースコード:** [socket](../../modules/network/socket)
+- **関連するサンプル:** [socketlistener](../../examples/network/socket/socketlistener)
 
-The `Listener` class implements a network socket listener to accept new TCP connections. The `Listener` class is used together with the `Socket` class.
+`Listener`クラスは、新しいTCP接続を受け入れるためのネットワークソケットリスナーを実装します。`Listener`クラスは`Socket`クラスと一緒に使用されます。
 
 ```js
 import {Socket, Listener} from "socket";
@@ -264,9 +265,9 @@ import {Socket, Listener} from "socket";
 
 ### `constructor(dictionary)`
 
-The `Listener` constructor takes a single argument, a object dictionary of initialization parameters.
+`Listener` コンストラクタは、初期化パラメータのオブジェクト辞書を引数として受け取ります。
 
-To listen, use the `port` property to specify the port to listen on:
+リッスンするには、`port` プロパティを使用してリッスンするポートを指定します:
 
 ```js
 let telnet = new Listener({port: 23});
@@ -276,7 +277,7 @@ let telnet = new Listener({port: 23});
 
 ### `callback()`
 
-The user of the listener is notified through the callback function. The callback function accepts the connection request and instantiates a new socket by invoking the Socket constructor with the listener instance.
+リスナーのユーザーは、コールバック関数を通じて通知されます。コールバック関数は接続要求を受け入れ、リスナーインスタンスを使用して Socket コンストラクタを呼び出すことで新しいソケットをインスタンス化します。
 
 ```js
 telnet.callback = function() {
@@ -287,9 +288,9 @@ telnet.callback = function() {
 
 ***
 
-### Example: HTTP server
+### 例: HTTP サーバー
 
-The following example implements a trivial HTTP server using `Listener` and `Socket`. The server is truly trivial, not even parsing the client request.
+次の例は、`Listener` と `Socket` を使用して簡単な HTTP サーバーを実装しています。このサーバーは非常に簡単で、クライアントのリクエストを解析することさえしません。
 
 ```js
 let count = 0;
@@ -310,53 +311,53 @@ listener.callback = function() {
 ***
 
 <a id="http-request"></a>
-## class HTTP Request
+## HTTPリクエストクラス
 
-- **Source code:** [http](../../modules/network/http)
-- **Relevant Examples:** [httpget](../../examples/network/http/httpget), [httppost](../../examples/network/http/httppost), [httpsget](../../examples/network/http/httpsget), and [many more](../../examples/network/http/)
+- **ソースコード:** [http](../../modules/network/http)
+- **関連するサンプル:** [httpget](../../examples/network/http/httpget), [httppost](../../examples/network/http/httppost), [httpsget](../../examples/network/http/httpsget), および [その他多数](../../examples/network/http/)
 
-The HTTP `Request` class implements a client for making HTTP requests. It is built on the `Socket` class. Like the `Socket` class, the HTTP `Request` uses a dictionary-based constructor and a single callback.
+HTTP `Request` クラスは、HTTP リクエストを行うためのクライアントを実装します。これは `Socket` クラスに基づいて構築されています。`Socket` クラスと同様に、HTTP `Request` は辞書ベースのコンストラクタと単一のコールバックを使用します。
 
 ```js
 import {Request} from "http"
 ```
 
-> **Note**: Strings passed for the request body may only contain characters in the ASCII range 0 to 127. To use full UTF-8, convert the strings to a buffer using `ArrayBuffer.fromString` or `TextEncoder`.
+> **注**: リクエストボディに渡される文字列は、ASCII 範囲の 0 から 127 の文字のみを含むことができます。完全な UTF-8 を使用するには、文字列を `ArrayBuffer.fromString` または `TextEncoder` を使用してバッファに変換してください。
 
 ### `constructor(dictionary)`
 
-A new HTTP `Request` is configured using a dictionary of properties. The dictionary is a super-set of the `Socket` dictionary.
+新しい HTTP `Request` は、プロパティの辞書を使用して構成されます。この辞書は `Socket` 辞書のスーパーセットです。
 
-The complete list of properties the HTTP `Request` adds to the `Socket` dictionary is:
+HTTP `Request` が `Socket` 辞書に追加するプロパティの完全なリストは次のとおりです:
 
-| Parameter | Default Value | Description |
+| パラメータ | デフォルト値 | 説明 |
 | :---: | :---: | :--- |
-| `port` | 80 | The remote port number |
-| `path` | `/` | The path, query, and fragment portion of the HTTP URL |
-| `method` | `GET` | The method to use for this HTTP request|
-| `headers` |  Defaults to an empty array (e.g. `[]`) | An array containing the HTTP headers to add. Even number elements are header names and odd number elements are the corresponding header values.
-| `body` | `false` | Request body contents. Provide a `String` or `ArrayBuffer` with the complete body. Set to `true` to provide the request body in fragments via the callback. |
-| `response` | `undefined` | The type of object to use for the response body passed to the callback when the request is complete. May be set to `String`, `ArrayBuffer`, or `undefined`. If set to `undefined`, the response body is delivered to the callback in fragments upon arrival. |
+| `port` | 80 | リモートポート番号 |
+| `path` | `/` | HTTP URL のパス、クエリ、およびフラグメント部分 |
+| `method` | `GET` | この HTTP リクエストに使用するメソッド |
+| `headers` | デフォルトは空の配列 (例: `[]`) | 追加する HTTP ヘッダーを含む配列。偶数要素はヘッダー名、奇数要素は対応するヘッダー値です。 |
+| `body` | `false` | リクエストボディの内容。完全なボディを持つ `String` または `ArrayBuffer` を提供します。コールバックを介して断片的にリクエストボディを提供するには `true` に設定します。 |
+| `response` | `undefined` | リクエストが完了したときにコールバックに渡されるレスポンスボディに使用するオブジェクトのタイプ。`String`、`ArrayBuffer`、または `undefined` に設定できます。`undefined` に設定されている場合、レスポンスボディは到着時に断片的にコールバックに渡されます。 |
 
-To request the root "/" resource on port 80 as a `String`:
+ポート80でルート "/" リソースを `String` としてリクエストするには:
 
 ```js
 let request = new Request({host: "www.example.com", response: String});
 ```
 
-To request the "/info.dat" resource from port 8080 as an `ArrayBuffer`:
+ポート8080から "/info.dat" リソースを `ArrayBuffer` としてリクエストするには:
 
 ```js
 let request = new Request({host: "www.example.com", path: "/info.dat", port: 8080, response: ArrayBuffer});
 ```
 
-To request the "/weather.json" resource from a device with IP address "192.0.1.15" as a `String` object:
+IPアドレス "192.0.1.15" を持つデバイスから "/weather.json" リソースを `String` オブジェクトとしてリクエストするには:
 
 ```js
 let request = new Request({address: "192.0.1.15", path: "/weather.json", response: String});
 ```
 
-To issue a DELETE request, set the `method` property in the dictionary:
+DELETEリクエストを発行するには、辞書内の `method` プロパティを設定します:
 
 ```js
 let request = new Request({address: "192.0.1.15", path: "/resource/to/delete", method: "DELETE"});
@@ -366,7 +367,7 @@ let request = new Request({address: "192.0.1.15", path: "/resource/to/delete", m
 
 ### `close()`
 
-The `close` function immediately terminates the HTTP request, freeing the socket and any other associated memory.
+`close` 関数はHTTPリクエストを即座に終了し、ソケットおよびその他の関連メモリを解放します。
 
 ```js
 request.close();
@@ -376,54 +377,53 @@ request.close();
 
 ### `read(type [, until])`
 
-The `read` function behaves exactly like the read function of the `Socket` class. The `read` function can only be called inside the callback providing a response body fragment.
+`read` 関数は `Socket` クラスの read 関数と全く同じように動作します。`read` 関数は、レスポンスボディのフラグメントを提供するコールバック内でのみ呼び出すことができます。
 
-> **Note**: The HTTP read function implentation does not currently support passing a `String` for the `until` argument on a response that uses chunked transfer-encoding.
+> **注**: HTTP 読み取り関数の実装は、チャンク転送エンコーディングを使用するレスポンスに対して `until` 引数として `String` を渡すことを現在サポートしていません。
 
 ***
 
 ### `callback(message, val1, val2)`
 
-The user of the `Request` object receives status information through the callback function. The callback receives messages and, for some messages, additional data values. Non-negative `message` values indicate normal operation and negative `message` values indicate an error.
+`Request` オブジェクトのユーザーは、コールバック関数を通じてステータス情報を受け取ります。コールバックはメッセージを受け取り、一部のメッセージには追加のデータ値も含まれます。非負の `message` 値は通常の動作を示し、負の `message` 値はエラーを示します。
 
-
-| `message` | `Request.` | Description |
+| `message` | `Request.` | 説明 |
 | :---: | :---: | :--- |
 |-2 | `error` |
-| 0 | `requestFragment` | Get request body fragment. This callback is only received if the `body` property in the dictionary is set to `true`. When called, `val1` is the maximum number of bytes that can be transmitted. Return either a `String` or `ArrayBuffer` containing the next fragment of the request body. Return `undefined` when there are no more fragments.
-| 1 | `status` | Response status received with status code. This callback is invoked when the HTTP response status line is successfully received. When called, `val1` is the HTTP status code (e.g. 200 for OK).
-| 2 | `header` | One header received. The callback is called for each header in the response. When called, `val1` is the header name in lowercase letters (e.g. `connection`) and `val2` is the header value (e.g. `close`).
-| 3 | `headersComplete` | All headers received. When all headers have been received, the callback is invoked.
-| 4 | `responseFragment` | Response body fragment. This callback is invoked when a fragment of the complete HTTP response body is received. `val1` is the number of bytes in the fragment which may be retrieved using the `read` function. This callback only invoked if the `response` property value is `undefined`.
-| 5 | `responseComplete` | All response body received. This callback is invoked when the entire response body has been received. If the `response` property value is not  `undefined`, `val1` contains the response.
+| 0 | `requestFragment` | リクエストボディのフラグメントを取得します。このコールバックは、辞書の `body` プロパティが `true` に設定されている場合にのみ受信されます。呼び出されたとき、`val1` は送信可能な最大バイト数です。次のリクエストボディのフラグメントを含む `String` または `ArrayBuffer` を返します。フラグメントがもうない場合は `undefined` を返します。
+| 1 | `status` | ステータスコード付きのレスポンスステータスを受信します。このコールバックは、HTTP レスポンスステータスラインが正常に受信されたときに呼び出されます。呼び出されたとき、`val1` は HTTP ステータスコード（例: OK の場合は 200）です。
+| 2 | `header` | 1つのヘッダーを受信します。レスポンスの各ヘッダーに対してコールバックが呼び出されます。呼び出されたとき、`val1` は小文字のヘッダー名（例: `connection`）で、`val2` はヘッダー値（例: `close`）です。
+| 3 | `headersComplete` | すべてのヘッダーを受信します。すべてのヘッダーが受信されたときにコールバックが呼び出されます。
+| 4 | `responseFragment` | レスポンスボディのフラグメント。このコールバックは、完全な HTTP レスポンスボディのフラグメントが受信されたときに呼び出されます。`val1` はフラグメント内のバイト数で、`read` 関数を使用して取得できます。このコールバックは、`response` プロパティ値が `undefined` の場合にのみ呼び出されます。
+| 5 | `responseComplete` | すべてのレスポンスボディを受信します。このコールバックは、レスポンスボディ全体が受信されたときに呼び出されます。`response` プロパティ値が `undefined` でない場合、`val1` にレスポンスが含まれます。
 
 ***
 
 <a id="http-server"></a>
-## class HTTP Server
+## HTTPサーバークラス
 
-- **Source code:** [http](../../modules/network/http)
-- **Relevant Examples:** [httpserver](../../examples/network/http/httpserver), [httpserverbmp](../../examples/network/http/httpserverbmp), [httpserverchunked](../../examples/network/http/httpserverchunked), [httpserverputfile](../../examples/network/http/httpserverputfile)
+- **ソースコード:** [http](../../modules/network/http)
+- **関連するサンプル:** [httpserver](../../examples/network/http/httpserver), [httpserverbmp](../../examples/network/http/httpserverbmp), [httpserverchunked](../../examples/network/http/httpserverchunked), [httpserverputfile](../../examples/network/http/httpserverputfile)
 
-The HTTP `Server` class implements a server to respond to HTTP requests. It is built on the `Socket` class. Like the `Socket` class, the HTTP `Server` class uses a dictionary-based constructor and a single callback.
+HTTP `Server` クラスは、HTTP リクエストに応答するサーバーを実装します。これは `Socket` クラスを基に構築されています。`Socket` クラスと同様に、HTTP `Server` クラスは辞書ベースのコンストラクタと単一のコールバックを使用します。
 
 ```js
 import {Server} from "http"
 ```
 
-> **Note**: Strings passed for the response body may only contain characters in the ASCII range 0 to 127. To use full UTF-8, convert the strings to a buffer using `ArrayBuffer.fromString` or `TextEncoder`.
+> **注意**: レスポンスボディに渡される文字列は、ASCII 範囲の 0 から 127 の文字のみを含むことができます。完全な UTF-8 を使用するには、文字列を `ArrayBuffer.fromString` または `TextEncoder` を使用してバッファに変換してください。
 
 ### `constructor(dictionary)`
 
-A new HTTP server is configured using a dictionary of properties. The dictionary is a super-set of the `Socket` dictionary.
+新しい HTTP サーバーは、プロパティの辞書を使用して構成されます。この辞書は `Socket` 辞書のスーパーセットです。
 
-To open an HTTP server, on the default port (80):
+デフォルトポート (80) で HTTP サーバーを開くには:
 
 ```js
 let server = new Server({});
 ```
 
-To open an HTTP server on port 8080:
+ポート8080でHTTPサーバーを開くには:
 
 ```js
 let server = new Server({port: 8080});
@@ -433,8 +433,8 @@ let server = new Server({port: 8080});
 
 ### `close([connections])`
 
-The `close` function immediately terminates the HTTP server, freeing the server listener socket and any other associated memory.
-If connections is true it also closes all active connections to the server.
+`close`関数はHTTPサーバーを即座に終了し、サーバーリスナーソケットおよびその他の関連メモリを解放します。
+`connections`がtrueの場合、サーバーへのすべてのアクティブな接続も閉じます。
 
 ```js
 server.close();
@@ -444,7 +444,7 @@ server.close();
 
 ### `detach(connection)`
 
-The `detach` function accepts an active HTTP connection of the server instance and removes it from the server, returning the socket instance of the connection. This is useful for implementing an HTTP endpoint that accepts both HTTP and WebSocket connections by allowing the existing connection of HTTP server to be handed off to the WebSocket server.
+`detach`関数はサーバーインスタンスのアクティブなHTTP接続を受け入れ、それをサーバーから削除し、接続のソケットインスタンスを返します。これは、HTTPサーバーの既存の接続をWebSocketサーバーに引き渡すことにより、HTTPとWebSocketの両方の接続を受け入れるHTTPエンドポイントを実装するのに役立ちます。
 
 ```js
 server.detach(connection);
@@ -454,28 +454,28 @@ server.detach(connection);
 
 ### `callback(message, val1, val2)`
 
-The user of the server receives status information through the callback function. The callback receives messages and, for some messages, additional data values. Positive `message` values indicate normal operation and negative `message` values indicate an error.
+サーバーのユーザーは`callback`関数を通じてステータス情報を受け取ります。`callback`はメッセージを受け取り、一部のメッセージには追加のデータ値も含まれます。正の`message`値は通常の操作を示し、負の`message`値はエラーを示します。
 
-| `message` | `Server.` | Description |
+| `message` | `Server.` | 説明 |
 | :---: | :---: | :--- |
-| -1| `error`  | Disconnected. The request disconnected before the complete response could be delivered. Once disconnected, the request is closed by the server.
-| 1 | `connection` | New connection received. A new requested has been accepted by the server.
-| 2 | `status` | Status line of request received. The `val1` argument contains the request path (e.g. `index.html`) and `val2` contains the request method (e.g. `GET`).
-| 3 | `header` | One header received. A single HTTP header has been received, with the header name in lowercase letters in `val1` (e.g. `connection`) and the header value (e.g. `close`) in `val2`.
-| 4 | `headersComplete` | All headers received. All HTTP headers have been received. Return `String` or `ArrayBuffer` to receive the complete request body as an argument to the `requestComplete` message as the corresponding type; return `true` to have `requestFragment` invoked as the fragments arrive. Return `false` or `undefined` to ignore the request body. The behavior for ohter return values is undefined.
+| -1| `error`  | 切断されました。完全な応答が送信される前にリクエストが切断されました。切断されると、リクエストはサーバーによって閉じられます。 |
+| 1 | `connection` | 新しい接続が受信されました。サーバーが新しいリクエストを受け入れました。 |
+| 2 | `status` | リクエストのステータス行が受信されました。`val1` 引数にはリクエストパス（例：`index.html`）が含まれ、`val2` にはリクエストメソッド（例：`GET`）が含まれます。 |
+| 3 | `header` | 1つのヘッダーが受信されました。1つのHTTPヘッダーが受信され、ヘッダー名は小文字で `val1` に（例：`connection`）、ヘッダー値は `val2` に（例：`close`）含まれます。 |
+| 4 | `headersComplete` | すべてのヘッダーが受信されました。すべてのHTTPヘッダーが受信されました。`requestComplete` メッセージの引数として完全なリクエストボディを対応するタイプで受け取るには `String` または `ArrayBuffer` を返します。フラグメントが到着するたびに `requestFragment` を呼び出すには `true` を返します。リクエストボディを無視するには `false` または `undefined` を返します。他の戻り値の動作は未定義です。 |
 | 5 | `requestFragment` |
 | 6 | `requestComplete` |
-| 8 | `prepareResponse` | Prepare response. The server is ready to send the response. Callback returns a dictionary with the response status (e.g. 200) in the `status` property, HTTP headers in an array on the `headers` property, and the response body on the `body` property. If the status property is missing, the default value of `200` is used. If the body is a `String` or `ArrayBuffer`, it is the complete response. The server adds the `Content-Length` HTTP header. If the body property is set to `true`, the response is delivered using the `Transfer-encoding` mode `chunked`, and the callback is invoked to retrieve each response fragment.
-| 9 | `responseFragment` | Get response fragment. The server is ready to transmit another fragment of the response. The `val1` argument contains the number of bytes that may be transmitted. The callback returns either a `String` or `ArrayBuffer`. When all data of the request has been returned, the callback returns `undefined`.
-| 10| `responseComplete`  | Request complete. The request has successfully completed.
+| 8 | `prepareResponse` | 応答の準備をします。サーバーは応答を送信する準備ができています。コールバックは、`status` プロパティに応答ステータス（例：200）、`headers` プロパティにHTTPヘッダーの配列、`body` プロパティに応答ボディを持つ辞書を返します。ステータスプロパティが欠落している場合、デフォルト値の `200` が使用されます。ボディが `String` または `ArrayBuffer` の場合、それは完全な応答です。サーバーは `Content-Length` HTTPヘッダーを追加します。ボディプロパティが `true` に設定されている場合、応答は `Transfer-encoding` モード `chunked` を使用して配信され、コールバックは各応答フラグメントを取得するために呼び出されます。 |
+| 9 | `responseFragment` | 応答フラグメントを取得します。サーバーは応答の別のフラグメントを送信する準備ができています。`val1` 引数には送信可能なバイト数が含まれます。コールバックは `String` または `ArrayBuffer` のいずれかを返します。リクエストのすべてのデータが返されたとき、コールバックは `undefined` を返します。 |
+| 10| `responseComplete`  | リクエストが正常に完了しました。 |
 
-A new HTTP `Request` is instantiated for each incoming request. The callback is invoked with `this` set to the callback instance for the request. The callback function may attach properties related to handling a specific request to `this`, rather than using global variables, to ensure there are no state collisions when there are multiple active requests.
+新しいHTTP `Request`は、受信するリクエストごとにインスタンス化されます。コールバックは、そのリクエストのコールバックインスタンスに設定された`this`と共に呼び出されます。コールバック関数は、グローバル変数を使用するのではなく、特定のリクエストの処理に関連するプロパティを`this`にアタッチすることができ、複数のアクティブなリクエストがある場合に状態の衝突がないようにします。
 
 ***
 
-### Example: Simple HTTP server
+### 例: シンプルなHTTPサーバー
 
-The following example implements an HTTP server that responds to all requests by echoing the requested path.
+次の例は、要求されたパスをエコーすることで全てのリクエストに応答するHTTPサーバーを実装しています。
 
 ```js
 (new Server({})).callback = function(message, value) {
@@ -490,13 +490,13 @@ The following example implements an HTTP server that responds to all requests by
 }
 ```
 
-The server instance has a single callback function which responds to messages corresponding to the steps in fulfilling an HTTP request. A new request instance is created for each request, so the callback receives a unique `this` for each request. In this example, when the HTTP status line of a new request is received (message 2), the callback stores the path of the request. When the server is ready to transmit the body of the response (message 8), the callback returns the HTTP headers and response body (the path, in this case). The server adds the `Content-Length` header.
+サーバーインスタンスには、HTTPリクエストを満たすためのステップに対応するメッセージに応答する単一のコールバック関数があります。各リクエストごとに新しいリクエストインスタンスが作成されるため、コールバックは各リクエストに対して一意の`this`を受け取ります。この例では、新しいリクエストのHTTPステータスラインが受信されたとき（メッセージ2）、コールバックはリクエストのパスを保存します。サーバーがレスポンスの本文を送信する準備ができたとき（メッセージ8）、コールバックはHTTPヘッダーとレスポンス本文（この場合はパス）を返します。サーバーは`Content-Length`ヘッダーを追加します。
 
 ***
 
-### Example: HTTP Server with chunked response
+### 例: チャンクレスポンスを持つHTTPサーバー
 
-The following example implements an HTTP server that responds to requests with a sequence of random numbers of random length.
+次の例は、ランダムな長さのランダムな数列でリクエストに応答するHTTPサーバーを実装しています。
 
 ```js
 (new Server({})).callback = function(message, value) {
@@ -513,13 +513,13 @@ The following example implements an HTTP server that responds to requests with a
 }
 ```
 
-In this example, when the server is ready to transmit the response body (message 8), the callback returns the HTTP headers, and `true` for the body indicating the response body will be provided in fragments. In this case, the server adds a `Transfer-encoding` header with the value `chunked`. When the server is ready to transmit the next chunk of the response, the callback is invoked (message 9) to return the chunk. In this example, it returns a random number. When the random number is 0, the server returns `undefined` indicating the request is complete.
+この例では、サーバーがレスポンスボディを送信する準備ができたとき（メッセージ8）、コールバックはHTTPヘッダーを返し、レスポンスボディがフラグメントで提供されることを示すために`true`を返します。この場合、サーバーは値`chunked`の`Transfer-encoding`ヘッダーを追加します。サーバーがレスポンスの次のチャンクを送信する準備ができたとき、コールバックが呼び出され（メッセージ9）、チャンクを返します。この例では、ランダムな数値を返します。ランダムな数値が0の場合、サーバーはリクエストが完了したことを示すために`undefined`を返します。
 
 ***
 
-### Example: HTTP Server receiving a JSON PUT
+### 例: JSON PUTを受信するHTTPサーバー
 
-The following example implements an HTTP server that receives a JSON request, and echoes the JSON back in the response body.
+次の例は、JSONリクエストを受信し、レスポンスボディでJSONをエコーバックするHTTPサーバーを実装しています。
 
 ```js
 (new Server({})).callback = function(message, value) {
@@ -539,13 +539,13 @@ The following example implements an HTTP server that receives a JSON request, an
 }
 ```
 
-The callback is invoked when the request headers have been received (message 4), and returns String indicating it wants to receive the request body as a String object. When the complete request body has been received, the callback is invoked (message 6). The callback retains a reference to the JSON object in the `jsonRequest` property of the request instance. When the callback is invoked to transmit the response body (message 8), it serializes the JSON object to a string to transmit as the message body.
+コールバックはリクエストヘッダーが受信されたときに呼び出され（メッセージ4）、リクエストボディをStringオブジェクトとして受信したいことを示すStringを返します。完全なリクエストボディが受信されたとき、コールバックが呼び出されます（メッセージ6）。コールバックはリクエストインスタンスの`jsonRequest`プロパティにJSONオブジェクトへの参照を保持します。レスポンスボディを送信するためにコールバックが呼び出されたとき（メッセージ8）、メッセージボディとして送信するためにJSONオブジェクトを文字列にシリアライズします。
 
 ***
 
-### Example: HTTP Server streaming PUT to file
+### 例: ファイルにストリーミングするHTTPサーバーのPUTリクエスト
 
-The following example implements an HTTP server that receives PUT requests, and streams the request body to a file using the HTTP request path as the local file path.
+次の例は、PUTリクエストを受信し、HTTPリクエストパスをローカルファイルパスとして使用してリクエストボディをファイルにストリーミングするHTTPサーバーを実装しています。
 
 ```js
 import {File} from "file";
@@ -573,47 +573,47 @@ import config from "mc/config";
 }
 ```
 
-To try the code, use the `curl` tool as follows, substituting the file path and IP address as necessary:
+コードを試すには、必要に応じてファイルパスとIPアドレスを置き換えて、次のように`curl`ツールを使用します：
 
 	curl --data-binary "@/users/hoddie/projects/test.txt"  http://192.168.1.37/test.txt
 
 ***
 
 <a id="websocket-client"></a>
-## class WebSocket Client
+## WebSocket Clientクラス
 
-- **Source code:** [websocket](../../modules/network/websocket)
-- **Relevant Examples:** [websocketclient](../../examples/network/websocket/websocketclient)
+- **ソースコード:** [websocket](../../modules/network/websocket)
+- **関連するサンプル:** [websocketclient](../../examples/network/websocket/websocketclient)
 
-The WebSocket `Client` class implements a client for communicating with a WebSocket server. It is built on the `Socket` class. Like the `Socket` class, the WebSocket `Client` uses a dictionary-based constructor and a single callback.
+WebSocket `Client`クラスは、WebSocketサーバーと通信するためのクライアントを実装しています。これは`Socket`クラスを基に構築されています。`Socket`クラスと同様に、WebSocket `Client`は辞書ベースのコンストラクタと単一のコールバックを使用します。
 
 ```js
 import {Client} from "websocket"
 ```
 
-The WebSocket client implementation is designed for sending and receiving small messages. It has the following limitations:
+WebSocketクライアントの実装は、小さなメッセージの送受信を目的としています。以下の制限があります：
 
-- Each message must be a single frame. Fragmented messages are not supported.
-- Messages are not masked when sent.
+- 各メッセージは単一フレームでなければなりません。断片化されたメッセージはサポートされていません。
+- 送信時にメッセージはマスクされません。
 
 ### `constructor(dictionary)`
 
-A new WebSocket `Client` is configured using a dictionary of properties. The dictionary is a super-set of the `Socket` dictionary.
+新しいWebSocket `Client`はプロパティの辞書を使用して構成されます。辞書は`Socket`辞書のスーパーセットです。
 
-The complete list of properties the WebSocket `Client` adds to the `Socket` dictionary is:
+WebSocket `Client`が`Socket`辞書に追加するプロパティの完全なリストは次のとおりです：
 
-| Property | Default Value | Description |
+| プロパティ | デフォルト値 | 説明 |
 | :---: | :---: | :--- |
-| `port` | 80 | The remote port number |
-| `path` | `/` | The path, query, and fragment portion of the HTTP URL |
+| `port` | 80 | リモートポート番号 |
+| `path` | `/` | HTTP URLのパス、クエリ、およびフラグメント部分 |
 
-To connect to a server on port 80 at the root path "/":
+ルートパス "/"のポート80でサーバーに接続するには：
 
 ```js
 let ws = new Client({host: "echo.websocket.org"});
 ```
 
-To connect to a server by IP address on port 8080:
+ポート8080でIPアドレスによるサーバーに接続するには：
 
 ```js
 let ws = new Client({address: "174.129.224.73", port: 8080});
@@ -623,7 +623,7 @@ let ws = new Client({address: "174.129.224.73", port: 8080});
 
 ### `close()`
 
-The `close` function immediately terminates the WebSocket connection, freeing the socket and any other associated memory.
+`close`関数はWebSocket接続を即座に終了し、ソケットおよびその他の関連メモリを解放します。
 
 ```js
 ws.close();
@@ -633,7 +633,7 @@ ws.close();
 
 ### `write(message)`
 
-The write function transmits a single WebSockets message. The message is either a `String`, which is sent as a text message, or an `ArrayBuffer`, which is sent as a binary message.
+write関数は単一のWebSocketsメッセージを送信します。メッセージは`String`であり、テキストメッセージとして送信されるか、`ArrayBuffer`であり、バイナリメッセージとして送信されます。
 
 ```js
 ws.write("hello");
@@ -644,38 +644,38 @@ ws.write(JSON.stringify({text: "hello"}));
 
 ### `callback(message, value)`
 
-The user of the WebSocket client receives status information through the callback function. The callback receives messages and, for some messages, a data value. Positive `message` values indicate normal operation and negative `message` values indicate an error.
+WebSocketクライアントのユーザーは、コールバック関数を通じてステータス情報を受け取ります。コールバックはメッセージを受け取り、一部のメッセージにはデータ値も含まれます。正の`message`値は正常な動作を示し、負の`message`値はエラーを示します。
 
-| `message` | `Client.` | Description |
+| `message` | `Client.` | 説明 |
 | :---: | :---: | :--- |
-| 1 | `connect` | Socket connected. This callback is received when the client has connected to the WebSocket server. |
-| 2 | `handshake` | WebSocket handshake complete. This callback is received after the client has successfully completed the handshake with the WebSocket server to upgrade from the HTTP connection to a WebSocket connection. |
-| 3 | `receive` | Message received. This callback is received when a complete new message arrives from the server. The `value` argument contains the message. Binary messages are delivered in an `ArrayBuffer` and text messages in a `String`. |
-| 4 | `disconnect` | Closed. This callback is received when the connection closes, either by request of the server or a network error. `value` contains the error code, which is 0 if the connection was closed by the server and non-zero in the case of a network error. |
+| 1 | `connect` | ソケットが接続されました。クライアントがWebSocketサーバーに接続したときにこのコールバックが受信されます。 |
+| 2 | `handshake` | WebSocketハンドシェイクが完了しました。クライアントがHTTP接続からWebSocket接続へのアップグレードをWebSocketサーバーと正常に完了した後にこのコールバックが受信されます。 |
+| 3 | `receive` | メッセージが受信されました。サーバーから新しい完全なメッセージが到着したときにこのコールバックが受信されます。`value`引数にはメッセージが含まれます。バイナリメッセージは`ArrayBuffer`で、テキストメッセージは`String`で配信されます。 |
+| 4 | `disconnect` | 接続が閉じられました。このコールバックは、サーバーの要求またはネットワークエラーによって接続が閉じられたときに受信されます。`value`にはエラーコードが含まれ、サーバーによって接続が閉じられた場合は0、ネットワークエラーの場合は非ゼロです。 |
 
 ***
 
 <a id="websocket-server"></a>
-## class WebSocket Server
+## WebSocket Serverクラス
 
-- **Source code:** [websocket](../../modules/network/websocket)
-- **Relevant Examples:** [websocketserver](../../examples/network/websocket/websocketserver)
+- **ソースコード:** [websocket](../../modules/network/websocket)
+- **関連するサンプル:** [websocketserver](../../examples/network/websocket/websocketserver)
 
-The WebSocket `Server` class implements a server for communicating with WebSocket clients. It is built on the `Socket` class. Like the `Socket` class, the WebSocket `Server` uses a dictionary-based constructor and a single callback.
+WebSocket `Server` クラスは、WebSocket クライアントと通信するためのサーバーを実装します。これは `Socket` クラスに基づいて構築されています。`Socket` クラスと同様に、WebSocket `Server` は辞書ベースのコンストラクタと単一のコールバックを使用します。
 
 ```js
 import {Server} from "websocket"
 ```
 
-The WebSocket server implementation is designed for sending and receiving small messages. It has the following limitations:
+WebSocket サーバーの実装は、小さなメッセージの送受信を目的としています。以下の制限があります:
 
-- Each message must be a single frame. Fragmented messages are not supported.
+- 各メッセージは単一のフレームでなければなりません。断片化されたメッセージはサポートされていません。
 
 ### `constructor(dictionary)`
 
-A new WebSocket `Server` is configured using a dictionary of properties. The dictionary is a super-set of the `Listener` dictionary. The server is a Socket Listener. If no port is provided in the dictionary, port 80 is used. If port is set to `null`, no listener is created which is useful when sharing a listener with an http server (see `attach` below).
+新しい WebSocket `Server` は、プロパティの辞書を使用して構成されます。この辞書は `Listener` 辞書のスーパーセットです。サーバーはソケットリスナーです。辞書にポートが指定されていない場合、ポート 80 が使用されます。ポートが `null` に設定されている場合、リスナーは作成されません。これは、http サーバーとリスナーを共有する場合に便利です（下記の `attach` を参照）。
 
-At this time, the WebSocket `Server` does not define any additional properties for the dictionary.
+この時点では、WebSocket `Server` は辞書に対して追加のプロパティを定義していません。
 
 ```js
 let ws = new Server({});
@@ -687,7 +687,7 @@ let ws = new Server({});
 
 ### `close()`
 
-The `close` function immediately terminates the WebSocket server listener, freeing the socket and any other associated memory. Active connections remain open.
+`close` 関数は、WebSocket サーバーリスナーを即座に終了し、ソケットおよびその他の関連メモリを解放します。アクティブな接続は開いたままになります。
 
 ```js
 ws.close();
@@ -697,31 +697,31 @@ ws.close();
 
 ### `attach(socket)`
 
-The `attach` function creates a new incoming WebSockets connection from the provided socket. The server issues the `Server.connect` callback and then performs the WebSockets handshake. The status line has been read from the socket, but none of the HTTP headers have been read as these are required to complete the handshake.
+`attach` 関数は、提供されたソケットから新しい着信 WebSockets 接続を作成します。サーバーは `Server.connect` コールバックを発行し、その後 WebSockets ハンドシェイクを実行します。ステータスラインはソケットから読み取られていますが、HTTP ヘッダーはハンドシェイクを完了するために必要なため、読み取られていません。
 
-See the [httpserverwithwebsockets](../../examples/network/http/httpserverwithwebsockets/main.js) for an example of sharing a single listener socket between the HTTP and WebSockets servers.
+HTTP と WebSockets サーバー間で単一のリスナーソケットを共有するサンプルについては、[httpserverwithwebsockets](../../examples/network/http/httpserverwithwebsockets/main.js) を参照してください。
 
 ***
 
 ### `callback(message, value)`
 
-The WebSocket server callback is the same as the WebSocket client callback with the addition of the "Socket connected" (`1` or `Server.connect`) message. The socket connected message for the server is invoked when the server accepts a new incoming connection.
+WebSocket サーバーのコールバックは、"Socket connected" (`1` または `Server.connect`) メッセージが追加された点を除いて、WebSocket クライアントのコールバックと同じです。サーバーのソケット接続メッセージは、サーバーが新しい着信接続を受け入れたときに呼び出されます。
 
-The value of `this` is unique for each connection made to the server. Messages cannot be sent until after the callback receives the WebSocket handshake complete message (`Server.handshake`).
+`this` の値は、サーバーへの各接続ごとにユニークです。メッセージは、コールバックが WebSocket ハンドシェイク完了メッセージ (`Server.handshake`) を受け取った後でなければ送信できません。
 
-The `this` instance of the callback has the same `write` and `close` methods as the WebSocket Client. These methods are used to send data and to close the connection.
+コールバックの `this` インスタンスには、WebSocket クライアントと同じ `write` および `close` メソッドがあります。これらのメソッドは、データの送信および接続の終了に使用されます。
 
->**Note**: Text and binary messages received with the mask bit set are unmasked by the server before delivering them to the callback.
+>**注意**: マスクビットが設定されたテキストおよびバイナリメッセージは、コールバックに配信される前にサーバーによってマスク解除されます。
 
 ***
 
 <a id="net"></a>
-## class Net
+## Netクラス
 
-- **Source code:** [net](../../modules/network/net)
-- **Relevant Examples:** [net](../../examples/network/net)
+- **ソースコード:** [net](../../modules/network/net)
+- **関連するサンプル:** [net](../../examples/network/net)
 
-The `Net` class provides access to status information about the active network connection.
+`Net` クラスは、アクティブなネットワーク接続に関するステータス情報へのアクセスを提供します。
 
 ```js
 import Net from "net";
@@ -729,59 +729,58 @@ import Net from "net";
 
 ### `static get(property [, interface])`
 
-The `get` function returns properties of the active network connection.
+`get` 関数は、アクティブなネットワーク接続のプロパティを返します。
 
-The following properties are available:
+利用可能なプロパティは次のとおりです:
 
 | Property | Description |
 | :---: | :--- |
-| `IP` | The IP address of the network connection as a `String`, e.g. "10.0.1.4". These may be IPv4 or IPv6 addresses.
-| `MAC` | The MAC address of the device as a `String`, e.g. "A4:D1:8C:DB:C0:20"
-| `SSID` | The name of the Wi-Fi access point connected to as a `String`, e.g. "Moddable Wi-Fi"
-| `BSSID` | The MAC address of the Wi-Fi access point connected to as a `String`, e.g. "18:64:72:47:d4:32"
-| `RSSI` | The Wi-Fi [received signal strength](https://en.wikipedia.org/wiki/Received_signal_strength_indication) as a `Number`
-| `CHANNEL` | The Wi-Fi channel currently in use as a `Number`
-| `DNS` | The DNS server(s) used to resolve domain names to IP addresses by `Net.resolve` as an `Array` of IP address strings. These may be IPv4 or IPv6 addresses.
-
+| `IP` | ネットワーク接続の IP アドレスを `String` で返します。例: "10.0.1.4"。これらは IPv4 または IPv6 アドレスである可能性があります。
+| `MAC` | デバイスの MAC アドレスを `String` で返します。例: "A4:D1:8C:DB:C0:20"
+| `SSID` | 接続されている Wi-Fi アクセスポイントの名前を `String` で返します。例: "Moddable Wi-Fi"
+| `BSSID` | 接続されている Wi-Fi アクセスポイントの MAC アドレスを `String` で返します。例: "18:64:72:47:d4:32"
+| `RSSI` | Wi-Fi の[受信信号強度](https://en.wikipedia.org/wiki/Received_signal_strength_indication)を `Number` で返します。
+| `CHANNEL` | 現在使用中の Wi-Fi チャンネルを `Number` で返します。
+| `DNS` | `Net.resolve` によってドメイン名を IP アドレスに解決するために使用される DNS サーバーを、IP アドレス文字列の `Array` として返します。これらは IPv4 または IPv6 アドレスである可能性があります。
 
 ```js
 trace(`Connected to Wi-Fi access point: ${Net.get("SSID")}\n`);
 ```
 
-For a device operating as both a Wi-Fi station (client) and a Wi-Fi access point, the static `get` method accepts an optional second argument to indicate if the request is for the station or access point interface. The interface accepts values of `"station"` and `"ap"`. It is used for the `IP` and `MAC` properties.
+デバイスがWi-Fiステーション（クライアント）とWi-Fiアクセスポイントの両方として動作する場合、静的な `get` メソッドは、リクエストがステーションインターフェースかアクセスポイントインターフェースかを示すためのオプションの第2引数を受け入れます。インターフェースは `"station"` と `"ap"` の値を受け入れます。これは `IP` および `MAC` プロパティに使用されます。
 
-On ESP32, the optional second argument can also be used to explicitly request information about the Ethernet interface by providing the value `"ethernet"`.
+ESP32では、オプションの第2引数を使用して、値 `"ethernet"` を提供することでイーサネットインターフェースに関する情報を明示的に要求することもできます。
 
 ```js
 trace(`IP default ${Net.get("IP")}\n`);
 trace(`IP station ${Net.get("IP", "station")}\n`);
 trace(`IP AP ${Net.get("IP", "ap")}\n`);
 ```
-In station mode, the default value for the interface is `"station"`; in access point mode, `"ap"`. In the combined station and access point mode, there is no default value (because it is ambiguous). Requesting the `IP` or `MAC` properties in this mode returns `undefined`.
+ステーションモードでは、インターフェースのデフォルト値は `"station"` です。アクセスポイントモードでは `"ap"` です。ステーションとアクセスポイントの結合モードでは、デフォルト値はありません（曖昧であるため）。このモードで `IP` または `MAC` プロパティを要求すると、`undefined` が返されます。
 
 ***
 
 ### `static resolve(host, callback)`
 
-The `resolve` function performs performs an asynchronous [DNS](https://en.wikipedia.org/wiki/Domain_Name_System) look-up for the specified `host` and invokes the `callback` to deliver the result.
+`resolve` 関数は、指定された `host` の非同期 [DNS](https://en.wikipedia.org/wiki/Domain_Name_System) ルックアップを実行し、結果を配信するために `callback` を呼び出します。
 
 ```js
 Net.resolve("moddable.tech", (name, address) => trace(`${name} IP address is ${address}\n`));
 ```
 
-The IP address is provided as a `String` in dotted IP address notation. If `host` cannot be resolved, the `address` parameter is `undefined`.
+IP アドレスはドット区切りの IP アドレス表記の `String` として提供されます。`host` を解決できない場合、`address` パラメータは `undefined` です。
 
-The DNS implementation in lwIP supports a limited number of simultaneous DNS look-ups. The number depends on the specific platform deployment. On the ESP8266 it is 4. If the DNS resolve queue is full, resolve throws an exception.
+lwIP の DNS 実装は、同時に実行できる DNS ルックアップの数が限られています。この数は特定のプラットフォームの展開に依存します。ESP8266 では 4 です。DNS 解決キューが満杯の場合、resolve は例外をスローします。
 
 ***
 
 <a id="wifi"></a>
-## class WiFi
+##  WiFiクラス
 
-- **Source code:** [wifi](../../modules/network/wifi)
-- **Relevant Examples:** [wifiaccesspoint](../../examples/network/wifi/wifiaccesspoint), [wifiscan](../../examples/network/wifi/wifiscan)
+- **ソースコード:** [wifi](../../modules/network/wifi)
+- **関連するサンプル:** [wifiaccesspoint](../../examples/network/wifi/wifiaccesspoint), [wifiscan](../../examples/network/wifi/wifiscan)
 
-The `WiFi` class provides access to use and configure the Wi-Fi capabilities of the host device.
+`WiFi` クラスは、ホストデバイスの Wi-Fi 機能を使用および構成するためのアクセスを提供します。
 
 ```js
 import WiFi from "wifi";
@@ -789,13 +788,13 @@ import WiFi from "wifi";
 
 ### `constructor(dictionary, callback)`
 
-The `WiFi` constructor takes a single argument, a dictionary of initialization parameters. The constructor begins the process of establishing a connection.
+`WiFi` コンストラクタは、初期化パラメータの辞書を引数として受け取ります。コンストラクタは接続の確立プロセスを開始します。
 
-The dictionary always contains the required `ssid` property with the name of the base station to connect to. The optional `password` property is included when the base station requires a password. When the optional `bssid` property is included, it may accelerate connecting to Wi-Fi on device targets that support it.
+辞書には、接続するベースステーションの名前を持つ必須の `ssid` プロパティが常に含まれています。ベースステーションがパスワードを必要とする場合は、オプションの `password` プロパティが含まれます。オプションの `bssid` プロパティが含まれている場合、対応するデバイスターゲットでのWi-Fi接続が高速化されることがあります。
 
-The connection process is asynchronous and may be monitored using the callback function.
+接続プロセスは非同期であり、コールバック関数を使用して監視することができます。
 
-The following example begins the process of connecting to a Wi-Fi access point and waits for the connection to succeed with an IP address being assigned to the device.
+次の例は、Wi-Fiアクセスポイントへの接続プロセスを開始し、デバイスにIPアドレスが割り当てられるまで接続が成功するのを待ちます。
 
 ```js
 let monitor = new WiFi({ssid: "My Wi-Fi", password: "secret"}, msg => {
@@ -811,7 +810,7 @@ let monitor = new WiFi({ssid: "My Wi-Fi", password: "secret"}, msg => {
 });
 ```
 
-The following example initiates a connection to a Wi-Fi access point with no password. Because there is no callback function to monitor connection progress, polling is necessary to determine when the connection is ready. Poll by getting the IP address of the device using the `Net` class. When there is no connection, the results is `undefined`.
+次の例は、パスワードなしでWi-Fiアクセスポイントへの接続を開始します。接続進行状況を監視するコールバック関数がないため、接続が準備完了になる時期を判断するにはポーリングが必要です。`Net` クラスを使用してデバイスのIPアドレスを取得することでポーリングを行います。接続がない場合、結果は `undefined` です。
 
 ```js
 let monitor = new WiFi({ssid: "Open Wi-Fi"});
@@ -819,7 +818,7 @@ let monitor = new WiFi({ssid: "Open Wi-Fi"});
 
 ### `close()`
 
-The `close` function closes the connection between the `WiFi` instance and the underlying process managing the device's connection to the network. In other words, it prevents future calls to the callback function, but it does not disconnect from the network.
+`close` 関数は、`WiFi` インスタンスとデバイスのネットワーク接続を管理する基礎プロセスとの間の接続を閉じます。言い換えれば、コールバック関数への将来の呼び出しを防ぎますが、ネットワークからの切断は行いません。
 
 ```js
 monitor.close();
@@ -827,16 +826,16 @@ monitor.close();
 
 ### `static scan(dictionary, callback)`
 
-The `scan` static function initiates a scan for available Wi-Fi access points.
+`scan` 静的関数は、利用可能な Wi-Fi アクセスポイントのスキャンを開始します。
 
-The dictionary parameter supports two optional properties:
+dictionary パラメータは、2 つのオプションプロパティをサポートします:
 
-| Property | Description |
+| プロパティ | 説明 |
 | :---: | :--- |
-| `hidden` | When `true`, hidden access point are included in the scan results. Defaults to `false`. |
-| `channel` | The Wi-Fi channel number to scan. When this property is not present, all channels are scanned. |
+| `hidden` | `true` の場合、隠しアクセスポイントがスキャン結果に含まれます。デフォルトは `false` です。 |
+| `channel` | スキャンする Wi-Fi チャンネル番号。このプロパティが存在しない場合、すべてのチャンネルがスキャンされます。 |
 
-The callback function is invoked once for each access point found. When the scan is complete, the callback function is invoked a final time with a `null` argument.
+コールバック関数は、見つかった各アクセスポイントごとに一度呼び出されます。スキャンが完了すると、コールバック関数は `null` 引数で最終的に一度呼び出されます。
 
 ```js
 WiFi.scan({}, item => {
@@ -847,35 +846,35 @@ WiFi.scan({}, item => {
 });
 ```
 
-The Wi-Fi scan runs for a fixed period of time, approximately two seconds. During that time, not all access points may be found. It may be necessary to call scan several times to create a complete list of visible access points.
+Wi-Fiスキャンは約2秒間の固定期間実行されます。その間に、すべてのアクセスポイントが見つかるわけではありません。見えるアクセスポイントの完全なリストを作成するために、スキャンを数回呼び出す必要があるかもしれません。
 
-> **Note**: Only one scan may be active at a time. Starting a new scan while one is still active will throw an exception.
+> **注意**: 一度にアクティブにできるスキャンは1つだけです。まだアクティブなスキャンがある状態で新しいスキャンを開始すると、例外がスローされます。
 
 ***
 
-### `mode` property
+### `mode` プロパティ
 
-The `mode` property is set to `WiFi.Mode.station` for station mode (e.g. device acts as Wi-Fi client), `WiFi.Mode.accessPoint` for access point mode (e.g. device acts as Wi-Fi base station), and `WiFi.Mode.station | WiFi.Mode.accessPoint` for simultaneous operation of station and access point modes.
+`mode` プロパティは、ステーションモード（例：デバイスがWi-Fiクライアントとして動作する場合）には `WiFi.Mode.station`、アクセスポイントモード（例：デバイスがWi-Fiベースステーションとして動作する場合）には `WiFi.Mode.accessPoint`、ステーションモードとアクセスポイントモードを同時に動作させるには `WiFi.Mode.station | WiFi.Mode.accessPoint` に設定されます。
 
-`mode` may be set to `WiFi.Mode.none` to disable both station and accessPoint modes. Depending on the platform, Wi-Fi may still be powered when mode is set to `WiFi.Mode.none`. Some platforms support `WiFi.Mode.off` to power-down Wi-Fi. Use `"off" in WiFi.Mode` at runtime to test to see if the feature is supported.
+`mode` は、ステーションモードとアクセスポイントモードの両方を無効にするために `WiFi.Mode.none` に設定することができます。プラットフォームによっては、`WiFi.Mode.none` に設定されている場合でもWi-Fiが電源オンのままになることがあります。一部のプラットフォームでは、Wi-Fiをシャットダウンするために `WiFi.Mode.off` をサポートしています。実行時に `"off" in WiFi.Mode` を使用して、その機能がサポートされているかどうかを確認してください。
 
 ***
 
 ### `static connect(dictionary)`
 
-The `connect` function begins the process of establishing a connection. The connection process is asynchronous and may be monitored by polling `Net.get("IP")` or by creating a new WiFi instance. The dictionary contains either `ssid` or `bssid` properties indicating the base station to connect to, and an optional `password`.
+`connect` 関数は接続を確立するプロセスを開始します。接続プロセスは非同期であり、`Net.get("IP")` をポーリングするか、新しい WiFi インスタンスを作成することで監視できます。辞書には接続する基地局を示す `ssid` または `bssid` プロパティと、オプションの `password` が含まれます。
 
 ```js
 WiFi.connect({ssid: "Moddable", password: "1234"});
 ```
 
-> **Note**: Calling `WiFi.connect` with no parameters disconnects. However, it is recommended to use `WiFi.disconnect` insteadm
+> **Note**: パラメータなしで `WiFi.connect` を呼び出すと切断されます。ただし、代わりに `WiFi.disconnect` を使用することをお勧めします。
 
 ***
 
 ### `static disconnect()`
 
-Disconnects from the current Wi-Fi base station
+現在の Wi-Fi 基地局から切断します。
 
 ```js
 WiFi.disconnect();
@@ -884,20 +883,20 @@ WiFi.disconnect();
 
 ### `static accessPoint(dictionary)`
 
-The `accessPoint` function configures the device as a Wi-Fi access point. Depending on the device, this may exit station mode.
+`accessPoint` 関数はデバイスを Wi-Fi アクセスポイントとして構成します。デバイスによっては、ステーションモードを終了する場合があります。
 
-The dictionary must include an `ssid` property, a string that gives the name of the access point.
+辞書には、アクセスポイントの名前を示す文字列である `ssid` プロパティを含める必要があります。
 
-The dictionary may optionally include the following properties:
+辞書には、以下のプロパティをオプションで含めることができます:
 
-| Property | Default Value | Description |
+| プロパティ | デフォルト値 | 説明 |
 | :---: | :---: | :--- |
-| `password` | none | A string indicating the password of the access point; if no password is provided, the access point will be open |
-| `channel` | 1 | A number indicating the channel to use for the access point |
-| `hidden` | `false` | A boolean indicating if the channel should be hidden |
-| `interval` | 100 | A number indicating the beacon interval in milliseconds |
-| `max` | 4 | A number indicating the maximum number of simultaneous connections |
-| `station` | `false` | A boolean indicating if station mode should simultaneously be enabled with access point mode. |
+| `password` | なし | アクセスポイントのパスワードを示す文字列。パスワードが提供されない場合、アクセスポイントはオープンになります。 |
+| `channel` | 1 | アクセスポイントに使用するチャネルを示す数値。 |
+| `hidden` | `false` | チャネルを隠すかどうかを示すブール値。 |
+| `interval` | 100 | ビーコン間隔をミリ秒単位で示す数値。 |
+| `max` | 4 | 同時接続の最大数を示す数値。 |
+| `station` | `false` | アクセスポイントモードと同時にステーションモードを有効にするかどうかを示すブール値。 |
 
 ```js
 WiFi.accessPoint({
@@ -909,37 +908,37 @@ WiFi.accessPoint({
 ***
 
 <a id="sntp"></a>
-## class SNTP
+## SNTPクラス
 
-- **Source code:** [sntp](../../modules/network/sntp)
-- **Relevant Examples:** [sntp](../../examples/network/sntp), [ntpclient](../../examples/network/mdns/ntpclient)
+- **ソースコード:** [sntp](../../modules/network/sntp)
+- **関連するサンプル:** [sntp](../../examples/network/sntp), [ntpclient](../../examples/network/mdns/ntpclient)
 
-The `SNTP` class implements an [SNTP](https://en.wikipedia.org/wiki/Network_Time_Protocol#SNTP) client ([RFC 4330](https://tools.ietf.org/html/rfc4330)) to retrieve a real time clock value.
+`SNTP` クラスは、リアルタイムクロックの値を取得するための [SNTP](https://en.wikipedia.org/wiki/Network_Time_Protocol#SNTP) クライアント ([RFC 4330](https://tools.ietf.org/html/rfc4330)) を実装します。
 
 ```js
 import SNTP from "sntp";
 ```
 
-The SNTP client implementation fail-over mechanism allows additional servers to be queried in case of failure.
+SNTP クライアントの実装には、障害発生時に追加のサーバーに問い合わせるフェイルオーバーメカニズムが含まれています。
 
 ### `constructor(dictionary, callback)`
 
-The SNTP constructor takes a dictionary of properties and a callback function to receive information about the instance status.
+SNTP コンストラクタは、プロパティの辞書とインスタンスのステータスに関する情報を受け取るコールバック関数を取ります。
 
-The dictionary must include a `host` property, a string that gives the host name or IP address of the SNTP server.
+辞書には、SNTP サーバーのホスト名または IP アドレスを示す文字列である `host` プロパティを含める必要があります。
 
-The callback receives messages and, for some messages, a data value. Positive `message` values indicate normal operation and negative `message` values indicate an error.
+コールバックはメッセージを受け取り、一部のメッセージにはデータ値が含まれます。正の `message` 値は通常の操作を示し、負の `message` 値はエラーを示します。
 
-| `message` | Description |
+| `message` | 説明 |
 | :---: | :--- |
-| -1 | Unable to retrieve time. The value parameter contains a `String` with the reason for the failure. The callback function may return a `String` with the host name or IP address of another SNTP server to try; otherwise, the SNTP client closes itself and may not be used for additional requests. See the [SNTP example](https://github.com/Moddable-OpenSource/moddable/blob/public/examples/network/sntp/main.js) for an implementation of fail-over handling. |
-| 1 | Time retrieved. The `value` parameter is the time in seconds since 1970, appropriate for passing to the Date constructor
-| 2 | Retry. The time has not yet been retrieved and the SNTP client is making an additional request.
+| -1 | 時間を取得できません。`value` パラメータには失敗の理由が `String` として含まれます。コールバック関数は、試すべき別の SNTP サーバーのホスト名または IP アドレスを `String` として返すことがあります。そうでない場合、SNTP クライアントは自動的に閉じられ、追加のリクエストには使用できません。フェイルオーバー処理の実装については、[SNTP のサンプル](https://github.com/Moddable-OpenSource/moddable/blob/public/examples/network/sntp/main.js) を参照してください。 |
+| 1 | 時間が取得されました。`value` パラメータは1970年からの秒数で、Date コンストラクタに渡すのに適しています。 |
+| 2 | リトライ。時間はまだ取得されておらず、SNTP クライアントが追加のリクエストを行っています。
 
 ***
 
-### Example: Retrieving the time
-The following example retrieves the current time value from the NTP server at `pool.ntp.org`.
+### 例: 時間の取得
+次の例では、`pool.ntp.org` の NTP サーバーから現在の時間値を取得します。
 
 ```js
 new SNTP({host: "pool.ntp.org"}, (message, value) => {
@@ -948,82 +947,81 @@ new SNTP({host: "pool.ntp.org"}, (message, value) => {
 });
 ```
 
-The SNTP constructor requires the host name or IP address of a time server. If a host name is provided, the SNTP client first resolves that to an IP address using `Net.resolve`.
+SNTP コンストラクタには、タイムサーバーのホスト名または IP アドレスが必要です。ホスト名が提供された場合、SNTP クライアントはまず `Net.resolve` を使用してそれを IP アドレスに解決します。
 
 ***
 
 <a id="dns"></a>
-## class DNS constants
+## DNSクラス定数
 
-- **Source code:** [dns](../../modules/network/dns)
+- **ソースコード:** [dns](../../modules/network/dns)
 
-The DNS module contains constants that are useful when implementing code that interacts directly with the DNS protocol. It is used by the DNS `Parser`, DNS `Serializer`, and mDNS implementation.
+DNSモジュールには、DNSプロトコルと直接やり取りするコードを実装する際に役立つ定数が含まれています。これは、DNS `Parser`、DNS `Serializer`、およびmDNS実装によって使用されます。
 
 ```js
 import DNS from "dns";
 ```
 
-- `DNS.RR` contains constants for resource record types, such as `DNS.RR.PTR`.
-- `DNS.OPCODE` contains values for `DNS.OPCODE.QUERY` and `DNS.OPCODE.UPDATE`.
-- `DNS.CLASS` contains values for `DNS.CLASS.IN`, `DNS.CLASS.NONE`, and `DNS.CLASS.ANY`.
-- `DNS.SECTION` contains values that include `DNS.QUESTION` and `DNS.ANSWER`.
+- `DNS.RR` には、`DNS.RR.PTR` などのリソースレコードタイプの定数が含まれています。
+- `DNS.OPCODE` には、`DNS.OPCODE.QUERY` および `DNS.OPCODE.UPDATE` の値が含まれています。
+- `DNS.CLASS` には、`DNS.CLASS.IN`、`DNS.CLASS.NONE`、および `DNS.CLASS.ANY` の値が含まれています。
+- `DNS.SECTION` には、`DNS.QUESTION` および `DNS.ANSWER` を含む値が含まれています。
 
 <a id="dns-parser"></a>
-## class DNS Parser
+##  DNS パーサークラス
 
-- **Source code:** [dnsparser](../../modules/network/dns)
+- **ソースコード:** [dnsparser](../../modules/network/dns)
 
-The DNS `Parser` class extracts JavaScript objects from a binary DNS record.
+DNS `Parser` クラスは、バイナリDNSレコードからJavaScriptオブジェクトを抽出します。
 
 ```js
 import Parser from "dns/parser";
 ```
 
-The DNS parser class parses and returns a single resource record at a time to minimize memory use. It has parsers for the resource data of A, AAAA, PTR, SRV, TXT resource record types.
+DNSパーサークラスは、メモリ使用量を最小限に抑えるために、一度に1つのリソースレコードを解析して返します。A、AAAA、PTR、SRV、TXTリソースレコードタイプのリソースデータ用のパーサーを備えています。
 
-> **Note**: The DNS Parser is a low level class used to build higher level services, such as mDNS.
+> **注**: DNSパーサーは、mDNSなどの高レベルサービスを構築するために使用される低レベルクラスです。
 
 ### `constructor(buffer)`
-The DNS `Parser` constructor is initialized with an `ArrayBuffer` containing a single DNS packet.
+DNS `Parser` コンストラクタは、単一のDNSパケットを含む `ArrayBuffer` で初期化されます。
 
-No validation is performed by the constructor. Errors, if any, are reported when extracting resource records.
+コンストラクタによる検証は行われません。エラーがある場合は、リソースレコードを抽出する際に報告されます。
 
 ***
 
 ### `questions(index)`
-Returns the question resource record corresponding to the index argument. Indices are numbered from 0. Returns `null` if index is greater than number of question records in the packet.
+インデックス引数に対応する質問リソースレコードを返します。インデックスは0から番号が付けられます。インデックスがパケット内の質問レコードの数を超える場合は `null` を返します。
 
 ***
 
 ### `answers(index)`
-Returns the answer resource record corresponding to the index argument. Indices are numbered from 0. Returns `null` if index is greater than number of answer records in the packet.
+インデックス引数に対応する回答リソースレコードを返します。インデックスは0から番号が付けられます。インデックスがパケット内の回答レコードの数を超える場合は `null` を返します。
 
 ***
 
 ### `authorities(index)`
-Returns the authority resource record corresponding to the index argument. Indices are numbered from 0. Returns `null` if index is greater than number of authority records in the packet.
+インデックス引数に対応する権威リソースレコードを返します。インデックスは0から番号が付けられます。インデックスがパケット内の権威レコードの数を超える場合は `null` を返します。
 
 ***
 
 ### `additionals(index)`
-Returns the additional resource record corresponding to the index argument. Indices are numbered from 0. Returns `null` if index is greater than number of additional records in the packet.
+インデックス引数に対応する追加リソースレコードを返します。インデックスは0から番号が付けられます。インデックスがパケット内の追加レコードの数を超える場合は `null` を返します。
 
 ***
 
-### Example: Parsing a DNS packet
-DNS packets are typically received as UDP packets. The `Socket` object provides each DNS packet in an `ArrayBuffer`. The follow example creates a DNS parser instance for an `ArrayBuffer`:
+### 例: DNSパケットの解析
+DNSパケットは通常UDPパケットとして受信されます。`Socket`オブジェクトは各DNSパケットを`ArrayBuffer`で提供します。以下の例では、`ArrayBuffer`のためのDNSパーサーインスタンスを作成します:
 
 ```js
 let packet = new Parser(dnsPacket);
 ```
 
-The `Parser` constructor does not validate the packet. If the packet is invalid, errors will be reported when extracting records from it.
+`Parser`コンストラクタはパケットを検証しません。パケットが無効な場合、レコードを抽出する際にエラーが報告されます。
 
 ***
 
-### Example: Reading header fields
-
-The parser instance has properties for the `id` and `flags` fields in the DNS packet:
+### 例: ヘッダーフィールドの読み取り
+パーサーインスタンスには、DNSパケットの`id`および`flags`フィールドのプロパティがあります:
 
 ```js
 let id = packet.id;
@@ -1032,8 +1030,8 @@ let flags = packet.flags;
 
 ***
 
-### Example: Determining the number of records
-The parser instance has properties that provide the number of resource records in each section.
+### 例: レコード数の決定
+パーサーインスタンスには、各セクションのリソースレコードの数を提供するプロパティがあります。
 
 ```js
 let total = packet.questions + packet.answers + packet.authorities + packet.additionals;
@@ -1041,78 +1039,77 @@ let total = packet.questions + packet.answers + packet.authorities + packet.addi
 
 ***
 
-### Example: Extracting a resource record
-A JavaScript object containing a single resource record is retrieved by calling the function corresponding to the resource record's section. The following example retrieves the second question resource record (indices start at 0):
+### 例: リソースレコードの抽出
+リソースレコードのセクションに対応する関数を呼び出すことで、単一のリソースレコードを含むJavaScriptオブジェクトが取得されます。以下の例では、2番目の質問リソースレコードを取得します（インデックスは0から始まります）:
 
 ```js
 let rr = packet.question(1);
 ```
 
-There are also `answers`, `authorities`, and `additionals` functions.
+また、`answers`、`authorities`、`additionals` 関数もあります。
 
 ***
 
 <a id="dns-serializer"></a>
-## class DNS Serializer
+## DNSシリアライザクラス
 
-- **Source code:** [dnsserializer](../../modules/network/dns)
+- **ソースコード:** [dnsserializer](../../modules/network/dns)
 
-The DNS `Serializer` class implements a DNS record serializer.
+DNS `Serializer` クラスは、DNS レコードのシリアライザを実装します。
 
 ```js
 import Serializer from "dns/serializer";
 ```
 
-The DNS `Serializer` class is able to serialize A, NSEC, PTR, SRV, and TXT resource record types. Clients may perform their own serialization of other resource record types and provide the result to the DNS `Serializer` class to include in the generated DNS packet.
+DNS `Serializer` クラスは、A、NSEC、PTR、SRV、および TXT リソースレコードタイプをシリアライズすることができます。クライアントは他のリソースレコードタイプのシリアライズを独自に行い、その結果を DNS `Serializer` クラスに提供して生成された DNS パケットに含めることができます。
 
-> **Note**: The DNS `Serializer` is a low level class used to build higher level services, such as mDNS.
+> **注**: DNS `Serializer` は、mDNS などの高レベルサービスを構築するために使用される低レベルクラスです。
 
 ### `constructor(dictionary)`
-The DNS `Serializer` constructor accepts a dictionary with properties to configure the DNS packet to be created. The dictionary may contain the following properties:
+DNS `Serializer` コンストラクタは、作成される DNS パケットを構成するプロパティを持つ辞書を受け取ります。辞書には次のプロパティを含めることができます:
 
-| Property | Default Value | Description |
+| プロパティ | デフォルト値 | 説明 |
 | :---: | :---: | :--- |
-| `opcode` | `DNS.OPCODE.QUERY` | The numeric value of the `opcode` header field
-| `query` | `true` | A boolean that indicates whether this packet contains a query or response
-| `authoritative` | `false` | A boolean indicating the value of the `authoritative` bit in the header
-| `id` | 0 | A numeric value for the ID field
+| `opcode` | `DNS.OPCODE.QUERY` | `opcode` ヘッダーフィールドの数値
+| `query` | `true` | このパケットがクエリまたは応答を含むかどうかを示すブール値
+| `authoritative` | `false` | ヘッダーの `authoritative` ビットの値を示すブール値
+| `id` | 0 | ID フィールドの数値
 
 ***
 
 ### `add(section, name, type, clss, ttl, ...)`
-The `add` function adds a resource record to be serialized into the DNS packet. The first five arguments to `add` are the same for all resource records.
+`add` 関数は、リソースレコードを追加してDNSパケットにシリアライズします。`add` の最初の5つの引数は、すべてのリソースレコードに共通です。
 
-
-| Argument | Description |
+| 引数 | 説明 |
 | :---: | :--- |
-| `section` | The section to add this resource record to, e.g. `DNS.SECTION.ANSWER`.
-| `name` | A `String` containing the DNS QNAME
-| `type` | A `Number` representing the resource record type, e.g. `DNS.RR.A`
-| `clss` | A `Number` containing the resource record class field value, typically `DNS.CLASS.IN`
-| `ttl` | A `Number` containing the time-to-live value in seconds for this resource record
+| `section` | このリソースレコードを追加するセクション、例: `DNS.SECTION.ANSWER`。
+| `name` | DNS QNAME を含む `String`
+| `type` | リソースレコードタイプを表す `Number`、例: `DNS.RR.A`
+| `clss` | リソースレコードクラスフィールド値を含む `Number`、通常は `DNS.CLASS.IN`
+| `ttl` | このリソースレコードの有効期間を秒単位で含む `Number`
 
-The optional `data` argument is used to build the resource data portion of the resource record. If not present, the resource data is empty. If it is an `ArrayBuffer`, its contents are used for the resource data. The `data` argument is interpreted these resource record types:
+オプションの `data` 引数は、リソースレコードのリソースデータ部分を構築するために使用されます。存在しない場合、リソースデータは空です。`ArrayBuffer` の場合、その内容がリソースデータとして使用されます。`data` 引数は次のリソースレコードタイプに解釈されます:
 
-| Type | Description |
+| タイプ | 説明 |
 | :---: | :--- |
-| `A` | A string containing the IP address.
-| `NSEC` | A dictionary with two keys. The first is `next` containing a string with the next hostname value. The second is a Uint8Array containing the bit-mask.
-| `PTR` | A string with the PTR value.
-| `SRV` | A dictionary with four keys. The `priority`, `weight`, and `port` fields are numbers with the value of the corresponding field. The `target` property is a string containing the name of the target.
-| `TXT` | A dictionary of key / value pairs for the TXT record. The property name is the key. Only string values are supported at this time.
+| `A` | IPアドレスを含む文字列。
+| `NSEC` | 2つのキーを持つ辞書。最初のキーは次のホスト名値を含む文字列 `next`。2つ目はビットマスクを含む Uint8Array。
+| `PTR` | PTR値を含む文字列。
+| `SRV` | 4つのキーを持つ辞書。`priority`、`weight`、`port` フィールドは対応するフィールドの値を持つ数値。`target` プロパティはターゲットの名前を含む文字列。
+| `TXT` | TXTレコードのキー/バリューペアの辞書。プロパティ名がキー。この時点では文字列値のみがサポートされています。
 
 ***
 
 ### `build()`
-The `build` function generates a DNS packet based on the previous calls to the serializer instance. The packet is returned as an `ArrayBuffer`.
+`build` 関数は、シリアライザーインスタンスへの以前の呼び出しに基づいてDNSパケットを生成します。パケットは `ArrayBuffer` として返されます。
 
-> **Note**: The current implementation does not compress QNAMES, resulting in a larger DNS packet than necessary.
+> **注意**: 現在の実装では QNAMES を圧縮しないため、必要以上に大きなDNSパケットになります。
 
 ***
 
-### Example: Building a DNS query
+### 例: DNSクエリの構築
 
-The following example uses the DNS Serializer to create a DNS packet querying for an A record for the "example.com" domain:
+次の例では、DNSシリアライザーを使用して "example.com" ドメインのAレコードをクエリするDNSパケットを作成します:
 
 ```js
 let serializer = new Serializer({query: true, opcode: DNS.OPCODE.QUERY});
@@ -1120,27 +1117,27 @@ serializer.add(DNS.SECTION.QUESTION, "example.com", DNS.RR.A, DNS.CLASS.IN);
 let buffer = serializer.build();
 ```
 
-The `build` function returns a DNS packet suitable for sending using the `write` function of the `Socket` class.
+`build` 関数は、`Socket` クラスの `write` 関数を使用して送信するのに適したDNSパケットを返します。
 
 ***
 
 <a id="dns-server"></a>
-## class DNS Server
+## DNSサーバークラス
 
-- **Source code:** [dnsserver](../../modules/network/dns)
-- **Relevant Examples:** [dnsserver](../../examples/network/dns/dnsserver)
+- **ソースコード:** [dnsserver](../../modules/network/dns)
+- **関連するサンプル:** [dnsserver](../../examples/network/dns/dnsserver)
 
-The `DNSServer` class implements a simple DNS server.
+`DNSServer` クラスは、シンプルなDNSサーバーを実装します。
 
 ```js
 import DNSServer from "dns/server";
 ```
 
-The server is indicated for use in devices in Wi-Fi access point mode that wish to act as a captive portal. The DNS server is used to direct look-ups for certain domains to an IP address, typically the device running the DNS server.
+サーバーは、キャプティブポータルとして機能したいWi-Fiアクセスポイントモードのデバイスでの使用を想定しています。DNSサーバーは、特定のドメインのルックアップをデバイス（通常はDNSサーバーを実行しているデバイス）のIPアドレスに向けるために使用されます。
 
 ### `constructor(callback)`
 
-The `DNSServer` constructor takes a single argument, a function to call when a look-up request is received. The callback receives two arguments. The first, `message`, is set to 1 when a look-up is performed. The second argument, `value`, is set to the name to be resolved when a look-up request is made.
+`DNSServer`コンストラクタは、ルックアップリクエストが受信されたときに呼び出される関数を引数として取ります。コールバックは2つの引数を受け取ります。最初の引数`message`は、ルックアップが実行されたときに1に設定されます。2番目の引数`value`は、ルックアップリクエストが行われたときに解決される名前に設定されます。
 
 ```js
 let server = new DNSServer((message, value) => {
@@ -1152,7 +1149,7 @@ let server = new DNSServer((message, value) => {
 
 ### `close()`
 
-When the DNS server is no longer needed, call `close` to terminate it and free its resources.
+DNSサーバーが不要になった場合、`close`を呼び出して終了し、リソースを解放します。
 
 ```js
 server.close();
@@ -1160,9 +1157,9 @@ server.close();
 
 ***
 
-### Example: Simple DNS server
+### 例: シンプルなDNSサーバー
 
-The following example redirects all DNS look-ups to the IP address of the device running the server.
+次の例では、すべてのDNSルックアップをサーバーを実行しているデバイスのIPアドレスにリダイレクトします。
 
 ```js
 new DNSServer((message, value) => {
@@ -1171,11 +1168,11 @@ new DNSServer((message, value) => {
 })
 ```
 
-> **Note:**: This example expects to be run on a Wi-Fi connection in access point mode. It passes "ap" for the interface argument to `Net.get` to retrieve the IP address for access point.
+> **Note:**: この例は、アクセスポイントモードのWi-Fi接続で実行されることを想定しています。`Net.get`のインターフェース引数に"ap"を渡して、アクセスポイントのIPアドレスを取得します。
 
-### Example: DNS server for a single host name
+### 例: 単一ホスト名のためのDNSサーバー
 
-The following example redirects all DNS look-ups for "example.com" to the IP address of the device running the server. All other look-ups are ignored.
+次の例では、"example.com" のすべてのDNSルックアップをサーバーを実行しているデバイスのIPアドレスにリダイレクトします。他のすべてのルックアップは無視されます。
 
 ```js
 new DNSServer((message, value) => {
@@ -1187,12 +1184,12 @@ new DNSServer((message, value) => {
 ***
 
 <a id="mdns"></a>
-## class MDNS
+## MDNSクラス
 
-- **Source code:** [mdns](../../modules/network/mdns)
-- **Relevant Examples:** [discoverhttp](../../examples/network/mdns/discoverhttp), [httpserver](../../examples/network/mdns/httpserver), [ntpclient](../../examples/network/mdns/ntpclient), [ntpservice](../../examples/network/mdns/ntpservice),
+- **ソースコード:** [mdns](../../modules/network/mdns)
+- **関連するサンプル:** [discoverhttp](../../examples/network/mdns/discoverhttp), [httpserver](../../examples/network/mdns/httpserver), [ntpclient](../../examples/network/mdns/ntpclient), [ntpservice](../../examples/network/mdns/ntpservice),
 
-The `MDNS` class implements services for working with [Multicast DNS](https://tools.ietf.org/html/rfc6762) discovery and services. It includes claiming `.local` names, advertising mDNS service availability, and scanning for available mDNS services.
+`MDNS` クラスは [Multicast DNS](https://tools.ietf.org/html/rfc6762) のディスカバリーとサービスを扱うためのサービスを実装します。これには `.local` 名のクレーム（取得）、mDNS サービス利用可能のアドバタイズ（通知）、および利用可能な mDNS サービスのスキャンが含まれます
 
 ```js
 import MDNS from "mdns";
@@ -1200,25 +1197,25 @@ import MDNS from "mdns";
 
 ### `constructor(dictionary [, callback])`
 
-The `MDNS` constructor takes a dictionary to configure the mDNS instance and an optional `callback` to receive information about the instance status.
+`MDNS` コンストラクタは、mDNS インスタンスを構成するための辞書と、インスタンスのステータスに関する情報を受け取るためのオプションの `callback` を取ります。
 
-If the dictionary contains a `hostName` property, the MDNS instance will attempt to claim the name in the `.local` domain on the active network connection. The `hostName` is not required to monitor for available mDNS services.
+辞書に `hostName` プロパティが含まれている場合、MDNS インスタンスはアクティブなネットワーク接続上の `.local` ドメインで名前をクレームしようとします。利用可能な mDNS サービスをスキャンするために `hostName` は必須ではありません。
 
-The callback receives messages and, for some messages, a data value. The `message` and `value` provide information on the claiming process. Positive `message` values indicate normal operation and negative `message` values indicate an error.
+コールバックはメッセージを受け取り、一部のメッセージにはデータ値も含まれます。`message` と `value` は、名前取得プロセスに関する情報を提供します。正の `message` 値は通常の動作を示し、負の `message` 値はエラーを示します。
 
-| `message` | Description |
+| `message` | 説明 |
 | :---: | :--- |
-| 1 | **probing:** If `value` is an empty string, claiming is underway; when probing is successful, `value` contains the claimed name. |
-| 2 | **conflict:** The attempt to claim the requested name discovered another device already using the name. The result of the callback function determines what happens next.<BR>- If the result is undefined, a new name is created automatically and the claiming process continues.<BR>- If a string is returned, the claiming process continues with the string used as the candidate hostname. Returning true causes the claiming process to end without having claimed a name.
-| Any negative number | **error:** Claiming process terminated.
+| 1 | **probing:** `value` が空の文字列の場合、名前のクレームが進行中です。プロービングが成功すると、`value` にクレームした名前が含まれます。 |
+| 2 | **conflict:** 要求された名前をクレームしようとした際に、既にその名前を使用している別のデバイスが発見されました。コールバック関数の結果に基づいて次の処理が決まります。<BR>- 結果が未定義の場合、新しい名前が自動的に作成され、名前のクレームプロセスが続行されます。<BR>- 文字列が返される場合、その文字列が候補ホスト名として使用され、名前のクレームプロセスが続行されます。true を返すと、名前をクレームせずに名前のクレームプロセスが終了します。
+| 任意の負の数 | **error:** 名前のクレームプロセスが終了しました。
 
-The following example shows how to claim the name "mydevice" on the local network.
+以下の例は、ローカルネットワーク上で「mydevice」という名前をクレームする方法を示しています。
 
 ```js
 const mdns = new MDNS({hostName: "mydevice"});
 ```
 
-The claiming process takes some time, usually under one second. Claiming the name may not succeed because the name may already be in use. An optional callback function provides status on the claim:
+クレームプロセスには少し時間がかかりますが、通常は1秒未満です。名前が既に使用されているため、クレームが成功しない場合があります。オプションのコールバック関数はクレームのステータスを提供します：
 
 ```js
 const mdns = new MDNS({hostName: "mydevice"}, function(message, value) {
@@ -1241,11 +1238,11 @@ const mdns = new MDNS({hostName: "mydevice"}, function(message, value) {
 
 ### `monitor(serviceType, callback)`
 
-The `monitor` function continuously scans the network for mDNS services of the type indicated by the `serviceType` parameter.
+`monitor`関数は、`serviceType`パラメータで指定されたタイプのmDNSサービスをネットワーク上で継続的にスキャンします。
 
-The callback function is invoked for each unique service instance found and whenever a service announces changes to its TXT resource record. The first argument to the callback is the service type, for example "\_http.\_tcp". The second is a dictionary that contains `name`, `protocol`, `port`, and `txt` properties describing the service.
+コールバック関数は、見つかった各ユニークなサービスインスタンスおよびサービスがTXTリソースレコードの変更を通知するたびに呼び出されます。コールバックの最初の引数はサービスのタイプで、例えば「\_http.\_tcp」です。2番目の引数は、サービスを説明する`name`、`protocol`、`port`、および`txt`プロパティを含む辞書です。
 
-The following example continuously monitors for `_http._tcp` services available on the local network:
+次の例は、ローカルネットワーク上で利用可能な`_http._tcp`サービスを継続的にスキャンします：
 
 ```js
 mdns.monitor("_http._tcp", (service, instance) => {
@@ -1257,18 +1254,18 @@ mdns.monitor("_http._tcp", (service, instance) => {
 
 ### `add(service)`
 
-The `add` function registers an mDNS service description to be advertised. The service record contains the following properties:
+`add` 関数は、アドバタイズするための mDNS サービス記述を登録します。サービスレコードには次のプロパティが含まれます:
 
-| Property | Description |
+| プロパティ | 説明 |
 | :---: | :--- |
-| `name` | The service's name, e.g. "http"
-| `protocol` | The service's protocol, e.g. "tcp" or "udp"
-| `port` | The service's port
-| `txt` | An optional JavaScript object with name value pairs to populate the TXT resource record of the service
+| `name` | サービスの名前、例: "http" |
+| `protocol` | サービスのプロトコル、例: "tcp" または "udp" |
+| `port` | サービスのポート |
+| `txt` | サービスの TXT リソースレコードを埋めるための名前と値のペアを持つオプションの JavaScript オブジェクト |
 
-`add` may only be called after the hostname claiming process has completed successfully.
+`add` は、ホスト名のクレームプロセスが正常に完了した後にのみ呼び出すことができます。
 
-The following example announces the availability of an `_http._tcp` service on port 80 of the current host.
+次の例は、現在のホストのポート 80 で `_http._tcp` サービスの利用可能性を通知します。
 
 ```js
 mdns.add({
@@ -1285,7 +1282,7 @@ mdns.add({
 
 ### `update(service)`
 
-The `update` function tells the MDNS implementation that the contents of the TXT record have changed. This causes the new TXT record to be announced to the local network. The `service` object passed must be the same object provided to `add`.
+`update` 関数は、TXT レコードの内容が変更されたことを MDNS 実装に通知します。これにより、新しい TXT レコードがローカルネットワークに通知されます。渡される `service` オブジェクトは、`add` に提供されたものと同じオブジェクトでなければなりません。
 
 ```js
 let service = mdns.services[0];
@@ -1295,17 +1292,17 @@ mdns.update(service);
 
 ***
 
-### `remove(service)` or `remove(serviceType)`
+### `remove(service)` または `remove(serviceType)`
 
-The `remove` function is used both to unregister the service and to cancel monitoring for a service type.
+`remove` 関数は、サービスの登録解除とサービスタイプのスキャンのキャンセルの両方に使用されます。
 
-To unregister a service, pass the service description. This announces to the network that it is no longer available. The `service` object must be the same object provided to `add`.
+サービスの登録を解除するには、サービスの説明を渡します。これにより、ネットワークに対してそのサービスが利用できなくなったことが通知されます。`service` オブジェクトは、`add` に提供されたものと同じオブジェクトでなければなりません。
 
 ```js
 mdns.remove(mdns.services[0]);
 ```
 
-To cancel monitoring for a service type, pass the name of the service type.
+サービスタイプの監視をキャンセルするには、サービスタイプの名前を渡します。
 
 ```js
 mdns.remove("_http._tcp");
@@ -1314,18 +1311,18 @@ mdns.remove("_http._tcp");
 ***
 
 <a id="telnet"></a>
-## class Telnet
+##  Telnetクラス
 
-- **Source code:** [telnet](../../modules/network/telnet)
-- **Relevant Examples:** [telnet](../../examples/network/telnet)
+- **ソースコード:** [telnet](../../modules/network/telnet)
+- **関連するサンプル:** [telnet](../../examples/network/telnet)
 
-The `Telnet` class implements a simple telnet server. The commands supported by the telnet server are determined by the `CLI` classes registered with the Console `module`.
+`Telnet` クラスは、シンプルな telnet サーバーを実装します。telnet サーバーでサポートされるコマンドは、Console `module` に登録された `CLI` クラスによって決定されます。
 
 ### `constructor(dictionary)`
 
-To start a telnet server, invoke the `Telnet` constructor:
+telnet サーバーを開始するには、`Telnet` コンストラクターを呼び出します。
 
-The `Telnet` constructor takes a single argument, a dictionary. The dictionary has a single property, `port`, which indicates the port to listen on for new connections. If the `port` is not included in the dictionary, it defaults to 23.
+`Telnet` コンストラクターは、1 つの引数である辞書を取ります。辞書には、`port` という単一のプロパティがあり、新しい接続を待ち受けるポートを示します。辞書に `port` が含まれていない場合、デフォルトで 23 に設定されます。
 
 ```js
 let telnet = new Telnet({port: 2300});
@@ -1335,7 +1332,7 @@ let telnet = new Telnet({port: 2300});
 
 ### `close()`
 
-When the Telnet server is no longer needed, call `close` to terminate it and free its resources.
+Telnetサーバーが不要になった場合、`close`を呼び出して終了し、リソースを解放します。
 
 ```js
 telnet.close();
@@ -1344,12 +1341,12 @@ telnet.close();
 ***
 
 <a id="ping"></a>
-## class Ping
+## Pingクラス
 
-- **Source code:** [ping](../../modules/network/ping)
-- **Relevant Examples:** [ping](../../examples/network/ping)
+- **ソースコード:** [ping](../../modules/network/ping)
+- **関連するサンプル:** [ping](../../examples/network/ping)
 
-The `Ping` class implements the ping networking utility.
+`Ping`クラスはpingネットワークユーティリティを実装します。
 
 ```js
 import Ping from "ping";
@@ -1357,27 +1354,26 @@ import Ping from "ping";
 
 ### `constructor(dictionary, callback)`
 
-The `Ping` constructor takes two arguments, a dictionary and a callback function.
+`Ping`コンストラクタは2つの引数、辞書とコールバック関数を取ります。
 
-The dictionary must contain the following properties:
+辞書には以下のプロパティが含まれている必要があります:
 
-| Property | Description |
+| プロパティ | 説明 |
 | :---: | :--- |
-| `host` | The host to ping
-| `id` | The identifier of the ping process; this should be unique for each `Ping` instance
+| `host` | pingするホスト
+| `id` | pingプロセスの識別子; 各`Ping`インスタンスごとに一意である必要があります
 
-The dictionary may optionally contain an `interval` parameter, which sets the interval between pings, in milliseconds. If none is specified, the default is 5000, or 5 seconds.
+辞書にはオプションで`interval`パラメータを含めることができ、これはpingの間隔をミリ秒単位で設定します。指定されていない場合、デフォルトは5000ミリ秒、つまり5秒です。
 
-The user receives status information through the callback function. The callback receives messages and, for some messages, a data value and additional information in the `etc` parameter.  Positive `message` values indicate normal operation and negative `message` values indicate an error.
+ユーザーはコールバック関数を通じてステータス情報を受け取ります。コールバックはメッセージを受け取り、一部のメッセージにはデータ値と追加情報が`etc`パラメータに含まれます。正の`message`値は通常の動作を示し、負の`message`値はエラーを示します。
 
-| `message` | Description |
+| `message` | 説明 |
 | :---: | :--- |
-| -1 | **error:** An error occurred and the host is no longer being pinged.
-| 1 | **success:** The host responded to the echo request with an echo reply.
-| 2 | **timeout:** The host did not respond.
+| -1 | **エラー:** エラーが発生し、ホストがこれ以上pingされません。 |
+| 1 | **成功:** ホストがエコーリクエストにエコーリプライで応答しました。 |
+| 2 | **タイムアウト:** ホストが応答しませんでした。 |
 
-
-The following example pings the server at `example.com` every 1000ms, tracing the results to the console.
+以下の例では、`example.com`サーバーに1000msごとにpingを送り、結果をコンソールに表示します。
 
 ```js
 let ping = new Ping({host: "example.com", id: 1, interval: 1000}, (message, value, etc) => {
@@ -1390,7 +1386,7 @@ let ping = new Ping({host: "example.com", id: 1, interval: 1000}, (message, valu
 
 ### `close()`
 
-To stop pinging the host, call the `close` function.
+ホストへのpingを停止するには、`close`関数を呼び出します。
 
 ```js
 ping.close();
@@ -1399,12 +1395,12 @@ ping.close();
 ***
 
 <a id="mqtt"></a>
-## class MQTT
+##  MQTTクラス
 
-- **Source code:** [mqtt](../../modules/network/mqtt)
-- **Relevant examples:** [mqttbasic](../../examples/network/mqtt/mqttbasic), [mqttsecure](../../examples/network/mqtt/mqttsecure)
+- **ソースコード:** [mqtt](../../modules/network/mqtt)
+- **関連するサンプル:** [mqttbasic](../../examples/network/mqtt/mqttbasic), [mqttsecure](../../examples/network/mqtt/mqttsecure)
 
-The MQTT `Client` class implements a client that connects to an MQTT broker (server).
+MQTT `Client`クラスは、MQTTブローカー（サーバー）に接続するクライアントを実装します。
 
 ```js
 import Client from "mqtt";
@@ -1412,20 +1408,20 @@ import Client from "mqtt";
 
 ### `constructor(dictionary)`
 
-A new MQTT `Client` is configured using a dictionary of properties. The dictionary must contain `host` and `id` properties; other properties are optional.
+新しいMQTT `Client`は、プロパティの辞書を使用して構成されます。辞書には`host`と`id`プロパティが含まれている必要があります。他のプロパティはオプションです。
 
-| Parameter | Description |
+| パラメータ | 説明 |
 | :---: | :--- |
-| `host` | The host name of the remote MQTT server |
-| `port` | The remote port number. Required for connections using TLS., defaults to 1883 for direct MQTT connections and 80 for MQTT over WebSocket connections.  |
-| `id` | A unique ID for this device |
-| `user` | The username |
-| `password` | The password as an `ArrayBuffer` |
-| `will` | An object with `topic` and `message` properties to be set as the connection's Will. `message` may be a string or `ArrayBuffer`.  |
-| `path` | The endpoint to connect to. If present, the MQTT client communicates established a WebSocket connecting using the `mqtt` sub-protocol. |
-| `timeout` | The keep-alive timeout interval, in milliseconds. If no timeout is provided, the MQTT keep-alive feature is not used. |
-| `Socket` | The socket constructor to use to create the MQTT connection. Use `SecureSocket` to establish a secure connection using TLS. |
-| `secure` | Dictionary of options for a TLS connection when using `SecureSocket` |
+| `host` | リモートMQTTサーバーのホスト名 |
+| `port` | リモートポート番号。TLSを使用する接続には必須で、直接MQTT接続の場合はデフォルトで1883、WebSocket経由のMQTT接続の場合はデフォルトで80です。 |
+| `id` | このデバイスの一意のID |
+| `user` | ユーザー名 |
+| `password` | `ArrayBuffer`としてのパスワード |
+| `will` | 接続のWillとして設定される`topic`と`message`プロパティを持つオブジェクト。`message`は文字列または`ArrayBuffer`である可能性があります。 |
+| `path` | 接続するエンドポイント。存在する場合、MQTTクライアントは`mqtt`サブプロトコルを使用してWebSocket接続を確立します。 |
+| `timeout` | ミリ秒単位のキープアライブタイムアウト間隔。タイムアウトが提供されない場合、MQTTキープアライブ機能は使用されません。 |
+| `Socket` | MQTT接続を作成するために使用するソケットコンストラクタ。TLSを使用して安全な接続を確立するには`SecureSocket`を使用します。 |
+| `secure` | `SecureSocket`を使用する場合のTLS接続のオプションの辞書 |
 
 ```js
 let mqtt = new Client({
@@ -1440,7 +1436,7 @@ let mqtt = new Client({
 
 ### `onReady()`
 
-The `onReady` callback is invoked when a connection is successfully established to the server. No messages may be published or subscriptions created before `onReady` is called.
+`onReady` コールバックは、サーバーへの接続が正常に確立されたときに呼び出されます。`onReady` が呼び出される前にメッセージを公開したり、サブスクリプションを作成したりすることはできません。
 
 ```js
 mqtt.onReady = function () {
@@ -1452,7 +1448,7 @@ mqtt.onReady = function () {
 
 ### `subscribe(topic)`
 
-To subscribe to a topic, use the `subscribe` method. Your client can subscribe to multiple clients by calling `subscribe` more than once.
+トピックにサブスクライブするには、`subscribe` メソッドを使用します。クライアントは `subscribe` を複数回呼び出すことで、複数のクライアントにサブスクライブできます。
 
 ```js
 mqtt.subscribe("test/string");
@@ -1462,8 +1458,7 @@ mqtt.subscribe("test/json");
 
 ### `unsubscribe(topic)`
 
-Use the `unsubscribe` method to unsubscribe to a topic.
-
+トピックのサブスクリプションを解除するには、`unsubscribe` メソッドを使用します。
 
 ```js
 mqtt.unsubscribe("test/string");
@@ -1471,7 +1466,7 @@ mqtt.unsubscribe("test/string");
 
 ### `onMessage(topic, data)`
 
-The `onMessage` callback is invoked when a message is received for any topic that your client has subscribed to. The `topic` argument is the name of the topic and the `data` argument is the complete message.
+`onMessage` コールバックは、クライアントがサブスクライブしている任意のトピックにメッセージが受信されたときに呼び出されます。`topic` 引数はトピックの名前であり、`data` 引数は完全なメッセージです。
 
 ```js
 mqtt.onMessage = function(topic, data) {
@@ -1479,7 +1474,8 @@ mqtt.onMessage = function(topic, data) {
 }
 ```
 
-The `data` argument is an `ArrayBuffer`. For messages containing only UTF-8 text, you can convert it to a string using `String.fromArrayBuffer`.
+
+`data` 引数は `ArrayBuffer` です。UTF-8 テキストのみを含むメッセージの場合、`String.fromArrayBuffer` を使用して文字列に変換できます。
 
 ```js
 mqtt.onMessage = function(topic, data) {
@@ -1492,14 +1488,14 @@ mqtt.onMessage = function(topic, data) {
 
 ### `publish(topic, message)`
 
-To send a message to a topic, use the `publish` method. The `message` argument may be either a string or an `ArrayBuffer`.
+トピックにメッセージを送信するには、`publish` メソッドを使用します。`message` 引数は文字列または `ArrayBuffer` のいずれかです。
 
 ```js
 mqtt.publish("test/string", "hello");
 mqtt.publish("test/binary", Uint8Array.of(1, 2, 3).buffer);
 ```
 
-To publish JSON, first convert it to a string.
+JSON を公開するには、まずそれを文字列に変換します。
 
 ```js
 mqtt.publish("test/json", JSON.stringify({
@@ -1512,7 +1508,7 @@ mqtt.publish("test/json", JSON.stringify({
 
 ### `onClose()`
 
-The `onClose` callback is invoked when the connection is lost, because of a network error or because the MQTT broker closed the connection.
+`onClose` コールバックは、ネットワークエラーや MQTT ブローカーが接続を閉じたために接続が失われたときに呼び出されます。
 
 ```js
 mqtt.onClose = function() {
