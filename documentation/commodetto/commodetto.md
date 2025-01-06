@@ -1,69 +1,69 @@
 # Commodetto
 Copyright 2016-2023 Moddable Tech, Inc.<BR>
-Revised: August 31, 2023
+改訂： 2023年8月31日
 
-## About This Document
+## このドキュメントについて
 
-Commodetto is a graphics library designed to bring modern user interface rendering to devices powered by a resource-constrained microcontroller. For many applications, Commodetto needs only a few kilobytes of RAM, including the assets for rendering the user interface.
+Commodettoは、リソースが制約されたマイクロコントローラで動作するデバイスに、現代的なユーザーインターフェースのレンダリングを提供するために設計されたグラフィックスライブラリです。多くのアプリケーションにおいて、Commodettoはユーザーインターフェースをレンダリングするためのアセットを含め、数キロバイトのRAMしか必要としません。
 
-This document provides a high-level overview of the parts of Commodetto, information about asset format requirements for assets included in Commodetto applications, and details on the objects that define the Commodetto JavaScript API.
+このドキュメントは、Commodettoの各部分の概要、Commodettoアプリケーションに含まれるアセットのフォーマット要件に関する情報、およびCommodetto JavaScript APIを定義するオブジェクトの詳細を提供します。
 
-## Table of Contents
+## 目次
 
-* [Overview of Commodetto](#overview)
-	* [Native Data Types](#native-data-types)
-	* [Host Buffers](#host-buffers)
-* [Bitmap Operations](#bitmap-operations)
-	* [Bitmap Class](#bitmap-class)
-	* [PixelsOut Class](#pixelsout-class)
-	* [SPIOut Class](#"spiout-class)
-	* [BufferOut Class](#bufferout-class)
-	* [BMPOut Class](#bmpout-class)
-	* [RLE4Out Class](#rle4out-class)
-	* [ColorCellOut Class](#colorcellout-class)
-* [Asset Parsing](#asset-parsing)
+* [Commodettoの概要](#overview)
+	* [ネイティブデータ型](#native-data-types)
+	* [ホストバッファ](#host-buffers)
+* [ビットマップ操作](#bitmap-operations)
+	* [ビットマップクラス](#bitmap-class)
+	* [PixelsOutクラス](#pixelsout-class)
+	* [SPIOutクラス](#"spiout-class)
+	* [BufferOutクラス](#bufferout-class)
+	* [BMPOutクラス](#bmpout-class)
+	* [RLE4Outクラス](#rle4out-class)
+	* [ColorCellOutクラス](#colorcellout-class)
+* [アセット解析](#asset-parsing)
 	* [BMP](#bmp)
 	* [JPEG](#jpeg)
 	* [PNG](#png)
 	* [BMFont](#bmfont)
-* [Rendering](#rendering)
-	* [Render class](#render-class)
-* [Pixel format conversion](#pixel-format-conversion)
-	* [Convert Class](#convert-class)
-* [Odds and Ends](#odds-and-ends)
+* [レンダリング](#rendering)
+	* [Renderクラス](#render-class)
+* [ピクセルフォーマット変換](#pixel-format-conversion)
+	* [Convertクラス](#convert-class)
+* [その他](#odds-and-ends)
 
 <a id="overview"></a>
-## Overview of Commodetto
+## Commodettoの概要
 
-Commodetto consists of several parts:
+Commodettoは以下の部分で構成されています：
 
-* A lightweight [Poco rendering engine](./poco.md)--a display list renderer able to efficiently render a single scanline at a time, eliminating the need for a frame buffer
-* Asset loaders for working with common file formats
-* Pixel outputs for delivering rendered pixels to displays and files
-* A JavaScript API for all features
+* 軽量な[Pocoレンダリングエンジン](./poco.md) - フレームバッファを必要とせず、1回に1つのスキャンラインを効率的にレンダリングできるディスプレイリストレンダラー
+* 一般的なファイル形式を扱うためのアセットローダー
+* レンダリングされたピクセルをディスプレイやファイルに送信するためのピクセル出力
+* すべての機能に対応するJavaScript API
 
-Every part of Commodetto is a module, making it straightforward to deploy only necessary modules, add new modules, and replace existing modules. Even the rendering capabilities are a module, enabling integration of specialized rendering modules.
+Commodettoの各部分はモジュールで構成されており、必要なモジュールのみを展開したり、新しいモジュールを追加したり、既存のモジュールを置き換えたりすることが容易です。レンダリング機能もモジュールであり、専門的なレンダリングモジュールの統合を可能にします。
 
-The **Poco rendering engine** contains only the most essential rendering operations: fill or blend a rectangle with a solid color, plus a small set of bitmap drawing operations, including copy, pattern fill, and alpha blend. Text is implemented externally to the rendering engine using Poco bitmap rendering operations, which enables integration of different engines for glyph generation, text layout, and text measurement.
+**Pocoレンダリングエンジン**は、最も基本的なレンダリング操作のみを含んでいます：単色で矩形を塗りつぶすまたはブレンドする操作、コピー、パターン塗りつぶし、アルファブレンドを含む少数のビットマップ描画操作です。テキストは、Pocoビットマップレンダリング操作を使用してレンダリングエンジンの外部で実装されており、異なるエンジンを統合してグリフ生成、テキストレイアウト、テキスト測定を行うことができます。
 
-**Asset loaders** prepare graphical assets, such as photos, user interface elements, and fonts, for rendering. Commodetto includes asset loaders for BMP images, JPEG photos, PNG images, BMFont fonts. Additional asset loader modules may be added. The asset loaders enable many types of assets to be rendered directly from flash storage (for example, ROM) without having to be loaded into RAM.
+**アセットローダー**は、写真、ユーザーインターフェース要素、フォントなどのグラフィカルアセットをレンダリングのために準備します。Commodettoには、BMP画像、JPEG写真、PNG画像、BMFontフォントのためのアセットローダーが含まれています。追加のアセットローダーモジュールを追加することも可能です。アセットローダーは、多くの種類のアセットをRAMにロードすることなく、フラッシュストレージ（例えば、ROM）から直接レンダリングすることを可能にします。
 
-**Pixel outputs** deliver rendered pixels to their destination. Commodetto includes modules to write to files and in-memory bitmaps. Modules may be added to send the pixels to a display over the transports supported by the host device, including SPI, I<sup>2</sup>C, serial, and memory-mapped ports.
+**ピクセル出力**は、レンダリングされたピクセルをその目的地に届けます。Commodettoには、ファイルやメモリ内ビットマップに書き込むためのモジュールが含まれています。ホストデバイスがサポートするトランスポート（SPI、I<sup>2</sup>C、シリアル、メモリマップドポートを含む）を介してディスプレイにピクセルを送信するためのモジュールを追加することができます。
 
 <a id="native-data-types"></a>
-### Native Data Types
+### ネイティブデータ型
 
-Commodetto data types include pixel, coordinate, dimension, and bitmap. These types are described below along with the enumeration that defines pixel formats.
+Commodettoのデータ型には、ピクセル、座標、寸法、ビットマップが含まれます。これらの型は、ピクセルフォーマットを定義する列挙とともに以下に説明されています。
 
-#### Pixel Type
+#### ピクセル型
 
-To run well on resource-constrained hardware, Commodetto makes simplifying assumptions. One assumption is that only a single output pixel format is supported in a given deployment. A general-purpose graphics library needs to support many different output pixel formats to be compatible with the many different displays and file formats in use. Commodetto assumes the device it is deployed to connects to a single type of screen; this assumption reduces the code size and some runtime overhead.
+リソースが制約されたハードウェアでうまく動作するために、Commodettoは簡略化された仮定を行います。1つの仮定は、特定のデプロイメントでサポートされる出力ピクセルフォーマットが1つだけであるということです。汎用のグラフィックスライブラリは、多くの異なるディスプレイやファイルフォーマットに対応するために、多くの異なる出力ピクセルフォーマットをサポートする必要があります。Commodettoは、デプロイされるデバイスが1種類のスクリーンに接続されると仮定しており、この仮定によりコードサイズと一部のランタイムオーバーヘッドが削減されます。
 
-Commodetto has the ability to support different pixel formats, with the choice of the pixel format to use set at compile time. Changing the output pixel format--for example, to use a different screen--simply requires recompiling Commodetto with a different output pixel format configured.
+Commodettoは、異なるピクセルフォーマットをサポートする機能を持っており、使用するピクセルフォーマットの選択はコンパイル時に設定されます。出力ピクセルフォーマットを変更することは、例えば異なる画面を使用するために、異なる出力ピクセルフォーマットを設定してCommodettoを再コンパイルするだけで済みます。
 
-The pixel format is determined at build time by the value of the C #define `kCommodettoBitmapFormat`.  The following pixel format specifiers are supported for the rendering destination: `kCommodettoBitmapRGB565LE`, `kCommodettoBitmapRGB332`, `kCommodettoBitmapGray256`, `kCommodettoBitmapGray16`, and `kCommodettoBitmapCLUT16`.
+ピクセルフォーマットは、Cの#define `kCommodettoBitmapFormat`の値によってビルド時に決定されます。レンダリング先のピクセルフォーマットとしてサポートされているのは、`kCommodettoBitmapRGB565LE`、`kCommodettoBitmapRGB332`、`kCommodettoBitmapGray256`、`kCommodettoBitmapGray16`、および`kCommodettoBitmapCLUT16`です。
 
-`CommodettoPixel` is the data type for pixel. The definition of the type depends on the value of `kCommodettoBitmapFormat`. For 16-bit pixels, it is `uint16_t`, for 8-bit and 4-bit pixels it is `uint8_t`.
+`CommodettoPixel`はピクセルのデータ型です。この型の定義は、`kCommodettoBitmapFormat`の値に依存します。16ビットピクセルの場合は`uint16_t`、8ビットおよび4ビットピクセルの場合は`uint8_t`です。
 
 ```c
 typedef uint16_t CommodettoPixel;
@@ -71,12 +71,12 @@ typedef uint16_t CommodettoPixel;
 
 ***
 
-#### Pixel Formats
-Commodetto supports multiple source pixel formats at the same time. This allows for efficient storage and rendering of different kinds of assets.
+#### ピクセルフォーマット
+Commodettoは、同時に複数のソースピクセルフォーマットをサポートしています。これにより、異なる種類のアセットを効率的に保存およびレンダリングすることができます。
 
-The output pixel format is always one of the supported source pixel formats. In addition, source pixel formats of 1-bit monochrome and 4-bit gray are always supported.
+出力ピクセルフォーマットは常にサポートされているソースピクセルフォーマットの1つです。さらに、1ビットのモノクロームと4ビットのグレーのソースピクセルフォーマットは常にサポートされています。
 
-The `CommodettoBitmapFormat` enumeration defines the pixel formats. A subset of pixel formats are supported in each deployment.
+`CommodettoBitmapFormat` 列挙型はピクセルフォーマットを定義します。各デプロイメントでサポートされるピクセルフォーマットのサブセットがあります。
 
 ```c
 typedef enum {
@@ -95,52 +95,52 @@ typedef enum {
 } CommodettoBitmapFormat;
 ```
 
-| Format | Description |
+| フォーマット | 説明 |
 | :---: | :--- |
-| kCommodettoBitmapDefault | The output pixel format. The format varies depending on the value of `kCommodettoBitmapFormat` when Commodetto is built.
-|  kCommodettoBitmapMonochrome | Pixels are 1-bit data, packed into bytes in which the high bit of the byte is the leftmost pixel.
-| kCommodettoBitmapGray16 | Pixels are 4-bit data, where 0 represents white, 15 represents black, and the values in between are proportionally interpolated gray levels. The pixels are packed into bytes in which the high nybble is the leftmost pixel.
-| kCommodettoBitmapGray16 \| kCommodettoBitmapPacked | Pixels are the same as in `kCommodettoBitmapGray16`, and compressed using a weighted RLE algorithm.
-| kCommodettoBitmapGray256 | Pixels are 8-bit data, where 0 represents white, 255 represents black, and the values in between are proportionally interpolated gray levels.
-| kCommodettoBitmapRGB332 | Pixels are 8-bit data, with packed RGB values. The high three bits are red, followed by three bits of green, and two bits of blue.
-| kCommodettoBitmapRGB565LE | Pixels are 16-bit data, with packed RGB values. The high five are red, followed by six bits of green, and five bits of blue. The 16-bit value is stored in little-endian byte order.
-| kCommodettoBitmapRGB565BE | Pixels are 16-bit data, with packed RGB values. The high five are red, followed by six bits of green, and five bits of blue. The 16-bit value is stored in big-endian byte order.
-| kCommodettoBitmap24RGB | Pixels are three 8-bit values, in the order of red, green, blue.
-| kCommodettoBitmap24RGBA | Pixels are four 8-bit values, in the order of red, green, blue, alpha.
+| kCommodettoBitmapDefault | 出力ピクセルフォーマット。このフォーマットは、Commodetto がビルドされる際の `kCommodettoBitmapFormat` の値に応じて変わります。 |
+| kCommodettoBitmapMonochrome | ピクセルは1ビットデータで、バイトに詰め込まれ、バイトの最上位ビットが最も左のピクセルです。 |
+| kCommodettoBitmapGray16 | ピクセルは4ビットデータで、0は白、15は黒を表し、その間の値は比例的に補間されたグレーのレベルです。ピクセルはバイトに詰め込まれ、最上位のニブルが最も左のピクセルです。 |
+| kCommodettoBitmapGray16 \| kCommodettoBitmapPacked | ピクセルは `kCommodettoBitmapGray16` と同じで、重み付きRLEアルゴリズムを使用して圧縮されています。 |
+| kCommodettoBitmapGray256 | ピクセルは8ビットデータで、0は白、255は黒を表し、その間の値は比例的に補間されたグレーのレベルです。 |
+| kCommodettoBitmapRGB332 | ピクセルは8ビットデータで、RGB値が詰め込まれています。最上位の3ビットが赤、その後に3ビットの緑、2ビットの青が続きます。 |
+| kCommodettoBitmapRGB565LE | ピクセルは16ビットデータで、RGB値が詰め込まれています。最上位の5ビットが赤、その後に6ビットの緑、5ビットの青が続きます。16ビットの値はリトルエンディアンのバイトオーダーで保存されます。 |
+| kCommodettoBitmapRGB565BE | ピクセルは16ビットデータで、RGB値が詰め込まれています。最上位の5ビットが赤、その後に6ビットの緑、5ビットの青が続きます。16ビットの値はビッグエンディアンのバイトオーダーで保存されます。 |
+| kCommodettoBitmap24RGB | ピクセルは3つの8ビット値で、赤、緑、青の順です。 |
+| kCommodettoBitmap24RGBA | ピクセルは4つの8ビット値で、赤、緑、青、アルファの順です。 |
 
 ***
 
-#### Coordinate Type
+#### 座標タイプ
 
-The `CommodettoCoordinate` type specifies coordinates.
+`CommodettoCoordinate` タイプは座標を指定します。
 
 ```c
 typedef int16_t CommodettoCoordinate;
 ```
 
-The coordinate type is signed to enable applications to render objects that overlap the screen on any edge.
+座標タイプは符号付きで、アプリケーションが画面の任意の端に重なるオブジェクトをレンダリングできるようにします。
 
-For devices with very small displays (128 pixels or fewer in each dimension), `CommodettoCoordinate` may be redefined as an 8-bit value--for example, `int8_t`--to reduce memory requirements. When doing this, application code must take care not to use coordinates smaller than -128 or larger than 127, or the results will be unpredictable.
+非常に小さなディスプレイ（各次元で128ピクセル以下）のデバイスでは、`CommodettoCoordinate` を8ビット値、例えば `int8_t` に再定義してメモリ要件を削減できます。この場合、アプリケーションコードは-128より小さいか127より大きい座標を使用しないように注意する必要があります。そうしないと、結果は予測不可能になります。
 
 ***
 
-#### Dimension Type
+#### 次元タイプ
 
-`CommodettoDimension` is the type used to specify dimensions.
+`CommodettoDimension` は次元を指定するために使用されるタイプです。
 
 ```c
 typedef uint16_t CommodettoDimension;
 ```
 
-The dimension type is unsigned, as Commodetto assigns no meaning to a negative width or height.
+次元タイプは符号なしで、Commodettoは負の幅や高さに意味を持たせません。
 
-`CommodettoDimension` may be redefined as `uint8_t` on devices with very small displays (256 pixels in each dimension) to reduce memory use. When doing this, application code must take care not to specify dimensions larger than 255 pixels.
+`CommodettoDimension` は、非常に小さなディスプレイ（各次元で256ピクセル）を持つデバイスで `uint8_t` に再定義してメモリ使用量を削減できます。この場合、アプリケーションコードは255ピクセルを超える次元を指定しないように注意する必要があります。
 
 ***
 
-#### Bitmap Type
+#### ビットマップタイプ
 
-The `CommodettoBitmap` structure defines a bitmap.
+`CommodettoBitmap` 構造体はビットマップを定義します。
 
 ```c
 typedef struct {
@@ -155,19 +155,19 @@ typedef struct {
 } CommodettoBitmapRecord, *CommodettoBitmap;
 ```
 
-The `w` and `h` fields are the width and height of the bitmap in pixels. The coordinates of the top-left corner of a bitmap are always `{x: 0, y: 0}`, so the bitmap does not contain *x* and *y* coordinates. The `format` field indicates the pixel format of the pixels in the bitmap.
+`w` と `h` フィールドはビットマップの幅と高さをピクセル単位で示します。ビットマップの左上隅の座標は常に `{x: 0, y: 0}` であるため、ビットマップには *x* および *y* 座標は含まれません。`format` フィールドはビットマップ内のピクセルのピクセルフォーマットを示します。
 
-The remaining fields indicate where the pixel data is located. If the `havePointer` field is nonzero, the `data` field in the union is valid and points to the pixel data.
+残りのフィールドはピクセルデータがどこにあるかを示します。`havePointer` フィールドがゼロでない場合、ユニオン内の `data` フィールドが有効で、ピクセルデータを指します。
 
 ```c
-CommodettoBitmap bitmap = ...  /* Get bitmap */;
+CommodettoBitmap bitmap = ...  /* ビットマップを取得 */;
 CommodettoPixel *pixels = bitmap.bits.data;
 ```
 
-If the `havePointer` field is 0, the address of `pixels` is stored external to this bitmap data structure. The `offset` field indicates where the pixel data begins, as a number of bytes from that external pixels pointer; it is commonly used to calculate the address of pixels stored in an `ArrayBuffer`.
+`havePointer` フィールドが0の場合、`pixels` のアドレスはこのビットマップデータ構造の外部に保存されます。`offset` フィールドは、外部ピクセルポインタからのバイト数としてピクセルデータが始まる位置を示します。これは、`ArrayBuffer` に格納されたピクセルのアドレスを計算するためによく使用されます。
 
 ```c
-CommodettoBitmap bitmap = ...  /* Get bitmap */;
+CommodettoBitmap bitmap = ...  /* ビットマップを取得 */;
 unsigned char *buffer = xsToArrayBuffer(xsArg(0));
 CommodettoPixel *pixels = (CommodettoPixel *)(bitmap.bits.offset + buffer);
 ```
@@ -175,27 +175,27 @@ CommodettoPixel *pixels = (CommodettoPixel *)(bitmap.bits.offset + buffer);
 ***
 
 <a id="host-buffers"></a>
-### Host Buffers
+### HostBuffer
 
-The built-in `ArrayBuffer` object is the standard way to store and manipulate binary data in JavaScript. Commodetto supports storing the pixels of assets in an `ArrayBuffer`. However, the JavaScript standard effectively requires an `ArrayBuffer` to reside in RAM. Because many embedded devices have limited RAM but relatively generous ROM (flash memory), it is desirable to use assets directly from ROM without first moving them to RAM.
+組み込みの `ArrayBuffer` オブジェクトは、JavaScriptでバイナリデータを保存および操作するための標準的な方法です。Commodettoは、アセットのピクセルを `ArrayBuffer` に保存することをサポートしています。しかし、JavaScriptの標準では、`ArrayBuffer` がRAMに存在することが事実上要求されています。多くの組み込みデバイスは限られたRAMしか持たず、比較的豊富なROM（フラッシュメモリ）を持っているため、アセットをRAMに移動することなく直接ROMから使用することが望ましいです。
 
-To support this situation, the XS JavaScript engine, which Commodetto is built on, adds a `HostBuffer` object. `HostBuffer` has no constructor because it can be created only by native code. Once instantiated, the `HostBuffer` JavaScript API is identical to the `ArrayBuffer` API. Because the memory referenced by a `HostBuffer` is in read-only memory, write operations should not be performed, as the results are unpredictable; depending on the target hardware, writes may crash or fail silently.
+この状況をサポートするために、Commodettoが基づいているXS JavaScriptエンジンは、`HostBuffer` オブジェクトを追加します。`HostBuffer` にはコンストラクタがありません。なぜなら、ネイティブコードによってのみ作成できるからです。一度インスタンス化されると、`HostBuffer` のJavaScript APIは `ArrayBuffer` APIと同一です。`HostBuffer` が参照するメモリは読み取り専用メモリにあるため、書き込み操作は行うべきではありません。結果は予測不可能であり、ターゲットハードウェアによっては、書き込みがクラッシュしたり、静かに失敗したりする可能性があります。
 
-In the Moddable SDK, the `Resource` constructor is a way to create a `HostBuffer` for a block of data in ROM.
+Moddable SDKでは、`Resource` コンストラクタはROM内のデータブロックに対して `HostBuffer` を作成する方法です。
 
-> **Note:** The Commodetto and Poco JavaScript-to-C bindings support using a `HostBuffer` anywhere an `ArrayBuffer` is allowed; however, some JavaScript-to-C bindings do not accept a `HostBuffer` in place of an `ArrayBuffer` and so throw an exception.
+> **注:** Commodetto と Poco の JavaScript-to-C バインディングは、`ArrayBuffer` が許可されている場所で `HostBuffer` を使用することをサポートしています。ただし、一部の JavaScript-to-C バインディングは `ArrayBuffer` の代わりに `HostBuffer` を受け入れず、例外をスローします。
 
 ***
 
 <a id="bitmap-operations"></a>
-## Bitmap Operations
+## ビットマップ操作
 
-This section describes the classes used to operate on bitmaps: `Bitmap`, `PixelsOut`, and four subclasses of `PixelsOut`.
+このセクションでは、ビットマップを操作するために使用されるクラス、`Bitmap`、`PixelsOut`、および `PixelsOut` の4つのサブクラスについて説明します。
 
 <a id="bitmap-class"></a>
-### Bitmap Class
+### ビットマップクラス
 
-The Commodetto `Bitmap` object contains the three pieces of information needed to render a bitmap: the bitmap dimensions, the format of the pixels in the bitmap, and a reference to the pixel data. The following example creates a `Bitmap` object with 16-bit pixels stored in an `ArrayBuffer`.
+Commodettoの `Bitmap` オブジェクトは、ビットマップをレンダリングするために必要な3つの情報、ビットマップの寸法、ビットマップ内のピクセルのフォーマット、およびピクセルデータへの参照を含んでいます。次の例では、`ArrayBuffer` に格納された16ビットのピクセルを持つ `Bitmap` オブジェクトを作成します。
 
 ```js
 import Bitmap from "commodetto/Bitmap";
@@ -205,85 +205,85 @@ let pixels = new ArrayBuffer(height * width * 2);
 let bitmap = new Bitmap(width, height, Bitmap.RGB565LE, pixels, 0);
 ```
 
-The pixels for a `Bitmap` object are often stored in a `HostBuffer`, to minimize use of RAM. For example, `Resource` creates a `HostBuffer` corresponding to the following resource:
+`Bitmap` オブジェクトのピクセルは、RAMの使用を最小限に抑えるために、しばしば `HostBuffer` に格納されます。例えば、`Resource` は次のリソースに対応する `HostBuffer` を作成します。
 
 ```js
 let pixels = new Resource("pixels.dat");
 let bitmap = new Bitmap(width, height, Bitmap.RGB565LE, pixels, 0);
 ```
 
-#### Functions
+#### 関数
 
 ##### `constructor(width, height, format, buffer, offset)`
 
-The `Bitmap` constructor takes the following arguments:
+`Bitmap` コンストラクタは以下の引数を取ります：
 
-| Argument | Description |
+| 引数 | 説明 |
 | :---: | :--- |
-| `width` | number indicating width of bitmap in pixels
-| `height` | number indicating height of bitmap in pixels
-| `format` | type of pixels in bitmap, taken from `Bitmap` static properties (for example, `Bitmap.RGB565LE` or `Bitmap.Gray16`)
-| `buffer` | `ArrayBuffer` or `HostBuffer` containing pixel data for bitmap
-| `offset` | number indicating offset in bytes from start of `buffer` to pixel data
+| `width` | ビットマップの幅をピクセル単位で示す数値 |
+| `height` | ビットマップの高さをピクセル単位で示す数値 |
+| `format` | ビットマップ内のピクセルの種類を示すもので、`Bitmap` の静的プロパティから取られます（例: `Bitmap.RGB565LE` または `Bitmap.Gray16`） |
+| `buffer` | ビットマップのピクセルデータを含む `ArrayBuffer` または `HostBuffer` |
+| `offset` | ピクセルデータまでの `buffer` の開始位置からのバイト単位のオフセットを示す数値 |
 
-All properties of a bitmap are fixed at the time it is constructed and cannot be changed after that.
+ビットマップのすべてのプロパティは、構築時に固定され、その後変更することはできません。
 
 ***
 
-#### Properties
+#### プロパティ
 
-| Name | Type | Read-only | Description |
+| 名前 | 型 | 読み取り専用 | 説明 |
 | :---: | :---: | :---: | :--- |
-| `width` | `Number` | ✓ | The width in pixels of the bitmap.
-| `height` | `Number` | ✓ | The height in pixels of the bitmap.
-| `format` | `Number` | ✓ | Returns the pixel format of pixels of the bitmap.
+| `width` | `Number` | ✓ | ビットマップの幅をピクセル単位で示します。 |
+| `height` | `Number` | ✓ | ビットマップの高さをピクセル単位で示します。 |
+| `format` | `Number` | ✓ | ビットマップのピクセルのピクセルフォーマットを返します。 |
 
 ***
 
-#### Static Functions
+#### 静的関数
 
 #### `depth(pixelFormat)`
 
-Returns the number of bits per pixel for the specified pixel format.
+指定されたピクセルフォーマットのビット数を返します。
 
 ```js
-Bitmap.depth(Bitmap.RGB565LE);		// returns 16
-Bitmap.depth(Bitmap.Monochrome);	// returns 1
-Bitmap.depth(Bitmap.Gray256);		// returns 8
+Bitmap.depth(Bitmap.RGB565LE);		// 16を返します
+Bitmap.depth(Bitmap.Monochrome);	// 1を返します
+Bitmap.depth(Bitmap.Gray256);		// 8を返します
 ```
 
 ***
 
-#### Static Properties
+#### 静的プロパティ
 
-| Name | Description |
+| 名前 | 説明 |
 | :---: | :--- |
-| `Bitmap.Default` | A constant corresponding to the value of `kCommodettoBitmapDefault`
-| `Bitmap.RLE` |A constant corresponding to the value of `kCommodettoBitmapPacked`
-| `Bitmap.Monochrome` | A constant corresponding to the value of `kCommodettoBitmapMonochrome`
-| `Bitmap.Gray16` | A constant corresponding to the value of `kCommodettoBitmapGray16`
-| `Bitmap.Gray256` | A constant corresponding to the value of `kCommodettoBitmapGray256`
-| `Bitmap.RGB332` | A constant corresponding to the value of `kCommodettoBitmapRGB332`
-| `Bitmap.RGB565LE` | A constant corresponding to the value of `kCommodettoBitmapRGB565LE`
-| `Bitmap.RGB565BE` | A constant corresponding to the value of `kCommodettoBitmapRGB565BE`
-| `Bitmap.RGB24` | A constant corresponding to the value of `kCommodettoBitmapRGB24`
-| `Bitmap.RGBA32` | A constant corresponding to the value of `kCommodettoBitmapRGBA32`
-| `Bitmap.CLUT16` | A constant corresponding to the value of `kCommodettoBitmapCLUT16`
+| `Bitmap.Default` | `kCommodettoBitmapDefault` の値に対応する定数 |
+| `Bitmap.RLE` | `kCommodettoBitmapPacked` の値に対応する定数 |
+| `Bitmap.Monochrome` | `kCommodettoBitmapMonochrome` の値に対応する定数 |
+| `Bitmap.Gray16` | `kCommodettoBitmapGray16` の値に対応する定数 |
+| `Bitmap.Gray256` | `kCommodettoBitmapGray256` の値に対応する定数 |
+| `Bitmap.RGB332` | `kCommodettoBitmapRGB332` の値に対応する定数 |
+| `Bitmap.RGB565LE` | `kCommodettoBitmapRGB565LE` の値に対応する定数 |
+| `Bitmap.RGB565BE` | `kCommodettoBitmapRGB565BE` の値に対応する定数 |
+| `Bitmap.RGB24` | `kCommodettoBitmapRGB24` の値に対応する定数 |
+| `Bitmap.RGBA32` | `kCommodettoBitmapRGBA32` の値に対応する定数 |
+| `Bitmap.CLUT16` | `kCommodettoBitmapCLUT16` の値に対応する定数 |
 
 ***
 
 <a id="pixelsout-class"></a>
-### PixelsOut Class
+### PixelsOut クラス
 
-The `PixelsOut` class is an abstract base class used to output pixels. It is overridden by these other classes to output to different destinations:
+`PixelsOut` クラスは、ピクセルを出力するための抽象基底クラスです。これは、異なる宛先に出力するために他のクラスによってオーバーライドされます：
 
-* `SPIOut` -- sends pixels to LCD display connected over SPI
-* `BufferOut` -- sends pixels to offscreen memory buffer
-* `BMPOut` -- writes pixels to BMP file
-* `RLE4Out` -- compresses pixels to Commodetto 4-bit gray RLE format
-* `ColorCellOut` -- compresses pixels to Moddable variation of ColorCell
+* `SPIOut` -- SPI経由で接続されたLCDディスプレイにピクセルを送信
+* `BufferOut` -- オフスクリーンメモリバッファにピクセルを送信
+* `BMPOut` -- BMPファイルにピクセルを書き込み
+* `RLE4Out` -- Commodetto 4ビットグレー RLE形式にピクセルを圧縮
+* `ColorCellOut` -- ModdableのColorCell変種にピクセルを圧縮
 
-A `PixelsOut` instance is initialized with a dictionary of values. The dictionary provides an arbitrary number of name-value pairs to the constructor. Different `PixelsOut` subclasses require different initialization parameters. For example:
+`PixelsOut` インスタンスは、値の辞書で初期化されます。辞書は、コンストラクタに任意の数の名前と値のペアを提供します。異なる `PixelsOut` サブクラスは、異なる初期化パラメータを必要とします。例えば：
 
 ```javascript
 let display = new SPIOut({width: 320, height: 240,
@@ -296,9 +296,9 @@ let bmpOut = new BMPOut({width: 240, height: 240,
 		pixelFormat: Bitmap.RGB565LE, path: "/test.bmp"});
 ```
 
-Developers building applications using Commodetto do not need to use the majority of the `PixelsOut` API directly. An application uses the constructor of a subclass of `PixelsOut` and then immediately binds it to a `Renderer` instance that calls the `PixelsOut` API as needed. The application interacts exclusively with the `Renderer` instance. The remaining information in this `PixelsOut` section is intended for developers implementing their own `PixelsOut` subclasses.
+Commodettoを使用してアプリケーションを構築する開発者は、`PixelsOut` APIの大部分を直接使用する必要はありません。アプリケーションは `PixelsOut` のサブクラスのコンストラクタを使用し、それを `Renderer` インスタンスに直ちにバインドします。この `Renderer` インスタンスが必要に応じて `PixelsOut` APIを呼び出します。アプリケーションは `Renderer` インスタンスとだけやり取りします。この `PixelsOut` セクションの残りの情報は、自分自身の `PixelsOut` サブクラスを実装する開発者を対象としています。
 
-Once constructed, a `PixelsOut` instance can receive pixels. Three function calls are used to send pixels to the output: `begin`, `send`, and `end`. The following example shows how to output black pixels to a portion of a `PixelsOut` instance.
+構築されると、`PixelsOut` インスタンスはピクセルを受け取ることができます。ピクセルを出力に送信するために使用される関数呼び出しは、`begin`、`send`、および `end` の3つです。以下の例は、`PixelsOut` インスタンスの一部に黒いピクセルを出力する方法を示しています。
 
 ```javascript
 let x = 10, y = 20;
@@ -312,11 +312,11 @@ for (let line = 0; line < height; line++)
 display.end();
 ```
 
-The `begin` call indicates the area of the `PixelsOut` bitmap to update. Following that are one or more calls to `send` that contain the pixels. In the example above, `send` is called 50 times, each time with a buffer of 40 black (all 0) pixels. The number of bytes of data passed by the combined calls to `send` must be exactly the number of bytes needed to fill the area specified in the call to `begin`. Once all data has been provided, call `end`.
+`begin` 呼び出しは、更新する `PixelsOut` ビットマップの領域を示します。その後に、ピクセルを含む1つ以上の `send` 呼び出しが続きます。上記の例では、`send` は40個の黒（すべて0）のピクセルを持つバッファを50回呼び出しています。`send` への呼び出しによって渡されるデータのバイト数は、`begin` への呼び出しで指定された領域を埋めるために必要なバイト数と正確に一致している必要があります。すべてのデータが提供されたら、`end` を呼び出します。
 
-The `PixelsOut` API does not define when the data is transmitted to the output. Different `PixelsOut` subclasses implement it differently: some transmit the data immediately and synchronously, some use asynchronous transfers, and others buffer the data to display only when `end` is called.
+`PixelsOut` APIは、データが出力に送信されるタイミングを定義していません。異なる `PixelsOut` サブクラスはそれを異なる方法で実装します：一部はデータを即座に同期的に送信し、一部は非同期転送を使用し、他はデータをバッファして `end` が呼び出されたときにのみ表示します。
 
-The following example shows the definition of the `PixelsOut` class (with the function bodies omitted).
+以下の例は、`PixelsOut` クラスの定義を示しています（関数の本体は省略されています）。
 
 ```javascript
 class PixelsOut {
@@ -335,19 +335,19 @@ class PixelsOut {
 }
 ```
 
-#### Functions
+#### 関数
 
 ##### `constructor(dictionary)`
 
-The `PixelsOut` constructor takes a single argument: a dictionary of property names and values. The `PixelsOut` base class defines three properties that are defined for all subclasses of `PixelsOut`:
+`PixelsOut` のコンストラクタは、プロパティ名と値の辞書を1つの引数として受け取ります。`PixelsOut` 基底クラスは、すべての `PixelsOut` サブクラスに対して定義される3つのプロパティを定義します。
 
-| Name | Description |
+| 名前 | 説明 |
 | :---: | :--- |
-| `width` | number specifying width of output in pixels
-| `height` | number specifying height of output in pixels
-| `pixelFormat` | string specifying format of output pixels (for example, `Bitmap.RGB565BE` for 16-bit 565 little-endian pixels and `Bitmap.RGB565BE` for 16-bit 565 big-endian pixels)
+| `width` | 出力の幅をピクセルで指定する数値 |
+| `height` | 出力の高さをピクセルで指定する数値 |
+| `pixelFormat` | 出力ピクセルのフォーマットを指定する文字列（例: 16ビット 565 リトルエンディアンピクセルの場合は `Bitmap.RGB565BE`、16ビット 565 ビッグエンディアンピクセルの場合は `Bitmap.RGB565BE`）
 
-Subclasses define additional properties in their dictionary as needed.
+サブクラスは必要に応じて辞書に追加のプロパティを定義します。
 
 ```javascript
 import PixelsOut from "commodetto/PixelsOut";
@@ -355,49 +355,49 @@ import PixelsOut from "commodetto/PixelsOut";
 let out = new PixelsOut({width: 120, height: 160, pixelFormat: Bitmap.RGB565BE});
 ```
 
-> **Note:** The `width`, `height`, and `pixelFormat` properties of a `PixelsOut` object are fixed at the time the object is created and cannot be changed. In general, all properties included in the dictionary provided to the constructor should be considered read-only to keep the implementation of the `PixelsOut` subclasses simple. However, subclasses of `PixelsOut` may choose to provide ways to modify some properties.
+> **注:** `PixelsOut` オブジェクトの `width`、`height`、および `pixelFormat` プロパティは、オブジェクトが作成された時点で固定され、変更することはできません。一般に、コンストラクタに提供される辞書に含まれるすべてのプロパティは、`PixelsOut` サブクラスの実装を簡単に保つために読み取り専用と見なすべきです。ただし、`PixelsOut` のサブクラスは、一部のプロパティを変更する方法を提供することを選択する場合があります。
 
 ***
 
 ##### `begin(x, y, width, height)`
 
-The `begin` function starts the delivery of a frame to the output. The `x` and `y` arguments indicate the top-left corner of the frame; the `width` and `height` arguments, the size of the frame. The area contained by the arguments to the `begin` function must fit entirely within the dimensions provided to the constructor in its dictionary.
+`begin` 関数は、フレームの出力への送信を開始します。`x` と `y` の引数はフレームの左上隅を示し、`width` と `height` の引数はフレームのサイズを示します。`begin` 関数への引数で指定された領域は、コンストラクタにその辞書で提供された寸法内に完全に収まる必要があります。
 
 ***
 
 ##### `end()`
 
-The `end` function indicates that delivery of the current frame to the output is complete. Calling `end` is required for proper output of the frame.
+`end` 関数は、現在のフレームの出力への送信が完了したことを示します。フレームを正しく出力するには、`end` を呼び出す必要があります。
 
 ***
 
 <a id="PixelsOut-continue"></a>
 ##### `continue(x, y, width, height)`
 
-The `continue` function is a way to draw to more than one area of a single frame. Calling `continue` is similar to calling `end` following by `begin`. That is, the following
+`continue` 関数は、単一のフレームの複数の領域に描画する方法です。`continue` を呼び出すことは、`end` の後に `begin` を呼び出すことに似ています。つまり、次のように
 
 ```javascript
 out.continue(10, 20, 30, 40);
 ```
 
-is almost the same as this:
+することは、ほぼ次のようにすることと同じです：
 
 ```javascript
 out.end();
 out.begin(10, 20, 30, 40);
 ```
 
-The difference is that when `continue` is used, all output pixels are part of the same frame, whereas with `end`/`begin` pixels transmitted before `end` are part of one frame and pixels transmitted after it are part of the following frame.
+違いは、`continue` が使用されると、すべての出力ピクセルが同じフレームの一部であるのに対し、`end`/`begin` では、`end` の前に送信されたピクセルは1つのフレームの一部であり、その後に送信されたピクセルは次のフレームの一部であるということです。
 
-For some outputs--for example, `BufferOut`--there is no difference. For others--for example, a hardware-accelerated renderer--the results are visually different.
+出力によっては、例えば `BufferOut` の場合、違いはありません。他の出力、例えばハードウェアアクセラレーションされたレンダラーの場合、結果は視覚的に異なります。
 
-> **Note:** Not all `PixelsOut` subclasses implement `continue`. If it is not supported, an exception is thrown. The subclass descriptions that follow indicate if `continue` is supported.
+> **注:** すべての `PixelsOut` サブクラスが `continue` を実装しているわけではありません。サポートされていない場合、例外がスローされます。以下のサブクラスの説明では、`continue` がサポートされているかどうかが示されています。
 
 ***
 
 ##### `send(pixels, offset = 0, count = pixels.byteLength - offset)`
 
-The `send` function transmits pixels to the output. The `pixels` argument is an `ArrayBuffer` or `HostBuffer` containing the pixels. The `offset` argument is the offset (in bytes) at which the pixels begin in the buffer, and `count` is the number of bytes to transmit from the buffer.
+`send` 関数はピクセルを出力に送信します。`pixels` 引数はピクセルを含む `ArrayBuffer` または `HostBuffer` です。`offset` 引数はバッファ内でピクセルが始まるオフセット（バイト単位）であり、`count` はバッファから送信するバイト数です。
 
 ```javascript
 let pixels = new ArrayBuffer(40);
@@ -406,13 +406,14 @@ out.send(pixels, 30);	// Send last 5 pixels in buffer
 out.send(pixels, 2, 2)	// Send 2nd pixel in buffer
 ```
 
->**Note:** The `offset` and `count` arguments are in units of bytes, not pixels.
+>**注:** `offset` と `count` 引数はピクセル単位ではなくバイト単位です。
 
 ***
 
 ##### `adaptInvalid(r)`
 
-The `adaptInvalid` function takes a rectangle argument specifying an area inside the `PixelsOut` area and modifies the rectangle as needed to make it a valid update area for the PixelsOut. The `adaptInvalid` function is necessary because some display controllers are only able to update the display in certain quanta. For example, one display requires that the x coordinate and width are even numbers, another display can only update complete horizontal scan lines, and another updates the entire display even if only a single pixel changed.
+`adaptInvalid` 関数は、`PixelsOut` 領域内のエリアを指定する矩形引数を取り、必要に応じて矩形を修正してPixelsOutの有効な更新領域にします。`adaptInvalid` 関数は、一部のディスプレイコントローラーが特定の量子でしかディスプレイを更新できないために必要です。例えば、あるディスプレイではx座標と幅が偶数である必要があり、別のディスプレイでは完全な水平走査線のみを更新でき、さらに別のディスプレイでは単一のピクセルが変更された場合でもディスプレイ全体を更新します。
+
 
 	let r = renderer.rectangle(x, y, w, h);
 	pixelsOut.adaptInvalid(r);
@@ -423,7 +424,7 @@ The `adaptInvalid` function takes a rectangle argument specifying an area inside
 
 ##### `pixelsToBytes(count)`
 
-The `pixelsToBytes` function calculates the number of bytes required to store the number of pixels specified by the `count` argument. The following allocates an `ArrayBuffer` corresponding to a single scanline of pixels:
+`pixelsToBytes` 関数は、`count` 引数で指定されたピクセル数を格納するのに必要なバイト数を計算します。以下は、ピクセルの単一スキャンラインに対応する `ArrayBuffer` を割り当てます：
 
 ```javascript
 let buffer = new ArrayBuffer(out.pixelsToBytes(width));
@@ -431,23 +432,23 @@ let buffer = new ArrayBuffer(out.pixelsToBytes(width));
 
 ***
 
-#### Properties
+#### プロパティ
 
-| Name | Type | Read-only | Description |
+| 名前 | 型 | 読み取り専用 | 説明 |
 | :---: | :---: | :---: | :--- |
-| `width` | `Number` | ✓ | The width of the `PixelsOut` instance in pixels.
-|`height` | `Number` | ✓ | The height of the `PixelsOut` instance in pixels.
-| `pixelFormat` | `Number` | ✓ | The format of the pixels of the `PixelsOut` instance.
-`async` | `Boolean` | ✓ | Returns true if the PixelsOut supports asynchronous rendering. This means  pixels passed to `send` are not copied, and must remain unchanged through the completion of the next call to `send` or `end`.
-| `c_dispatch` |  | ✓ | Optionally returns a pointer to a `HostBuffer` that contains a native `PixelsOutDispatchRecord`. Returns undefined if no native dispatch table is available. The native `PixelsOutDispatchRecord` allows native code to call the `PixelsOut`'s `begin`, `send`, `continue`, `end`, and `adaptInvalid` functions directly, without going through the XS virtual machine. The native dispatch table is strictly an optimization and provides only functionality in the JavaScript API.
-| `clut` |  |  | (Not documented yet)
+| `width` | `Number` | ✓ | `PixelsOut` インスタンスの幅をピクセル単位で示します。 |
+|`height` | `Number` | ✓ | `PixelsOut` インスタンスの高さをピクセル単位で示します。 |
+| `pixelFormat` | `Number` | ✓ | `PixelsOut` インスタンスのピクセルのフォーマットを示します。 |
+`async` | `Boolean` | ✓ | PixelsOut が非同期レンダリングをサポートしている場合に true を返します。これは、`send` に渡されたピクセルがコピーされず、次の `send` または `end` の呼び出しが完了するまで変更されないままである必要があることを意味します。 |
+| `c_dispatch` |  | ✓ | ネイティブの `PixelsOutDispatchRecord` を含む `HostBuffer` へのポインタをオプションで返します。ネイティブディスパッチテーブルが利用できない場合は未定義を返します。ネイティブ `PixelsOutDispatchRecord` は、ネイティブコードが `PixelsOut` の `begin`、`send`、`continue`、`end`、および `adaptInvalid` 関数を XS 仮想マシンを介さずに直接呼び出すことを可能にします。ネイティブディスパッチテーブルは厳密には最適化であり、JavaScript API における機能のみを提供します。 |
+| `clut` |  |  | (まだ文書化されていません) |
 
 ***
 
 <a id="spiout-class"></a>
-### SPIOut Class
+### SPIOut クラス
 
-The `SPIOut` subclass of `PixelsOut` is a placeholder for an implementation of a `PixelsOut` instance that sends pixels to a display connected over SPI.
+`SPIOut` は `PixelsOut` のサブクラスで、SPI接続のディスプレイにピクセルを送信する `PixelsOut` インスタンスの実装のためのプレースホルダーです。
 
 ```javascript
 class SPIOut extends PixelsOut
@@ -456,17 +457,17 @@ class SPIOut extends PixelsOut
 ***
 
 <a id="bufferout-class"></a>
-### BufferOut Class
+### BufferOut クラス
 
-`BufferOut` is a subclass of `PixelsOut` that implements an offscreen in-memory bitmap.
+`BufferOut` は `PixelsOut` のサブクラスで、オフスクリーンのメモリ内ビットマップを実装します。
 
 ```javascript
 class BufferOut extends PixelsOut;
 ```
 
-Because memory tends to be a scarce resource on target devices, applications should use `BufferOut` sparingly.
+ターゲットデバイスではメモリが限られたリソースであるため、アプリケーションは `BufferOut` を控えめに使用するべきです。
 
-To create a `BufferOut` instance:
+`BufferOut` インスタンスを作成するには：
 
 ```javascript
 import BufferOut from "commodetto/BufferOut";
@@ -474,100 +475,100 @@ import BufferOut from "commodetto/BufferOut";
 let offscreen = new BufferOut({width: 40, height: 30, pixelFormat: Bitmap.RGB565LE});
 ```
 
-The `BufferOut` constructor allocates the buffer for the bitmap pixels. Once the offscreen bitmap has been created, pixels are delivered to it using the `send` function, as described for the `PixelsOut` class. The pixels in the `BufferOut` instance are accessed through the instance's bitmap.
+`BufferOut` コンストラクタはビットマップピクセルのためのバッファを割り当てます。オフスクリーンビットマップが作成されると、`PixelsOut` クラスで説明されているように `send` 関数を使用してピクセルが送信されます。`BufferOut` インスタンスのピクセルは、インスタンスのビットマップを通じてアクセスされます。
 
 ```javascript
 let bitmap = offscreen.bitmap;
 ```
 
-`BufferOut` implements the optional `continue` function of `PixelsOut`.
+`BufferOut`は、`PixelsOut`のオプションの`continue`関数を実装しています。
 
-#### Properties
+#### プロパティ
 
-| Name | Type | Read-only | Description |
+| 名前 | 型 | 読み取り専用 | 説明 |
 | :---: | :---: | :---: | :--- |
-| `bitmap ` | `Bitmap` | ✓ | Returns a `Bitmap` instance to access the pixels of the `BufferOut` instance.
+| `bitmap ` | `Bitmap` | ✓ | `BufferOut`インスタンスのピクセルにアクセスするための`Bitmap`インスタンスを返します。
 
 ***
 
 <a id="bmpout-class"></a>
-### BMPOut Class
+### BMPOut クラス
 
-`BMPOut` is a subclass of `PixelsOut` that receives pixels and writes them in a BMP file in the following formats: `Bitmap.Gray16`, `Bitmap.Gray256`, `Bitmap.RGB565LE`, `Bitmap.RGB332`, and `Bitmap.CLUT16`. The `BMPOut` implementation writes pixels to the file incrementally, so it can create files larger than available free memory.
+`BMPOut`は、`PixelsOut`のサブクラスで、ピクセルを受け取り、次のフォーマットでBMPファイルに書き込みます： `Bitmap.Gray16`、`Bitmap.Gray256`、`Bitmap.RGB565LE`、`Bitmap.RGB332`、および`Bitmap.CLUT16`。`BMPOut`の実装は、ファイルにピクセルを段階的に書き込むため、利用可能なメモリよりも大きなファイルを作成することができます。
 
-`BMPOut` adds the `path` property to the constructor's dictionary; `path` is a string containing the full path to the output BMP file.
+`BMPOut`は、コンストラクタの辞書に`path`プロパティを追加します。`path`は、出力BMPファイルへのフルパスを含む文字列です。
 
-> **Note:** The width multiplied by the bit-depth of the BMP file must be a multiple of 32.
+> **注意:** BMPファイルの幅にビット深度を掛けた値は、32の倍数でなければなりません。
 
 ***
 
 <a id="rle4out-class"></a>
-### RLE4Out Class
+### RLE4Out クラス
 
-`RLE4Out` is a subclass of `PixelsOut` that receives pixels in `Bitmap.Gray16` format and packs them into an RLE-encoded bitmap.
+`RLE4Out`は、`PixelsOut`のサブクラスで、`Bitmap.Gray16`フォーマットのピクセルを受け取り、それをRLEエンコードされたビットマップにパックします。
 
 ```javascript
 class RLE4Out extends PixelsOut;
 ```
 
-RLE-encoded bitmaps are smaller, reducing the amount of ROM required for assets. Additionally, for many common bitmaps uses, RLE-encoded bitmaps draw more quickly.
+RLEエンコードされたビットマップはサイズが小さく、アセットに必要なROMの量を減らします。さらに、多くの一般的なビットマップの使用において、RLEエンコードされたビットマップはより速く描画されます。
 
-The `RLE4Out` class may be used on the device. More commonly, however, a bitmap is RLE-encoded and written to storage at build time; this avoids the time and memory required to encode the image on the device, while saving storage space.
+`RLE4Out`クラスはデバイス上で使用できます。しかし、より一般的には、ビットマップはRLEエンコードされ、ビルド時にストレージに書き込まれます。これにより、デバイス上で画像をエンコードするための時間とメモリを節約しながら、ストレージスペースを節約できます。
 
-The `rle4encode` tool in the Moddable SDK compresses 4-bit grayscale BMP files using the `RLE4Out` class. The `compressbmf` tool applies the RLE4Out class to each individual glyph in a BMF font.
+Moddable SDKの`rle4encode`ツールは、`RLE4Out`クラスを使用して4ビットグレースケールBMPファイルを圧縮します。`compressbmf`ツールは、BMFフォントの各個別のグリフに`RLE4Out`クラスを適用します。
 
-The `RLE4Out` class does not implement the optional `continue` function.
+`RLE4Out`クラスはオプションの`continue`関数を実装していません。
 
-#### Properties
+#### プロパティ
 
-| Name | Type | Read-only | Description |
+| 名前 | 型 | 読み取り専用 | 説明 |
 | :---: | :---: | :---: | :--- |
-| `bitmap ` | `Bitmap` | ✓ | Returns a `Bitmap` instance to access the pixels of the `RLE4Out` instance.
+| `bitmap ` | `Bitmap` | ✓ | `RLE4Out`インスタンスのピクセルにアクセスするための`Bitmap`インスタンスを返します。
 
 ***
 
 <a id="colorcellout-class"></a>
-### ColorCellOut Class
+### ColorCellOut クラス
 
-`ColorCellOut` is a subclass of `PixelsOut` that receives pixels in `Bitmap.RGB565LE` format and compresses them using a modified version of the [ColorCell](https://en.wikipedia.org/wiki/Color_Cell_Compression) image compression algorithm. ColorCell was widely used in the early 90's, primarily in the [Apple Video](https://en.wikipedia.org/wiki/Apple_Video) algorithm.
+`ColorCellOut`は`PixelsOut`のサブクラスで、`Bitmap.RGB565LE`形式のピクセルを受け取り、[ColorCell](https://en.wikipedia.org/wiki/Color_Cell_Compression)画像圧縮アルゴリズムの修正版を使用して圧縮します。ColorCellは90年代初頭に広く使用され、主に[Apple Video](https://en.wikipedia.org/wiki/Apple_Video)アルゴリズムで使用されました。
 
-The Moddable SDK's `image2cs` tool uses the `ColorCellOut` class to compress JPEG, PNG, and GIF images and image sequences.
+Moddable SDKの`image2cs`ツールは、`ColorCellOut`クラスを使用してJPEG、PNG、GIF画像および画像シーケンスを圧縮します。
 
-The `send` function of the ColorCellOut class requires that the number of scan lines provided on each call be a multiple of 4. This allows the ColorCellOut implementation to encode complete rows of the image on each call to `send`.
+`ColorCellOut`クラスの`send`関数は、各呼び出しで提供される走査線の数が4の倍数であることを要求します。これにより、`send`の各呼び出しで画像の完全な行をエンコードすることができます。
 
-The `begin` function takes an optional 5th parameter, a dictionary of compression options for the frame. The dictionary contains an optional `quality` property with values from 0 to 1, with 0 being the lowest quality and 1 the highest.
+`begin`関数は、フレームの圧縮オプションの辞書を5番目のオプションパラメータとして受け取ります。この辞書には、0から1の値を持つオプションの`quality`プロパティが含まれており、0が最低品質、1が最高品質です。
 
-#### Properties
+#### プロパティ
 
-| Name | Type | Read-only | Description |
+| 名前 | 型 | 読み取り専用 | 説明 |
 | :---: | :---: | :---: | :--- |
-| `bitmap ` | `Bitmap` | ✓ | Returns a `Bitmap` instance to access the pixels of the `ColorCellOut ` instance.
+| `bitmap ` | `Bitmap` | ✓ | `ColorCellOut`インスタンスのピクセルにアクセスするための`Bitmap`インスタンスを返します。
 
 ***
 
 <a id="asset-parsing"></a>
-## Asset Parsing
+## アセット解析
 
-Building a user interface for a display requires visual assets--icons, bitmaps, photos, fonts, and so on. There are many commonly used file formats for storing these assets, some of which work well on constrained devices. Commodetto includes functions to use several common asset file formats directly; however, Commodetto does not support all features of these file formats. Graphic designers creating assets for use with Commodetto need to be aware of the asset format requirements.
+ディスプレイ用のユーザーインターフェースを構築するには、アイコン、ビットマップ、写真、フォントなどの視覚的なアセットが必要です。これらのアセットを保存するための一般的に使用されるファイル形式は多数あり、その中には制約のあるデバイスでうまく機能するものもあります。Commodettoには、いくつかの一般的なアセットファイル形式を直接使用するための関数が含まれていますが、Commodettoはこれらのファイル形式のすべての機能をサポートしているわけではありません。Commodettoで使用するアセットを作成するグラフィックデザイナーは、アセット形式の要件を理解しておく必要があります。
 
-> **Note:** For optimal render performance and minimum storage size, it is beneficial to convert assets to the preferred format of the target device at build time.
+> **注:** 最適なレンダリング性能と最小のストレージサイズを実現するために、ビルド時にアセットをターゲットデバイスの推奨フォーマットに変換することが有益です。
 
 <a id="bmp"></a>
 ### BMP
 
-The [BMP](https://msdn.microsoft.com/en-us/library/dd183391.aspx) file format was created by Microsoft for use on Windows. It is a flexible container for uncompressed pixels of various formats. The format is unambiguously documented and well supported by graphic tools. BMP is the preferred format for uncompressed bitmaps in Commodetto. The Commodetto BMP file parser supports the following variants of BMP:
+[BMP](https://msdn.microsoft.com/en-us/library/dd183391.aspx) ファイルフォーマットは、Windowsでの使用のためにMicrosoftによって作成されました。これは、さまざまなフォーマットの非圧縮ピクセルの柔軟なコンテナです。このフォーマットは明確に文書化されており、グラフィックツールによってよくサポートされています。BMPはCommodettoでの非圧縮ビットマップの推奨フォーマットです。Commodetto BMPファイルパーサーは、以下のBMPのバリエーションをサポートしています：
 
-* **16-bit 565 little-endian pixels** -- The image width must be a multiple of 2. When using Photoshop to save the BMP file, select **Advanced Mode** in the BMP dialog and check **R5 G6 B5**.
-* **16-bit 555 little-endian pixels** -- The image width must be a multiple of 2. This format is the most common 16-bit format for BMP files; however, it is not recommended, as the pixels must be converted to 565, which takes time and requires memory to store the converted pixels.
-* **8-bit gray** -- The image width must be a multiple of 4 and must have a gray palette.
-* **8-bit color** -- The image width must be a multiple of 4 and must have an RGB 332 palette.
-* **4-bit gray** -- The image width must be a multiple of 8 and must have a gray palette. When working in Photoshop, set **Image Mode** to **Grayscale** before saving the image in BMP format.
-* **4-bit color** -- The image width must be a multiple of 8.
-* **1-bit black and white** -- The image width must be a multiple of 32.
+* **16ビット 565 リトルエンディアンピクセル** -- 画像の幅は2の倍数でなければなりません。Photoshopを使用してBMPファイルを保存する際は、BMPダイアログで**Advanced Mode**を選択し、**R5 G6 B5**をチェックしてください。
+* **16ビット 555 リトルエンディアンピクセル** -- 画像の幅は2の倍数でなければなりません。このフォーマットはBMPファイルの最も一般的な16ビットフォーマットですが、推奨されません。ピクセルを565に変換する必要があり、時間がかかり、変換されたピクセルを保存するためのメモリが必要です。
+* **8ビット グレー** -- 画像の幅は4の倍数でなければならず、グレーパレットを持っている必要があります。
+* **8ビット カラー** -- 画像の幅は4の倍数でなければならず、RGB 332パレットを持っている必要があります。
+* **4ビット グレー** -- 画像の幅は8の倍数でなければならず、グレーパレットを持っている必要があります。Photoshopで作業する際は、BMPフォーマットで画像を保存する前に**Image Mode**を**Grayscale**に設定してください。
+* **4ビット カラー** -- 画像の幅は8の倍数でなければなりません。
+* **1ビット 白黒** -- 画像の幅は32の倍数でなければなりません。
 
-By default, BMP files are stored with the bottom line of the bitmap first in the file--for example, bottom-to-top order. Commodetto requires bitmaps to be stored top to bottom. When saving a BMP file, select the option to store it in top-to-bottom order. In Photoshop, check **Flip row order** to store the BMP in top-to-bottom order.
+デフォルトでは、BMPファイルはファイル内でビットマップの下の行から順に保存されます。例えば、下から上への順序です。Commodettoでは、ビットマップを上から下に保存する必要があります。BMPファイルを保存する際には、上から下の順序で保存するオプションを選択してください。Photoshopでは、BMPを上から下の順序で保存するために、**Flip row order** をチェックしてください。
 
-The `parseBMP` function creates a bitmap from an `ArrayBuffer` or `HostBuffer` containing BMP data. It performs validation to confirm that the file format is supported, and throws an exception if it detects an unsupported variant of BMP.
+`parseBMP` 関数は、BMPデータを含む `ArrayBuffer` または `HostBuffer` からビットマップを作成します。ファイル形式がサポートされていることを確認するための検証を行い、サポートされていないBMPのバリアントを検出した場合には例外をスローします。
 
 ```javascript
 import parseBMP from "commodetto/parseBMP";
@@ -582,12 +583,12 @@ trace(`Bitmap width ${bitmap.width}, height ${bitmap.height}\n`);
 <a id="jpeg"></a>
 ### JPEG
 
-The JPEG file format is the most common format for storing photos. Many resource-constrained devices have the performance to decompress JPEG images, though not all have the memory to store the result. Commodetto provides a way to render a JPEG image to an output, even if the decompressed JPEG image cannot fit into memory.
+JPEGファイル形式は、写真を保存するための最も一般的な形式です。多くのリソース制約のあるデバイスは、JPEG画像を解凍する性能を持っていますが、結果を保存するメモリを持っているわけではありません。Commodettoは、解凍されたJPEG画像がメモリに収まらなくても、JPEG画像を出力にレンダリングする方法を提供します。
 
-The JPEG decoder in Commodetto supports a subset of the JPEG specification. YUV encoding with H1V1 and H2V2 are supported. Grayscale JPEG images are supported, and there are no restrictions on the width and height of the JPEG image. Progressive JPEG images are not supported.
+CommodettoのJPEGデコーダーは、JPEG仕様のサブセットをサポートしています。YUVエンコーディングではH1V1とH2V2がサポートされています。グレースケールのJPEG画像もサポートされており、JPEG画像の幅と高さに制限はありません。プログレッシブJPEG画像はサポートされていません。
 
-#### Decompressing entire image
-To decompress a complete JPEG data to an offscreen bitmap, use the `loadJPEG` function.
+#### 画像全体の解凍
+オフスクリーンビットマップに完全なJPEGデータを解凍するには、`loadJPEG` 関数を使用します。
 
 ```javascript
 import loadJPEG from "commodetto/loadJPEG";
@@ -596,8 +597,8 @@ let jpegData = new Resource("image.jpg");
 let bitmap = loadJPEG(jpegData);
 ```
 
-#### Decoding block by block
-The JPEG decoder also implements a block-based decode mode to return a single block of decompressed data at a time.
+#### ブロックごとのデコード
+JPEGデコーダーは、ブロック単位でデコードするモードも実装しており、解凍されたデータの単一ブロックを一度に返します。
 
 ```javascript
 import JPEG from "commodetto/readJPEG";
@@ -612,35 +613,35 @@ while (decoder.ready) {
 }
 ```
 
-Each block returned is a bitmap. The `width` and `height` fields of the bitmap indicate the dimensions of the block. The width and height can change from block to block. The `x` and `y` properties indicate the placement of the block relative to the top-left corner of the full JPEG image. Blocks are returned in a left-to-right, top-to-bottom order.
+返される各ブロックはビットマップです。ビットマップの `width` と `height` フィールドはブロックの寸法を示します。幅と高さはブロックごとに変わることがあります。`x` と `y` プロパティは、フルJPEG画像の左上隅に対するブロックの配置を示します。ブロックは左から右、上から下の順に返されます。
 
-The same bitmap object is used for all blocks, so the contents of the block change after each call to `read`. This means an application cannot collect all the blocks into an array for later rendering. To do that, the application must copy the data from each block.
+同じビットマップオブジェクトがすべてのブロックに使用されるため、`read` を呼び出すたびにブロックの内容が変わります。これは、アプリケーションが後でレンダリングするためにすべてのブロックを配列に収集できないことを意味します。そのためには、アプリケーションが各ブロックからデータをコピーする必要があります。
 
-Using a renderer, it is straightforward to incrementally send a JPEG image to a display block-by-block as it is decoded, eliminating the need to copy the data of each block. The Poco renderer documentation includes an example of this technique.
+レンダラーを使用すると、JPEG画像をデコードしながらブロックごとにディスプレイに送信することが容易になり、各ブロックのデータをコピーする必要がなくなります。Pocoレンダラーのドキュメントには、この技術の例が含まれています。
 
-#### Streaming decode
+#### ストリーミングデコード
 
-The preceding sections explain how to decode a JPEG image when the full compressed JPEG image is available. The JPEG decoder can also be used to decode a streaming JPEG image, that is decode JPEG data as it arrives over the network. This approach has the advantage of eliminating the need to store the entire compressed JPEG image in memory. Instead, network buffers are pushed to the JPEG decoder as they arrive, and `read` is used to retrieve as many decoded blocks as possible from the available buffers.
+前のセクションでは、完全な圧縮JPEG画像が利用可能な場合にJPEG画像をデコードする方法を説明しました。JPEGデコーダーは、ストリーミングJPEG画像、つまりネットワーク経由で到着するJPEGデータをデコードするためにも使用できます。このアプローチには、メモリに圧縮されたJPEG画像全体を保存する必要がないという利点があります。代わりに、ネットワークバッファが到着するとJPEGデコーダーにプッシュされ、`read`を使用して利用可能なバッファから可能な限り多くのデコードされたブロックを取得します。
 
-To use the JPEG decoder in streaming mode, call the constructor with no arguments:
+JPEGデコーダーをストリーミングモードで使用するには、引数なしでコンストラクタを呼び出します：
 
 ```javascript
 let decoder = new JPEG();
 ```
 
-As data arrives, push `ArrayBuffer` containing the data to the decoder:
+データが到着したら、データを含む`ArrayBuffer`をデコーダーにプッシュします：
 
 ```javascript
 decoder.push(buffer);
 ```
 
-After the final buffer arrives, call `push` with parameters to indicate the end of the data stream. Failure to do this may result in blocks missing from the bottom of the image:
+最後のバッファが到着したら、データストリームの終了を示すパラメータを指定して`push`を呼び出します。これを行わないと、画像の下部からブロックが欠落する可能性があります：
 
 ```javascript
 decoder.push();
 ```
 
-The JPEG decoder `ready` property indicates blocks are available to be read. The first time the `ready` property returns true also indicates that the JPEG header has been successfully parsed and the JPEG `width` and `height` properties have been initialized.
+JPEGデコーダーの`ready`プロパティは、読み取り可能なブロックがあることを示します。`ready`プロパティが初めてtrueを返すときは、JPEGヘッダーが正常に解析され、JPEGの`width`および`height`プロパティが初期化されたことも示します。
 
 ```javascript
 decoder.push(buffer);
@@ -650,22 +651,23 @@ while (decoder.ready) {
 }
 ```
 
-> **Note:** Commodetto uses the excellent public domain [picojpeg](https://code.google.com/archive/p/picojpeg/) decoder, which is optimized to minimize memory use. Some quality and performance are sacrificed, but the results are generally quite good. Small changes have been made to picojpeg to eliminate compiler warnings; those changes are included in the Moddable SDK source code distribution.
+> **注:** Commodettoは、メモリ使用量を最小限に抑えるよう最適化された、優れたパブリックドメインの[picojpeg](https://code.google.com/archive/p/picojpeg/)デコーダーを使用しています。品質とパフォーマンスの一部は犠牲になりますが、結果は一般的に非常に良好です。コンパイラの警告を排除するためにpicojpegに小さな変更が加えられており、それらの変更はModdable SDKのソースコード配布に含まれています。
 
 ***
 
 <a id="png"></a>
 ### PNG
 
-The PNG image format is commonly used for the assets of user interface elements such as buttons and sliders. Because the PNG file format is heavily compressed, PNG images must be decompressed to a `BufferOut` instance for use. Also because of the compression used in PNG, a significant amount of memory is required for decompressing the image. Nonetheless, because PNG is so common in user interface work, Commodetto implements a PNG module for use on devices and scenarios where it is practical.
+PNG画像フォーマットは、ボタンやスライダーなどのユーザーインターフェース要素のアセットに一般的に使用されます。PNGファイルフォーマットは大幅に圧縮されているため、PNG画像は使用するために`BufferOut`インスタンスに解凍される必要があります。また、PNGで使用される圧縮のため、画像を解凍するにはかなりのメモリが必要です。それにもかかわらず、ユーザーインターフェース作業でPNGが非常に一般的であるため、Commodettoは、デバイスや実用的なシナリオで使用するためのPNGモジュールを実装しています。
 
-The PNG decoder in Commodetto supports most variations of the PNG file format, with two exceptions:
+CommodettoのPNGデコーダーは、PNGファイルフォーマットのほとんどのバリエーションをサポートしていますが、2つの例外があります：
 
-- Interlaced images are not supported, as interlacing is incompatible with progressive decoding.
 
-- Images with 16-bit channels are unsupported because the high resolution exceeds the image quality capabilities of target devices.
+- インターレース画像はサポートされていません。インターレースはプログレッシブデコードと互換性がないためです。
 
-To decompress PNG data to an offscreen bitmap, use the static `decompress` function.
+- 16ビットチャンネルの画像はサポートされていません。高解像度がターゲットデバイスの画像品質能力を超えるためです。
+
+オフスクリーンビットマップにPNGデータをデコードするには、静的な`decompress`関数を使用します。
 
 ```javascript
 import PNG from "commodetto/readPNG";
@@ -674,15 +676,15 @@ let pngData = new Resource("image.png");
 let bitmap = PNG.decompress(pngData);
 ```
 
-The PNG `decompress` function supports the following PNG variants:
+PNGの`decompress`関数は、以下のPNGバリアントをサポートしています：
 
-- 3 channels, 8 bits per channel (24-bit RGB)
-- 4 channels, 8 bits per channel (32-bit RGBA)
-- 1 channel, 8 bits per channel (8-bit gray)
-- 1 channel, 8 bits per channel with palette (8-bit indexed RGB)
-- 1 channel, 1 bit per channel (1-bit monochrome)
+- 3チャンネル、各チャンネル8ビット（24ビットRGB）
+- 4チャンネル、各チャンネル8ビット（32ビットRGBA）
+- 1チャンネル、各チャンネル8ビット（8ビットグレー）
+- 1チャンネル、各チャンネル8ビットのパレット付き（8ビットインデックスRGB）
+- 1チャンネル、各チャンネル1ビット（1ビットモノクローム）
 
-For images that contain an alpha channel, pass `true` for the optional second argument to `decompress`. The alpha channel is returned as a 4-bit gray bitmap in the `mask` property of the returned bitmap image.
+アルファチャンネルを含む画像の場合、`decompress`のオプションの第2引数に`true`を渡します。アルファチャンネルは、返されるビットマップ画像の`mask`プロパティとして4ビットグレービットマップで返されます。
 
 ```javascript
 let pngData = new Resource("image_with_alpha.png");
@@ -690,7 +692,7 @@ let bitmap = PNG.decompress(pngData, true);
 let alpha = bitmap.mask;
 ```
 
-The PNG decoder also implements a progressive decoding mode to return a single scanline of decompressed data at a time. The scanline is raw data from the PNG decoder, with no pixel transformations applied. The following example converts a 24-bit (RGB) or 32-bit (RGBA) PNG image to a 16-bit BMP.
+PNGデコーダーは、進行的デコードモードも実装しており、解凍されたデータの単一スキャンラインを一度に返します。スキャンラインはPNGデコーダーからの生データで、ピクセル変換は適用されていません。以下の例は、24ビット（RGB）または32ビット（RGBA）のPNG画像を16ビットBMPに変換します。
 
 ```js
 let png = new PNG(new Resource("image.png"));
@@ -717,22 +719,22 @@ for (let i = 0; i < height; i++) {
 bmp.end();
 ```
 
-In addition to the `width` and `height` properties, the PNG instance contains `depth` and `channels` properties based on the content of the PNG image.
+`width`と`height`プロパティに加えて、PNGインスタンスにはPNG画像の内容に基づいた`depth`と`channels`プロパティが含まれています。
 
-The PNG decoder uses up to 45 KB of memory while decoding an image. This amount of memory may not be available or practical on all target devices. The memory requirement is primarily due to the zlib compression algorithm used in PNG images.
+PNGデコーダーは、画像をデコードする際に最大45 KBのメモリを使用します。このメモリ量は、すべてのターゲットデバイスで利用可能または実用的であるとは限りません。このメモリ要件は主に、PNG画像で使用されるzlib圧縮アルゴリズムによるものです。
 
-> **Note:** Commodetto uses the public domain [miniz](https://github.com/richgel999/miniz/) library to decompress the [zlib](http://www.zlib.net/manual.html) data contained in PNG images. The PNG parsing is partially based on the Apache-licensed [`FskPNGDecodeExtension.c`](https://github.com/Kinoma/kinomajs/blob/master/extensions/FskPNGDecode/sources/FskPNGDecodeExtension.c) from KinomaJS, with significant simplifications.
+> **注:** Commodettoは、PNG画像に含まれる[zlib](http://www.zlib.net/manual.html)データを解凍するために、パブリックドメインの[miniz](https://github.com/richgel999/miniz/)ライブラリを使用しています。PNGの解析は、KinomaJSのApacheライセンスの[`FskPNGDecodeExtension.c`](https://github.com/Kinoma/kinomajs/blob/master/extensions/FskPNGDecode/sources/FskPNGDecodeExtension.c)に部分的に基づいており、大幅に簡略化されています。
 
 ***
 
 <a id="bmfont"></a>
 ### BMFont
 
-[BMFont](http://www.angelcode.com/products/bmfont/) is a format for storing bitmap fonts. It is widely used to embed distinctive fonts in games in a format that is efficiently rendered using OpenGL. BMFont is well designed and straightforward to support. Commodetto uses BMFont to store both anti-aliased and multicolor fonts. In addition, BMFont has good tool support--in particular the excellent [Glyph Designer](https://71squared.com/glyphdesigner), which converts macOS fonts to a Commodetto-compatible BMFont.  For Windows and Linux users, the command line [bmfont](https://github.com/vladimirgamalyan/fontbm) has been used  successfully.
+[BMFont](http://www.angelcode.com/products/bmfont/)は、ビットマップフォントを保存するためのフォーマットです。これは、OpenGLを使用して効率的にレンダリングされる形式で、ゲームに独自のフォントを埋め込むために広く使用されています。BMFontはよく設計されており、サポートが簡単です。Commodettoは、アンチエイリアスフォントとマルチカラーフォントの両方を保存するためにBMFontを使用します。さらに、BMFontには優れたツールサポートがあります。特に、macOSフォントをCommodetto互換のBMFontに変換する優れた[Glyph Designer](https://71squared.com/glyphdesigner)があります。WindowsおよびLinuxユーザー向けには、コマンドラインの[bmfont](https://github.com/vladimirgamalyan/fontbm)がうまく使用されています。
 
-BMFont stores a font's metrics data separately from the font's glyph atlas (bitmap). This means that loading a BMFont requires two steps: loading the metrics and loading the glyph atlas. BMFont allows the metrics data to be stored in a variety of formats, including text, XML, and binary. Commodetto supports the binary format for metrics.
+BMFontは、フォントのメトリクスデータをフォントのグリフアトラス（ビットマップ）とは別に保存します。これは、BMFontをロードするには、メトリクスをロードし、グリフアトラスをロードするという2つのステップが必要であることを意味します。BMFontは、メトリクスデータをテキスト、XML、バイナリなどのさまざまな形式で保存することを可能にします。Commodettoは、メトリクスのバイナリ形式をサポートしています。
 
-The `parseBMF` function prepares the BMFont binary metrics file for use with a `Render` object.
+`parseBMF` 関数は、BMFontバイナリメトリクスファイルを `Render` オブジェクトで使用するために準備します。
 
 ```javascript
 import parseBMF from "commodetto/parseBMF";
@@ -742,22 +744,22 @@ let palatino36 = parseBMF(new Resource("palatino36.fnt"));
 palatino36.bitmap = parseBMP(new Resource("palatino36.bmp"));
 ```
 
-After the metrics are prepared with `parseBMF`, the glyph atlas is prepared using `parseBMP` and is attached to the metrics as the `bitmap` property.
+メトリクスが `parseBMF` で準備された後、グリフアトラスは `parseBMP` を使用して準備され、メトリクスに `bitmap` プロパティとして添付されます。
 
-BMFont files with discontiguous ranges of characters are supported. Commodetto may be configured to use the kerning data that may be present in a BMFont, though it is disabled by default.
+文字の不連続な範囲を持つBMFontファイルがサポートされています。Commodettoは、BMFontに存在する可能性のあるカーニングデータを使用するように設定できますが、デフォルトでは無効になっています。
 
-For anti-aliased text, the BMP file containing the glyph atlas bitmap must be in 4-bit gray format. For multicolor text, the bitmap must be in `Bitmap.default` format (e.g. the pixel format Commodetto is configured to render to).
+アンチエイリアスされたテキストの場合、グリフアトラスビットマップを含むBMPファイルは4ビットグレイ形式でなければなりません。マルチカラーテキストの場合、ビットマップは `Bitmap.default` 形式（例：Commodettoがレンダリングするように設定されているピクセル形式）でなければなりません。
 
-Commodetto extends the BMFont format with RLE compressed glyphs. Glyphs are individually compressed using the `RLE4Out` class. The Moddable SDK tool `compressbmf` performs the compression.  The tool also appends the compressed glyphs to the `.fnt` metrics file, storing a single font's metrics and glyph data in a single file.
+Commodettoは、RLE圧縮されたグリフでBMFont形式を拡張します。グリフは `RLE4Out` クラスを使用して個別に圧縮されます。Moddable SDKツール `compressbmf` は圧縮を実行します。このツールはまた、圧縮されたグリフを `.fnt` メトリクスファイルに追加し、単一のフォントのメトリクスとグリフデータを単一のファイルに保存します。
 
 ***
 
 <a id="rendering"></a>
-## Rendering
+## レンダリング
 
-Commodetto is designed to support multiple rendering engines. The initial engine is [Poco](./poco.md), a small bitmap-based scanline renderer. A renderer knows how to draw pixels and relies on a `PixelsOut` instance to output those pixels, whether to a display, an offscreen buffer, or a file.
+Commodettoは複数のレンダリングエンジンをサポートするように設計されています。最初のエンジンは、小さなビットマップベースのスキャンラインレンダラーである[Poco](./poco.md)です。レンダラーはピクセルを描画する方法を知っており、ディスプレイ、オフスクリーンバッファ、またはファイルにピクセルを出力するために`PixelsOut`インスタンスに依存します。
 
-When a renderer is created, it is bound to an output. For example, to render to a BMP file:
+レンダラーが作成されると、出力にバインドされます。例えば、BMPファイルにレンダリングするには：
 
 ```javascript
 import BMPOut from "commodetto/BMPOut";
@@ -768,7 +770,7 @@ let bmpOut = new BMPOut({width: decoded.width, height: decoded.height,
 let render = new Poco(bmpOut);
 ```
 
-To render to a display, use `SPIOut` in place of `BMPOut`, as follows:
+ディスプレイにレンダリングするには、`BMPOut`の代わりに`SPIOut`を使用します。以下のようにします：
 
 ```javascript
 import SPIOut from "commodetto/SPIOut";
@@ -779,16 +781,16 @@ let display = new SPIOut({width: 320, height: 240,
 let render = new Poco(display);
 ```
 
-The Poco renderer documentation describes its rendering operations with examples of common uses.
+Pocoレンダラーのドキュメントには、一般的な使用例を含むレンダリング操作が記載されています。
 
 ***
 
 <a id="render-class"></a>
-### Render class
+### Renderクラス
 
-The `Render` class is a abstract base class used to generate pixels. It is overridden by specific rendering engines, such as Poco. The `Render` class has only four functions, which manage the rendering process but do no rendering themselves. The specific rendering operations available are defined by subclasses of `Render`.
+`Render`クラスはピクセルを生成するための抽象基底クラスです。これは、Pocoのような特定のレンダリングエンジンによってオーバーライドされます。`Render`クラスには、レンダリングプロセスを管理するだけで、実際のレンダリングを行わない4つの関数しかありません。利用可能な具体的なレンダリング操作は、`Render`のサブクラスによって定義されます。
 
-The following example shows using the Poco renderer with `SPIOut` to render a screen consisting of a white background with a 10-pixel red square at location `{x: 5, y: 5}`.
+以下の例は、`SPIOut`を使用してPocoレンダラーを使い、白い背景に `{x: 5, y: 5}` の位置に10ピクセルの赤い四角を描画する方法を示しています。
 
 ```javascript
 let display = new SPIOut({width: 320, height: 240,
@@ -804,43 +806,43 @@ render.fillRectangle(red, 5, 5, 10, 10);
 render.end();
 ```
 
-#### Functions
+#### 関数
 
 ##### `constructor(pixelsOut, dictionary)`
 
-The `Render` constructor takes two arguments: the `PixelsOut` instance the `Render` object sends pixels to for output, and a dictionary to configure rendering options. All dictionary properties are defined by the subclasses of `Render`.
+`Render` コンストラクタは2つの引数を取ります。1つは `Render` オブジェクトが出力用にピクセルを送信する `PixelsOut` インスタンス、もう1つはレンダリングオプションを設定するための辞書です。すべての辞書プロパティは `Render` のサブクラスによって定義されます。
 
 ***
 
 ##### `begin(x, y, width, height)`
 
-The `begin` function starts the rendering of a frame. The area to be updated is specified with the `x` and `y` coordinates and `width` and `height` dimensions. The area must be fully contained within the bounds of the `PixelsOut` instance bound to the renderer.
+`begin` 関数はフレームのレンダリングを開始します。更新される領域は、`x` と `y` の座標、および `width` と `height` の寸法で指定されます。この領域は、レンダラーにバインドされた `PixelsOut` インスタンスの境界内に完全に含まれている必要があります。
 
 ```javascript
 render.begin(x, y, width, height);
 ```
 
-All drawing is clipped to the updated area defined by `begin`.
+すべての描画は、`begin` で定義された更新領域にクリップされます。
 
-Calling `begin` with no arguments is equivalent to calling it with `x` and `y` equal to 0 and `width` and `height` equal to the `width` and `height` values of the `render` instance. That is, the following
+引数なしで `begin` を呼び出すことは、`x` と `y` を0に、`width` と `height` を `render` インスタンスの `width` と `height` の値に等しくして呼び出すことと同等です。つまり、次のように
 
 ```javascript
 render.begin()
 ```
 
-is equivalent to this:
+は次のコードと同等です：
 
 ```javascript
 render.begin(0, 0, render.width, render.height);
 ```
 
-If `width` and `height` are omitted, the update area is the rectangle defined by the `x` and `y` coordinates passed to `begin`. The following bottom-right corner of the `render` bounds
+`width` と `height` が省略された場合、更新領域は `begin` に渡された `x` と `y` 座標で定義される矩形になります。`render` の境界の右下隅は次のようになります。
 
 ```javascript
 render.begin(x, y);
 ```
 
-is equivalent to this:
+は次のコードと同等です：
 
 ```javascript
 render.begin(x, y, render.width - x, render.height - y);
@@ -850,24 +852,24 @@ render.begin(x, y, render.width - x, render.height - y);
 
 ##### `end()`
 
-The `end` function completes the rendering of a frame. All pending rendering operations are completed by this function.
+`end` 関数はフレームのレンダリングを完了します。この関数によって、保留中のすべてのレンダリング操作が完了します。
 
-> **Note:** For a display list renderer, such as Poco, all rendering occurs during the execution of `end`. Consequently, the display is not updated immediately following drawing calls.
+> **注意:** Poco のようなディスプレイリストレンダラーの場合、すべてのレンダリングは `end` の実行中に行われます。そのため、描画呼び出しの直後にディスプレイが更新されるわけではありません。
 
 ***
 
 ##### `continue(x, y, width, height)`
 
-The `continue` function is used when there are multiple update areas in a single frame. The arguments to `continue` behave in the same manner as the arguments to `begin`. The `continue` function is nearly equivalent to the following sequence:
+`continue` 関数は、単一のフレーム内に複数の更新領域がある場合に使用されます。`continue` の引数は `begin` の引数と同様に動作します。`continue` 関数は次のシーケンスにほぼ等しいです：
 
 ```javascript
 render.end();
 render.begin(x, y, width, height);
 ```
 
-The difference is for displays with a buffer--for example, when Commodetto is running on a display with page flipping hardware or on a computer simulator. In such cases the output frame is displayed only when `end` is called. With `continue`, intermediate results remain hidden offscreen until the full frame is rendered.
+違いはバッファを持つディスプレイの場合です。例えば、Commodettoがページフリッピングハードウェアを持つディスプレイやコンピュータシミュレータ上で動作している場合です。このような場合、`end`が呼び出されたときにのみ出力フレームが表示されます。`continue`を使用すると、完全なフレームがレンダリングされるまで中間結果はオフスクリーンに隠れたままになります。
 
-The following fragment shows three separate update areas for a single frame.
+次のフラグメントは、単一フレームのための3つの別々の更新領域を示しています。
 
 ```javascript
 render.begin(10, 10, 20, 20);
@@ -886,7 +888,7 @@ render.end();
 
 ##### `adaptInvalid(r)`
 
-The renderer's `adaptInvalid` function is used to adjust the update area defined by the `r` argument to the update area constraints of the `PixelsOut` used for rendering. The renderer's implementation of `adaptInvalid` invokes the `PixelsOut`'s `adaptInvalid` function, taking renderer features into consideration, most notably rotation.
+レンダラーの`adaptInvalid`関数は、レンダリングに使用される`PixelsOut`の更新領域制約に合わせて、`r`引数で定義された更新領域を調整するために使用されます。レンダラーの`adaptInvalid`の実装は、特に回転を考慮して、レンダラーの機能を考慮しながら`PixelsOut`の`adaptInvalid`関数を呼び出します。
 
 ```javascript
 let r = renderer.rectangle(x, y, w, h);
@@ -895,33 +897,33 @@ renderer.begin(r.x, r.y, r.w, r.h);
 ...
 ```
 
-Applications written to work with a single display controller should be able to safely ignore `adaptInvalid` by applying its constraints themselves. Code written to work with more than a single display controller will likely need to use `adaptInvalid` for reliable updates to subsections of the display.
+単一のディスプレイコントローラーで動作するように書かれたアプリケーションは、その制約を自分で適用することで`adaptInvalid`を無視しても安全であるべきです。複数のディスプレイコントローラーで動作するように書かれたコードは、ディスプレイのサブセクションへの信頼性のある更新のために`adaptInvalid`を使用する必要があるでしょう。
 
-The Piu user interface framework calls `adaptInvalid` when necessary, so application scripts don't need to call it directly.
+Piuユーザーインターフェースフレームワークは必要に応じて`adaptInvalid`を呼び出すため、アプリケーションスクリプトが直接呼び出す必要はありません。
 
 ***
 
 <a id="pixel-format-conversion"></a>
-## Pixel format conversion
+## ピクセルフォーマット変換
 
-Commodetto provides a pixel format conversion capability intended primarily for use in tools that process images running on a computer. They are used, for example, by the `image2cs` and `png2bmp` tools in the Moddable SDK. The converters are small and efficient, and so may also be used in deployments to microcontrollers.
+Commodettoは、主にコンピュータ上で画像を処理するツールで使用されることを目的としたピクセルフォーマット変換機能を提供します。これらは、例えばModdable SDKの`image2cs`や`png2bmp`ツールで使用されます。コンバータは小型で効率的であるため、マイクロコントローラへの展開にも使用できます。
 
 <a id="convert-class"></a>
-### Convert class
+### Convertクラス
 
-The `Convert` class converts between two pixel formats supported by Commodetto. The conversions are implemented in native code and so run more quickly than they would if written in JavaScript.
+`Convert`クラスは、Commodettoがサポートする2つのピクセルフォーマット間で変換を行います。変換はネイティブコードで実装されているため、JavaScriptで書かれた場合よりも高速に実行されます。
 
 ```js
 import Convert from "commodetto/Convert";
 ```
 
-The `Convert` class operates on an array of pixels. The concepts of Bitmap and row bytes (or stride) are not part of the API. Instead, they must be handled by the code that calls the `Convert` class.
+`Convert`クラスはピクセルの配列に対して動作します。Bitmapや行バイト（またはストライド）の概念はAPIの一部ではありません。代わりに、それらは`Convert`クラスを呼び出すコードによって処理される必要があります。
 
 #### `constructor(src, dst)`
 
-The constructor accepts two pixel formats, the source and destination formats.
+コンストラクタは2つのピクセルフォーマット、ソースフォーマットとデスティネーションフォーマットを受け取ります。
 
-The following instantiates a converter to convert pixels from RGB565LE to Gray256.
+以下は、RGB565LEからGray256にピクセルを変換するためのコンバータをインスタンス化する例です。
 
 ```js
 let converter = new Convert(Bitmap.RGB565LE, Bitmap.Gray256);
@@ -932,15 +934,15 @@ let converter = new Convert(Bitmap.RGB565LE, Bitmap.Gray256);
 #### `process(src, dst)`
 #### `process(src, srcOffset, srcLength, dst, src, dstOffset, dstLength)`
 
-The `process` function performs a pixel conversion. The `src` argument is the input pixels in the format specified in the constructor. The input and output pixels are stored in a buffer -- `ArrayBuffer`, `TypedArray`, `DataView`, or `HostBuffer`.
+`process`関数はピクセル変換を行います。`src`引数はコンストラクタで指定されたフォーマットの入力ピクセルです。入力と出力のピクセルは、`ArrayBuffer`、`TypedArray`、`DataView`、または`HostBuffer`のバッファに格納されます。
 
-There are two ways to call `process`. The first passes only the input and output buffers. The second passes offsets and lengths within the input and output buffers to use. Note that `process` always respects the view of the input and output buffers and applies passed offset and lengths to the view.
+`process`を呼び出す方法は2つあります。1つ目は入力と出力のバッファのみを渡す方法です。2つ目は、使用する入力と出力バッファ内のオフセットと長さを渡す方法です。`process`は常に入力と出力バッファのビューを尊重し、渡されたオフセットと長さをビューに適用します。
 
 ```js
 converter.process(inputPixels, outputPixels);
 ```
 
-The caller of process is responsible for allocating a large enough output buffer. The `Bitmap.depth` function is useful for this calculation.
+`process`の呼び出し側は、十分な大きさの出力バッファを確保する責任があります。この計算には`Bitmap.depth`関数が便利です。
 
 ```js
 let outputPixelFormat = Bitmap.Gray256;
@@ -952,25 +954,25 @@ let outputPixels = new ArrayBuffer(outputBufferSize);
 ***
 
 <a id="odds-and-ends"></a>
-## Odds and Ends
+## 雑多な事項
 
-### Target Hardware
+### 対象ハードウェア
 
-The primary design constraint for Commodetto is to render a modern user interface on a resource-constrained microcontroller. The target devices have the following broad characteristics:
+Commodettoの主な設計制約は、リソースが制限されたマイクロコントローラ上で最新のユーザーインターフェースをレンダリングすることです。対象デバイスは以下のような広範な特性を持っています：
 
 - ARM Cortex M3/M4 CPU
-- Single core
-- 80 to 200 MHZ CPU speed
-- 128 to 512 KB of RAM
-- 1 to 4 MB of flash storage
-- No graphics rendering hardware
+- シングルコア
+- 80から200 MHZのCPU速度
+- 128から512 KBのRAM
+- 1から4 MBのフラッシュストレージ
+- グラフィックスレンダリングハードウェアなし
 
-If a more capable processor is available, Commodetto gets better. More memory allows for more offscreen bitmaps and more complex scenes. More CPU speed allows for greater use of computationally demanding graphics operations. More flash storage allows for more assets to be stored. Hardware graphics acceleration allows for faster rendering of more complex screens.
+より高性能なプロセッサが利用可能であれば、Commodettoはさらに高いパフォーマンスを発揮します。より多くのメモリがあれば、オフスクリーンのビットマップやより複雑なシーンを処理できます。CPU速度が速いほど、計算負荷の高いグラフィックス操作をより多く活用できます。フラッシュストレージが増えれば、より多くのアセットを保存できます。ハードウェアによるグラフィックスアクセラレーションを利用することで、より複雑な画面をより高速にレンダリングできます。
 
-Commodetto runs on any target hardware that supports the XS JavaScript engine. Commodetto is written in ANSI C, with only a handful of calls to external functions (`memcpy`, `malloc`, and `free`). The core Poco renderer allocates no memory.
+Commodettoは、XS JavaScriptエンジンをサポートする任意のハードウェアを対象に動作します。CommodettoはANSI Cで書かれており、外部関数（`memcpy`、`malloc`、および`free`）への呼び出しはほんの一握りです。コアのPocoレンダラーはメモリを割り当てません。
 
 ***
 
-### About the Name "Commodetto"
+### 「Commodetto」という名前について
 
-The word *commodetto* is a term used in music meaning "leisurely." The use of the name Commodetto here is taken from a set of piano variations by Beethoven, specifically the third variation of WoO 66. A sample of the variation is [available for listening](http://www.prestoclassical.co.uk/r/Warner%2BClassics/5857612). The feeling of the variation is light and leisurely, though there is nothing simple or trivial about the composition or the performance.
+*commodetto* という言葉は、音楽用語で「ゆったりと」という意味です。ここでのCommodettoという名前の使用は、ベートーヴェンのピアノ変奏曲集、特にWoO 66の第3変奏から取られています。変奏のサンプルは[こちらで試聴可能](http://www.prestoclassical.co.uk/r/Warner%2BClassics/5857612)です。この変奏の雰囲気は軽やかでゆったりとしていますが、作曲や演奏には何も単純なことや些細なことはありません。
