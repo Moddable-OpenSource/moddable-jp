@@ -175,7 +175,7 @@ CommodettoPixel *pixels = (CommodettoPixel *)(bitmap.bits.offset + buffer);
 ***
 
 <a id="host-buffers"></a>
-### HostBuffer
+### ホストバッファ
 
 組み込みの `ArrayBuffer` オブジェクトは、JavaScriptでバイナリデータを保存および操作するための標準的な方法です。Commodettoは、アセットのピクセルを `ArrayBuffer` に保存することをサポートしています。しかし、JavaScriptの標準では、`ArrayBuffer` がRAMに存在することが事実上要求されています。多くの組み込みデバイスは限られたRAMしか持たず、比較的豊富なROM（フラッシュメモリ）を持っているため、アセットをRAMに移動することなく直接ROMから使用することが望ましいです。
 
