@@ -41,13 +41,16 @@
 #define mxReport 0
 #endif
 
+static void fxCheckModuleFlag(txMachine* the, txID moduleID, txFlag moduleFlag, txFlag requestFlag);
+static txFlag fxCheckModuleOptions(txMachine* the, txSlot* options);
+static void fxPushModuleOptions(txMachine* the, txFlag moduleFlag);
 static void fxCompleteModule(txMachine* the, txSlot* module, txSlot* exception);
 static void fxDuplicateModuleTransfers(txMachine* the, txSlot* srcModule, txSlot* dstModule);
 
 static void fxExecuteModules(txMachine* the, txSlot* queue);
 static txID fxExecuteModulesFrom(txMachine* the, txSlot* queue, txSlot* module, txSlot** exception);
 
-static txSlot* fxGetModule(txMachine* the, txSlot* realm, txID moduleID);
+static txSlot* fxGetModule(txMachine* the, txSlot* realm, txID moduleID, txFlag moduleFlag);
 
 static void fxLinkCircularities(txMachine* the, txSlot* module, txSlot* circularities, txSlot* exports);
 static void fxLinkExports(txMachine* the, txSlot* module);
@@ -61,14 +64,14 @@ static void fxLoadModulesFrom(txMachine* the, txSlot* queue, txSlot* module, txB
 
 static txBoolean fxMapModule(txMachine* the, txSlot* realm, txID moduleID, txSlot* module, txSlot* queue, txSlot* result);
 static void fxMapModuleDescriptor(txMachine* the, txSlot* realm, txID moduleID, txSlot* module, txSlot* queue, txSlot* result, txSlot* descriptor);
-static void fxNewModule(txMachine* the, txSlot* realm, txID moduleID, txSlot* module);
+static void fxNewModule(txMachine* the, txSlot* realm, txID moduleID, txFlag moduleFlag, txSlot* module);
 static void fxOrderModule(txMachine* the, txSlot* queue, txSlot* order, txSlot* module);
 static void fxOverrideModule(txMachine* the, txSlot* queue, txSlot* list, txSlot* result, txSlot* module, txSlot* record);
 static txBoolean fxQueueModule(txMachine* the, txSlot* queue, txSlot* module);
 
 static txID fxResolveSpecifier(txMachine* the, txSlot* realm, txID moduleID, txSlot* name);
 
-static txSlot* fxRunImportAux(txMachine* the, txSlot* realm, txSlot* referrer, txSlot* stack, txBoolean now);
+static txSlot* fxRunImportAux(txMachine* the, txSlot* realm, txSlot* referrer, txSlot* specifier, txSlot* options, txBoolean now);
 static void fxRunImportFulfilled(txMachine* the, txSlot* module, txSlot* with);
 static void fxRunImportRejected(txMachine* the, txSlot* module, txSlot* with);
 
@@ -212,6 +215,9 @@ void fxBuildModule(txMachine* the)
 	slot = fxNextHostAccessorProperty(the, slot, mxCallback(fx_ModuleSource_prototype_get_bindings), C_NULL, mxID(_bindings), XS_DONT_ENUM_FLAG);
 	slot = fxNextHostAccessorProperty(the, slot, mxCallback(fx_ModuleSource_prototype_get_needsImport), C_NULL, mxID(_needsImport), XS_DONT_ENUM_FLAG);
 	slot = fxNextHostAccessorProperty(the, slot, mxCallback(fx_ModuleSource_prototype_get_needsImportMeta), C_NULL, mxID(_needsImportMeta), XS_DONT_ENUM_FLAG);
+#if mxECMAScript2025	
+	slot = fxNextHostAccessorProperty(the, slot, mxCallback(fx_ModuleSource_prototype_get_options), C_NULL, mxID(_options), XS_DONT_ENUM_FLAG);
+#endif
 	slot = fxNextStringXProperty(the, slot, "ModuleSource", mxID(_Symbol_toStringTag), XS_DONT_ENUM_FLAG | XS_DONT_SET_FLAG);
 	mxModuleSourcePrototype = *the->stack;
 	slot = fxBuildHostConstructor(the, mxCallback(fx_ModuleSource), 1, mxID(_ModuleSource));
@@ -227,6 +233,88 @@ void fxBuildModule(txMachine* the)
 	mxModuleStuffConstructor = *the->stack;
 	mxPop();
 #endif
+}
+
+void fxCheckModuleFlag(txMachine* the, txID moduleID, txFlag moduleFlag, txFlag requestFlag)
+{
+#ifndef mxLink
+	if (moduleFlag & XS_JSON_MODULE_FLAG) {
+		if (!(requestFlag & XS_JSON_MODULE_FLAG)) {
+			fxIDToString(the, moduleID, the->nameBuffer, sizeof(the->nameBuffer));
+			fxThrowMessage(the, C_NULL, 0, XS_TYPE_ERROR, "%s: JSON module", the->nameBuffer);
+		}
+	}
+	else {
+		if (requestFlag & XS_JSON_MODULE_FLAG) {
+			fxIDToString(the, moduleID, the->nameBuffer, sizeof(the->nameBuffer));
+			fxThrowMessage(the, C_NULL, 0, XS_TYPE_ERROR, "%s: not a JSON module", the->nameBuffer);
+		}
+	}
+#endif
+}
+
+void fxPushModuleOptions(txMachine* the, txFlag moduleFlag)
+{
+#if mxECMAScript2025	
+	if (moduleFlag & XS_JSON_MODULE_FLAG) {
+		txSlot* optionsInstance = fxNewObject(the);
+		txSlot* withInstance = fxNewObject(the);
+		fxNextSlotProperty(the, optionsInstance, the->stack, mxID(_with), XS_NO_FLAG);
+		mxPop();
+		fxNextStringProperty(the, withInstance, "json", mxID(_type), XS_NO_FLAG);
+	}
+	else
+#endif
+		mxPushUndefined();
+}
+
+txFlag fxCheckModuleOptions(txMachine* the, txSlot* options)
+{
+	txFlag moduleFlag = XS_NO_FLAG;
+#if mxECMAScript2025	
+	if (!mxIsUndefined(options)) {
+		txSlot* with;
+		if (!mxIsReference(options))
+			mxTypeError("options: not an object");
+		mxPushSlot(options);
+		mxGetID(mxID(_with));
+		with = the->stack;
+		if (!mxIsUndefined(with)) {
+			txSlot* key;
+			txSlot* property;
+			txSlot* value;
+			txInteger count = 0;
+			if (!mxIsReference(with))
+				mxTypeError("options.with: not an object");
+			key = fxNewInstance(the);
+			mxBehaviorOwnKeys(the, with->value.reference, XS_EACH_NAME_FLAG, key);
+			mxTemporary(property);
+			while ((key = key->next)) {
+				if (mxBehaviorGetOwnProperty(the, with->value.reference, key->value.at.id, key->value.at.index, property) && !(property->flag & XS_DONT_ENUM_FLAG)) {
+					mxPushSlot(with);
+					mxGetAll(key->value.at.id, key->value.at.index);
+					value = the->stack;
+					count++;
+					if ((value->kind != XS_STRING_KIND) && (value->kind != XS_STRING_X_KIND)) {
+						mxPop();
+						break;
+					}
+					if ((key->value.at.id == mxID(_type)) && (!c_strcmp(value->value.string, "json"))) {
+						count--;
+						moduleFlag |= XS_JSON_MODULE_FLAG;
+					}
+					mxPop();
+				}
+			}
+			mxPop();
+			mxPop();
+			if (count > 0)
+				mxTypeError("options.with: invalid attributes");
+		}
+		mxPop();
+	}
+#endif
+	return moduleFlag;
 }
 
 void fxCompleteModule(txMachine* the, txSlot* module, txSlot* exception)
@@ -472,9 +560,11 @@ void fxExecuteVirtualModuleSource(txMachine* the)
 	mxPullSlot(mxResult);
 }
 
-txSlot* fxGetModule(txMachine* the, txSlot* realm, txID moduleID)
+txSlot* fxGetModule(txMachine* the, txSlot* realm, txID moduleID, txFlag moduleFlag)
 {
 	txSlot* result = mxBehaviorGetProperty(the, mxOwnModules(realm)->value.reference, moduleID, 0, XS_ANY);
+	if (result)
+		fxCheckModuleFlag(the, moduleID, mxModuleInternal(result)->flag, moduleFlag);
 	return result;
 }
 
@@ -1015,7 +1105,8 @@ void fxLoadModules(txMachine* the, txSlot* queue)
 						mxPushSlot(loadHook);
 						mxCall();
 						fxPushKeyString(the, moduleID, C_NULL);
-						mxRunCount(1);
+						fxPushModuleOptions(the, loader->flag);
+						mxRunCount(2);
 						
 						fxLoadModulesPromise(the, queue, module, the->stack, fxLoadModulesFulfilled, fxLoadModulesRejected);
 
@@ -1100,10 +1191,10 @@ void fxLoadModulesFrom(txMachine* the, txSlot* queue, txSlot* module, txBoolean 
 				importModuleID = fxResolveSpecifier(the, realm, moduleID, from);
 				the->stack->ID = importModuleID;
 			}
-			importModule = fxGetModule(the, realm, importModuleID);
+			importModule = fxGetModule(the, realm, importModuleID, from->flag & XS_JSON_MODULE_FLAG);
 			if (!importModule) {
 				importModule = mxBehaviorSetProperty(the, mxOwnModules(realm)->value.reference, importModuleID, 0, XS_OWN);
-				fxNewModule(the, realm, importModuleID, importModule);
+				fxNewModule(the, realm, importModuleID, from->flag & XS_JSON_MODULE_FLAG, importModule);
 			}
 			from->kind = XS_REFERENCE_KIND;
 			from->value.reference = importModule->value.reference;
@@ -1410,7 +1501,7 @@ void fxLoadVirtualModuleSource(txMachine* the, txSlot* record, txSlot* instance)
 							mxPushNull();
 							mxPushInteger(3);
 						}
-						fxPrepareTransfer(the);
+						fxPrepareTransfer(the, XS_NO_FLAG);
 						transfer = fxNextSlotProperty(the, transfer, the->stack, XS_NO_ID, XS_DONT_ENUM_FLAG);
 						mxPop(); // transfer
 					}
@@ -1420,7 +1511,7 @@ void fxLoadVirtualModuleSource(txMachine* the, txSlot* record, txSlot* instance)
 						mxPushNull();
 						mxPushSymbol(asID);
 						mxPushInteger(4);
-						fxPrepareTransfer(the);
+						fxPrepareTransfer(the, XS_NO_FLAG);
 						transfer = fxNextSlotProperty(the, transfer, the->stack, XS_NO_ID, XS_DONT_ENUM_FLAG);
 						mxPop(); // transfer
 					}
@@ -1447,7 +1538,7 @@ void fxLoadVirtualModuleSource(txMachine* the, txSlot* record, txSlot* instance)
 					mxPushSlot(specifier);
 					mxPushNull();
 					mxPushInteger(3);
-					fxPrepareTransfer(the);
+					fxPrepareTransfer(the, XS_NO_FLAG);
 					transfer = fxNextSlotProperty(the, transfer, the->stack, XS_NO_ID, XS_DONT_ENUM_FLAG);
 					mxPop(); // transfer
 				}
@@ -1497,7 +1588,7 @@ void fxLoadVirtualModuleSource(txMachine* the, txSlot* record, txSlot* instance)
 					else			
 						mxPushNull();
 					mxPushInteger(3);
-					fxPrepareTransfer(the);
+					fxPrepareTransfer(the, XS_NO_FLAG);
 					transfer = fxNextSlotProperty(the, transfer, the->stack, XS_NO_ID, XS_DONT_ENUM_FLAG);
 					mxPop(); // transfer
 				}
@@ -1617,7 +1708,7 @@ void fxMapModuleDescriptor(txMachine* the, txSlot* realm, txID moduleID, txSlot*
 			}
 			else {
 				property = mxBehaviorSetProperty(the, aliasOwn, aliasModuleID, 0, XS_OWN);
-				fxNewModule(the, aliasRealm, aliasModuleID, property);
+				fxNewModule(the, aliasRealm, aliasModuleID, XS_NO_FLAG, property);
 			}
 			goto namespace;
 		}
@@ -1692,7 +1783,7 @@ namespace:
 	mxPop(); // property;
 
 	if (module->kind == XS_UNDEFINED_KIND)
-		fxNewModule(the, realm, moduleID, module);
+		fxNewModule(the, realm, moduleID, XS_NO_FLAG, module);
 	else {
 		txID status = mxModuleStatus(module);
 		mxCheck(the, (status == XS_MODULE_STATUS_NEW) || (status == XS_MODULE_STATUS_LOADING));
@@ -1812,7 +1903,7 @@ done:
 }
 
 
-void fxNewModule(txMachine* the, txSlot* realm, txID moduleID, txSlot* module)
+void fxNewModule(txMachine* the, txSlot* realm, txID moduleID, txFlag moduleFlag, txSlot* module)
 {
 	txSlot* slot;
 	
@@ -1822,7 +1913,7 @@ void fxNewModule(txMachine* the, txSlot* realm, txID moduleID, txSlot* module)
 	/* HOST */
 	slot = slot->next = fxNewSlot(the);
 	slot->ID = XS_MODULE_BEHAVIOR;
-	slot->flag = XS_INTERNAL_FLAG;
+	slot->flag = XS_INTERNAL_FLAG | moduleFlag;
 	slot->kind = XS_MODULE_KIND;
 	slot->value.module.realm = realm;
 	slot->value.module.id = moduleID;
@@ -1842,6 +1933,7 @@ void fxNewModule(txMachine* the, txSlot* realm, txID moduleID, txSlot* module)
 	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
 	/* LOADER */
 	slot = fxNextNullProperty(the, slot, XS_NO_ID, XS_INTERNAL_FLAG);
+	slot->flag = XS_INTERNAL_FLAG | moduleFlag;
 	slot->kind = XS_MODULE_KIND;
 	slot->value.module.realm = realm;
 	slot->value.module.id = moduleID;	
@@ -1937,6 +2029,7 @@ void fxPrepareModule(txMachine* the, txFlag flag)
 	txSlot* slot;
 	txSlot* property;
 	property = mxModuleInstanceInternal(module);	
+	fxCheckModuleFlag(the, property->value.module.id, flag, property->flag);
 	property->flag |= flag;
 	slot = argument--;
 	property = mxModuleInstanceInitialize(module);	
@@ -1962,7 +2055,7 @@ void fxPrepareModule(txMachine* the, txFlag flag)
 	the->stack = result;
 }
 
-void fxPrepareTransfer(txMachine* the)
+void fxPrepareTransfer(txMachine* the, txFlag flag)
 {
 	txInteger c = the->stack->value.integer, i;
 	txSlot* argument = the->stack + c;
@@ -1972,7 +2065,7 @@ void fxPrepareTransfer(txMachine* the)
 	mxPush(mxTransferPrototype);
 	property = fxNewObjectInstance(the);
 	property = fxNextSlotProperty(the, property, argument--, mxID(_local), XS_DONT_ENUM_FLAG);
-	property = fxNextSlotProperty(the, property, argument--, mxID(_from), XS_DONT_ENUM_FLAG);
+	property = fxNextSlotProperty(the, property, argument--, mxID(_from), XS_DONT_ENUM_FLAG | flag);
 	property = fxNextSlotProperty(the, property, argument--, mxID(_import), XS_DONT_ENUM_FLAG);
 	if (c > 3) {
 		mxPush(mxObjectPrototype);
@@ -2104,13 +2197,14 @@ void fxImport(txMachine* the)
 {
 	txSlot* realm = mxModuleInstanceInternal(mxProgram.value.reference)->value.module.realm;
 	fxToString(the, the->stack);
+	mxPushUndefined();
 	fxRunImport(the, realm, C_NULL);
 }
 
 
 void fxRunImport(txMachine* the, txSlot* realm, txSlot* referrer)
 {
-	txSlot* stack = the->stack;
+	txSlot* stack = the->stack + 1;
 	txSlot* promise;
 	txSlot* fulfillFunction;
 	txSlot* rejectFunction;
@@ -2127,7 +2221,7 @@ void fxRunImport(txMachine* the, txSlot* realm, txSlot* referrer)
 	rejectFunction = the->stack;
 	{
 		mxTry(the) {
-			module = fxRunImportAux(the, realm, referrer, stack, 0);
+			module = fxRunImportAux(the, realm, referrer, stack, stack - 1, 0);
 			status = mxModuleStatus(module);
 			if (status == XS_MODULE_STATUS_ERROR) {
 				/* THIS */
@@ -2171,32 +2265,33 @@ void fxRunImport(txMachine* the, txSlot* realm, txSlot* referrer)
 	the->stack = stack;
 }
 
-txSlot* fxRunImportAux(txMachine* the, txSlot* realm, txSlot* referrer, txSlot* stack, txBoolean now)
+txSlot* fxRunImportAux(txMachine* the, txSlot* realm, txSlot* referrer, txSlot* specifier, txSlot* options, txBoolean now)
 {
 	txSlot* module;
 	txID moduleID;
+	txFlag moduleFlag = fxCheckModuleOptions(the, options);
 #if mxModuleStuff
-	if (mxIsReference(stack)) {
-		txSlot* internal = stack->value.reference->next;
+	if (mxIsReference(specifier)) {
+		txSlot* internal = specifier->value.reference->next;
 		if (internal && (internal->kind == XS_MODULE_STUFF_KIND)) {
-			module = mxModuleStuffModule(stack);
+			module = mxModuleStuffModule(specifier);
 			if (mxIsNull(module)) {
-				txSlot* source = mxModuleStuffSource(stack);
-				fxNewModule(the, realm, XS_NO_ID, module);
+				txSlot* source = mxModuleStuffSource(specifier);
+				fxNewModule(the, realm, XS_NO_ID, XS_NO_FLAG, module);
 				if (mxIsModuleSource(source->value.reference))
 					fxDuplicateModuleTransfers(the, source, module);
 				else
 					fxLoadVirtualModuleSource(the, source, module->value.reference);
 				internal = mxModuleHook(module);
-				internal->kind = stack->kind;
-				internal->value = stack->value;
+				internal->kind = specifier->kind;
+				internal->value = specifier->value;
 				mxModuleStatus(module) = XS_MODULE_STATUS_LOADED;
 			}
 			return module;
 		}
 	}
 #endif
-	fxToString(the, stack);
+	fxToString(the, specifier);
 	if (referrer) {
 #if mxModuleStuff
 		if (referrer->next->kind == XS_MODULE_KIND) {
@@ -2205,20 +2300,20 @@ txSlot* fxRunImportAux(txMachine* the, txSlot* realm, txSlot* referrer, txSlot* 
 				txSlot* handler = mxModuleStuffHandler(reference);
 				txSlot* importHook = (now) ? mxModuleStuffImportNowHook(reference) : mxModuleStuffImportHook(reference);
 				if (mxIsReference(handler) && mxIsReference(importHook)) {
-					module = fxImportModuleStuff(the, realm, mxModuleQueue.value.reference, reference, stack, now);
+					module = fxImportModuleStuff(the, realm, mxModuleQueue.value.reference, reference, specifier, now);
 					return module;
 				}
 			}
 		}
 #endif
-		moduleID = fxResolveSpecifier(the, realm, mxModuleInstanceInternal(referrer)->value.module.id, stack);
+		moduleID = fxResolveSpecifier(the, realm, mxModuleInstanceInternal(referrer)->value.module.id, specifier);
 	}
 	else
-		moduleID = fxResolveSpecifier(the, realm, XS_NO_ID, stack);
-	module = fxGetModule(the, realm, moduleID);
+		moduleID = fxResolveSpecifier(the, realm, XS_NO_ID, specifier);
+	module = fxGetModule(the, realm, moduleID, moduleFlag);
 	if (!module) {
 		module = mxBehaviorSetProperty(the, mxOwnModules(realm)->value.reference, moduleID, 0, XS_OWN);
-		fxNewModule(the, realm, moduleID, module);
+		fxNewModule(the, realm, moduleID, moduleFlag, module);
 	}
 	return module;
 }
@@ -2329,6 +2424,7 @@ void fxAwaitImport(txMachine* the, txBoolean defaultFlag)
 			stack->value.boolean = moduleID != XS_NO_ID;
 		}
 		else {
+			mxPushUndefined();
 			if (defaultFlag & XS_IMPORT_ASYNC) {
 				gxDefaults.runImport(the, realm, C_NULL);
 			}
@@ -2360,13 +2456,14 @@ void fxImportNow(txMachine* the)
 {
 	txSlot* realm = mxModuleInstanceInternal(mxProgram.value.reference)->value.module.realm;
 	fxToString(the, the->stack);
+	mxPushUndefined();
 	fxRunImportNow(the, realm, C_NULL);
 }
 
 void fxRunImportNow(txMachine* the, txSlot* realm, txSlot* referrer)
 {
-	txSlot* stack = the->stack;
-	txSlot* module = fxRunImportAux(the, realm, referrer, stack, 1);
+	txSlot* stack = the->stack + 1;
+	txSlot* module = fxRunImportAux(the, realm, referrer, stack, stack - 1, 1);
 	txID status = mxModuleStatus(module);
 	if ((status == XS_MODULE_STATUS_NEW) || (status == XS_MODULE_STATUS_LOADED)) {
 		txSlot* result = stack;
@@ -2407,7 +2504,8 @@ void fxRunImportNow(txMachine* the, txSlot* realm, txSlot* referrer)
 							mxPushSlot(loadNowHook);
 							mxCall();
 							fxPushKeyString(the, moduleID, C_NULL);
-							mxRunCount(1);
+							fxPushModuleOptions(the, loader->flag);
+							mxRunCount(2);
 							descriptor = the->stack;
 							fxMapModuleDescriptor(the, realm, moduleID, module, queue, result, descriptor);
 							mxPop(); // descriptor
@@ -3084,6 +3182,10 @@ void fx_Compartment_prototype_import(txMachine* the)
 		mxPushSlot(mxArgv(0));
 	else
 		mxPushUndefined();
+	if (mxArgc > 1)
+		mxPushSlot(mxArgv(1));
+	else
+		mxPushUndefined();
 	gxDefaults.runImport(the, realm, C_NULL);
 	mxPullSlot(mxResult);
 }
@@ -3094,6 +3196,10 @@ void fx_Compartment_prototype_importNow(txMachine* the)
 	txSlot* realm = mxModuleInstanceInternal(program)->value.module.realm;
 	if (mxArgc > 0)
 		mxPushSlot(mxArgv(0));
+	else
+		mxPushUndefined();
+	if (mxArgc > 1)
+		mxPushSlot(mxArgv(1));
 	else
 		mxPushUndefined();
 	fxRunImportNow(the, realm, C_NULL);
@@ -3161,6 +3267,7 @@ void fxExecuteVirtualModuleSourceImport(txMachine* the)
 void fx_ModuleSource(txMachine* the)
 {
 	txSlot* instance;
+	txUnsigned flags = mxDebugFlag;
 	txSlot* slot;
 	txStringStream stream;
 	txScript* script;
@@ -3170,15 +3277,21 @@ void fx_ModuleSource(txMachine* the)
 	fxGetPrototypeFromConstructor(the, &mxModuleSourcePrototype);
 	instance = fxNewModuleSourceInstance(the);
 	mxPullSlot(mxResult);
-	if (mxArgc == 0)
-		mxPushUndefined();
-	else		
+	if (mxArgc > 0)
 		mxPushSlot(mxArgv(0));
+	else		
+		mxPushUndefined();
+	if (mxArgc > 1) {
+		if (fxCheckModuleOptions(the, mxArgv(1))) {
+			instance->next->flag |= XS_JSON_MODULE_FLAG;
+			flags |= mxJSONModuleFlag;
+		}
+	}
 	slot = the->stack;
 	stream.slot = slot;
 	stream.offset = 0;
 	stream.size = mxStringLength(fxToString(the, slot));
-	script = fxParseScript(the, &stream, fxStringGetter, mxDebugFlag);
+	script = fxParseScript(the, &stream, fxStringGetter, flags);
 // 		mxPushClosure(mxResult);
 	fxRunScript(the, script, mxResult, C_NULL, C_NULL, C_NULL, instance);
 	mxPop();
@@ -3331,6 +3444,14 @@ void fx_ModuleSource_prototype_get_needsImportMeta(txMachine* the)
 	mxResult->kind = XS_BOOLEAN_KIND;
 }
 
+void fx_ModuleSource_prototype_get_options(txMachine* the)
+{
+	txSlot* record = fxCheckModuleSourceInstance(the, mxThis);
+	txFlag flag = mxModuleInstanceInternal(record)->flag;
+	fxPushModuleOptions(the, flag);
+	mxPullSlot(mxResult);
+}
+
 #if mxModuleStuff
 
 txSlot* fxCheckModuleStuffInstance(txMachine* the, txSlot* slot)
@@ -3356,7 +3477,7 @@ txSlot* fxImportModuleStuff(txMachine* the, txSlot* realm, txSlot* queue, txSlot
 		txSlot* loader;
 		
 		module = mxBehaviorSetProperty(the, list, moduleID, 0, XS_OWN);
-		fxNewModule(the, realm, XS_NO_ID, module);
+		fxNewModule(the, realm, XS_NO_ID, XS_NO_FLAG, module);
 		mxModuleStatus(module) = XS_MODULE_STATUS_LOADING;
 		fxQueueModule(the, queue, module);
 		
@@ -3368,7 +3489,8 @@ txSlot* fxImportModuleStuff(txMachine* the, txSlot* realm, txSlot* queue, txSlot
 		mxPushSlot(importHook);
 		mxCall();
 		mxPushSlot(name);
-		mxRunCount(1);
+		fxPushModuleOptions(the, name->flag);
+		mxRunCount(2);
 		
 		if (now) {
 			fxLoadModuleStuff(the, queue, module, the->stack);

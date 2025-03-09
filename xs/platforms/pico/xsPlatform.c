@@ -77,6 +77,14 @@ static int gDebugMutexInited = 0;
 #define mxDebugMutexGive()	sem_release(&gDebugMutex)
 #define mxDebugMutexAllocated() (gDebugMutexInited)
 
+int modMessagePostToMachine(xsMachine *the, uint8_t *message, uint16_t messageLength, modMessageDeliver callback, void *refcon);
+int modMessagePostToMachineFromISR(xsMachine *the, modMessageDeliver callback, void *refcon);
+int modMessageService(xsMachine *the, int maxDelayMS);
+void modMachineTaskInit(xsMachine *the);
+void modMachineTaskUninit(xsMachine *the);
+void modMachineTaskWait(xsMachine *the);
+void modMachineTaskWake(xsMachine *the);
+
 
 void fxCreateMachinePlatform(txMachine* the)
 {

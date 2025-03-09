@@ -107,11 +107,6 @@ C_DEFINES = \
 	/D XS_ARCHIVE=1 \
 	/D INCLUDE_XSPLATFORM=1 \
 	/D XSPLATFORM=\"win_xs.h\" \
-	/D mxRun=1 \
-	/D mxNoFunctionLength=1 \
-	/D mxNoFunctionName=1 \
-	/D mxHostFunctionPrimitive=1 \
-	/D mxFewGlobalsTable=1 \
 	/D kCommodettoBitmapFormat=$(COMMODETTOBITMAPFORMAT) \
 	/D kPocoRotation=$(POCOROTATION)
 !IF "$(INSTRUMENT)"=="1"

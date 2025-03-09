@@ -1,6 +1,6 @@
 # Moddable SDKを使用してアプリケーション用のフォントを作成する
 Copyright 2017-2024 Moddable Tech, Inc.<BR>
-改訂日： 2024年3月21日
+改訂日： 2025年3月5日
 
 Moddableはフォントに[BMFont](http://www.angelcode.com/products/bmfont/doc/file_format.html)形式を使用します
 
@@ -17,6 +17,7 @@ Moddableは非連続グリフ範囲をサポートしており、開発者やグ
 
 BMFont形式でTrueTypeおよびOpenTypeフォントを変換するためのツールは多数あります。Moddableチームはよく[Glyph Designer](https://71squared.com/glyphdesigner)（macOS）を使用します。もう1つの良い選択肢は、Vladimir Gamalyanによるコマンドラインツール[fontbm](https://github.com/vladimirgamalyan/fontbm)です。両方の使用方法についての指示は以下に提供されています。
 
+<a id="glyph-designer"></a>
 ## Glyph Designerの使い方
 
 フォントとウェイトを選択します。フォントの色を黒に設定し、アウトラインをなしにします。
@@ -33,11 +34,12 @@ BMFontバイナリ形式で.pngグリフと.fntフォントメトリクスファ
 
 ## fontbmの使い方
 
-fontbmを使用するには、まずシステムにインストールする必要があります。Windowsユーザー向けには、[ダウンロード可能なバイナリ](https://github.com/vladimirgamalyan/fontbm/releases/latest)が用意されています。現在[macOS](https://github.com/vladimirgamalyan/fontbm#building-macos)および[Linux](https://github.com/vladimirgamalyan/fontbm#building-linux)ユーザーは、手順に従ってソースコードからビルドする必要があります。
+fontbmを使用するには、まずシステムにインストールする必要があります。事前ビルド済みのバイナリはGitHub上の
+Moddable SDKの[リリース](https://github.com/moddable-OpenSource/moddable/releases/latest)の一部として入手できます。あるいは、[macOS](https://github.com/vladimirgamalyan/fontbm#building-macos)、[Linux](https://github.com/vladimirgamalyan/fontbm#building-linux)および[Windows](https://github.com/vladimirgamalyan/fontbm?tab=readme-ov-file#building-windows)では、手順に従ってソースコードからビルドできます。
 
 fontbmを入手したら、コマンドラインから使用して、Moddable SDKにフォントを追加するために必要な.fntファイルと.pngファイルを生成できます。
 
-Moddable SDKプロジェクトのmanifest.jsonファイルを使用して、プロジェクトのビルドの一部としてfontbmを自動的に呼び出すことができます。これにより、プロジェクトで異なるフォントやフォントサイズを使用するのが非常に簡単になります。`mcconfig`や`mcrun`でfontbmサポートを使用するには、まず環境変数`FONTBM`をfontbm実行ファイルへのパスに設定して、Moddable SDKビルドツールがfontbmを見つけられるようにする必要があります。
+Moddable SDKプロジェクトのmanifest.jsonファイルを使用して、プロジェクトのビルドの一部としてfontbmを自動的に呼び出すことができます。これにより、プロジェクトで異なるフォントやフォントサイズを使用するのが非常に簡単になります。`mcconfig`や`mcrun`でfontbmサポートを使用するには、まず環境変数`FONTBM`をfontbm実行ファイルへのパスに設定して、Moddable SDKビルドツールがfontbmを見つけられるようにする必要があります。Moddable SDKのインストール管理にxs-devを使用している場合、fontbmは自動的にModdable SDKのバイナリからインストールされます。
 
 ### manifest.jsonでのfontbmの使用
 

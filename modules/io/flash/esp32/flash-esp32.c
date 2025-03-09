@@ -2,6 +2,7 @@
 #include "xsHost.h"
 #include "mc.xs.h"      // for xsID_ values
 #include "builtinCommon.h"
+#include "flash-esp32.h"
 
 #include "esp_partition.h"
 #include "app_update/include/esp_ota_ops.h"
@@ -87,13 +88,6 @@ void xs_flashstorage_destructor(void *data)
 {
 }
 
-void xs_flashstorage(xsMachine *the)
-{
-	xsFlashRecord f = {0};
-
-	xsmcSetHostChunk(xsThis, &f, sizeof(f));
-}
-
 void xs_flashstorage_close(xsMachine *the)
 {
 	if (!xsmcGetHostChunk(xsThis)) 
@@ -133,7 +127,7 @@ void xs_flashstorage_open(xsMachine *the)
 		else if (0 == c_strcmp(modeStr, "r+"))
 			;
 		else
-			xsUnknownError("invalid mode");
+			xsUnknownError("invalid mode");		//@@ range error
 	}
 
 	if (kIOFormatBuffer != builtinInitializeFormat(the, kIOFormatBuffer))
@@ -211,4 +205,11 @@ void xs_flashstorage_status(xsMachine *the)
 
 	xsmcSetInteger(xsVar(0), partition->size / partition->erase_size);
 	xsmcSet(xsResult, xsID_blocks, xsVar(0));
+}
+
+const esp_partition_t *getESP32FlashPartition(xsMachine *the, xsSlot *from, uint8_t *writable)
+{
+	xsFlash flash = xsmcGetHostChunkValidate(*from, xs_flashstorage_destructor);
+	*writable = !flash->readOnly;
+	return flash->partition;
 }

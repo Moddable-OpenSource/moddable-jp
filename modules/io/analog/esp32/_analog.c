@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024 Moddable Tech, Inc.
+ * Copyright (c) 2019-2025 Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  *
@@ -40,7 +40,7 @@ struct AttenuationRecord {
 	uint16_t Vmax;
 };
 typedef struct AttenuationRecord AttenuationRecord;
-typedef struct AttenuationRecord *Attenuation;
+typedef struct AttenuationRecord const *Attenuation;
 
 #define maxAtten (4)
 static const AttenuationRecord kAttenuationTable[maxAtten] = {

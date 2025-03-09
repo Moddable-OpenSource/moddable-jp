@@ -413,7 +413,7 @@ void fx_Object_prototype_toString(txMachine* the)
             	tag = "Object";
 		}
 		break;
-#ifdef mxHostFunctionPrimitive
+#if mxHostFunctionPrimitive
 	case XS_HOST_FUNCTION_KIND:
 		instance = mxFunctionPrototype.value.reference;
 		tag = "Function";

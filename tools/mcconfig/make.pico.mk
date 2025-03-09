@@ -91,7 +91,7 @@ ifeq ($(HOST_OS),Darwin)
 		WAIT_FOR_COPY_COMPLETE = $(PLATFORM_DIR)/config/waitForVolume -x $(UF2_VOLUME_PATH)
 	endif
 
-	DO_PROGRAM = @echo "\# Programming: $(BIN_DIR)/xs_pico.uf2 $(UF2_VOLUME_PATH) " ; cp $(BIN_DIR)/xs_pico.uf2 $(UF2_VOLUME_PATH) ; $(WAIT_FOR_COPY_COMPLETE)
+	DO_PROGRAM = @echo "\# Programming: $(BIN_DIR)/xs_pico.uf2 $(UF2_VOLUME_PATH) " ; cp -X $(BIN_DIR)/xs_pico.uf2 $(UF2_VOLUME_PATH) ; $(WAIT_FOR_COPY_COMPLETE)
 
 ### Linux
 else
@@ -884,7 +884,6 @@ endif
 C_DEFINES = \
 	$(PICO_C_DEFINES) \
 	-DmxUseDefaultSharedChunks=1 \
-	-DmxRun=1 \
 	-DkCommodettoBitmapFormat=$(COMMODETTOBITMAPFORMAT) \
 	-DkPocoRotation=$(POCOROTATION) \
 	-DMODGCC=1
@@ -1050,6 +1049,11 @@ $(LIB_DIR)/buildinfo.c.o: $(SDK_GLUE_OBJ) $(XS_OBJ) $(TMP_DIR)/mc.xs.c.o $(TMP_D
 	$(CC) $(C_FLAGS) $(C_INCLUDES) $(C_DEFINES) $(LIB_DIR)/buildinfo.c -o $@
 
 $(XS_OBJ): $(XS_HEADERS)
+
+$(LIB_DIR)/xsBigInt.c.o: xsBigInt.c
+	@echo "# * library xs:" $(<F)
+	$(CC) -Wno-incompatible-pointer-types $(C_FLAGS) $(C_INCLUDES) $(C_DEFINES) $< -o $@
+
 $(LIB_DIR)/xs%.c.o: xs%.c
 	@echo "# library xs:" $(<F)
 	$(CC) $(C_FLAGS) $(C_INCLUDES) $(C_DEFINES) $< -o $@

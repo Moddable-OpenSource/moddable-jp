@@ -626,7 +626,7 @@ TLS証明書は `*` 配列に含めるべきです。
 }
 ```
 
-The `esp32` platform has an additional property `dependency` which can be used to [add ESP Registry components](../devices/esp32/manifest.md#idf-components) to your project.
+`esp32`プラットフォームには追加のプロパティである`dependency`があり、これを使用してプロジェクトに[ESPレジストリのコンポーネント](../devices/esp32.md#idf-components)を追加できます。
 
 ```json
 	"platforms": {
@@ -639,11 +639,11 @@ The `esp32` platform has an additional property `dependency` which can be used t
 	}
 ```
 
-`namespace` is optional and defaults to `espressif`.
+`namespace`は任意で、デフォルトでは`espressif`です。
 
-The library and include files from the dependencies will be loaded from the ESP Registry and made available to you. You can then write your module with a native part to interface with the component.
+依存関係からのライブラリおよびインクルードファイルはESPレジストリから読み込まれ、使用可能になります。次に、コンポーネントとインターフェースするネイティブ部分を含むモジュールを書くことができます。
 
-The [onewire module](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/drivers/onewire) demonstrates the use of `dependency`.
+[onewire モジュール](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/drivers/onewire) `dependency`の使用方法を示しています、
 
 <a id="subplatforms"></a>
 #### サブプラットフォーム

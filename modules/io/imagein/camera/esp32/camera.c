@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024  Moddable Tech, Inc.
+ * Copyright (c) 2024-2025  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -17,17 +17,20 @@
  *   along with the Moddable SDK Runtime.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #include "xsmc.h"
 #include "mc.xs.h"
 #include "mc.defines.h"
 #include "xsHost.h"
 
 #include "builtinCommon.h"
+#include "_i2c.h"
 
 #include "esp_camera.h"
 #include "sensor.h"
 
 #include "commodettoBitmapFormat.h"
+#include "commodettoPocoBlit.h"
 
 #ifndef MODDEF_CAMERA_POWERDOWN
 	#define MODDEF_CAMERA_POWERDOWN -1
@@ -41,6 +44,12 @@
 	#else
 		#define MODDEF_CAMERA_I2C_PORT	0
 	#endif
+#endif
+#ifndef MODDEF_CAMERA_XCLK_FREQ_HZ
+	#define MODDEF_CAMERA_XCLK_FREQ_HZ (24000000)
+#endif
+#ifndef MODDEF_CAMERA_JPEG_QUALITY
+	#define MODDEF_CAMERA_JPEG_QUALITY (12)
 #endif
 
 static void xs_camera_mark(xsMachine *the, void *it, xsMarkRoot markRoot);
@@ -78,17 +87,14 @@ struct CameraRecord {
 	xsSlot		object;
 	xsSlot		*onReadable;
 
-	uint8_t		calling;
-	uint8_t		running;
-
 	uint32_t	width;
 	uint32_t	height;
 
 	SemaphoreHandle_t	mutex;
 	TaskHandle_t		task;
-	uint8_t		state;
+	uint8_t				state;
+	uint8_t				calling;
 
-	uint8_t		frameSize;
 	uint8_t		swap16;
 	uint8_t		format;
 	uint8_t		isJPEG;
@@ -112,15 +118,16 @@ struct FramesizeRecord {
 typedef struct FramesizeRecord FramesizeRecord;
 typedef struct FramesizeRecord *Framesize;
 
-#define MAX_FRAMESIZES (22)
 // ordered by width, then by height
-static FramesizeRecord FrameSizes[MAX_FRAMESIZES] = {
+static FramesizeRecord FrameSizes[] = {
     FRAMESIZE_96X96,   96, 96,
+    FRAMESIZE_128X128, 128, 128,
     FRAMESIZE_QQVGA,   160, 120,
     FRAMESIZE_QCIF,    176, 144,
     FRAMESIZE_HQVGA,   240, 176,
     FRAMESIZE_240X240, 240, 240,
     FRAMESIZE_QVGA,    320, 240,
+    FRAMESIZE_320X320, 320, 320,
     FRAMESIZE_CIF,     400, 296,
     FRAMESIZE_HVGA,    480, 320,
     FRAMESIZE_VGA,     640, 480,
@@ -137,6 +144,7 @@ static FramesizeRecord FrameSizes[MAX_FRAMESIZES] = {
     FRAMESIZE_QHD,     2560, 1440,
     FRAMESIZE_WQXGA,   2560, 1600,
     FRAMESIZE_QSXGA,   2560, 1920,
+    FRAMESIZE_INVALID, 0, 0
 };
 
 static camera_config_t camera_config = {
@@ -158,14 +166,14 @@ static camera_config_t camera_config = {
 	.pin_href = MODDEF_CAMERA_HREF,
 	.pin_pclk = MODDEF_CAMERA_PCLK,
 
-	.xclk_freq_hz = 24000000,
+	.xclk_freq_hz = MODDEF_CAMERA_XCLK_FREQ_HZ,
 	.ledc_timer = LEDC_TIMER_0,
 	.ledc_channel = LEDC_CHANNEL_0,
 
 	.pixel_format = PIXFORMAT_RGB565,
 	.frame_size = FRAMESIZE_VGA,
 
-	.jpeg_quality = 12,
+	.jpeg_quality = MODDEF_CAMERA_JPEG_QUALITY,
 	.fb_count = 3,
 	.fb_location = CAMERA_FB_IN_PSRAM,
 	.grab_mode = CAMERA_GRAB_LATEST,		// vs. CAMERA_GRAB_WHEN_EMPTY
@@ -173,6 +181,7 @@ static camera_config_t camera_config = {
 };
 
 enum {
+	kStateInitializing,
 	kStateIdle,
 	kStateRunning,
 	kStateStopping,
@@ -189,22 +198,25 @@ static void deliverCallbacks(void *the, void *refcon, uint8_t *message, uint16_t
 		return;
 	}
 
+	if (kStateRunning != camera->state)
+		return;
+
 	xsBeginHost(the);
 		xsCallFunction1(xsReference(camera->onReadable), camera->object, xsInteger(0));
 	xsEndHost(the);
 	camera->calling = 0;
-//	xTaskNotify(camera->task, kStateRunning, eSetValueWithOverwrite);
 }
 
 static void cameraLoop(void *pvParameter)
 {
 	Camera camera = pvParameter;
-
-	// free up i2c control port	//@@
-	i2c_driver_delete(camera_config.sccb_i2c_port);
+	uint8_t running = 0;
 
 	camera->initErr = esp_camera_init(&camera_config);
-	if (ESP_OK != camera->initErr) goto bail;
+	if (ESP_OK != camera->initErr) {
+		xSemaphoreTake(camera->mutex, portMAX_DELAY);
+		goto bail;
+	}
 
 	while (true) {
 		if (kStateClosing == camera->state) {
@@ -213,14 +225,20 @@ static void cameraLoop(void *pvParameter)
 		}
 
 		if (kStateStopping == camera->state) {
-			camera->running = 0;
+			running = 0;
 			camera->state = kStateIdle;
 		}
 
-		if (camera->running) {
+		if (running || (kStateInitializing == camera->state)) {
 			camera_fb_t *fb = esp_camera_fb_get();
 			CameraFrame frame = NULL;
 			int i;
+
+			if (!camera->width) {
+				camera->state = kStateIdle;	// was kStateInitializing
+				camera->width = fb->width;
+				camera->height = fb->height;
+			}
 
 			xSemaphoreTake(camera->mutex, portMAX_DELAY);
 
@@ -248,6 +266,19 @@ static void cameraLoop(void *pvParameter)
 					pixels[i] = ((t & mask) << 8) | ((t >> 8) & mask);
 				}
 			}
+			else if (kCommodettoBitmapGray16 == camera->imageType) {	// convert RGB565BE to Gray16
+				uint32_t *src = (uint32_t*)fb->buf;
+				uint8_t *dst = (uint8_t*)fb->buf;
+				uint32_t i, count = fb->len >> 2;
+				const uint32_t mask = 0x00ff00ff;
+				for (i = 0; i < count; i++) {
+					uint32_t t = *src++;
+					t = ((t & mask) << 8) | ((t >> 8) & mask);
+					uint8_t a = PocoMakePixelGray16((((t >> 27) & 0x1f) << 3), (((t >> 21) & 0x3f) << 2), (((t >> 16) & 0x1f) >> 3));
+					uint8_t b = PocoMakePixelGray16((((t >> 11) & 0x1f) << 3), (((t >> 5) & 0x3f) << 2), (((t >> 0) & 0x1f) >> 3));
+					*dst++ = (b << 4) | a; 
+				}
+			}
 
 			frame->fb = fb;
 			frame->data = fb->buf;
@@ -260,18 +291,17 @@ static void cameraLoop(void *pvParameter)
 			}
 		}
 
-		if (kStateIdle == camera->state || !camera->running) {
+		if (kStateIdle == camera->state || !running) {
 			uint32_t newState;
 			xTaskNotifyWait(0, 0, &newState, portMAX_DELAY);
 
 			if (kStateRunning == newState)
-				camera->running = 1;
+				running = 1;
 			camera->state = newState;
 		}
 	}
 
 bail:
-	camera->running = 0;
 	esp_camera_deinit();
 
 	camera->task = NULL;
@@ -290,7 +320,7 @@ static int formatToCamFormat(int commodettoFormat)
 		case kCommodettoBitmap24RGB: return PIXFORMAT_RGB888;			// 3BPP/RGB888
 		case kCommodettoBitmapRGB444: return PIXFORMAT_RGB444;			// 3BP2P/RGB444
 		case kCommodettoBitmapYUV422: return PIXFORMAT_YUV422;			// 2BPP/YUV422
-
+		case kCommodettoBitmapGray16: return PIXFORMAT_RGB565;			// 4BPP/GRAYSCAPE (post process) (in a perfec world, we would select YUV422 when available)
 		// PIXFORMAT_YUV420;    // 1.5BPP/YUV420
 		// PIXFORMAT_RAW;       // RAW	(?)
 		// PIXFORMAT_RGB555;    // 3BP2P/RGB555
@@ -301,14 +331,14 @@ static int formatToCamFormat(int commodettoFormat)
 static int sizeToFrameSize(int width, int height)
 {
 	int i;
-	for (i=0; i<MAX_FRAMESIZES; i++) {
+	for (i = 0; FRAMESIZE_INVALID != FrameSizes[i].id; i++) {
 		if (FrameSizes[i].width < width)
 			continue;
 		if (FrameSizes[i].height < height) {
-			if (i<MAX_FRAMESIZES-1 && (FrameSizes[i+1].width == FrameSizes[i].width))
-				return FrameSizes[i+1].id;
+			if ((FRAMESIZE_INVALID != FrameSizes[i + 1].id) && (FrameSizes[i+1].width == FrameSizes[i].width))
+				return i + 1;
 		}
-		return FrameSizes[i].id;
+		return i;
 	}
 	return -1;
 }
@@ -364,16 +394,13 @@ void xs_camera_constructor(xsMachine *the)
 
 	xsmcGet(xsVar(0), xsArg(0), xsID_prototype);
 	camera->hostBufferPrototype = xsmcToReference(xsVar(0));
+	int frameSizeIndex = sizeToFrameSize(width, height);
+	if (-1 == frameSizeIndex)
+		xsUnknownError("unsupported dimensions");
 
-	int frameSize = sizeToFrameSize(width, height);
-	width = FrameSizes[frameSize].width;
-	height = FrameSizes[frameSize].height;
-	if (-1 != frameSize)
-		camera_config.frame_size = frameSize;
+	camera_config.frame_size = FrameSizes[frameSizeIndex].id;
 
-	camera->width = width;
-	camera->height = height;
-	camera->state = kStateIdle;
+	camera->state = kStateInitializing;
 	camera->mutex = xSemaphoreCreateMutex();
 
 	if (isJPEG)
@@ -387,10 +414,16 @@ void xs_camera_constructor(xsMachine *the)
 	camera->swap16 = (imageType == kCommodettoBitmapRGB565LE);
 	camera->isJPEG = isJPEG;
 
-	camera->initErr = ESP_ERR_INVALID_MAC;		// error that the camera won't generate
+	xsmcGet(xsVar(0), xsArg(0), xsID_i2cControl);
+	xsI2CHostHooks i2c = (xsI2CHostHooks)xsGetHostHooks(xsVar(0));
+	if (!i2c || !i2c->hooks.signature || (0 != c_strcmp(i2c->hooks.signature, "i2c")))
+		xsUnknownError("invalid i2c");
+	void *instanceData = i2c->doValidate(the, &xsVar(0));
+	i2c->doDeactivate(instanceData);
+
 	xTaskCreate(cameraLoop, "camera", 8 * 1024 + XT_STACK_EXTRA_CLIB, camera, 10, &camera->task);
 	
-	while (ESP_ERR_INVALID_MAC == camera->initErr)
+	while (kStateInitializing == camera->state)
 		vTaskDelay(1);
 
 	if (camera->initErr)

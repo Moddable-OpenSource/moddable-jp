@@ -1,7 +1,7 @@
 # Moddable SDK - TCP IO の例
 
 著作権2022-2024 Moddable Tech, Inc.<BR>
-改訂： 2024年10月2日
+改訂： 2024年12月11日
 
 このディレクトリの例は、ECMA-419によって定義された[TCPソケット](https://419.ecma-international.org/#-10-io-classes-tcp-socket)を使用しています。
 
@@ -13,10 +13,11 @@
 	- [httpsclient](./httpsclient) – `TLS` TCPソケットと`httpclient`を組み合わせて、google.comへの複数の安全なリクエストを行います。
 - WebSocket
 	- [websocketclient](./websocketclient) – TCPソケットに基づいたWebSocketクライアントAPIです。`WebSocketClient`クラスはECMA-419の第2版の[仕様](https://419.ecma-international.org/#-25-mqtt-client-class-pattern)を実装しています。
-	- [websocketsclient](./websocketsclient) – `TLS` TCPソケットと`websocketclient`を組み合わせて、api.openapi.comへの安全な接続を確立します
+	- [websocketsclient](./websocketsclient) – `TLS` TCPソケットと`websocketclient`を組み合わせて、wss://api.openapi.comへの安全な接続を確立します
 	- [websocket](./websocket) – ECMA-419の第2版`WebSocketClient` APIに基づいた標準HTMLの`WebSocket` [API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)の実装です。
 - MQTT
 	- [mqttclient](./mqttclient) – TCPソケットに基づいたMQTTクライアントAPIです。`MQTTClient`クラスはEcma-419の第2版の[仕様](https://419.ecma-international.org/#-25-mqtt-client-class-pattern)のほとんどを実装しています。
+	- [mqttsclient](./mqttsclient) – TLS `TCP`ソケットと`mqttclient`を組み合わせて、`mqtts://broker.hivemq.com`への安全な接続を確立します。
 	- [MQTT.js](./mqtt) – ECMA-419の第2版`MQTTClient` APIに基づいた、Node.jsおよびブラウザで広く使用されている[MQTT.jsパッケージ](https://www.npmjs.com/package/mqtt)の実装です。
 - サーバー送信イベント
 	- [EventSource](./eventsource) – [サーバー送信イベント](https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream)を受信するための標準HTMLの`EventSource` [API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource)の実装です。HTTPクライアントAPIに基づいて構築されています。

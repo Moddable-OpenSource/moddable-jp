@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024  Moddable Tech, Inc.
+ * Copyright (c) 2024-2025  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK.
  * 
@@ -18,12 +18,11 @@ import Listener from "embedded:io/socket/listener";
 import Camera from "embedded:x-io/imagein/camera";
 import Net from "net";
 
-let width = 320, height = 240;
 let frame;
 
 const camera = new Camera({
-	width,
-	height,
+	width: 320,
+	height: 240,
 	imageType: "jpeg",
 	format: "buffer/disposable",
 	onReadable: () => {
@@ -34,7 +33,8 @@ const camera = new Camera({
 		else {
 			frame?.close();
 			frame = camera.read();
-			frame.inUse = 0;
+			if (frame)
+				frame.inUse = 0;
 		}
 
 		connections.forEach(connection => {
@@ -43,8 +43,8 @@ const camera = new Camera({
 		});
 	}
 });
-width = camera.width;
-height = camera.height;
+const width = camera.width;
+const height = camera.height;
 camera.start();
 
 const router = new Map;
@@ -104,24 +104,28 @@ router.set("/camera", {
 			}
 		}
 
-		const use = Math.min(count, frame.byteLength - this.position);
-		this.write(frame.bytes.subarray(this.position, this.position + use));
+		const use = Math.min(count, this.frame.byteLength - this.position);
+		this.write(this.frame.bytes.subarray(this.position, this.position + use));
 		this.position += use;
 		this.writable = count - use;
 		
-		if (this.position === frame.byteLength) {
-			frame.inUse -= 1;
+		if (this.position === this.frame.byteLength) {
+			this.frame.inUse -= 1;
 			delete this.frame;
 		}
 	},
 	onDone() {
-		if (frame)
-			frame.inUse -= 1;
+		if (this.frame) {
+			this.frame.inUse -= 1;
+			delete this.frame;
+		}
 		connections.delete(this);
 	},
 	onError() {
-		if (frame)
-			frame.inUse -= 1;
+		if (this.frame) {
+			this.frame.inUse -= 1;
+			delete this.frame;
+		}
 		connections.delete(this);
 	}
 });

@@ -926,6 +926,7 @@ void fxRunModuleFile(txMachine* the, txString path)
 {
 	txSlot* realm = mxProgram.value.reference->next->value.module.realm;
 	mxPushStringC(path);
+	mxPushUndefined();
 	fxRunImport(the, realm, C_NULL);
 	mxDub();
 	fxGetID(the, mxID(_then));
@@ -1009,6 +1010,7 @@ void fxLoadModule(txMachine* the, txSlot* module, txID moduleID)
 {
 	char path[C_PATH_MAX];
 	char real[C_PATH_MAX];
+	txString dot;
 	txScript* script;
 #ifdef mxDebug
 	txUnsigned flags = mxDebugFlag;
@@ -1032,6 +1034,9 @@ void fxLoadModule(txMachine* the, txSlot* module, txID moduleID)
 				return;
 		}
 #endif	
+		dot = c_strrchr(real, '.');
+		if (dot && !c_strcmp(dot, ".json"))
+			flags |= mxJSONModuleFlag;
 		script = fxLoadScript(the, real, flags);
 		if (script)
 			fxResolveModule(the, module, moduleID, script, C_NULL, C_NULL);
