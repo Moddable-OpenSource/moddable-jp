@@ -1,58 +1,58 @@
-# Handle
+# ハンドル
 Copyright 2016-17 Moddable Tech, Inc.<BR>
-Revised: May 17, 2017
+更新日: 2017年5月17日
 
 
-## Objective
+## 目的
 
-To develop frameworks for microcontrollers with XS, the most significant constraint is RAM.
+XSでマイクロコントローラ用のフレームワークを開発する際に、最も重要な制約はRAMです。
 
-The XS linker prepares most classes, prototypes, functions and byte codes to be accessed straightly from ROM. All the ECMAScript 2017 features, and most modules composing the frameworks are there, instantaneously available and requiring just a few KB of RAM.
+XSリンカーは、ほとんどのクラス、プロトタイプ、関数、バイトコードをROMから直接アクセスできるように準備します。ECMAScript 2017のすべての機能と、フレームワークを構成するほとんどのモジュールがそこにあり、瞬時に利用可能で、わずか数KBのRAMしか必要としません。
 
-For everything that is created at runtime, applications rely on the XS garbage collector to manage memory. XS divides memory into two zones: the slots and the chunks.
+実行時に作成されるすべてのものについて、アプリケーションはメモリを管理するためにXSガベージコレクタに依存します。XSはメモリを2つのゾーンに分割します：スロットとチャンクです。
 
-Slots have a fixed size (16 bytes on a 32-bit processor) and cannot move. Chunks have a variable size and can move. The XS garbage collector can compact chunks when necessary, which is a life saver for processors without an MMU.
+スロットは固定サイズ（32ビットプロセッサでは16バイト）で移動できません。チャンクは可変サイズで移動できます。XSガベージコレクタは必要に応じてチャンクを圧縮でき、これはMMUを持たないプロセッサにとって救世主です。
 
-Slots are used for anything that fits: booleans, dates, instances, numbers, properties, references, symbols, etc. Chunks are used for everything else: byte codes, arrays, strings, etc.
+スロットは、適合するすべてのものに使用されます：ブール値、日付、インスタンス、数値、プロパティ、参照、シンボルなど。チャンクは他のすべてに使用されます：バイトコード、配列、文字列など。
 
-In practice, the slot and chunk heaps works so well for reducing peak memory use that it is tempting to use JavaScript for everything. But, for critical operations, like the layout and the update of the screen, there is a second constraint: performance.
+実際には、スロットとチャンクヒープは、ピークメモリ使用量を削減するのに非常によく機能するため、すべてにJavaScriptを使用したくなります。しかし、画面のレイアウトや更新などの重要な操作では、2つ目の制約があります：パフォーマンスです。
 
-Accessing properties to get and set their values, to call functions, etc., can have significant performance overhead when it is happening at every frame (30 or 60 fps). Even in the world of web browsers, where JavaScript engines sacrifice MB of RAM to optimize such dispatching and the layout and update of the screen are implemented in C or C++.
+プロパティにアクセスして値を取得・設定したり、関数を呼び出したりすることは、フレームごと（30または60 fps）に発生すると、大きなパフォーマンスオーバーヘッドを生じることがあります。Webブラウザの世界でも、JavaScriptエンジンがそのようなディスパッチを最適化するためにMBのRAMを犠牲にし、画面のレイアウトと更新はCまたはC++で実装されています。
 
-XS handles allow C based objects implementations to access properties and to dispatch functions with native performance, while using the memory managed by XS, i.e. slots and chunks.
+XSハンドルは、Cベースのオブジェクト実装が、XSが管理するメモリ（つまり、スロットとチャンク）を使用しながら、ネイティブパフォーマンスでプロパティにアクセスし、関数をディスパッチできるようにします。
 
-## Definition
+## 定義
 
-As in the early days of macOS a handle is a pointer to a pointer to a memory block. A handle allows the system to move memory blocks to coalesce free space. Applications store the handle, instead of address of the pointer block, and deference the handle to access memory blocks. The value of the handle never changes, but the address of the memory block may.
+macOSの初期の頃のように、ハンドルはメモリブロックへのポインタのポインタです。ハンドルにより、システムは空きスペースを結合するためにメモリブロックを移動できます。アプリケーションは、ポインタブロックのアドレスの代わりにハンドルを格納し、メモリブロックにアクセスするためにハンドルを逆参照します。ハンドルの値は変わりませんが、メモリブロックのアドレスは変わる可能性があります。
 
-In XS, it is similar: a handle is a pointer to a pointer to a chunk. Here is a schema:
+XSでは同様です：ハンドルはチャンクへのポインタのポインタです。スキーマは以下の通りです：
 
 ![](./../assets/handle/handle.png)
 
-The `HANDLE` is a pointer to the `DATA` part of a `HOST` slot. The `DATA` part of a `HOST` slot is a pointer to a chunk. Since slots do not move, a handle remains valid across garbage collections. The XS garbage collector updates the `DATA` part of a `HOST` slot when sweeping chunks.
+`HANDLE`は`HOST`スロットの`DATA`部分へのポインタです。`HOST`スロットの`DATA`部分はチャンクへのポインタです。スロットは移動しないため、ハンドルはガベージコレクション間で有効なままです。XSガベージコレクタは、チャンクをスイープするときに`HOST`スロットの`DATA`部分を更新します。
 
-C based objects are chunks. They can contain anything, for instance colors, coordinates, dimensions, etc. Notice that for such values, C based objects are also saving memory since they can pack several values into one chunk instead of using one slot for each value. The memory savings by applying this approach can be considerable as a JavaScript property requires a slot (16 bytes on a typical MCU) which is larger than a native boolean (1 byte), integer (2 or 4 bytes), or even a floating point double (8 bytes).
+Cベースのオブジェクトはチャンクです。色、座標、次元などの何でも含むことができます。そのような値について、Cベースのオブジェクトは、各値に1つのスロットを使用する代わりに複数の値を1つのチャンクにパックできるため、メモリも節約していることに注意してください。JavaScriptプロパティには、ネイティブブール値（1バイト）、整数（2または4バイト）、または浮動小数点double（8バイト）よりも大きいスロット（典型的なMCUでは16バイト）が必要であるため、このアプローチを適用することによるメモリ節約は相当なものになります。
 
-From JavaScript, C based objects are just host objects and are accessed thru the `INSTANCE` slot like any host objects. Thru the `PROTOTYPE` part of the `INSTANCE` slot, frameworks provides getters, setters and methods so applications can access and manipulate values as usual.
+JavaScriptから、Cベースのオブジェクトは単なるホストオブジェクトであり、他のホストオブジェクトと同様に`INSTANCE`スロットを介してアクセスされます。`INSTANCE`スロットの`PROTOTYPE`部分を介して、フレームワークはゲッター、セッター、メソッドを提供し、アプリケーションが通常通り値にアクセスして操作できるようにします。
 
-## Implementation
+## 実装
 
-C based objects reference other C based object thru handles, i.e. a chunk can contain a handle to another chunk. For instance a content accesses its container with
+Cベースのオブジェクトは、ハンドルを介して他のCベースのオブジェクトを参照します。つまり、チャンクは別のチャンクへのハンドルを含むことができます。例えば、コンテンツは以下でそのコンテナにアクセスします：
 
 	(*content)->container
 
-That is essential for to achieve maximum performance. For instance, the layout hierarchy is traversed a lot when animating a screen at 30 fps.
+これは、最大のパフォーマンスを達成するために不可欠です。例えば、30 fpsで画面をアニメーション化するときに、レイアウト階層が多く走査されます。
 
-What happens when XS collects garbage if a handle inside a chunk is the only reference to a C based object?
+チャンク内のハンドルがCベースのオブジェクトへの唯一の参照である場合、XSがガベージコレクションを行うとどうなるでしょうか？
 
-By convention, at the beginning of each chunk corresponding to a C based object there is a pointer that is a `REFERENCE` to the `INSTANCE` slot.
+慣例により、Cベースのオブジェクトに対応する各チャンクの開始時に、`INSTANCE`スロットへの`REFERENCE`であるポインタがあります。
 
-C based objects implement host `HOOKS`, which are XS garbage collector callbacks. It is the responsibility of the C based object to use such callbacks to mark its references
+Cベースのオブジェクトは、XSガベージコレクタコールバックであるホスト`HOOKS`を実装します。Cベースのオブジェクトは、そのようなコールバックを使用してその参照をマークする責任があります：
 
 	xsMarkSlot(the, (*((*content)->container))->reference);
 
-## Example
+## 例
 
-Please look at the *Piu* sources, which implement part of the *KinomaJS* programming interface on microcontrollers using the *Commodetto* graphics library.
+*Commodetto*グラフィックスライブラリを使用してマイクロコントローラ上で*KinomaJS*プログラミングインターフェースの一部を実装する*Piu*ソースを参照してください。
 
 

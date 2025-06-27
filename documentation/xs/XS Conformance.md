@@ -1,34 +1,34 @@
-# XS Conformance
+# XS 準拠性
 Copyright 2016-2023 Moddable Tech, Inc.<BR>
-Revised: February 15, 2024
+更新日: 2024年2月15日
 
-## Caveat
+## 注意事項
 
 #### Realm
 
-XS supports one realm by virtual machine. Tests that expect `$262.createRealm` to return a new realm fail.
+XSは仮想マシンあたり1つのRealmをサポートしています。`$262.createRealm`が新しいRealmを返すことを期待するテストは失敗します。
 
-#### Internationalization
+#### 国際化
 
-XS does not implement ECMA-402, the Internationalization API Specification, so the `intl402` tests are skipped.
+XSはECMA-402（国際化API仕様）を実装していないため、`intl402`テストはスキップされます。
 
 #### Annex B
 
-No XS hosts are web browsers, so the `annexB` tests are skipped. However XS implements `Date.prototype.getYear`, `Date.prototype.setYear`, `Object.prototype.__defineGetter__`, `Object.prototype.__defineSetter__`, `Object.prototype.__lookupGetter__`, `Object.prototype.__lookupSetter__`, `Object.prototype.__proto__`, `String.prototype.substr`, `escape` and `unescape`,
+XSホストはWebブラウザではないため、`annexB`テストはスキップされます。ただし、XSは`Date.prototype.getYear`、`Date.prototype.setYear`、`Object.prototype.__defineGetter__`、`Object.prototype.__defineSetter__`、`Object.prototype.__lookupGetter__`、`Object.prototype.__lookupSetter__`、`Object.prototype.__proto__`、`String.prototype.substr`、`escape`、`unescape`を実装しています。
 
-## Runtime models
+## ランタイムモデル
 
-On microcontrollers, XS uses a runtime model based on a virtual machine prepared by the XS compiler and linker. The prepared virtual machine contains the ECMAScript built-ins, along with the classes, functions and objects of preloaded modules. The prepared virtual machine is in ROM, its contents is shared by the tiny virtual machines that XS quickly creates in RAM to run apps.
+マイクロコントローラ上では、XSはXSコンパイラとリンカーによって準備された仮想マシンに基づくランタイムモデルを使用します。準備された仮想マシンには、ECMAScriptの組み込み機能と、プリロードされたモジュールのクラス、関数、オブジェクトが含まれています。準備された仮想マシンはROMにあり、その内容はXSがアプリを実行するためにRAM内に迅速に作成する小さな仮想マシンによって共有されます。
 
-Such a runtime model introduces no conformance issues in itself since XS can alias shared classes, functions and objects if apps modify them. However, in order to save ROM and RAM, other restrictions have been introduced:
+このようなランタイムモデルは、アプリが変更した場合にXSが共有されたクラス、関数、オブジェクトをエイリアスできるため、それ自体では準拠性の問題を引き起こしません。ただし、ROMとRAMを節約するために、他の制限が導入されています：
 
-- Host functions, i.e. functions implemented in C, are primitive values like booleans, numbers, strings, etc. They are promoted to `Function` objects when necessary.
-- Scripts evaluation is optional. So some platforms do not support `eval`, `new Function`, etc. But all platforms support `JSON.parse`.
-- Optionally the XS linker can dead strip ECMAScript built-ins that Moddable apps do not use, and remove `length` and `name` properties from functions.
+- ホスト関数（Cで実装された関数）は、ブール値、数値、文字列などのプリミティブ値です。必要に応じて`Function`オブジェクトに昇格されます。
+- スクリプトの評価はオプションです。そのため、一部のプラットフォームは`eval`、`new Function`などをサポートしていません。ただし、すべてのプラットフォームは`JSON.parse`をサポートしています。
+- オプションで、XSリンカーはModdableアプリが使用しないECMAScript組み込み機能をデッドストリップし、関数から`length`と`name`プロパティを削除できます。
 
-Here the conformance is tested on macOS with a traditional runtime model and without any restrictions. For each case, XS creates a virtual machine, then parses and runs the script. The XS harness, `xst`, uses [LibYAML](http://pyyaml.org/wiki/LibYAML) to load the frontmatter, which contains, among other information, the harness scripts to parse and run before the case script itself.
+ここでは、伝統的なランタイムモデルを使用し、制限なしでmacOS上で準拠性がテストされています。各ケースで、XSは仮想マシンを作成し、スクリプトを解析して実行します。XSハーネス`xst`は、[LibYAML](http://pyyaml.org/wiki/LibYAML)を使用してフロントマターを読み込みます。これには、ケーススクリプト自体の前に解析および実行するハーネススクリプトなどの情報が含まれています。
 
-To build `xst`:
+`xst`をビルドするには：
 
 #### Linux
 
@@ -45,25 +45,25 @@ To build `xst`:
 	cd %MODDABLE%\xs\makefiles\win
 	build
 
-To pass some tests, clone [test262](https://github.com/tc39/test262.git) and change the directory to the `test` directory inside the `test262` directory. Then you can run `xst` with files or directories. For instance:
+一部のテストを実行するには、[test262](https://github.com/tc39/test262.git)をクローンし、`test262`ディレクトリ内の`test`ディレクトリに移動します。その後、ファイルやディレクトリで`xst`を実行できます。例えば：
 
 	cd ~/test262/test
 	$MODDABLE/build/bin/mac/release/xst language/block-scope
 	$MODDABLE/build/bin/mac/release/xst built-ins/TypedArray*
 
-## Results
+## 結果
 
-After the 6th edition, TC39 adopted a [process](https://tc39.github.io/process-document/) based on [proposals](https://github.com/tc39/proposals). Each proposal has a maturity stage. At stage 4, proposals are finished and will be published in the following edition of the specifications.
+第6版以降、TC39は[提案](https://github.com/tc39/proposals)に基づく[プロセス](https://tc39.github.io/process-document/)を採用しました。各提案には成熟度ステージがあります。ステージ4では、提案が完了し、仕様書の次の版で公開されます。
 
-The official conformance test suite, [test262](https://github.com/tc39/test262), contains cases for the published specifications, together with cases for proposals at stages 3 and 4, which is great to prepare XS for future editions. The XS harness, `xst` uses adhoc comparisons of the frontmatter `[features]` to skip cases related to not yet implemented proposals. See the skipped cases at the end of this document.
+公式の準拠性テストスイートである[test262](https://github.com/tc39/test262)には、公開された仕様書のケースと、ステージ3および4の提案のケースが含まれており、XSを将来の版に備えるのに優れています。XSハーネス`xst`は、フロントマター`[features]`のアドホック比較を使用して、まだ実装されていない提案に関連するケースをスキップします。このドキュメントの最後にスキップされたケースを参照してください。
 
-Currently, on macOS, XS passes **99.41%** of the language tests and **82.04%** of the built-ins tests.
+現在、macOS上でXSは言語テストの**99.41%**と組み込みテストの**82.04%**を通過しています。
 
-Mostly because of `Temporal`, the number of skipped cases is significant. For implemented features, XS passes **99.92%** of the language tests and **99.88%** of the built-ins tests.
+主に`Temporal`のため、スキップされたケースの数は多くなっています。実装された機能では、XSは言語テストの**99.92%**と組み込みテストの**99.88%**を通過しています。
 
-Details are here under. The numbers of skipped cases are between parentheses. The following section lists the failed tests with some explanations.
+詳細は以下の通りです。スキップされたケースの数は括弧内に示されています。次のセクションでは、失敗したテストについていくつかの説明とともにリストしています。
 
-### Language
+### 言語
 
      42636/42888 (218) language
          460/460 arguments-object
@@ -450,7 +450,7 @@ Details are here under. The numbers of skipped cases are between parentheses. Th
              15/15 undefined
          134/134 white-space
          
-### Built-ins
+### 組み込み機能
 
      34077/41392 (7275) built-ins
          5763/5869 (94) Array
@@ -1517,20 +1517,20 @@ Details are here under. The numbers of skipped cases are between parentheses. Th
          120/120 parseInt
          12/12 undefined
 
-## Failures
+## 失敗
 
-Here under are the failed tests. The comments are primarily here for the sake of future versions of XS.
+以下は失敗したテストです。コメントは主にXSの将来のバージョンのためのものです。
 
-### Language
+### 言語
 
 	language/eval-code/indirect/realm.js
 	language/expressions/call/eval-realm-indirect.js (sloppy)
 
-One realm.
+1つのRealm。
 
 	language/expressions/assignment/fn-name-lhs-cover.js
 
-Assignments should rename functions only if the left hand side is an identifier. XS also rename functions if the left hand side is a group with only an identifier.
+代入は、左辺が識別子の場合のみ関数をリネームするべきです。XSは左辺が識別子のみのグループの場合も関数をリネームします。
 
 	language/expressions/async-function/named-reassign-fn-name-in-body-in-arrow.js (sloppy)
 	language/expressions/async-function/named-reassign-fn-name-in-body-in-eval.js (sloppy)
@@ -1547,36 +1547,36 @@ Assignments should rename functions only if the left hand side is an identifier.
 	language/expressions/generators/named-no-strict-reassign-fn-name-in-body.js (sloppy)
 	language/expressions/generators/scope-name-var-open-non-strict.js (sloppy)
 
-The name of a function expression always defines a constant variable that reference the current function. In sloppy mode it should define a variable that can be assigned but does not change!
+関数式の名前は常に現在の関数を参照する定数変数を定義します。sloppyモードでは、代入可能だが変更されない変数を定義するべきです！
 
 	language/expressions/object/literal-property-name-bigint.js
 
-XS does not support bigint as property name.
+XSはプロパティ名としてbigintをサポートしていません。
 
 	language/expressions/super/call-proto-not-ctor.js
 
-XS checks if super is a constructor before evaluating arguments.
+XSは引数を評価する前にsuperがコンストラクタかどうかをチェックします。
 
 	language/statements/class/subclass/default-constructor-spread-override.js
 
-The default derived constructor should not use `%Array.prototype%  @@iterator`
+デフォルトの派生コンストラクタは`%Array.prototype%  @@iterator`を使用すべきではありません
 
 	language/statements/for-await-of/head-lhs-async.js
 
-`for (async of x)` is a syntax error but `for await (async of x)` should not be!
+`for (async of x)`は構文エラーですが、`for await (async of x)`はそうであるべきではありません！
 
 	language/statements/try/tco-catch.js (strict)
 
-XS does not tail call optimize `return` inside `catch`
+XSは`catch`内の`return`を末尾呼び出し最適化しません
 
 	language/expressions/assignment/target-member-computed-reference-null.js
 	language/expressions/assignment/target-member-computed-reference-undefined.js
 	language/global-code/script-decl-lex-var-declared-via-eval-sloppy.js
 	language/identifier-resolution/assign-to-global-undefined.js
 
-To be investigated.
+調査中。
 
-### Built-ins
+### 組み込み機能
 
 	built-ins/Array/prototype/concat/create-proto-from-ctor-realm-array.js
 	built-ins/Array/prototype/filter/create-proto-from-ctor-realm-array.js
@@ -1596,21 +1596,21 @@ To be investigated.
 	built-ins/Symbol/keyFor/cross-realm.js
 	built-ins/Symbol/keyFor/cross-realm.js
 
-One realm.
+1つのRealm。
 
 	built-ins/Array/prototype/reduceRight/length-near-integer-limit.js
 	built-ins/String/prototype/localeCompare/15.5.4.9_CE.js
 	built-ins/JSON/stringify/replacer-function-object-deleted-property.js
 
-To be investigated.
+調査中。
 
 	built-ins/Function/prototype/toString/method-computed-property-name.js
 
-Invalid test.
+無効なテスト。
 
-### Skipped cases
+### スキップされたケース
 
-`xst` skips cases with the following features:
+`xst`は以下の機能を持つケースをスキップします：
 
 - Array.fromAsync
 - FinalizationRegistry.prototype.cleanupSome

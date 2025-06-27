@@ -1,9 +1,9 @@
 # xst
-Updated: June 3, 2024
+更新日: 2024年6月3日
 
-`xst` is the XS test engine, a JavaScript engine to test XS on Linux, macOS and Windows.
+`xst`はXSテストエンジンで、Linux、macOS、WindowsでXSをテストするためのJavaScriptエンジンです。
 
-## Build
+## ビルド
 
 ### Linux
 
@@ -20,45 +20,44 @@ Updated: June 3, 2024
 	cd %MODDABLE%\xs\makefiles\win
 	build
 
-## Download
+## ダウンロード
 
-You can use the [jsvu CLI](https://github.com/GoogleChromeLabs/jsvu) to install or update  **xst**.
+[jsvu CLI](https://github.com/GoogleChromeLabs/jsvu)を使用して**xst**をインストールまたは更新できます。
 
-You can also download the latest versions of `xst`
-from the [moddable-xst](https://github.com/Moddable-OpenSource/moddable-xst/releases) repository into a directory that is on your `PATH`
+`PATH`上のディレクトリに[moddable-xst](https://github.com/Moddable-OpenSource/moddable-xst/releases)リポジトリから`xst`の最新版をダウンロードすることもできます。
 
 
-## Usage
+## 使用方法
 
 	xst [-h] [-e] [-m] [-s] [-v] [-l] [-lc] [-b] [-j] strings...
 
-- `-h`: print this help message
-- `-e`: eval `strings`
-- `-m`: `strings` are paths to modules
-- `-s`: `strings` are paths to scripts
-- `-v`: print XS version and configuration (slot and ID sizes)
-- `-l`: execute scripts under Hardened JavaScript's `lockdown`
-- `-lc`: execute scripts inside a `Compartment` under Hardened JavaScript's `lockdown``
-- `-b` - scripts are binary buffers of UTF-8 data. Will be paassed through TextDecoder before parsing
-- `-j` - scripts are JSON and will be passed to `JSON.parse()` instead of executed
+- `-h`: このヘルプメッセージを表示
+- `-e`: `strings`を評価
+- `-m`: `strings`はモジュールへのパス
+- `-s`: `strings`はスクリプトへのパス
+- `-v`: XSバージョンと設定（スロットとIDサイズ）を表示
+- `-l`: Hardened JavaScriptの`lockdown`下でスクリプトを実行
+- `-lc`: Hardened JavaScriptの`lockdown`下で`Compartment`内でスクリプトを実行
+- `-b` - スクリプトはUTF-8データのバイナリバッファ。パース前にTextDecoderを通す
+- `-j` - スクリプトはJSONで、実行する代わりに`JSON.parse()`に渡す
 
 
-Without the `-e`, `-m` or `-s` options, `strings` are paths to **test262** cases or directories.
+`-e`、`-m`、または`-s`オプションがない場合、`strings`は**test262**ケースまたはディレクトリへのパスです。
 
 ### eshost
 
-To test XS with **eshost**, install the [eshost CLI](https://github.com/bterlson/eshost-cli). Then add XS to the hosts:
+**eshost**でXSをテストするには、[eshost CLI](https://github.com/bterlson/eshost-cli)をインストールします。その後、XSをホストに追加します：
 
 	eshost --add 'XS' xs ~/.jsvu/xst
 
-**eshost** uses the `-s` option of **xst**.
+**eshost**は**xst**の`-s`オプションを使用します。
 
 ### test262
 
-To test XS with **test262**, clone [test262](https://github.com/tc39/test262) and change the directory to the `test` directory inside the `test262` directory. For instance:
+**test262**でXSをテストするには、[test262](https://github.com/tc39/test262)をクローンし、`test262`ディレクトリ内の`test`ディレクトリに移動します。例えば：
 
 	cd ~/test262/test
 	xst language/block-scope
 	xst built-ins/TypedArrays/buffer-arg-*
 
-See [XS Conformance](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/xs/XS%20Conformance.md) for details about how **XS** currently passes **test262** cases.
+**XS**が現在**test262**ケースをどのようにパスしているかの詳細については、[XS準拠性](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/xs/XS%20Conformance.md)を参照してください。

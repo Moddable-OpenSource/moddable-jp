@@ -1,27 +1,27 @@
-# XS Profiler
-Updated: December 1, 2022
+# XS プロファイラー
+更新日: 2022年12月1日
 
-The XS profiler is a sample based JavaScript profiler. The XS profiler also reports time spent in native functions or in the garbage collector. This document is a guide to the implementation of the profiler in XS. The information it contains, particularly in the [Viewers](#viewers) section, is useful in interpreting the results of a profiling session.
+XSプロファイラーは、サンプルベースのJavaScriptプロファイラーです。XSプロファイラーは、ネイティブ関数やガベージコレクタで費やされた時間も報告します。このドキュメントは、XSにおけるプロファイラーの実装に関するガイドです。このドキュメントに含まれる情報、特に[ビューアー](#viewers)セクションは、プロファイリングセッションの結果を解釈するのに役立ちます。
 
-There are two implementations of the profiler:
+プロファイラーには2つの実装があります：
 
-- **Instrument**: XS sends profile records and samples to **xsbug**. The instrument profiler is used by Moddable SDK applications in the simulator and on devices.
+- **Instrument**: XSはプロファイルレコードとサンプルを**xsbug**に送信します。Instrumentプロファイラーは、シミュレーターとデバイス上のModdable SDKアプリケーションで使用されます。
 
-> Build XS with `mxInstrument` defined.
+> `mxInstrument`を定義してXSをビルドしてください。
 
-- **File**: XS accumulates profile records and samples in RAM then saves them into a [`.cpuprofile`](https://chromedevtools.github.io/devtools-protocol/tot/Profiler/#type-Profile) file. The file profiler is used by command line tools including **xst** and **xsnap**.
+- **File**: XSはプロファイルレコードとサンプルをRAMに蓄積し、その後[`.cpuprofile`](https://chromedevtools.github.io/devtools-protocol/tot/Profiler/#type-Profile)ファイルに保存します。Fileプロファイラーは、**xst**や**xsnap**を含むコマンドラインツールで使用されます。
 
-> Build XS with `mxProfile` defined and xsProfile.c included.
+> `mxProfile`を定義してxsProfile.cをインクルードしてXSをビルドしてください。
 
-Both profilers require debugging information, so scripts must be built with debugging enabled. The instrument profiler requires a connection to **xsbug**. Therefore, profiling is only supported in builds of XS with debugging support enabled.
+両方のプロファイラーにはデバッグ情報が必要なため、スクリプトはデバッグを有効にしてビルドする必要があります。Instrumentプロファイラーは**xsbug**への接続が必要です。したがって、プロファイリングはデバッグサポートが有効になっているXSのビルドでのみサポートされます。
 
 <a id="profile"></a>
-## Profile
-This section describes the data the XS profiler collects and how it transmits and stores that data.
+## プロファイル
+このセクションでは、XSプロファイラーが収集するデータと、そのデータを送信・保存する方法について説明します。
 
 ### ID
 
-Every function has a unique profile ID, which is assigned when the function is defined. All function instances created from the same function definition have the same profile ID. For example, the following creates only a single profile ID:
+すべての関数は一意のプロファイルIDを持ち、これは関数が定義されるときに割り当てられます。同じ関数定義から作成されたすべての関数インスタンスは同じプロファイルIDを持ちます。例えば、以下は単一のプロファイルIDのみを作成します：
 
 ```js
 for (let i = 0; i < 10; i++) {
@@ -32,88 +32,88 @@ for (let i = 0; i < 10; i++) {
 }
 ```
 
-For function instances, the profile ID is stored in the ID of the internal home slot. For function primitives, the profile ID is stored in the slot itself. This approach means that profile IDs require no additional RAM or storage space. All debug builds are ready to be profiled.
+関数インスタンスの場合、プロファイルIDは内部ホームスロットのIDに格納されます。関数プリミティブの場合、プロファイルIDはスロット自体に格納されます。このアプローチにより、プロファイルIDは追加のRAMやストレージ領域を必要としません。すべてのデバッグビルドはプロファイリングの準備ができています。
 
-The profile ID of the host is 0. The profile ID of the garbage collector is 1. For newly created machines, function profile IDs start incrementing from 2; for cloned machines, from the profile ID stored in the preparation.
+ホストのプロファイルIDは0です。ガベージコレクタのプロファイルIDは1です。新しく作成されたマシンの場合、関数プロファイルIDは2から増分を開始します。クローンされたマシンの場合は、準備に格納されたプロファイルIDから開始します。
 
-### Record
+### レコード
 
-A profile record is created for each function observed to run during a profile session. The profile record contains:
+プロファイルレコードは、プロファイルセッション中に実行が観察された各関数に対して作成されます。プロファイルレコードには以下が含まれます：
 
-- Profile ID
-- Function identifier (name)
-- Path (source file)
-- Line number
+- プロファイルID
+- 関数識別子（名前）
+- パス（ソースファイル）
+- 行番号
 
-Profile records are only stored once by the file profiler and only sent once to **xsbug** by the instrument profiler.
+プロファイルレコードは、ファイルプロファイラーでは一度だけ保存され、インストルメントプロファイラーでは**xsbug**に一度だけ送信されます。
 
-The home slot allows function identifiers to be more detailed for function instances (`Array.prototype.push`) than for function primitives (`push`).
+ホームスロットにより、関数識別子は関数プリミティブ（`push`）よりも関数インスタンス（`Array.prototype.push`）の方がより詳細になります。
 
-### Sample
+### サンプル
 
-A profile sample is created for each sample taken during a profile session. The profile sample contains:
+プロファイルサンプルは、プロファイルセッション中に取得された各サンプルに対して作成されます。プロファイルサンプルには以下が含まれます：
 
-- Time delta: microseconds since the last sample.
-- Profile ID stack: sequence of profile ID in stack order. The first profile ID is the function hit by the profiler. The last profile ID is always the host (0).
+- 時間デルタ：前回のサンプルからのマイクロ秒。
+- プロファイルIDスタック：スタック順のプロファイルIDのシーケンス。最初のプロファイルIDはプロファイラーがヒットした関数です。最後のプロファイルIDは常にホスト(0)です。
 
-For each sample, The instrument profiler simply  sends the sample to **xsbug**, which updates the call graph and the durations of the profile records. The file profiler updates the call graph and stores the time delta and the first profile ID.
+各サンプルに対して、インストルメントプロファイラーは単純にサンプルを**xsbug**に送信し、**xsbug**がコールグラフとプロファイルレコードの継続時間を更新します。ファイルプロファイラーはコールグラフを更新し、時間デルタと最初のプロファイルIDを保存します。
 
-### Time
+### 時間
 
-XS checks the profiler to determine if a sample should be taken at several points in execution:
+XSは、実行の以下の時点でプロファイラーをチェックし、サンプルを取るべきかどうかを判断します：
 
-- Each `LINE` byte code
-- Exiting a native function
-- Exiting the garbage collector
-- Entering the machine from the host
+- 各`LINE`バイトコード
+- ネイティブ関数からの退出
+- ガベージコレクタからの退出
+- ホストからマシンへの入場
 
 <a id="memoryandperformance"></a>
-## Memory and Performance
+## メモリとパフォーマンス
 
-Starting and stopping the profiler creates and deletes a profiler. No RAM is used when the profiler is inactive.
+プロファイラーの開始と停止はプロファイラーを作成・削除します。プロファイラーが非アクティブのときはRAMは使用されません。
 
-Both the instrument and file profilers allocate their buffers outside the XS heaps. These ensures that enabling profiling does not change the runtime behavior of the garbage collector.
+インストルメントプロファイラーとファイルプロファイラーの両方で、バッファをXSヒープの外側に割り当てます。これにより、プロファイリングを有効にしてもガベージコレクタのランタイム動作が変わらないことが保証されます。
 
-### Instrument Profiler
+### インストルメントプロファイラー
 
-The instrument profiler uses:
+インストルメントプロファイラーは以下を使用します：
 
-- A bitmap to remember which profile records have already been sent to **xsbug**, i.e. one bit for each profile ID.
-- Buffers for profile samples. The size of the buffers is the size of the XS stack divided by the size of a frame and multiplied by the size of a profile ID.
+- どのプロファイルレコードがすでに**xsbug**に送信されたかを記憶するビットマップ、つまり各プロファイルIDに対して1ビット。
+- プロファイルサンプル用のバッファ。バッファのサイズは、XSスタックのサイズをフレームのサイズで割って、プロファイルIDのサイズを掛けたものです。
 
-### File Profiler
+### ファイルプロファイラー
 
-The file profiler uses growing buffers to store profile records and samples.
+ファイルプロファイラーは、プロファイルレコードとサンプルを保存するために成長するバッファを使用します。
 
 <a id="howtouse"></a>
-## How To Use
+## 使用方法
 
-### Instrument Profiler
+### インストルメントプロファイラー
 
-In xsbug, the stopwatch icon starts and stops the profiler. The icon is located at the top-right of the PROFILE pane of a debuggee tab.
+xsbugでは、ストップウォッチアイコンがプロファイラーを開始・停止します。アイコンはデバッグ対象タブのPROFILEペインの右上にあります。
 
-There is also a preference to automatically start the profiler when the debuggee starts.
+デバッグ対象が開始するときに自動的にプロファイラーを開始する設定もあります。
 
-### File Profiler
+### ファイルプロファイラー
 
-For **xst**, the `-p` option starts and stops the profiler around the execution of the script or module. The `.cpuprofile` file containing the profile results is saved in the current directory.
+**xst**の場合、`-p`オプションがスクリプトまたはモジュールの実行を囲んでプロファイラーを開始・停止します。プロファイル結果を含む`.cpuprofile`ファイルは現在のディレクトリに保存されます。
 
-The `.cpuprofile` file can be viewed in **Google Chrome DevTools**, **Visual Studio Code**, and **xsbug**.
+`.cpuprofile`ファイルは**Google Chrome DevTools**、**Visual Studio Code**、**xsbug**で表示できます。
 
-### Programming Interface
+### プログラミングインターフェース
 
-Use the `xsStartProfiling` and `xsStopProfiling` macros to start and stop the profiler.
+プロファイラーを開始・停止するには`xsStartProfiling`と`xsStopProfiling`マクロを使用します。
 
 <a id="viewers"></a>
-## Viewers
+## ビューアー
 
-Because you can open the `.cpuprofile` file created by the File Profiler with at least three different applications, you get somewhat different views of the same data.
+ファイルプロファイラーが作成した`.cpuprofile`ファイルは少なくとも3つの異なるアプリケーションで開くことができるため、同じデータのやや異なるビューを得ることができます。
 
-In the three viewers, the first column is the "Self Time", the second column is the "Total Time".
+3つのビューアーでは、最初の列が「Self Time」、二番目の列が「Total Time」です。
 
-Google Chrome DevTools and xsbug can toggle between a "Bottom Up" viewer (from callees to callers) and a "Top Down" viewer (from callers to callees).
+Google Chrome DevToolsとxsbugは、「Bottom Up」ビューアー（被呼び出しから呼び出し元へ）と「Top Down」ビューアー（呼び出し元から被呼び出しへ）を切り替えることができます。
 
-For reference, here are links to relevant source files:
+参考のため、関連するソースファイルへのリンクを以下に示します：
 
 - Google Chrome DevTools: [CPUProfileDataModel.ts](https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/core/sdk/CPUProfileDataModel.ts)
 - Visual Studio Code: [profilingModel.ts](https://github.com/microsoft/vscode/blob/main/src/vs/platform/profiling/common/profilingModel.ts)
@@ -121,22 +121,22 @@ For reference, here are links to relevant source files:
 
 ### Self Time
 
-The Self Time is the sum of the sample durations of functions hit by the profiler, i.e. functions that were executing when the profiler sampled. The sample duration is the time delta between a sample and its next sample.
+Self Timeは、プロファイラーがヒットした関数、つまりプロファイラーがサンプルしたときに実行していた関数のサンプル継続時間の合計です。サンプル継続時間は、サンプルとその次のサンプル間の時間デルタです。
 
-Visual Studio Code and xsbug display the same  Self Time. Google Chrome DevTools does not, although values are similar.
+Visual Studio Codeとxsbugは同じSelf Timeを表示します。Google Chrome DevToolsはそうではありませんが、値は似ています。
 
 ### Total Time
 
-Visual Studio Code computes the Total Time of a function by recursively  adding, from callers to callees, the Self Time and the Total Time of all its callees. Since one function can be called by several different functions, the results can be greater than the duration of the profile itself.
+Visual Studio Codeは、呼び出し元から被呼び出しへと再帰的に、すべての被呼び出しのSelf TimeとTotal Timeを加算することで関数のTotal Timeを計算します。1つの関数は複数の異なる関数から呼び出される可能性があるため、結果はプロファイル自体の継続時間よりも大きくなる可能性があります。
 
-xsbug computes the Total Time by recursively propagating the Self Time from callees to callers, dividing the propagated duration by the number of callers at each step. No results are greater than the duration of the profile itself.
+xsbugは、被呼び出しから呼び出し元へと再帰的にSelf Timeを伝播し、各ステップで伝播された継続時間を呼び出し元の数で割ることでTotal Timeを計算します。どの結果もプロファイル自体の継続時間よりも大きくなることはありません。
 
-Visual Studio Code and xsbug agree on the Total Time if the call graph is a tree.
+コールグラフがツリーの場合、Visual Studio CodeとxsbugはTotal Timeについて一致します。
 
-How Google Chrome DevTools compute the Total Time? To be investigated but the results are closer to xsbug than to Visual Studio Code.
+Google Chrome DevToolsはTotal Timeをどのように計算しているのでしょうか？調査が必要ですが、結果はVisual Studio Codeよりもxsbugに近いです。
 
-### Notes
+### 注意事項
 
-- To be able to open a `.cpuprofile` file in Visual Studio Code, there cannot be cycles in the call graph. Therefore, the File Profiler eliminates cycles when saving the file.
-- Both Google Chrome DevTools and Visual Studio Code merge profile records by location (function name, file, line). xsbug does not since the XS engine ensures that there is only one profile record for each function.
-- Google Chrome DevTools crashes when opening `.cpuprofile` files saved by **xsnap** when replaying a session of the Agoric runtime.
+- `.cpuprofile`ファイルをVisual Studio Codeで開くことができるようにするためには、コールグラフにサイクルがあってはいけません。そのため、ファイルプロファイラーはファイルを保存するときにサイクルを除去します。
+- Google Chrome DevToolsとVisual Studio Codeの両方で、プロファイルレコードを場所（関数名、ファイル、行）でマージします。XSエンジンは各関数に対して1つのプロファイルレコードのみあることを保証しているため、xsbugはそうしません。
+- Google Chrome DevToolsは、Agoricランタイムのセッションを再生するときに**xsnap**が保存した`.cpuprofile`ファイルを開くとクラッシュします。

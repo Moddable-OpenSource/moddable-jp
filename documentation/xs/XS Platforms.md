@@ -1,26 +1,26 @@
-# XS Platforms
+# XS プラットフォーム
 Copyright 2016-2024 Moddable Tech, Inc.<BR>
-Revised: April 22, 2024
+更新日: 2024年4月22日
 
-## History
+## 歴史
 
-A platform is a combination of hardware and system software. For each platform, XS requires an interface file, `xsPlatform.h`, and an implementation file, `xsPlatform.c`
+プラットフォームは、ハードウェアとシステムソフトウェアの組み合わせです。各プラットフォームに対して、XSはインターフェースファイル`xsPlatform.h`と実装ファイル`xsPlatform.c`を必要とします。
 
-Historically, XS used one interface file, `xsPlatform.h` splitting the implementation into two files: `xsPlatform.c` and `xsHost.c`. Many platforms shared the same interface and implementation files, based either on the KinomaJS platform abstraction, or on an adhoc platform abstraction for command line tools.
+歴史的に、XSは1つのインターフェースファイル`xsPlatform.h`を使用し、実装を`xsPlatform.c`と`xsHost.c`の2つのファイルに分割していました。多くのプラットフォームは、KinomaJSプラットフォーム抽象化か、コマンドラインツール用のアドホックプラットフォーム抽象化のいずれかに基づいて、同じインターフェースと実装ファイルを共有していました。
 
-Further, an XS machine had many ways to find and load modules and programs: from JS files, from stand alone compiled XSB files with or without companion DLL or SO files, and from a linked XSA file with a companion DLL or SO file... The XS platform was in charge of providing such options.
+さらに、XSマシンには、モジュールとプログラムを見つけてロードする多くの方法がありました：JSファイルから、付属のDLLまたはSOファイルありまたはなしのスタンドアロンでコンパイルされたXSBファイルから、付属のDLLまたはSOファイルを持つリンクされたXSAファイルから...XSプラットフォームは、そのようなオプションを提供する責任がありました。
 
-When we started working on microcontrollers, the main inspiration for XS platforms was the adhoc platform abstraction for command line tools, which was the most complex version.
+マイクロコントローラでの作業を開始したとき、XSプラットフォームの主なインスピレーションは、最も複雑なバージョンであったコマンドラインツール用のアドホックプラットフォーム抽象化でした。
 
-Today the XS runtime has been significantly streamlined, especially on microcontrollers. XS machines are always cloned from a read-only machine prepared by the XS linker. There are only modules, byte coded by the XS compiler. Modules are either preloaded or prepared to be loaded and unloaded at runtime.
+今日、XSランタイムは、特にマイクロコントローラ上で大幅に合理化されています。XSマシンは常に、XSリンカーによって準備された読み取り専用マシンからクローンされます。XSコンパイラによってバイトコード化されたモジュールのみが存在します。モジュールは、プリロードされるか、実行時にロードおよびアンロードされるように準備されています。
 
-Consequently, it is now much simpler to build an XS platform. This document describes the necessary interface and implementation files.
+したがって、XSプラットフォームを構築することは現在はるかに簡単になりました。このドキュメントでは、必要なインターフェースと実装ファイルについて説明します。
 
 ## xsPlatform.h
 
-### Basic types
+### 基本型
 
-XS uses a few basic types that the interface file has to define.
+XSは、インターフェースファイルで定義する必要があるいくつかの基本型を使用します。
 
 ```c
 #include <stdint.h>
@@ -32,9 +32,9 @@ typedef int32_t txS4;
 typedef uint32_t txU4;
 ```
 
-### C defines and includes
+### C定義とインクルード
 
-XS mostly relies on constants and functions from the C standard library, accessed thru macros with `C_` or `c_` prefixes:
+XSは主にC標準ライブラリの定数と関数に依存し、`C_`または`c_`プレフィックスを持つマクロを介してアクセスします：
 
 ```c
 #include <math.h>
@@ -47,11 +47,11 @@ XS mostly relies on constants and functions from the C standard library, accesse
 //...
 ```
 
-Such definitions, and the corresponding includes, are the most significant part of the interface file. The macros allows a platform to provide its own constants and functions. See any of the provided `xsPlatform.h` for the list of macros to define.
+これらの定義と対応するインクルードは、インターフェースファイルの最も重要な部分です。マクロにより、プラットフォームが独自の定数と関数を提供できます。定義すべきマクロのリストについては、提供されている任意の`xsPlatform.h`を参照してください。
 
-### ESP macros
+### ESPマクロ
 
-The Xtensa instruction set and architecture, used most notably in microcontrollers by Espressif, requires special macros to locate certain constant data in ROM and to read that data. On other platforms these macros are trivially defined:
+Espressifのマイクロコントローラで最も顕著に使用されるXtensa命令セットとアーキテクチャでは、ROMの特定の定数データを配置し、そのデータを読み取るための特別なマクロが必要です。他のプラットフォームでは、これらのマクロは単純に定義されます：
 
 ```c
 #define c_read8(POINTER) *((txU1 *)(POINTER))
@@ -70,9 +70,9 @@ The Xtensa instruction set and architecture, used most notably in microcontrolle
 
 ###  `mxMachinePlatform`
 
-The platform can add fields to the machine record by defining the `mxMachinePlatform` macro. Since the machine is passed to all functions that XS calls (as the ubiquitous `the`), it is a convenient way for platforms to have their own context besides the application context.
+プラットフォームは、`mxMachinePlatform`マクロを定義することで、マシンレコードにフィールドを追加できます。マシンはXSが呼び出すすべての関数に渡される（ユビキタスな`the`として）ため、プラットフォームがアプリケーションコンテキスト以外に独自のコンテキストを持つ便利な方法です。
 
-For instance, on Mac, the `mxMachinePlatform` macro adds references to a socket and a run loop source for the communication with **xsbug**, and another run loop source for promises.
+例えば、Macでは、`mxMachinePlatform`マクロは**xsbug**との通信用のソケットとランループソース、およびプロミス用の別のランループソースへの参照を追加します。
 
 ```c
 #include <CoreServices/CoreServices.h>
@@ -83,7 +83,7 @@ For instance, on Mac, the `mxMachinePlatform` macro adds references to a socket 
 	CFRunLoopSourceRef promiseSource;
 ```
 
-On Windows, the `mxMachinePlatform` macro adds the socket and message window handles that are used for the same purposes.
+Windowsでは、`mxMachinePlatform`マクロは同じ目的で使用されるソケットとメッセージウィンドウハンドルを追加します。
 
 ```c
 #include <winsock2.h>
@@ -95,29 +95,29 @@ On Windows, the `mxMachinePlatform` macro adds the socket and message window han
 
 ## xsPlatform.c
 
-The implementation file first includes `xsAll.h`, which contains the definitions of all XS macros and types, and the declarations of all XS extern functions. Then the platform has to implement the functions described here under.
+実装ファイルは最初に`xsAll.h`をインクルードします。これにはすべてのXSマクロと型の定義、およびすべてのXS extern関数の宣言が含まれています。その後、プラットフォームは以下で説明する関数を実装する必要があります。
 
-XS machines do not support multiple threads, though platforms can support multiple threads, each with their own XS machines. All calls and callbacks described here must happen in the thread that created or cloned the machine.
+XSマシンはマルチスレッドをサポートしていませんが、プラットフォームはそれぞれ独自のXSマシンを持つマルチスレッドをサポートできます。ここで説明するすべての呼び出しとコールバックは、マシンを作成またはクローンしたスレッドで実行される必要があります。
 
-The functions are grouped into meaningful sections. The xsPlatform.c file can also provide POSIX functions that the platform is missing.
+関数は意味のあるセクションにグループ化されています。xsPlatform.cファイルは、プラットフォームに不足しているPOSIX関数も提供できます。
 
 --
 
 - `void fxCreateMachinePlatform(txMachine* the)`
 
-`fxCreateMachinePlatform` is called when creating and cloning an XS machine. The platform initializes the fields defined by its `mxMachinePlatform` macro. By default all fields are zero.
+`fxCreateMachinePlatform`は、XSマシンの作成とクローン時に呼び出されます。プラットフォームは、その`mxMachinePlatform`マクロで定義されたフィールドを初期化します。デフォルトでは、すべてのフィールドはゼロです。
 
 --
 
 - `void fxDeleteMachinePlatform(txMachine* the)`
 
-`fxDeleteMachinePlatform` is called when deleting an XS machine. The platform must dispose or free here appropriate fields defined by its `mxMachinePlatform` macro.
+`fxDeleteMachinePlatform`は、XSマシンの削除時に呼び出されます。プラットフォームは、その`mxMachinePlatform`マクロで定義された適切なフィールドをここで破棄または解放する必要があります。
 
 --
 
-### Debug
+### デバッグ
 
-The functions in this section are only necessary for the debug version of XS. They can be condtionally defined within:
+このセクションの関数は、XSのデバッグバージョンでのみ必要です。これらは条件付きで定義できます：
 
 ```c
 #ifdef mxDebug
@@ -125,13 +125,13 @@ The functions in this section are only necessary for the debug version of XS. Th
 #endif
 ```
 
-If the platform does not support the communication with **xsbug**, functions in this section can be empty, except  `fxIsConnected` and `fxIsReadable`, which must return `0`.
+プラットフォームが**xsbug**との通信をサポートしていない場合、このセクションの関数は空にできますが、`fxIsConnected`と`fxIsReadable`は`0`を返す必要があります。
 
-Communication between **xsbug** and the XS machine can be done over either a TCP/IP or serial connection. In the case of a TCP/IP connection, **xsbug** is the server and XS machines are clients. When using a serial connection, **xsbug** continues to communication over TCP/IP and a bridge running on the computer relays data between the serial and TCP connections. In the case of the ESP8266, this relay is performed by **serial2xsbug**.
+**xsbug**とXSマシン間の通信は、TCP/IPまたはシリアル接続のいずれかで行うことができます。TCP/IP接続の場合、**xsbug**がサーバーでXSマシンがクライアントです。シリアル接続を使用する場合、**xsbug**はTCP/IPでの通信を継続し、コンピュータ上で動作するブリッジがシリアル接続とTCP接続間でデータを中継します。ESP8266の場合、この中継は**serial2xsbug**によって実行されます。
 
-Platforms must implement `fxIsReadable` to allow XS machines to receive messages from **xsbug** while executing byte codes, i.e. when platforms are inside the `fxRun` function. Most of the time, platforms are outside the `fxRun` function. So they use a system event and `fxDebugCommand` to tell XS about messages from **xsbug**.
+プラットフォームは、XSマシンがバイトコードを実行中、つまりプラットフォームが`fxRun`関数内にいるときに**xsbug**からメッセージを受信できるように`fxIsReadable`を実装する必要があります。ほとんどの場合、プラットフォームは`fxRun`関数の外にいます。そのため、システムイベントと`fxDebugCommand`を使用して**xsbug**からのメッセージについてXSに通知します。
 
-For instance on Mac the platform uses `CFSocketCreate` with a `kCFSocketReadCallBack`:
+例えば、Macでは、プラットフォームは`kCFSocketReadCallBack`で`CFSocketCreate`を使用します：
 
 ```c
 void fxReadableCallback(CFSocketRef socketRef, CFSocketCallBackType cbType, CFDataRef addr, const void* data, void* context)
@@ -142,7 +142,7 @@ void fxReadableCallback(CFSocketRef socketRef, CFSocketCallBackType cbType, CFDa
 }
 ```
 
-On Windows the platform uses `WSAAsyncSelect` with the `WM_XSBUG` message:
+Windowsでは、プラットフォームは`WM_XSBUG`メッセージで`WSAAsyncSelect`を使用します：
 
 ```c
 LRESULT CALLBACK fxMessageWindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
@@ -166,67 +166,67 @@ LRESULT CALLBACK fxMessageWindowProc(HWND window, UINT message, WPARAM wParam, L
 
 - `void fxConnect(txMachine* the)`
 
-XS calls `fxConnect` to connect `the` machine to **xsbug**.
+XSは、`the`マシンを**xsbug**に接続するために`fxConnect`を呼び出します。
 
-For TCP/IP connections, platforms create a socket and connect it to **xsbug**. On Mac and Windows the address of **xsbug** is usually `localhost`, on other platforms it is usually defined by an environment variable. The port of **xsbug** defaults to `5002` by convention.
+TCP/IP接続の場合、プラットフォームはソケットを作成し、**xsbug**に接続します。MacとWindowsでは、**xsbug**のアドレスは通常`localhost`で、他のプラットフォームでは通常環境変数で定義されます。**xsbug**のポートは慣例により`5002`がデフォルトです。
 
-Machines are connect to **xsbug** after being created, i.e. `fxConnect` happens after `fxCreateMachinePlatform`.
+マシンは作成後に**xsbug**に接続されます。つまり、`fxConnect`は`fxCreateMachinePlatform`の後に発生します。
 
 --
 
 - `void fxDisconnect(txMachine* the)`
 
-XS calls `fxDisconnect` to disconnect `the` machine from **xsbug**.
+XSは、`the`マシンを**xsbug**から切断するために`fxDisconnect`を呼び出します。
 
-For TCP/IP connections, platforms close the socket.
+TCP/IP接続の場合、プラットフォームはソケットを閉じます。
 
-Machines are disconnected before being deleted, i.e. `fxDisconnect` happens before `fxDeleteMachinePlatform`.
+マシンは削除前に切断されます。つまり、`fxDisconnect`は`fxDeleteMachinePlatform`の前に発生します。
 
 --
 
 - `txBoolean fxIsConnected(txMachine* the)`
 
-XS calls `fxIsConnected` to know if `the` machine is connected to **xsbug**.
+XSは、`the`マシンが**xsbug**に接続されているかどうかを知るために`fxIsConnected`を呼び出します。
 
 --
 
 - `txBoolean fxIsReadable(txMachine* the)`
 
-XS calls `fxIsReadable` to know if `the` machine received a message from **xsbug**. Platforms must return 1 or 0 depending on the availability of bytes to read.
+XSは、`the`マシンが**xsbug**からメッセージを受信したかどうかを知るために`fxIsReadable`を呼び出します。プラットフォームは、読み取り可能なバイトの有無に応じて1または0を返す必要があります。
 
-The performance of the implementation of `fxIsReadable` is important since XS calls `fxIsReadable` at every `LINE` byte code (e.g. for each line of JavaScript source code executed).
+XSは`LINE`バイトコードごと（つまり、実行されるJavaScriptソースコードの各行）に`fxIsReadable`を呼び出すため、`fxIsReadable`の実装のパフォーマンスは重要です。
 
 --
 
 - `void fxReceive(txMachine* the)`
 
-XS calls `fxReceive` to receive a message from **xsbug**. The implementation reads bytes into `the->debugBuffer` and sets `the->debugOffset` to the number of bytes received.
+XSは、**xsbug**からメッセージを受信するために`fxReceive`を呼び出します。実装は`the->debugBuffer`にバイトを読み込み、受信したバイト数を`the->debugOffset`に設定します。
 
-XS calls `fxReceive` repeatedly until the entire message is received. The maximum number of bytes that can be read by `fxReceive` is `sizeof(the->debugBuffer) - 1`.
+XSは、メッセージ全体が受信されるまで`fxReceive`を繰り返し呼び出します。`fxReceive`で読み取れるバイトの最大数は`sizeof(the->debugBuffer) - 1`です。
 
 --
 
 - `void fxSend(txMachine* the, txBoolean more)`
 
-XS calls `fxSend` to send a message to **xsbug**. The implementation gets the number of bytes to send from `the->echoOffset` and write bytes from `the->echoBuffer`.
+XSは、**xsbug**にメッセージを送信するために`fxSend`を呼び出します。実装は`the->echoOffset`から送信するバイト数を取得し、`the->echoBuffer`からバイトを書き込みます。
 
-XS calls `fxSend ` repeatedly until the entire message is sent, `more` equals `1` while the message is incomplete, `0` when the message is complete.
+XSは、メッセージ全体が送信されるまで`fxSend`を繰り返し呼び出します。`more`は、メッセージが不完全な間は`1`、メッセージが完了すると`0`になります。
 
 --
 
 ### Eval
 
-The standard `eval` function, `Function` constructor and `Generator` constructor must transform source code into byte codes and keys.
+標準の`eval`関数、`Function`コンストラクタ、`Generator`コンストラクタは、ソースコードをバイトコードとキーに変換する必要があります。
 
-XS lets the platform decides is such feature is worth the memory it takes.
+XSは、このような機能がメモリコストに見合うかどうかをプラットフォームに決定させます。
 
 --
 
 - `txScript* fxParseScript(txMachine* the, void* stream, txGetter getter, txUnsigned flags)`
 
-XS calls `fxParseScript` to transform source code into XS byte codes and keys. The `stream` and `getter` arguments allow the parser to access the source code. The `flags` argument tells the parser the kind of source code: `mxModuleCode`, `mxProgramCode` or `mxEvalCode`.
+XSは、ソースコードをXSバイトコードとキーに変換するために`fxParseScript`を呼び出します。`stream`と`getter`引数により、パーサーがソースコードにアクセスできます。`flags`引数は、ソースコードの種類をパーサーに伝えます：`mxModuleCode`、`mxProgramCode`、または`mxEvalCode`。
 
-If the platform supports such feature, it must include `xsScript.h` and implements `fxParseScript` like:
+プラットフォームがこのような機能をサポートする場合、`xsScript.h`をインクルードし、以下のように`fxParseScript`を実装する必要があります：
 
 ```c
 #include "xsScript.h"
@@ -250,15 +250,15 @@ txScript* fxParseScript(txMachine* the, void* stream, txGetter getter, txUnsigne
 }
 ```
 
-The platform must also compile and link `xsScript.c`, `xsLexical.c`, `xsSyntaxical.c`, `xsTree.c`, `xsSourceMap.c`, `xsScope.c` and `xsCode.c`.
+プラットフォームは、`xsScript.c`、`xsLexical.c`、`xsSyntaxical.c`、`xsTree.c`、`xsSourceMap.c`、`xsScope.c`、および`xsCode.c`もコンパイルしてリンクする必要があります。
 
-If the platform does not support such feature, `fxParseScript` must return `NULL` and the C files here above do not have to be compiled and linked.
+プラットフォームがこのような機能をサポートしない場合、`fxParseScript`は`NULL`を返す必要があり、上記のCファイルをコンパイルしてリンクする必要はありません。
 
 --
 
-### Keys
+### キー
 
-Keys are the names and symbols that XS uses to identify properties.
+キーは、XSがプロパティを識別するために使用する名前とシンボルです。
 
 --
 

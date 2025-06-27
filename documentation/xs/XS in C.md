@@ -36,44 +36,44 @@
 -->
 
 # XS in C
-Revised: November 17, 2023
+更新日: 2023年11月17日
 
-**See end of document for [copyright and license](#license)**
+**著作権とライセンスについては[ドキュメント末尾](#license)を参照してください**
 
-## About This Document
+## このドキュメントについて
 
-This document describes XS in C, the C interface to the runtime of the XS JavaScript engine. Information on building XS for target software/hardware platforms is provided in the companion document [XS Platforms.md](./XS%20Platforms.md).
+このドキュメントでは、XS JavaScriptエンジンのランタイムへのCインターフェースであるXS in Cについて説明します。対象ソフトウェア/ハードウェアプラットフォーム用のXSのビルドに関する情報は、付属のドキュメント[XS Platforms.md](./XS%20Platforms.md)で提供されています。
 
-In accordance with the ECMAScript specifications, the XS runtime implements only generic features that all scripts can use. An application defines the specific features that its own scripts can use through C callbacks. An application that uses the XS runtime is a host in ECMAScript terminology.
+ECMAScript仕様に従い、XSランタイムはすべてのスクリプトが使用できる汎用機能のみを実装しています。アプリケーションは、Cコールバックを通じて独自のスクリプトが使用できる特定の機能を定義します。XSランタイムを使用するアプリケーションは、ECMAScript用語でホストと呼ばれます。
 
-XS in C provides macros to access properties of objects. XS provides two functionally equivalent variations of many of the macros. The macros prefixed with `xs` alone are somewhat more convenient to work with but generate larger binary code whereas the macros prefixed with `xsmc` generate smaller binary code at the expense of being more difficult to use. To use the `xsmc*` macros include "xsmc.h" and do not include "xs.h". to use the macros prefixed with `xs` alone, include "xs.h" and do not include "xsmc.h". Including the `xsmc.h` header file makes the `xs` versions of some operations available.
+XS in Cは、オブジェクトのプロパティにアクセスするためのマクロを提供します。XSは、多くのマクロについて機能的に同等な2つのバリエーションを提供しています。`xs`のみが前置されたマクロは作業がやや便利ですが、より大きなバイナリコードを生成します。一方、`xsmc`が前置されたマクロは、使いにくくなる代償として、より小さなバイナリコードを生成します。`xsmc*`マクロを使用するには、"xsmc.h"をインクルードし、"xs.h"をインクルードしないでください。`xs`のみが前置されたマクロを使用するには、"xs.h"をインクルードし、"xsmc.h"をインクルードしないでください。`xsmc.h`ヘッダーファイルをインクルードすると、一部の操作の`xs`バージョンが利用可能になります。
 
-## Table of Contents
+## 目次
 
-* [Slots](#slots): Describes how to handle ECMAScript constructs in C callbacks, with examples that show the correspondences between ECMAScript and XS in C.
-	* [Slot types](#slot-types)
-	* [Primitives](#primitives)
+* [スロット](#slots): CコールバックでECMAScript構造を処理する方法を説明し、ECMAScriptとXS in Cの対応関係を示す例を提供します。
+	* [スロット型](#slot-types)
+	* [プリミティブ](#primitives)
 	* [ArrayBuffer](#arraybuffer)
-	* [Instances and Prototypes](#instances-and-prototypes)
-	* [Identifiers](#identifiers)
-	* [Properties](#properties)
-	* [Arguments and Variables](#xsvars)
-	* [Garbage Collector](#garbage-collector)
-	* [Exceptions](#exceptions)
-	* [Errors](#errors)
-	* [Debugger](#debugger)
-* [Machine](#machine): Introduces the main structure of the XS runtime (its virtual machine) and explains how to use the runtime to build a host and to make C callbacks available to scripts. This section concludes with an example that demonstrates how to use XS in C to implement a JavaScript class with C functions.
-	* [Machine Allocation](#machine-allocation)
-	* [Context](#context)
-	* [Host](#host)
-	* [JavaScript `@` language syntax extension](#syntax-extension)
-* [Glossary](#glossary): Includes all the terms defined or referenced in this document.
-* [License](#license)
+	* [インスタンスとプロトタイプ](#instances-and-prototypes)
+	* [識別子](#identifiers)
+	* [プロパティ](#properties)
+	* [引数と変数](#xsvars)
+	* [ガベージコレクタ](#garbage-collector)
+	* [例外](#exceptions)
+	* [エラー](#errors)
+	* [デバッガー](#debugger)
+* [マシン](#machine): XSランタイムの主要構造（仮想マシン）を紹介し、ランタイムを使用してホストを構築し、スクリプトでCコールバックを利用可能にする方法を説明します。このセクションは、XS in CでC関数を使用してJavaScriptクラスを実装する方法を示す例で締めくくられます。
+	* [マシン割り当て](#machine-allocation)
+	* [コンテキスト](#context)
+	* [ホスト](#host)
+	* [JavaScript `@` 言語構文拡張](#syntax-extension)
+* [用語集](#glossary): このドキュメントで定義または参照されているすべての用語が含まれます。
+* [ライセンス](#license)
 
 <a id="slots"></a>
-## Slots
+## スロット
 
-In the XS runtime, the *slot* is a fundamental storage unit. A slot is an opaque structure that is manipulated only through XS in C.
+XSランタイムでは、*スロット*は基本的なストレージ単位です。スロットは、XS in Cを通じてのみ操作される不透明な構造です。
 
 ```c
 typedef struct xsSlotRecord xsSlot
@@ -83,9 +83,9 @@ struct xsSlotRecord {
 ```
 
 <a id="slot-types"></a>
-### Slot types
+### スロット型
 
-There are eleven types of slots:
+スロットには11種類あります：
 
 ```c
 enum {
@@ -104,7 +104,7 @@ enum {
 typedef char xsType;
 ```
 
-The undefined, null, boolean, number, string, symbol, and bigint slots correspond to the ECMAScript primitive types. The reference slot corresponds to the ECMAScript `reference` type. The integer, stringx and bigintx slots are optimizations that are unobservable by scripts. The integer slot is equivalent to the number slot, but allowing floating point operations to be bypassed. The stringx slot is equivalent to the string slot, but uses a string in place (e.g. in ROM) without making a copy. The bigintx slot is equivalent to the bigint slot, but uses a bigint in place (e.g. in ROM) without making a copy.
+undefined、null、boolean、number、string、symbol、bigintスロットは、ECMAScriptプリミティブ型に対応します。referenceスロットは、ECMAScript `reference`型に対応します。integer、stringx、bigintxスロットは、スクリプトでは観察できない最適化です。integerスロットはnumberスロットと同等ですが、浮動小数点演算をバイパスできます。stringxスロットはstringスロットと同等ですが、コピーを作成せずに（例：ROM内の）文字列をその場で使用します。bigintxスロットはbigintスロットと同等ですが、コピーを作成せずに（例：ROM内の）bigintをその場で使用します。
 
 ##### In ECMAScript:
 
@@ -130,18 +130,18 @@ xsNumber(0.0);
 xsString("foo");
 ```
 
-The `xsTypeOf` macro returns the type of a slot. It is similar to the ECMAScript `typeof` keyword.
+`xsTypeOf`マクロは、スロットの型を返します。これはECMAScript `typeof`キーワードに似ています。
 
 **`xsType xsTypeOf(xsSlot theSlot)`**<BR>
 **`xsType xsmcTypeOf(xsSlot theSlot)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot`|  The slot to test
+| `theSlot`|  テストするスロット
 
-Returns the type of the slot
+スロットの型を返します
 
-> **Note**: The macros in the XS in C API require a reference to the target virtual machine in a variable in the current scope with the name `the` of type `xsMachine *`.
+> **注意**: XS in C APIのマクロは、現在のスコープ内で`xsMachine *`型の`the`という名前の変数にターゲット仮想マシンへの参照が必要です。
 
 ##### In ECMAScript:
 
@@ -179,369 +179,369 @@ switch(xsTypeOf(xsArg(0))) {
 ```
 
 <a id="primitives"></a>
-### Primitives
+### プリミティブ
 
-The undefined, null, boolean, integer, number, string, and symbol slots (collectively known as *direct slots*) correspond to the ECMAScript primitive types, with the integer and stringx slots added as optimizations.
+undefined、null、boolean、integer、number、string、symbolスロット（総称して*ダイレクトスロット*と呼ばれる）は、ECMAScriptプリミティブ型に対応し、integerとstringxスロットは最適化として追加されています。
 
-#### Undefined and null
+#### Undefinedとnull
 
-The undefined and null slots contain no value. The `xsUndefined` and `xsNull` macros return slots of those types.
+undefinedとnullスロットは値を含みません。`xsUndefined`と`xsNull`マクロは、これらの型のスロットを返します。
 
 **`xsSlot xsUndefined`**
 
-Returns an undefined slot
+undefinedスロットを返します
 
 ***
 
 **`void xsmcSetUndefined(xsSlot theSlot)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to set to `undefined`
+| `theSlot` | `undefined`に設定するスロット
 
-Sets the specified slot value to `undefined`
+指定されたスロットの値を`undefined`に設定します
 
 ***
 
 **`xsSlot xsNull`**
 
-Returns a null slot
+nullスロットを返します
 
 ***
 
 **`void xsmcSetNull(xsSlot theSlot)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to set to `null`
+| `theSlot` | `null`に設定するスロット
 
-Sets the specified slot value to `null`
+指定されたスロットの値を`null`に設定します
 
 ***
 
-#### Booleans, integers, and numbers
+#### ブール値、整数、数値
 
-These slots contain values of the corresponding type.
+これらのスロットは対応する型の値を含みます。
 
 	typedef char xsBooleanValue;
 	typedef long xsIntegerValue;
 	typedef double xsNumberValue;
 
-The following macros return slots of each of these types (set to a particular value) or access/set the value in a slot. When accessing the value in a slot, you specify a desired type; the slot is coerced to the requested type if necessary, and the value is returned.
+以下のマクロは、これらの各型のスロット（特定の値に設定）を返すか、スロット内の値にアクセス/設定します。スロット内の値にアクセスするときは、希望する型を指定します。必要に応じてスロットは要求された型に変換され、値が返されます。
 
 **`xsSlot xsTrue`**
 
-Returns a boolean slot containing `true`
+`true`を含むブールスロットを返します
 
 ***
 
 **`xsSlot xsFalse`**
 
-Returns a boolean slot containing `false`
+`false`を含むブールスロットを返します
 
 ***
 
 **`xsSlot xsBoolean(xsBooleanValue theValue)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theValue` | The value to be contained in the slot
+| `theValue` | スロットに含める値
 
-Returns a boolean slot
+ブールスロットを返します
 
 ***
 
 **`xsBooleanValue xsToBoolean(xsSlot theSlot)`**<BR>
 **`xsBooleanValue xsmcToBoolean(xsSlot theSlot)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to coerce to boolean
+| `theSlot` | ブール値に変換するスロット
 
-Returns the value contained in the slot
+スロットに含まれる値を返します
 
 ***
 
 **`void xsmcSetFalse(xsSlot theSlot)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to set false
+| `theSlot` | falseに設定するスロット
 
-Sets the slot value to `false`
+スロットの値を`false`に設定します
 
 ***
 
 **`void xsmcSetTrue(xsSlot theSlot)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to set true
+| `theSlot` | trueに設定するスロット
 
-Sets the slot value to `true`
+スロットの値を`true`に設定します
 
 ***
 
 **`void xsmcSetBoolean(xsSlot theSlot, xsBooleanValue theValue)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to set
-| `theValue` | The boolean `true` or `false` value to set
+| `theSlot` | 設定するスロット
+| `theValue` | 設定するブール値`true`または`false`
 
-Sets the slot value to `true` or `false`
+スロットの値を`true`または`false`に設定します
 
 ***
 
 **`xsSlot xsInteger(xsIntegerValue theValue)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theValue` | The value to be contained in the slot
+| `theValue` | スロットに含める値
 
-Returns an integer slot
+整数スロットを返します
 
 ***
 
 **`xsIntegerValue xsToInteger(xsSlot theSlot)`**<BR>
 **`xsIntegerValue xsmcToInteger(xsSlot theSlot)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to coerce to integer
+| `theSlot` | 整数に変換するスロット
 
-Returns the value contained in the slot
+スロットに含まれる値を返します
 
 ***
 
 **`void xsmcSetInteger(xsSlot theSlot, xsIntegerValue theValue)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to set
-| `theValue` | The integer value to set
+| `theSlot` | 設定するスロット
+| `theValue` | 設定する整数値
 
-Sets the slot value to an integer
+スロットの値を整数に設定します
 
 ***
 
 **`xsSlot xsNumber(xsNumberValue theValue)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theValue` | The value to be contained in the slot
+| `theValue` | スロットに含める値
 
-Returns a number slot
+数値スロットを返します
 
 ***
 
 **`xsNumberValue xsToNumber(xsSlot theSlot)`**<BR>
 **`xsNumberValue xsmcToNumber(xsSlot theSlot)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to coerce to number
+| `theSlot` | 数値に変換するスロット
 
-Returns the value contained in the slot
+スロットに含まれる値を返します
 
 ***
 
 **`void xsmcSetNumber(xsSlot theSlot, xsNumberValue theValue)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to set
-| `theValue` | The number value to set
+| `theSlot` | 設定するスロット
+| `theValue` | 設定する数値
 
-Sets the slot value to a number
+スロットの値を数値に設定します
 
 ***
 
-#### Strings
+#### 文字列
 
-These slots contain values of the corresponding type.
+これらのスロットは対応する型の値を含みます。
 
 ```c
 typedef char* xsStringValue;
 ```
 
-A string value is a pointer to a UTF-8 C string. The XS runtime virtual machine and the garbage collector manage UTF-8 C strings used by scripts.
+文字列値はUTF-8 C文字列へのポインタです。XSランタイム仮想マシンとガベージコレクタは、スクリプトが使用するUTF-8 C文字列を管理します。
 
 **`xsSlot xsString(xsStringValue theValue)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theValue` | The value to be contained in the slot
+| `theValue` | スロットに含める値
 
-Returns a string slot
+文字列スロットを返します
 
-C constants, C globals, or C locals can safely be passed to the `xsString` macro, since it duplicates its parameter.
+`xsString`マクロはパラメータを複製するため、C定数、Cグローバル、またはCローカルを安全に渡すことができます。
 
 ***
 
 **`xsStringValue xsToString(xsSlot theSlot)`**<BR>
 **`xsStringValue xsmcToString(xsSlot theSlot)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to coerce to string
+| `theSlot` | 文字列に変換するスロット
 
-Returns the string contained in the slot
+スロットに含まれる文字列を返します
 
-For speed, the `xsToString` macro returns the value contained in the slot itself, a pointer to the string in the memory managed by XS. Since the XS runtime can compact memory containing string values, the result of the `xsToString` macro cannot be used across or in other macros of XS in C. The ECMAScript language specification forbids modifying the string in place.
+速度のため、`xsToString`マクロはスロット自体に含まれる値、つまりXSが管理するメモリ内の文字列へのポインタを返します。XSランタイムは文字列値を含むメモリを圧縮できるため、`xsToString`マクロの結果は、XS in Cの他のマクロをまたいで使用することはできません。ECMAScript言語仕様は、文字列のインプレース修正を禁止しています。
 
 ***
 
 **`void xsmcSetString(xsSlot theSlot, xsStringValue theValue)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to set
-| `theValue` | The string value to set
+| `theSlot` | 設定するスロット
+| `theValue` | 設定する文字列値
 
-Sets the slot value to a string
+スロットの値を文字列に設定します
 
 ***
 
 **`xsStringValue xsToStringBuffer(xsSlot theSlot, xsStringValue theBuffer, xsIntegerValue theSize)`**<BR>
 **`xsStringValue xsmcToStringBuffer(xsSlot theSlot, xsStringValue theBuffer, xsIntegerValue theSize)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to coerce to string
-| `theBuffer` | A buffer to copy the string into
-| `theSize` | The size of the buffer
+| `theSlot` | 文字列に変換するスロット
+| `theBuffer` | 文字列をコピーするバッファ
+| `theSize` | バッファのサイズ
 
-Copies the string value and returns the buffer containing the copy of the string. The buffer provided has to be large enough to hold a copy of the string value.
+文字列値をコピーし、文字列のコピーを含むバッファを返します。提供されるバッファは、文字列値のコピーを保持するのに十分な大きさでなければなりません。
 
 ***
 
 **`xsSlot xsStringBuffer(void *theData, xsIntegerValue theSize)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theData` | A pointer to the data to copy into the string buffer, or `NULL` to leave the string buffer data uninitialized
-| `theSize` | The data size to copy in bytes
+| `theData` | 文字列バッファにコピーするデータへのポインタ、または文字列バッファデータを未初期化のままにする場合は`NULL`
+| `theSize` | コピーするデータサイズ（バイト単位）
 
-Copies the string into an allocated buffer, sets a slot value to the string buffer, and returns a reference to the new string buffer instance.
+文字列を割り当てられたバッファにコピーし、スロット値を文字列バッファに設定し、新しい文字列バッファインスタンスへの参照を返します。
 
 ***
 
 **`void xsmcSetStringBuffer(xsSlot theSlot, xsStringValue theValue, xsIntegerValue theSize)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The slot to set
-| `theValue` | The string value to set
-| `theSize` | The size of the string in bytes
+| `theSlot` | 設定するスロット
+| `theValue` | 設定する文字列値
+| `theSize` | 文字列のサイズ（バイト単位）
 
-Copies the string into an allocated buffer and sets the slot value to the string buffer.
+文字列を割り当てられたバッファにコピーし、スロット値を文字列バッファに設定します。
 
 ***
 
 <a id="arraybuffer"></a>
 ### ArrayBuffer
 
-In ECMAScript an `ArrayBuffer` is commonly used to store fixed length binary data.
+ECMAScriptでは、`ArrayBuffer`は固定長のバイナリデータを格納するために一般的に使用されます。
 
-#### Macros
+#### マクロ
 
 **`xsSlot xsArrayBuffer(void *theData, xsIntegerValue theSize)`**
 **`void xsmcSetArrayBuffer(xsSlot theSlot, void *theData, xsIntegerValue theSize)`**
 
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theData` | A pointer to the data to copy into the `ArrayBuffer`, or `NULL` to leave the `ArrayBuffer` data uninitialized
-| `theSize` | The size of the data in bytes
+| `theData` | `ArrayBuffer`にコピーするデータへのポインタ、または`ArrayBuffer`データを未初期化のままにする場合は`NULL`
+| `theSize` | データのサイズ（バイト単位）
 
-Creates an `ArrayBuffer` instance and returns a reference to the new `ArrayBuffer` instance
+`ArrayBuffer`インスタンスを作成し、新しい`ArrayBuffer`インスタンスへの参照を返します
 
 ***
 
 **`void xsGetArrayBufferData(xsSlot theSlot, xsIntegerValue theOffset, void *theData, xsIntegerValue theSize)`**<BR>
 **`void xsmcGetArrayBufferData(xsSlot theSlot, xsIntegerValue theOffset, void *theData, xsIntegerValue theSize)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The `ArrayBuffer` slot
-| `theOffset` | The starting byte offset to get the data
-| `theData` | The data pointer to get the `ArrayBuffer` data
-| `theSize` | The data size to copy in bytes
+| `theSlot` | `ArrayBuffer`スロット
+| `theOffset` | データを取得する開始バイトオフセット
+| `theData` | `ArrayBuffer`データを取得するデータポインタ
+| `theSize` | コピーするデータサイズ（バイト単位）
 
-Copies bytes from the `ArrayBuffer`
+`ArrayBuffer`からバイトをコピーします
 
 ***
 
 **`void xsSetArrayBufferData(xsSlot theSlot, xsIntegerValue theOffset, void *theData, xsIntegerValue theSize)`**<BR>
 **`void xsmcSetArrayBufferData(xsSlot theSlot, xsIntegerValue theOffset, void *theData, xsIntegerValue theSize)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The `ArrayBuffer` slot
-| `theOffset` | The starting byte offset to set the data
-| `theData` | The data pointer to set the `ArrayBuffer` data
-| `theSize` | The data size to copy in bytes
+| `theSlot` | `ArrayBuffer`スロット
+| `theOffset` | データを設定する開始バイトオフセット
+| `theData` | `ArrayBuffer`データを設定するデータポインタ
+| `theSize` | コピーするデータサイズ（バイト単位）
 
-Copies bytes into the `ArrayBuffer`
+`ArrayBuffer`にバイトをコピーします
 
 ***
 
 **`void xsmcSetArrayBuffer(xsSlot theSlot, void *theData, xsIntegerValue theSize)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The `ArrayBuffer` slot
-| `theData` | The data pointer to set the `ArrayBuffer` data
-| `theSize` | The data size to copy in bytes
+| `theSlot` | `ArrayBuffer`スロット
+| `theData` | `ArrayBuffer`データを設定するデータポインタ
+| `theSize` | コピーするデータサイズ（バイト単位）
 
-Creates an `ArrayBuffer` instance initialized from the provided data
+提供されたデータから初期化された`ArrayBuffer`インスタンスを作成します
 
 ***
 
 **`xsIntegerValue xsGetArrayBufferLength(xsSlot theSlot)`**<BR>
 **`xsIntegerValue xsmcGetArrayBufferLength(xsSlot theSlot)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The `ArrayBuffer` slot
+| `theSlot` | `ArrayBuffer`スロット
 
-Returns the size of the `ArrayBuffer` in bytes
+`ArrayBuffer`のサイズをバイト単位で返します
 
 ***
 
 **`void xsSetArrayBufferLength(xsSlot theSlot, xsIntegerValue theSize)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The `ArrayBuffer` slot
-| `theSize` | The size of the `ArrayBuffer` data in bytes. If the size of the buffer is increased, the new data is initialized to 0.
+| `theSlot` | `ArrayBuffer`スロット
+| `theSize` | `ArrayBuffer`データのサイズ（バイト単位）。バッファのサイズが増加される場合、新しいデータは0に初期化されます。
 
-Sets the length of the `ArrayBuffer`
+`ArrayBuffer`の長さを設定します
 
 ***
 
 **`void *xsToArrayBuffer(xsSlot theSlot)`**<BR>
 **`void *xsmcToArrayBuffer(xsSlot theSlot)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theSlot` | The `ArrayBuffer` slot
+| `theSlot` | `ArrayBuffer`スロット
 
-Returns a pointer to the `ArrayBuffer` data
+`ArrayBuffer`データへのポインタを返します
 
-For speed, the `xsToArrayBuffer ` macro returns the value contained in the slot itself, a pointer to the buffer in the memory managed by XS. Since the XS runtime can compact memory containing string values, the result of the `xsToArrayBuffer ` macro cannot be used across or in other macros of XS in C.
+速度のため、`xsToArrayBuffer`マクロはスロット自体に含まれる値、つまりXSが管理するメモリ内のバッファへのポインタを返します。XSランタイムは文字列値を含むメモリを圧縮できるため、`xsToArrayBuffer`マクロの結果は、XS in Cの他のマクロをまたいで使用することはできません。
 
 ***
 
 <a id="instances-and-prototypes"></a>
-### Instances and Prototypes
+### インスタンスとプロトタイプ
 
-In XS in C, as in ECMAScript, an object can inherit properties from another object, which can inherit from another object, and so on; the inheriting object is the *instance*, and the object from which it inherits is the *prototype*.
+XS in Cでは、ECMAScriptと同様に、オブジェクトは他のオブジェクトからプロパティを継承でき、そのオブジェクトはさらに他のオブジェクトから継承できます。継承するオブジェクトは*インスタンス*であり、継承元のオブジェクトは*プロトタイプ*です。
 
-Reference slots (type `xsReferenceType`) are *indirect* slots: they contain a reference to an instance of an object, function, array, and so on. Instances themselves are made of slots that are the properties of the instance (or, for an array, the items of the instance).
+参照スロット（型`xsReferenceType`）は*間接*スロットであり、オブジェクト、関数、配列などのインスタンスへの参照を含みます。インスタンス自体は、インスタンスのプロパティ（または配列の場合はインスタンスのアイテム）であるスロットで構成されます。
 
-#### Macros
+#### マクロ
 
 **`xsSlot xsObjectPrototype`**<BR>
 **`xsSlot xsFunctionPrototype`**<BR>
@@ -570,26 +570,26 @@ Reference slots (type `xsReferenceType`) are *indirect* slots: they contain a re
 **`xsSlot xsPromisePrototype`**<BR>
 **`xsSlot xsProxyPrototype`**<BR>
 
-Returns a reference to the prototype instance created by the XS runtime.
+XSランタイムによって作成されたプロトタイプインスタンスへの参照を返します。
 
 ***
 
 **`xsSlot xsNewArray(xsIntegerValue theLength)`**<BR>
 **`xsSlot xsmcNewArray(xsIntegerValue theLength)`**
 
-| Arguments | Description |
+| 引数 | 説明 |
 | --- | :-- |
-| `theLength` | The array length property to set
+| `theLength` | 設定する配列のlengthプロパティ
 
-Creates an array instance, and returns a reference to the new array instance
+配列インスタンスを作成し、新しい配列インスタンスへの参照を返します
 
-##### In ECMAScript:
+##### ECMAScriptで:
 
 ```javascript
 new Array(5);
 ```
 
-##### In C:
+##### Cで:
 
 ```c
 xsNewArray(5);
