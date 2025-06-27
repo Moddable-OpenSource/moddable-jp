@@ -1,121 +1,121 @@
-# Exploring TC53 IO using Firmata
+# FirmataでTC53 IOを探求する
 Copyright 2019 Moddable Tech, Inc.<BR>
-Author: Peter Hoddie<BR>
-Revised: August 4, 2019
+著者: Peter Hoddie<BR>
+更新日: 2019年8月4日
 
-The Moddable SDK contains an implementation of the Firmata protocol for communicating hardware control information between two devices, often a computer and  microcontroller. The implementation uses a new set of IO classes based on an active proposal to [Ecma TC53](https://www.ecma-international.org/memento/tc53.htm). The IO classes are based on a common IO pattern designed to provide access to hardware resources through a simple API that provides consistent behavior across a range of IO types while allowing efficient implementation on the most constrained hardware configurations capable of executing modern JavaScript.
+Moddable SDKには、2つのデバイス（多くの場合はコンピュータとマイクロコントローラ）間でハードウェア制御情報を通信するためのFirmataプロトコルの実装が含まれています。この実装では、[Ecma TC53](https://www.ecma-international.org/memento/tc53.htm)への積極的な提案に基づく新しいIOクラスセットを使用しています。IOクラスは、現代のJavaScriptを実行できる最も制約の厳しいハードウェア構成での効率的な実装を可能にしながら、様々なIOタイプにわたって一貫した動作を提供するシンプルなAPIを通じてハードウェアリソースへのアクセスを提供するように設計された共通のIOパターンに基づいています。
 
-The primary goal of the implementation is to explore using the new IO class. The Firmata protocol is an interesting test case as it exercises many different kinds of IO. The Firmata protocol has been invaluable in this regard. The resulting Firmata implementation may also be useful more broadly. As the TC53 IO class becomes available on other hardware platforms, this Firmata implementation should run more-or-less as-is there, perhaps providing Firmata support on additional hardware hosts.
+実装の主な目標は、新しいIOクラスの使用を探求することです。Firmataプロトコルは、多くの異なる種類のIOを活用するため、興味深いテストケースです。Firmataプロトコルはこの点で非常に貴重でした。結果として得られたFirmata実装は、より広く有用である可能性もあります。TC53 IOクラスが他のハードウェアプラットフォームで利用可能になるにつれて、このFirmata実装はそこでほぼそのまま動作し、追加のハードウェアホストでFirmataサポートを提供する可能性があります。
 
-> **Note**: The IO Class implementation is available only for the ESP8266 microcontroller which was selected as the initial target because it is representative of resource constrained devices, widely available, well-understood at Moddable, and inexpensive.
+> **注意**: IOクラス実装は、リソース制約のあるデバイスの代表例であり、広く利用可能で、Moddableでよく理解されており、安価であるため初期ターゲットとして選択されたESP8266マイクロコントローラでのみ利用可能です。
 
-The Firmata protocol is effectively a client/server protocol with the microcontroller taking the role of the server, and the device controller, often a computer, taking the role of the client. In the Firmata ecosystem, [Firmata.js](https://github.com/firmata/firmata.js#firmatajs) is a popular client, providing a [JavaScript API](https://github.com/firmata/firmata.js/tree/master/packages/firmata.js#firmata-prototype-api) in the Node.js environment to communicate with Firmata servers. There are [many other](https://github.com/firmata/arduino#firmata-client-libraries) Firmata clients available for various languages and environments. There are many fewer implementations of the Firmata server, with the [Standard Firmata Adruino implementation](https://github.com/firmata/arduino#firmata) being the most commonly used.
+Firmataプロトコルは本質的にクライアント/サーバープロトコルであり、マイクロコントローラがサーバーの役割を、デバイスコントローラ（多くの場合はコンピュータ）がクライアントの役割を担います。Firmataエコシステムでは、[Firmata.js](https://github.com/firmata/firmata.js#firmatajs)が人気のクライアントで、FirmataサーバーとやりとりするためのNode.js環境での[JavaScript API](https://github.com/firmata/firmata.js/tree/master/packages/firmata.js#firmata-prototype-api)を提供しています。様々な言語と環境で利用可能な[多くの他の](https://github.com/firmata/arduino#firmata-client-libraries) Firmataクライアントがあります。Firmataサーバーの実装ははるかに少なく、[Standard Firmata Arduino実装](https://github.com/firmata/arduino#firmata)が最も一般的に使用されています。
 
-The implementation of Firmata in the Moddable SDK includes both a client and server. Each is implemented in JavaScript using the proposed TC53 IO class APIs. In the case of the client, it presents Firmata as a TC53 IO class provider.
+Moddable SDKでのFirmataの実装には、クライアントとサーバーの両方が含まれています。それぞれは、提案されているTC53 IOクラスAPIを使用してJavaScriptで実装されています。クライアントの場合、FirmataをTC53 IOクラスプロバイダーとして提示します。
 
-Implementing both the client and server allowed more uses of the IO class to be explored. The server implementation was developed against the Firmata.js client; the client implementation, against the server. The Firmata.js and Arduino Firmata server code were consulted to supplement the information in the protocol documentation.
+クライアントとサーバーの両方を実装することで、IOクラスのより多くの使用方法を探求することができました。サーバーの実装はFirmata.jsクライアントに対して開発され、クライアントの実装はサーバーに対して開発されました。プロトコルドキュメントの情報を補完するために、Firmata.jsとArduino Firmataサーバーのコードが参照されました。
 
-> **Note:** To build and run the examples in this document, you must have already installed the Moddable SDK and followed the instructions to set up the build tools for the ESP8266 target from the [Getting Started document](../Moddable%20SDK%20-%20Getting%20Started.md).
+> **注意:** このドキュメントの例をビルドして実行するには、すでにModdable SDKをインストールし、[入門ドキュメント](../Moddable%20SDK%20-%20Getting%20Started.md)からESP8266ターゲット用のビルドツールをセットアップする手順に従っている必要があります。
 
-## Table of Contents
+## 目次
 
-* [Firmata Background](#firmata-background)
-* [Firmata Server](#firmata-server)
-	* [Example Code](#server-example-code)
-	* [Communicating with the Firmata Server Over TCP](#server-tcp)
-	* [Implementation Notes](#server-implementation-notes)
-* [Firmata Client](#firmata-client)
-	* [Example Code](#client-example-code)
-	* [Implementation Notes](#client-implementation-notes)
-* [Firmata Graphics using Poco](#firmata-graphics-using-poco)
-	* [Example Code](#poco-example-code)
-	* [Implementation Notes](#poco-implementation-notes)
-* [Conclusion](#conclusion)
+* [Firmataの背景](#firmata-background)
+* [Firmataサーバー](#firmata-server)
+	* [サンプルコード](#server-example-code)
+	* [TCP経由でのFirmataサーバーとの通信](#server-tcp)
+	* [実装ノート](#server-implementation-notes)
+* [Firmataクライアント](#firmata-client)
+	* [サンプルコード](#client-example-code)
+	* [実装ノート](#client-implementation-notes)
+* [Pocoを使用したFirmataグラフィックス](#firmata-graphics-using-poco)
+	* [サンプルコード](#poco-example-code)
+	* [実装ノート](#poco-implementation-notes)
+* [結論](#conclusion)
 
 <a id="firmata-background"></a>
-## Firmata Background
-Firmata is a [communication protocol](https://github.com/firmata/protocol#firmata-protocol-documentation) to interact with low-level hardware resources. These resources include digital inputs, digital outputs, I2C peripherals, serial ports, and analog inputs among many others. Serial is the most common transport for Firmata, for example between an Arduino and a computer, but the protocol can be carried over any bi-directional connection such as a TCP network connection.
+## Firmataの背景
+Firmataは、低レベルのハードウェアリソースとやりとりするための[通信プロトコル](https://github.com/firmata/protocol#firmata-protocol-documentation)です。これらのリソースには、デジタル入力、デジタル出力、I2Cペリフェラル、シリアルポート、アナログ入力などが含まれます。シリアルは、例えばArduinoとコンピュータの間など、Firmataで最も一般的なトランスポートですが、プロトコルはTCPネットワーク接続などの双方向接続を介して実行することもできます。
 
-The default baud rate for Firmata over serial is 57600, which is relatively slow. For comparison, the Moddable SDK runs the `xsbug` debugging protocol over serial at 921600 baud (16 times faster) on an ESP8266. Because the Firmata protocol is derived from the MIDI protocol, it is compact with many messages requiring only a few bytes. Consequently, the baud rate is not usually a limiting factor.
+シリアル経由でのFirmataのデフォルトボーレートは57600で、これは比較的低速です。比較として、Moddable SDKはESP8266で921600ボー（16倍高速）でシリアル経由で`xsbug`デバッグプロトコルを実行します。FirmataプロトコルはMIDIプロトコルから派生しているため、多くのメッセージが数バイトのみを必要とするコンパクトです。したがって、ボーレートは通常制限要因ではありません。
 
-The Firmata protocol has some implicit assumptions which shape any implementation:
+Firmataプロトコルには、実装を形作る暗黙の前提があります：
 
-- **Reliable transport**: It assumes a reliable transport as there are no provisions for checksums, acknowledgement, or retransmit in the protocol. The basic form of the Firmata protocol was derived from the MIDI protocol, though the meaning of the messages is different.
+- **信頼性のあるトランスポート**: プロトコルにチェックサム、確認応答、または再送信の規定がないため、信頼性のあるトランスポートを想定しています。Firmataプロトコルの基本形式はMIDIプロトコルから派生していますが、メッセージの意味は異なります。
 
-- **Near real-time**:  It assumes that the connection is near-real time as there are no time stamps in the protocol. When operating over a direct physical connection such as serial, the latency is small and constant. When communicating over Wi-Fi, however, the latency is larger and unpredictable.
+- **準リアルタイム**: プロトコルにタイムスタンプがないため、接続が準リアルタイムであることを想定しています。シリアルなどの直接物理接続で動作する場合、遅延は小さく一定です。しかし、Wi-Fi経由で通信する場合、遅延はより大きく予測不可能です。
 
-- **Single client**: It assumes that a server is connected to no more than one client as the protocol has no provision to report that a pin resource is unavailable because it is already in use.
+- **単一クライアント**: プロトコルにピンリソースがすでに使用中であるために利用できないことを報告する規定がないため、サーバーが1つ以下のクライアントに接続されることを想定しています。
 
-Because of the limited testing, it is possible that there are implementation errors based on oversights or misunderstandings. Prior to implementing Firmata, the Moddable team had no experience working with Firmata.
+限られたテストのため、見落としや誤解に基づく実装エラーがある可能性があります。Firmataを実装する前に、ModdableチームはFirmataでの作業経験がありませんでした。
 
 <a id="firmata-server"></a>
-## Firmata Server
-To build and run the Firmata server, execute the following commands:
+## Firmataサーバー
+Firmataサーバーをビルドして実行するには、以下のコマンドを実行します：
 
 	cd $MODDABLE/examples/io/firmata/server
 	mcconfig -m -p esp
 
-This builds and deploys the Firmata server to an ESP8266. Note that this a release build, not a debug build. This is because Firmata uses the serial port for communication, which precludes it from being by the xsbug debugger to communicate with the ESP8266.
+これはFirmataサーバーをビルドしてESP8266にデプロイします。これはデバッグビルドではなくリリースビルドであることに注意してください。これは、Firmataが通信にシリアルポートを使用し、xsbugデバッガーがESP8266との通信に使用することを妨げるためです。
 
-From here, the Firmata.js server may be used as usual with Firmata clients. Note that the Firmata server does not announce itself over serial so it is necessary to wait about five seconds for Firmata.js to issue a probe request before the connection is fully established.
+ここから、Firmata.jsサーバーはFirmataクライアントで通常通り使用できます。Firmataサーバーはシリアル経由で自分自身をアナウンスしないため、接続が完全に確立される前に、Firmata.jsがプローブリクエストを発行するまで約5秒待つ必要があることに注意してください。
 
-The Firmata server implementation supports the following standard pin types:
+Firmataサーバー実装は、以下の標準ピンタイプをサポートしています：
 
-- digital input
-- digital input pull-up
+- デジタル入力
+- デジタル入力プルアップ
 - I2C
-- analog input
-- serial
+- アナログ入力
+- シリアル
 
-The pins that are available depend on the configuration. For example, only a single serial port is available in the implementation. If that port is being used for Firmata transport, it is unavailable for use by a Firmata client.
+利用可能なピンは構成に依存します。例えば、実装では単一のシリアルポートのみが利用可能です。そのポートがFirmataトランスポートに使用されている場合、Firmataクライアントで使用することはできません。
 
-The Firmata Server was tested primarily on a [Moddable One](https://www.moddable.com/moddable-one.php), which combines an ESP8266 with a high quality IPS display and capacitive touch screen.
+Firmataサーバーは主に、ESP8266を高品質IPSディスプレイと静電容量式タッチスクリーンと組み合わせた[Moddable One](https://www.moddable.com/moddable-one.php)でテストされました。
 
 <a id="server-example-code"></a>
-### Example code
+### サンプルコード
 
-The following Firmata.js code fragments are useful when working with the Moddable One hardware. The `repl` included in the Firmata.js repository is a useful place to start exploring.
+以下のFirmata.jsコードフラグメントは、Moddable Oneハードウェアを扱う際に有用です。Firmata.jsリポジトリに含まれている`repl`は、探求を始めるのに便利な場所です。
 
-#### Turn Built-In LED On and Off
+#### 内蔵LEDのオン・オフ
 
 ````js
 board.pinMode(2, 1)
 board.digitalWrite(2, 1)	// off
 board.digitalWrite(2, 0)	// on
 ````
-#### Monitor Flash Button
+#### フラッシュボタンの監視
 
 ````js
 board.pinMode(0, 0)
 board.digitalRead(0, v => console.log(v))
 ````
 
-#### Disable Flash Button Monitor
+#### フラッシュボタン監視の無効化
 
 ````js
 board.reportDigitalPin(0, 0);
 ````
 
-#### Monitor Analog Input
+#### アナログ入力の監視
 
 ````js
 board.analogRead(0, v => console.log(v))
 ````
 
-#### Disable Analog Input Monitor
+#### アナログ入力監視の無効化
 
 ````js
 board.reportAnalogPin(0, 0)
 ````
 
-#### Write Bytes to Serial Port
+#### シリアルポートへのバイト書き込み
 
 ````js
 board.serialConfig({portId: 0, baud: 921600})
 board.serialWrite(0, [64, 65, 66, 67]);
 ````
 
-#### Monitor Incoming Bytes on Serial Port
+#### シリアルポートの受信バイト監視
 
 ````js
 board.serialConfig({portId: 0, baud: 921600})
@@ -123,130 +123,130 @@ board.serialRead(0, bytes =>
 	console.log(bytes.map(c => String.fromCharCode(c)).join("")))
 ````
 
-#### Disable Serial Port Monitor
+#### シリアルポート監視の無効化
 
 ````js
 board.serialStop(0)
 ````
 
-#### Monitor Touch Screen for Number of Touch Points (I2C)
+#### タッチ画面のタッチポイント数監視（I2C）
 
 ````js
 void board.i2cConfig()
 void board.i2cRead(0x38, 2, 1, v => console.log(v))
 ````
 
-#### Disable I2C Monitoring
+#### I2C監視の無効化
 
 ````js
 void board.i2cStop(0x38)
 ````
 
 <a id="server-tcp"></a>
-### Communicating with the Firmata Server Over TCP
-The Firmata server implements communication over a TCP network connection, in addition to serial. The Firmata server can operate in TCP in two different ways. One way is by initiating a TCP connection to a Firmata client, in which case (confusingly) the Firmata server is acting as a TCP client while the Firmata client is acting as a TCP server. This is the more common way. Alternatively, it can listen for an incoming TCP request from a Firmata client, in which case the Firmata server is a TCP server and the Firmata client is a TCP client.
+### TCP経由でのFirmataサーバーとの通信
+Firmataサーバーは、シリアルに加えてTCPネットワーク接続での通信を実装しています。FirmataサーバーはTCPで2つの異なる方法で動作できます。1つの方法は、FirmataクライアントへのTCP接続を開始することで、この場合（混乱を招くことに）FirmataサーバーがTCPクライアントとして動作し、FirmataクライアントがTCPサーバーとして動作します。これがより一般的な方法です。または、FirmataクライアントからのTCPリクエストを待ち受けることもでき、この場合FirmataサーバーがTCPサーバーであり、FirmataクライアントがTCPクライアントになります。
 
-#### Using `FirmataTCPClient`
-To configure the Firmata server to initiate a TCP connection to a Firmata client, do the following:
+#### `FirmataTCPClient`の使用
+FirmataサーバーがFirmataクライアントへのTCP接続を開始するように設定するには、以下を行います：
 
-1. Modify the source code in the `main.js` Firmata server file to connect to the Firmata client.
+1. Firmataサーバーファイルの`main.js`のソースコードを変更して、Firmataクライアントに接続します。
 
 	````js
 	// new FirmataSerial;
 	new FirmataTCPClient({address: "192.168.1.19"});
 	````
 
-	Firmata over TCP uses port 3030 by default. To connect to a different port, include a `port` property when calling `FirmataTCPClient`:
+	TCP経由のFirmataはデフォルトでポート3030を使用します。異なるポートに接続するには、`FirmataTCPClient`を呼び出す際に`port`プロパティを含めます：
 
 	````js
 	new FirmataTCPClient({address: "192.168.1.19", port: 3029});
 	````
 
-2. Build the Firmata server. Be sure to provide the Wi-Fi access point credentials:
+2. Firmataサーバーをビルドします。Wi-Fiアクセスポイントの認証情報を必ず提供してください：
 
 	```
 	mcconfig -d -m -p esp ssid="Moddable" password="secret"
 	```
 
-The Firmata.js client supports TCP communication using the [Etherport](https://github.com/rwaldron/etherport#etherport) module. While Firmata.js repl does not support Etherport, it is [easy to add](https://gist.github.com/phoddie/17601031d83602f688c20c98292c622e). If you are using that version of the `repl`, just enter `etherport` in place of the serial port ID to launch Firmata.js with a TCP listener waiting for incoming connections.
+Firmata.jsクライアントは[Etherport](https://github.com/rwaldron/etherport#etherport)モジュールを使用したTCP通信をサポートしています。Firmata.js replはEtherportをサポートしていませんが、[簡単に追加できます](https://gist.github.com/phoddie/17601031d83602f688c20c98292c622e)。そのバージョンの`repl`を使用している場合は、シリアルポートIDの代わりに`etherport`と入力するだけで、接続待ちのTCPリスナーでFirmata.jsを起動できます。
 
-#### Using `FirmataTCPServer`
-To configure the Firmata server to wait for an incoming TCP connection from a Firmata client, do the following:
+#### `FirmataTCPServer`の使用
+FirmataサーバーがFirmataクライアントからの接続を待ち受けるように設定するには、以下を行います：
 
-1. Modify the source code the main.js Firmata server file to connect to the Firmata client.
+1. Firmataサーバーファイルのmain.jsのソースコードを変更して、Firmataクライアントに接続します。
 
 	````js
 	// new FirmataSerial;
 	new FirmataTCPServer;
 	````
 
-	Firmata over TCP uses port 3030 by default. To listen on a different port, include a `port` property when calling `FirmataTCPServer `:
+	TCP経由のFirmataはデフォルトでポート3030を使用します。異なるポートで待ち受けるには、`FirmataTCPServer`を呼び出す際に`port`プロパティを含めます：
 
 	````js
 	new FirmataTCPServer({port: 3029});
 	````
 
-2. Build the Firmata server. Be sure to provide the Wi-Fi access point credentials:
+2. Firmataサーバーをビルドします。Wi-Fiアクセスポイントの認証情報を必ず提供してください：
 
 	```
 	mcconfig -d -m -p esp ssid="Moddable" password="secret"
 	```
 
-The `FirmataTCPServer` class allows only a single connection at a time. If there is an active connection, incoming connection requests are refused. Once the active connection is closed, the next incoming connection request is accepted.
+`FirmataTCPServer`クラスは一度に単一の接続のみを許可します。アクティブな接続がある場合、新しい接続要求は拒否されます。アクティブな接続が閉じられると、次の接続要求が受け入れられます。
 
-The `FirmataTCPServer` was tested using the `FirmataTCPClient` as Firmata.js does not yet support connecting to a Firmata Server waiting for an incoming connection.
+`FirmataTCPServer`は`FirmataTCPClient`を使用してテストされました。Firmata.jsはまだ接続待ちのFirmataサーバーへの接続をサポートしていないためです。
 
 <a id="server-implementation-notes"></a>
 
-### Implementation Notes
-The Moddable implementation of the Firmata server reports the following:
+### 実装ノート
+ModdableのFirmataサーバー実装は以下を報告します：
 
-- **Protocol, major version**: 2
-- **Protocol, minor version**: 6
-- **Firmware, major version**: 2
-- **Firmware, minor version**: 10
-- **Firmware name**: moddable
+- **プロトコル メジャーバージョン**: 2
+- **プロトコル マイナーバージョン**: 6
+- **ファームウェア メジャーバージョン**: 2
+- **ファームウェア マイナーバージョン**: 10
+- **ファームウェア名**: moddable
 
-Digital reports are driven from the interrupt that detects digital input changes, not by polling.
+デジタルレポートは、ポーリングではなく、デジタル入力の変化を検出する割り込みによって駆動されます。
 
-The ESP8266 has one digital pin, GPIO 16, that is connected to a different hardware unit than all the others. The difference is because this pin has a special use for waking the microcontroller from deep sleep. The server implementation does not support digital reports on this pin.
+ESP8266には、他のすべてのピンとは異なるハードウェアユニットに接続されているデジタルピンが1つあります（GPIO 16）。この違いは、このピンがディープスリープからマイクロコントローラを起こすための特別な用途を持っているからです。サーバー実装は、このピンでのデジタルレポートをサポートしていません。
 
-The I2C bus on Moddable One uses pin 5 for data and pin 4 for a clock.
+Moddable OneのI2Cバスは、データにピン5、クロックにピン4を使用します。
 
-The primary serial connection on ESP8266 uses pin 1 for TX and pin 3 for RX.
+ESP8266のプライマリシリアル接続は、TXにピン1、RXにピン3を使用します。
 
-The Moddable Firmata Server implementation combines a general purpose Firmata server with specific knowledge of the ESP2866 pin configuration. The ESP8266 knowledge is largely isolated and should eventually migrate to a separate file to ease supporting additional microcontrollers.
+Moddable Firmataサーバー実装は、汎用FirmataサーバーとESP2866ピン構成の特定の知識を組み合わせています。ESP8266の知識は大部分が分離されており、最終的には追加のマイクロコントローラのサポートを容易にするために別のファイルに移行すべきです。
 
-The Firmata Server implements the optional `STRING_DATA` message with the `doSendString` function which allows the server implementation to send short text strings to the client. These messages have no meaning defined in the protocol. They proved useful for debugging to generate a simple console trace from the server to the client, which is not possible when communicating with Firmata over serial which makes the xsbug debugging connection unavailable. To output these messages to the console using Firmata.js, add this line:
+Firmataサーバーは、サーバー実装がクライアントに短いテキスト文字列を送信できる`doSendString`関数でオプションの`STRING_DATA`メッセージを実装しています。これらのメッセージはプロトコルで定義された意味を持ちません。これらは、xsbugデバッグ接続を利用できなくするシリアル経由でFirmataと通信する際には不可能な、サーバーからクライアントへの簡単なコンソールトレースを生成するデバッグに有用であることが証明されました。Firmata.jsを使用してこれらのメッセージをコンソールに出力するには、この行を追加します：
 
 ```js
 board.on("string", msg => console.log(`Board message: ${msg}`));
 ```
 
 <a id="firmata-client"></a>
-## Firmata Client
-The Firmata Client example works by establishing a connection to a Firmata server at start-up (the Firmata Client acts as a TCP client). The IP address of the server is defined in the code. Modify the following line in the `main.js` file of the client example to match the IP address of the server being used.
+## Firmataクライアント
+Firmataクライアントの例は、スタートアップ時にFirmataサーバーへの接続を確立することで動作します（FirmataクライアントはTCPクライアントとして動作）。サーバーのIPアドレスはコードで定義されています。使用するサーバーのIPアドレスに合わせて、クライアント例の`main.js`ファイルの以下の行を変更してください。
 
 ```js
 const ServerAddress = "10.0.1.36";
 ```
 
-To build and run the Firmata client, execute the following commands:
+Firmataクライアントをビルドして実行するには、以下のコマンドを実行します：
 
 	cd $MODDABLE/examples/io/firmata/client
 	mcconfig -d -m -p esp ssid="Moddable" password="secret"
 
-This  builds and deploys the Firmata client to an ESP8266. Note that unlike the server, this a debug build, as the examples will only use Firmata over TCP, not serial.
+これはFirmataクライアントをビルドしてESP8266にデプロイします。サーバーとは異なり、これはデバッグビルドであることに注意してください。例ではシリアルではなくTCP経由でのみFirmataを使用するためです。
 
-The Client API is the proposed TC53 IO provider class. An IO provider is an object that gives access to one or more kinds of IO. The IO it provides access to may be remote, as is the case with the Firmata use described here, or local, for example an GPIO expander connected over I2C.
+クライアントAPIは、提案されているTC53 IOプロバイダークラスです。IOプロバイダーは、1つ以上の種類のIOへのアクセスを提供するオブジェクトです。アクセスを提供するIOは、ここで説明するFirmataの使用のようにリモートの場合もあれば、例えばI2C経由で接続されたGPIOエキスパンダーのようにローカルの場合もあります。
 
-To use the Firmata provider, the first step is to import the class. The example uses a TCP client, so it imports `FirmataClientTCP`.
+Firmataプロバイダーを使用するには、最初にクラスをインポートします。この例ではTCPクライアントを使用するため、`FirmataClientTCP`をインポートします。
 
 ```js
 import {FirmataClientTCP} from "firmataclient";
 ```
 
-The `FirmataClientTCP` provider is then instantiated. There are two parts to the instantiation: the configuration and the callbacks. The configuration tells the provider how to connect to the hardware resource. In this case, the configuration is the IP address.
+次に`FirmataClientTCP`プロバイダーをインスタンス化します。インスタンス化には2つの部分があります：設定とコールバックです。設定は、プロバイダーにハードウェアリソースへの接続方法を伝えます。この場合、設定はIPアドレスです。
 
 ```js
 const firmata = new FirmataClientTCP({
@@ -257,7 +257,7 @@ const firmata = new FirmataClientTCP({
 }
 ```
 
-The constructor argument accepts optional properties, including `port` which indicates the remote port to connect to if not using the default port 3030. The polling interval, in milliseconds, used by Firmata to report I2C and analog pin data is configured with the optional `interval` property.
+コンストラクタ引数は、デフォルトポート3030を使用しない場合に接続するリモートポートを示す`port`を含む、オプションのプロパティを受け入れます。FirmataがI2Cとアナログピンデータを報告するために使用するポーリング間隔（ミリ秒）は、オプションの`interval`プロパティで設定されます。
 
 ```js
 const firmata = new FirmataClientTCP({
@@ -270,16 +270,16 @@ const firmata = new FirmataClientTCP({
 }
 ```
 
-The configuration and callbacks of a provider are set when the constructor returns and may not be modified afterwards. The `FirmataClientTCP` has a single callback, `onReady`, which is invoked when the connection is established. Adding an `onError` callback to invoke when the connection is dropped is a future work item.
+プロバイダーの設定とコールバックは、コンストラクタが戻る際に設定され、その後変更することはできません。`FirmataClientTCP`には単一のコールバック`onReady`があり、接続が確立されたときに呼び出されます。接続が切断されたときに呼び出す`onError`コールバックの追加は今後の作業項目です。
 
-The provider implementation may not know what IO is available until it establishes a connection with the remote device. This is the case in the Firmata protocol, where an initial set of messages are exchanged (e.g. `CAPABILITY_QUERY`, `ANALOG_MAPPING_QUERY`, `REPORT_FIRMWARE`, etc.) for the client to learn the capabilities of the server. When `onReady` is invoked, this process is complete. The provider instance contains one or more constructors which the script uses to access the hardware resources of the provider.
+プロバイダー実装は、リモートデバイスとの接続を確立するまで、どのIOが利用可能かを知らない場合があります。これはFirmataプロトコルの場合で、クライアントがサーバーの機能を学習するために初期のメッセージセットが交換されます（例：`CAPABILITY_QUERY`、`ANALOG_MAPPING_QUERY`、`REPORT_FIRMWARE`など）。`onReady`が呼び出されると、このプロセスは完了します。プロバイダーインスタンスには、スクリプトがプロバイダーのハードウェアリソースにアクセスするために使用する1つ以上のコンストラクタが含まれています。
 
 <a id="client-example-code"></a>
-### Example Code
+### サンプルコード
 
-The following code samples show how to use the IO constructors provided by the `FirmataClientTCP` client. They must execute inside the `onReady` callback or afterwards. If executed before that time, the examples will fail as the constructors are not yet available. These examples assume the provider is connected to an ESP8266; in the case of the I2C examples, it assumes a Moddable One.
+以下のコードサンプルは、`FirmataClientTCP`クライアントが提供するIOコンストラクタの使用方法を示しています。これらは`onReady`コールバック内またはその後で実行する必要があります。その前に実行すると、コンストラクタがまだ利用できないため、例は失敗します。これらの例では、プロバイダーがESP8266に接続されていることを前提としています。I2Cの例の場合は、Moddable Oneを前提としています。
 
-#### Blink Remote LED
+#### リモートLEDの点滅
 
 ```js
 let led = new firmata.Digital({
@@ -294,7 +294,7 @@ System.setInterval(() => {
 }, 500);
 ```
 
-#### Monitor Remote Flash Button
+#### リモートフラッシュボタンの監視
 
 ```js
 let remoteButton = new firmata.Digital({
@@ -306,9 +306,9 @@ let remoteButton = new firmata.Digital({
 });
 ```
 
-Having an `onReadable` callback is optional in this example because the `read` call always returns the most recent value available to the provider. For example, a script that already has a polling loop might choose to simply read the value directly at that time rather than using the `onReadable` callback.
+この例では`onReadable`コールバックを持つことはオプションです。`read`呼び出しは常にプロバイダーが利用できる最新の値を返すためです。例えば、すでにポーリングループを持つスクリプトは、`onReadable`コールバックを使用するのではなく、その時点で値を直接読み取ることを選択する場合があります。
 
-#### Monitor Remote Analog Pin
+#### リモートアナログピンの監視
 
 ```js
 let analog = new firmata.Analog({
@@ -322,10 +322,10 @@ let analog = new firmata.Analog({
 });
 ```
 
-When this example receives a peak reading, it closes the analog monitor. To test this code on a Moddable One, place your finger near or on the analog pin trace to see the range of values.
+この例では、ピーク読み取り値を受信すると、アナログモニターを閉じます。Moddable Oneでこのコードをテストするには、アナログピントレースの近くまたは上に指を置いて、値の範囲を確認してください。
 
-#### Monitor Remote Digital Bank
-In Firmata, pins are organized into ports, which are groups of eight pins.  The TC53 IO class proposal uses the term `bank` for what Firmata calls a `port`. This example  creates a single monitor for pins Digital pins 12, 13, 14, 15 which are the top four pins of bank 1.
+#### リモートデジタルバンクの監視
+Firmataでは、ピンは8つのピンのグループであるポートに編成されています。TC53 IOクラス提案では、Firmataが`port`と呼ぶものに対して`bank`という用語を使用しています。この例では、バンク1の上位4つのピンであるデジタルピン12、13、14、15用の単一モニターを作成します。
 
 ```js
 let remoteBank = new firmata.DigitalBank({
@@ -339,7 +339,7 @@ let remoteBank = new firmata.DigitalBank({
 ```
 
 #### I2C
-I2C is a bit more complicated than Analog and Digital pins as it is a transaction-based hardware protocol: requests are made to the hardware to read and write bytes. The provider is fully asynchronous. This is not a problem for write operations as the Firmata protocol assumes reliable delivery, so the write request will eventually be delivered to the write pins.
+I2Cは、トランザクションベースのハードウェアプロトコルであるため、アナログおよびデジタルピンよりも少し複雑です：バイトの読み書きを行うためにハードウェアにリクエストが行われます。プロバイダーは完全に非同期です。Firmataプロトコルは信頼性の高い配信を前提としているため、書き込み要求は最終的に書き込みピンに配信されるので、書き込み操作には問題ありません。
 
 ```js
 let i2c = new firmata.I2C({
@@ -348,9 +348,9 @@ let i2c = new firmata.I2C({
 i2c.write(Uint8Array.of(3, 11, 5));
 ```
 
-For an I2C read, it is necessary to indicate how many bytes to read when making the read call. To address this situation within the IO Class API, the read is issued as usual, with the requested number of bytes. The `onReadable` callback is invoked when the bytes read are available. Invoking the `read` call without any parameters returns the result of the read. If multiple `read` calls are issued, their results are returned in the same order requested.
+I2C読み取りでは、読み取り呼び出しを行う際に読み取るバイト数を示す必要があります。IO Class API内でこの状況に対処するため、読み取りは要求されたバイト数で通常通り発行されます。読み取られたバイトが利用可能になると`onReadable`コールバックが呼び出されます。パラメータなしで`read`呼び出しを実行すると、読み取りの結果が返されます。複数の`read`呼び出しが発行された場合、それらの結果は要求されたのと同じ順序で返されます。
 
-The following example works with the capacitive touch controller on Moddable One. It reads the touch count register, which indicates whether 0, 1, or 2 fingers are currently detected by the touch sensor.
+以下の例は、Moddable Oneの静電容量式タッチコントローラーで動作します。タッチセンサーによって現在検出されている指が0、1、または2本であるかを示すタッチカウントレジスタを読み取ります。
 
 ```js
 let touchController = new firmata.I2C({
@@ -365,26 +365,26 @@ touchController.read(1);
 ```
 
 <a id="client-implementation-notes"></a>
-### Implementation Notes
-The Firmata Client provides the start of the `FirmataClientSerial` class. This has not been tested. It requires the addition of code to manage the initial handshake to work with the Moddable Firmata Server.
+### 実装ノート
+Firmataクライアントは`FirmataClientSerial`クラスの開始を提供します。これはテストされていません。Moddable Firmataサーバーと動作するために初期ハンドシェイクを管理するコードの追加が必要です。
 
-The implementation does not yet support serial.
+実装はまだシリアルをサポートしていません。
 
 <a id="firmata-graphics-using-poco"></a>
-## Firmata Graphics using Poco
-The Moddable One hardware has an integrated touch screen. To allow Firmata client code to draw to the display, a simple graphics protocol has been added to the Firmata protocol. The graphics implementation uses the [Poco graphics engine](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/poco.md) from the [Commodetto graphics library](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/commodetto.md) in the Moddable SDK. The integration is a small subset of the full capabilities, more or less the ability to fill rectangles. However, the approach is designed to support additional drawing functionality in the future.
+## Pocoを使用したFirmataグラフィックス
+Moddable Oneハードウェアには統合タッチスクリーンがあります。Firmataクライアントコードがディスプレイに描画できるようにするため、シンプルなグラフィックスプロトコルがFirmataプロトコルに追加されました。グラフィックス実装は、Moddable SDKの[Commodettoグラフィックスライブラリ](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/commodetto.md)の[Pocoグラフィックスエンジン](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/commodetto/poco.md)を使用しています。統合は全機能の小さなサブセットで、多かれ少なかれ矩形を塗りつぶす機能です。ただし、このアプローチは将来的に追加の描画機能をサポートするように設計されています。
 
-It is theoretically possible to render to the Moddable One display using the SPI pins with Firmata. However, there is no good reason to replace the optimized native display driver with a comparatively slow data transfer over over Firmata. Further, the large amount of data required to deliver rendered graphics is not what Firmata is best at. Instead, the implementation marshals Poco drawing commands over the Firmata protocol, with the rendering occurring efficiently on the Firmata server.
+理論的には、FirmataでSPIピンを使用してModdable Oneディスプレイにレンダリングすることは可能です。しかし、最適化されたネイティブディスプレイドライバーを、Firmata経由の比較的遅いデータ転送で置き換える良い理由はありません。さらに、レンダリングされたグラフィックスを配信するために必要な大量のデータは、Firmataが最も得意とするものではありません。代わりに、実装はFirmataプロトコル経由でPoco描画コマンドをマーシャリングし、レンダリングはFirmataサーバー上で効率的に行われます。
 
 <a id="poco-example-code"></a>
-### Example Code
-The following examples show how to use Poco graphics with the Firmata Client when communicating to the Firmata Server. The Firmata Server must have been built with display driver support to use Poco. For Moddable One, build the Firmata Server with the `esp/moddable_one` target:
+### サンプルコード
+以下の例は、FirmataサーバーとやりとりするときにFirmataクライアントでPocoグラフィックスを使用する方法を示しています。Pocoを使用するには、Firmataサーバーがディスプレイドライバーサポートでビルドされている必要があります。Moddable Oneの場合は、`esp/moddable_one`ターゲットでFirmataサーバーをビルドします：
 
 	cd $MODDABLE/examples/io/firmata/server
 	mcconfig -m -p esp/moddable_one ssid="Moddable" password="secret"
 
-#### Connect and Erase Screen
-The following example creates a Firmata provider which connects to a Moddable One. When the connection is established, the remote display is erased to blue.
+#### 接続と画面消去
+以下の例は、Moddable Oneに接続するFirmataプロバイダーを作成します。接続が確立されると、リモートディスプレイが青色で消去されます。
 
 ````js
 new FirmataClientTCP({
@@ -399,7 +399,7 @@ new FirmataClientTCP({
 })
 ````
 
-The instance created by calling the `this.Poco` constructor presents a subset of the full Poco JavaScript API. The code to erase the local display on a Moddable One is identical, beyond the constructor:
+`this.Poco`コンストラクタの呼び出しによって作成されるインスタンスは、完全なPoco JavaScript APIのサブセットを提示します。Moddable Oneでローカルディスプレイを消去するコードは、コンストラクタ以外は同じです：
 
 ````js
 const poco = new Poco(screen);
@@ -409,8 +409,8 @@ poco.begin();
 poco.end();
 ````
 
-#### Remote Button with Display
-The following example reads the remote button and updates a rectangle on the screen to be red when the button is pressed and gray otherwise.
+#### ディスプレイ付きリモートボタン
+以下の例は、リモートボタンを読み取り、ボタンが押されたときに画面の矩形を赤色に、そうでなければ灰色に更新します。
 
 ```js
 new FirmataClientTCP({
@@ -436,8 +436,8 @@ new FirmataClientTCP({
 ```
 
 <a id="poco-implementation-notes"></a>
-### Implementation Notes
-The Firmata support for Poco implements the following calls:
+### 実装ノート
+FirmataのPocoサポートは以下の呼び出しを実装しています：
 
 - `constructor`
 - `begin`
@@ -448,20 +448,20 @@ The Firmata support for Poco implements the following calls:
 - `clip`
 - `origin`
 
-Colors are transmitted from client to server using seven bits per channel (R, G, and B are each 7 bits). This is done as Firmata is designed to carry seven bit data, and many embedded displays use only 5 or 6 bits of color channel information.
+色は、チャネルあたり7ビット（R、G、Bはそれぞれ7ビット）を使用してクライアントからサーバーに送信されます。これは、Firmataが7ビットデータを運ぶように設計されており、多くの組み込みディスプレイは色チャネル情報の5または6ビットのみを使用するためです。
 
-The Firmata Server informs the client that the Poco protocol extension is supported by sending a `STRING_DATA` message with the value `hasPoco` following the response to the `CAPABILITY_QUERY` message. A client which is unaware of the feature will ignore the message. This is a temporary ad-hoc approach.
+Firmataサーバーは、`CAPABILITY_QUERY`メッセージへの応答に続いて値`hasPoco`の`STRING_DATA`メッセージを送信することで、Pocoプロトコル拡張がサポートされていることをクライアントに通知します。この機能を知らないクライアントはメッセージを無視します。これは一時的なアドホックアプローチです。
 
-All Poco messages contained within the Sysex message `User Command 1` to avoid conflicting with any existing or proposed extension to Firmata.
+すべてのPocoメッセージは、Firmataの既存または提案された拡張との競合を避けるために、Sysexメッセージ`User Command 1`内に含まれています。
 
 <a id="conclusion"></a>
-## Conclusion
-This project began as an experiment to implement a small Firmata server to exercise the ESP8266 implementation of the TC53 proposed IO classes. It succeeded in that goal, providing an excellent test bed to shake out bugs in the implementation and overlooked details in the design. The implementation is efficient. Its size and complexity seem appropriate to the task it performs. The code is focused on translating between Firmata and the IO class API, not in wrestling with the IO class to get the desired behavior. There is a reasonably strong correspondence between the capabilities Firmata requires the APIs the IO Class provides.
+## 結論
+このプロジェクトは、提案されているTC53 IOクラスのESP8266実装を動作させるための小さなFirmataサーバーを実装する実験として始まりました。この目標は成功し、実装のバグや設計で見落とされた詳細を振り落とすための優れたテストベッドを提供しました。実装は効率的です。そのサイズと複雑さは、実行するタスクに適切に見えます。コードは、所望の動作を得るためにIOクラスと格闘するのではなく、FirmataとIOクラスAPI間の変換に焦点を当てています。Firmataが要求する機能とIOクラスが提供するAPIの間には、合理的に強い対応関係があります。
 
-The Firmata client implementation began as a way to test `FirmataTCPServer`. Once the basics of that worked, it made sense to build it out using the TC53 IO Class provider model. As the first asynchronous provider implementation, it helped to formalize some of the ideas around how the IO class design should adapt to these scenarios.
+Firmataクライアント実装は、`FirmataTCPServer`をテストする方法として始まりました。その基本が動作すると、TC53 IOクラスプロバイダーモデルを使用してそれを構築することが理にかなっていました。最初の非同期プロバイダー実装として、IOクラス設計がこれらのシナリオにどのように適応すべきかについてのアイデアの一部を形式化するのに役立ちました。
 
-Implementing the Firmata Server and Client in JavaScript is relatively straightforward because of the many capabilities built into the language itself. The resulting implementation is quite stable for code that is still quite new.
+FirmataサーバーとクライアントをJavaScriptで実装することは、言語自体に組み込まれた多くの機能のため、比較的簡単です。結果として得られる実装は、まだ非常に新しいコードにとってはかなり安定しています。
 
-The Poco extension to Firmata is an experiment, which became possible once the Server and Client were working together. While drawing rectangles isn't quite enough functionality to be very useful, it is easy to using remote graphics over Firmata with a few more functions added. For now, it is a great way to build some visual Firmata examples and explore interactive scenarios involving a display.
+FirmataへのPoco拡張は実験であり、サーバーとクライアントが連携して動作するようになったことで可能になりました。矩形を描画することはとても有用になるほどの十分な機能ではありませんが、いくつかの関数を追加することで、Firmata経由でリモートグラフィックスを使用することは簡単です。今のところ、いくつかの視覚的なFirmataの例を構築し、ディスプレイを含むインタラクティブなシナリオを探求する素晴らしい方法です。
 
-Overall, this Firmata experiment has shown that the proposed IO Class is quite usable for implementing a very different IO model. That is significant as a key design point of the TC53 proposal is to define a low level IO Class that can be used as the foundation to build higher level frameworks that are focused on a focused use or market segment. It is exciting to glimpse a world where a such frameworks, as embodied by here by Firmata, are supported out-of-the-box by new hardware releases as they launch with support for TC53 APIs, such as the IO Class.
+全体的に、このFirmata実験は、提案されているIOクラスが非常に異なるIOモデルを実装するためにかなり使用可能であることを示しました。これは重要なことです。TC53提案の主要な設計ポイントは、特定の用途や市場セグメントに焦点を当てた高レベルのフレームワークを構築するための基盤として使用できる低レベルのIOクラスを定義することだからです。ここでFirmataによって具体化されたそのようなフレームワークが、IOクラスなどのTC53 APIサポートでローンチする新しいハードウェアリリースによって、箱から出してサポートされる世界を垣間見ることは刺激的です。
