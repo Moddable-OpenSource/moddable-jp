@@ -27,7 +27,7 @@ Copyright 2017-2024 Moddable Tech, Inc.<BR>
 	* [GAPWhitelistクラス](#classgapwhitelist)
 * [ESP32プラットフォームでのBLEアプリ](#esp32platform)
 * [Blue GeckoプラットフォームでのBLEアプリ](#geckoplatform)
-* [BLE例示アプリ](#exampleapps)
+* [BLEサンプルアプリ](#exampleapps)
 
 <a id="addingble"></a>
 ## プロジェクトにBLEを追加する
