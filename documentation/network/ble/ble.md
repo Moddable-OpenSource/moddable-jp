@@ -76,7 +76,7 @@ class Scanner extends BLEClient {
 let scanner = new Scanner;
 ```
 
-次のBLEサーバーの例では、`BLEServer`をサブクラス化して、デバイスをBLE健康体温計周辺機器としてアドバタイズします：
+次のBLEサーバーの例では、`BLEServer`をサブクラス化して、デバイスをBLE健康体温計ペリフェラルとしてアドバタイズします：
 
 ```javascript
 import BLEServer from "bleserver";
