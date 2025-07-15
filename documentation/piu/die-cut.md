@@ -1,23 +1,23 @@
 # Die Cut
 Copyright 2016 Moddable Tech, Inc.<BR>
-Revised: November 22, 2016
+更新日: 2016年11月22日
 
-## Introduction
+## はじめに
 
-To get animations on a screen connected to a microcontroller by a serial interface (SPI), the game is to minimize the number of pixels that change from frame to frame.
+シリアルインターフェース（SPI）でマイクロコントローラに接続された画面でアニメーションを実現するには、フレーム間で変化するピクセル数を最小化することが重要です。
 
-> FYI, here is what is happening at every frame when changes in the appearance or the layout invalidate and update the screen:
+> 参考として、外観やレイアウトの変更によって画面の無効化と更新が行われる際に、各フレームで何が起こっているかを以下に示します：
 >
-> - The dirty region accumulates the invalidations.
-> - The containment hierarchy is traversed once to build the command list that will update the screen.
-> - The dirty region and the command list are decomposed into rectangles and display lists.
-> - Rectangles and display lists are processed to send blocks of pixels to the screen.
+> - ダーティ領域（描画に変化のある領域）が再描画が必要な範囲を蓄積します。
+> - オブジェクト階層が一度走査され、画面を更新するコマンドリストが構築されます。
+> - ダーティ領域とコマンドリストが矩形とディスプレイリストに分解されます。
+> - 矩形とディスプレイリストが処理され、ピクセルのブロックが画面に送信されます。
 
-The `die` object is a `layout` object that allows animations and transitions to “die cut” contents with a region. Thanks to regions operations, the `die` object minimizes the areas to invalidate and to update. It can give the illusion of full screen animations while few pixels are in fact changing.
+`die`オブジェクトは、アニメーションとトランジションが領域を使ってコンテンツを「型抜き」することを可能にする`layout`オブジェクトです。領域操作のおかげで、`die`オブジェクトは再描画と更新する領域を最小化します。実際に変化するピクセルは少ないながら、フルスクリーンアニメーションの錯覚を与えることができます。
 
-## Examples
+## 例
 
-Let us begin with a static example:
+静的な例から始めましょう：
 
 	let TestContainer = Container.template($ => ({
 		left:0, right:0, top:0, bottom:0, skin:blueSkin,
@@ -44,15 +44,15 @@ Let us begin with a static example:
 		]
 	}));
 
-The `empty`, `or`, `xor` and `sub` methods are chainable operations to build the region. The `cut` method changes the region.
+`empty`、`or`、`xor`、`sub`メソッドは、領域を構築するためのチェーン可能な操作です。`cut`メソッドは領域を変更します。
 
-If you add the `TestContainer` to an application, here is what it will look like:
+`TestContainer`をアプリケーションに追加すると、次のような表示になります：
 
 ![](./../assets/die-cut/die-cut.png)
 
-But of course the `die` object is mostly interesting to build animations and transitions. You will find examples in the Piu libraries: WipeTransition and CombTransition.
+しかし、もちろん`die`オブジェクトは主にアニメーションとトランジションを構築するために興味深いものです。Piuライブラリには例があります：WipeTransitionとCombTransition。
 
-Let us build a "venitian blind" transition:
+「ベネチアンブラインド」トランジションを構築してみましょう：
 
 ```js
 class VenitianBlindTransition extends Transition {
@@ -86,74 +86,72 @@ class VenitianBlindTransition extends Transition {
 }
 ```
 
-The `attach` and `detach` methods allow to temporarily insert a `die` object in the containment hierarchy. At every step of the transition the region changes to progressively close the "venitian blind".
+`attach`と`detach`メソッドは、一時的に`die`オブジェクトをオブジェクト階層に挿入することを可能にします。トランジションの各ステップで、領域が変化して「ベネチアンブラインド」を段階的に閉じます。
 
-## Reference
+## リファレンス
 
-The `die` object is a `layout` object that allows to “die cut” its contents with a region. The `die` object maintains two regions:
+`die`オブジェクトは、領域を使ってそのコンテンツを「型抜き」することを可能にする`layout`オブジェクトです。`die`オブジェクトは2つの領域を維持します：
 
-- the work region that the available operations build,
-- the clip region that clips the contents of the `die` object
+- 利用可能な操作が構築する作業領域
+- `die`オブジェクトのコンテンツをクリップするクリップ領域
 
-Both regions are initially empty.
+両方の領域は最初は空です。
 
-#### Prototype Description
+#### プロトタイプの説明
 
-Prototype inherits from `Layout.prototype`.
+プロトタイプは`Layout.prototype`から継承します。
 
 ##### `Die.prototype.and(x, y, width, height)`
 
-> `x, y, width, height` a local rectangle, in pixels
+> `x, y, width, height` ローカル矩形、ピクセル単位
 >
-> Intersect the rectangle with the work region. Return this.
+> 矩形を作業領域と交差させます。thisを返します。
 
 ##### `Die.prototype.attach(content)`
 
-> `content ` the `content` object to attach
+> `content ` アタッチする`content`オブジェクト
 >
-> Bind the `die` object to the content hierarchy by replacing the specified `content` object in the content's container with this `die` object and adding the `content` object to this `die` object.
+> 指定された`content`オブジェクトをそのコンテナ内でこの`die`オブジェクトに置き換え、その`content`オブジェクトをこの`die`オブジェクトに追加することで、`die`オブジェクトをオブジェクト階層にバインドします。
 
 ##### `Die.prototype.cut()`
 
->  Copy the work region into the current region. Invalidate only the difference between the work and the clip regions.
+>  作業領域を現在の領域にコピーします。作業領域とクリップ領域の差分のみを再描画対象とします。
 
 ##### `Die.prototype.empty()`
 
-> Empty the work region. Return `this`
+> 作業領域を空にします。`this`を返します。
 
 ##### `Die.prototype.detach()`
 
-> Unbind this `die` object from the content hierarchy by removing the first `content` object from this `die` object and replacing this `die` object in its container with the removed `content` object.
+> この`die`オブジェクトから最初の`content`オブジェクトを削除し、この`die`オブジェクトをそのコンテナ内で削除された`content`オブジェクトに置き換えることで、この`die`オブジェクトをオブジェクト階層からアンバインドします。
 
 ##### `Die.prototype.fill()`
 
-> Set the work region to the bounds of this `die` object. Return `this`
+> 作業領域をこの`die`オブジェクトの境界に設定します。`this`を返します。
 
 ##### `Die.prototype.or(x, y, width, height)`
 
-> `x, y, width, height` a local rectangle, in pixels
+> `x, y, width, height` ローカル矩形、ピクセル単位
 >
-> Inclusively union the rectangle with the work region. Return `this`.
+> 矩形を作業領域と包含的に結合します。`this`を返します。
 
 ##### `Die.prototype.set(x, y, width, height)`
 
-> `x, y, width, height` a local rectangle, in pixels
+> `x, y, width, height` ローカル矩形、ピクセル単位
 >
-> Set the work region to the rectangle. Return `this`.
+> 作業領域を矩形に設定します。`this`を返します。
 
 ##### `Die.prototype.sub(x, y, width, height)`
 
-> `x, y, width, height` a local rectangle, in pixels
+> `x, y, width, height` ローカル矩形、ピクセル単位
 >
-> Subtract the rectangle from the work region. Return `this`.
+> 作業領域から矩形を減算します。`this`を返します。
 
 ##### `Die.prototype.xor(x, y, width, height)`
 
-> `x, y, width, height` a local rectangle, in pixels
+> `x, y, width, height` ローカル矩形、ピクセル単位
 >
-> Exclusively union the work region with the rectangle. Return `this`.
-
-
+> 作業領域と矩形を排他的に結合します。`this`を返します。
 
 
 
