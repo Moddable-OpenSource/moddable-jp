@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2024  Moddable Tech, Inc.
+ * Copyright (c) 2016-2025  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Tools.
  * 
@@ -389,12 +389,6 @@ class CMakeListsFile extends PrerequisiteFile {
 			this.line("\tmxDebug=1");
 			this.line("\tmxInstrument=1");
 		}
-		this.line("\tmxRun=1");
-		this.line("\tmxParse=1");
-		this.line("\tmxNoFunctionLength=1");
-		this.line("\tmxNoFunctionName=1");
-		this.line("\tmxHostFunctionPrimitive=1");
-		this.line("\tmxFewGlobalsTable=1");
 		this.line(")");
 		
 		this.line("target_include_directories(tech-moddable-piu PUBLIC");
@@ -614,12 +608,6 @@ class XcodeFile extends PrerequisiteFile {
 			this.line("\t\t\t\t\t\"mxDebug=1\",");
 			this.line("\t\t\t\t\t\"mxInstrument=1\",");
 		}
-		this.line("\t\t\t\t\t\"mxRun=1\",");
-		this.line("\t\t\t\t\t\"mxParse=1\",");
-		this.line("\t\t\t\t\t\"mxNoFunctionLength=1\",");
-		this.line("\t\t\t\t\t\"mxNoFunctionName=1\",");
-		this.line("\t\t\t\t\t\"mxHostFunctionPrimitive=1\",");
-		this.line("\t\t\t\t\t\"mxFewGlobalsTable=1\",");
 		template = template.replace(/#GCC_PREPROCESSOR_DEFINITIONS#/g, this.current);
 		
 		this.current = ""
@@ -802,7 +790,7 @@ export default class extends Tool {
 			this.createDirectory(path);
 		}
 		else {
-			path += this.slash + this.platform;
+			path += this.slash + platform;
 			this.createDirectory(path);
 			if (this.subplatform) {
 				path += this.slash + this.subplatform;
@@ -1043,6 +1031,31 @@ export default class extends Tool {
 		}
 	}
 	run() {
+		if (this.platform === "esp") {
+			let base;
+			if (this.windows) {
+				base = this.environment.BASE_DIR ?? this.getenv("BASE_DIR") ?? this.getenv("USERPROFILE");
+				this.environment.BASE_DIR = base;
+				this.setenv("BASE_DIR", base);
+				base = this.resolveDirectoryPath(base + this.slash + "esp" + this.slash); 
+				if (!base)
+					throw new Error("esp directory not found");
+			}
+			else {
+				base = this.environment.ESP_BASE ?? this.getenv("ESP_BASE");
+				if (!base) {
+					base = this.resolveDirectoryPath(this.getenv("HOME") + "/esp/");
+					if (!base)
+						throw new Error("esp directory not found");
+				}
+				this.environment.ESP_BASE = base;
+				this.setenv("ESP_BASE", base);
+			}
+		
+			this.environment.ARDUINO_ROOT = base + this.slash + "esp8266-2.3.0";
+			this.setenv("ARDUINO_ROOT", this.environment.ARDUINO_ROOT);
+		}
+
 		this.localsName = "locals";
 		super.run();
 

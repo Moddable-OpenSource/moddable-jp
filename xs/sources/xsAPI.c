@@ -53,7 +53,7 @@ txKind fxTypeOf(txMachine* the, txSlot* theSlot)
 		return XS_STRING_KIND;
 	if (theSlot->kind == XS_BIGINT_X_KIND)
 		return XS_BIGINT_KIND;
-#ifdef mxHostFunctionPrimitive
+#if mxHostFunctionPrimitive
 	if (theSlot->kind == XS_HOST_FUNCTION_KIND)
 		return XS_REFERENCE_KIND;
 #endif
@@ -120,7 +120,7 @@ txBoolean fxToBoolean(txMachine* the, txSlot* theSlot)
 		else
 			theSlot->value.boolean = 1;
 		break;
-#ifdef mxHostFunctionPrimitive
+#if mxHostFunctionPrimitive
 	case XS_HOST_FUNCTION_KIND:
 #endif
 	case XS_SYMBOL_KIND:
@@ -545,7 +545,7 @@ void fxBuildHosts(txMachine* the, txInteger c, const txHostFunctionBuilder* buil
 	fxArrayCacheBegin(the, the->stack);
 	while (c) {
 		if (builder->length >= 0) {
-		#ifdef mxHostFunctionPrimitive
+		#if mxHostFunctionPrimitive
 			mxPushUndefined();
 			the->stack->kind = XS_HOST_FUNCTION_KIND;
 			the->stack->value.hostFunction.builder = builder;
@@ -877,7 +877,7 @@ void fxSetHostBuffer(txMachine* the, txSlot* slot, void* theData, txSize theSize
 		bufferInfo->value.bufferInfo.length = theSize;
 	}
 	else
-		mxSyntaxError("C: xsSetHostData: not a host object");
+		mxSyntaxError("C: xsSetHostBuffer: not a host object");
 }
 
 void *fxSetHostChunk(txMachine* the, txSlot* slot, void* theValue, txSize theSize)

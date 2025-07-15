@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2024  Moddable Tech, Inc.
+ * Copyright (c) 2016-2025  Moddable Tech, Inc.
  *
  *   This file is part of the Moddable SDK Runtime.
  * 
@@ -20,7 +20,6 @@
 
 
 #define __XS6PLATFORMMINIMAL__
-#define ESP32 5
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,8 +40,6 @@
 	#include "esp_bt.h"
 #endif
 
-#include "driver/uart.h"
-
 #include "modInstrumentation.h"
 #include "esp_system.h"		// to get system_get_free_heap_size, etc.
 
@@ -56,25 +53,11 @@
 	#include "common/builtinCommon.h"
 #endif
 
-#define XS_STACK_EXTRA	512
-#define XS_STACK_EXTRA_CLIB	1024
+#define XT_STACK_EXTRA	512
+#define XT_STACK_EXTRA_CLIB	1024
 
-#ifndef DEBUGGER_SPEED
-	#define DEBUGGER_SPEED 921600
-#endif
-
-#if USE_USB
-	#include "driver/usb_serial_jtag.h"
-#else
-	#include "driver/uart.h"
-
-	#define USE_UART	UART_NUM_0
-	#define USE_UART_TX	24
-	#define USE_UART_RX	23
-#endif
-
-extern void fx_putc(void *refcon, char c);		//@@
 extern void mc_setup(xsMachine *the);
+extern void	setupDebugger();
 
 #if 0 == CONFIG_LOG_DEFAULT_LEVEL
 	#define kStack (((10 * 1024) + XT_STACK_EXTRA_CLIB) / sizeof(StackType_t))
@@ -86,59 +69,28 @@ extern void mc_setup(xsMachine *the);
 	uint8_t gSoftReset;
 #endif
 
-#ifndef UART_HW_FIFO_LEN
-	#define UART_HW_FIFO_LEN(USE_UART) UART_FIFO_LEN
-#endif
-
-static xsMachine *gThe;		// the main XS virtual machine running
-
-/*
-	xsbug IP address
-
-	IP address either:
-		0,0,0,0 - no xsbug connection
-		127,0,0,7 - xsbug over serial
-		w,x,y,z - xsbug over TCP (address of computer running xsbug)
-*/
-
-#define XSDEBUG_NONE 0,0,0,0
-#define XSDEBUG_SERIAL 127,0,0,7
-#ifndef DEBUG_IP
-	#define DEBUG_IP XSDEBUG_SERIAL
-#endif
+xsMachine *gThe;		// the main XS virtual machine running
 
 #ifdef mxDebug
-	unsigned char gXSBUG[4] = {DEBUG_IP};
-#endif
+	// #define WEAK __attribute__((weak))
+	#define WEAK
 
-#ifdef mxDebug
+	/*
+		xsbug IP address
 
-#if USE_USB
-static void debug_task(void *pvParameter)
-{
-	usb_serial_jtag_driver_config_t cfg = { .rx_buffer_size = 4096, .tx_buffer_size = 2048 };
-	usb_serial_jtag_driver_install(&cfg);
+		IP address either:
+			0,0,0,0 - no xsbug connection
+			127,0,0,7 - xsbug over serial
+			w,x,y,z - xsbug over TCP (address of computer running xsbug)
+	*/
 
-	while (true) {
-		fxReceiveLoop();
-		modDelayMilliseconds(1);
-	}
-}
+	#define XSDEBUG_NONE 0,0,0,0
+	#define XSDEBUG_SERIAL 127,0,0,7
+	#ifndef DEBUG_IP
+		#define DEBUG_IP XSDEBUG_SERIAL
+	#endif
 
-#else	// !USE_USB
-static void debug_task(void *pvParameter)
-{
-	while (true) {
-		uart_event_t event;
-
-		if (!xQueueReceive((QueueHandle_t)pvParameter, (void * )&event, portMAX_DELAY))
-			continue;
-
-		if (UART_DATA == event.type)
-			fxReceiveLoop();
-	}
-}
-#endif
+	WEAK unsigned char gXSBUG[4] = {DEBUG_IP};
 #endif
 
 void loop_task(void *pvParameter)
@@ -175,86 +127,6 @@ void loop_task(void *pvParameter)
 	}
 }
 
-/*
-	Required functions provided by application
-	to enable serial port for diagnostic information and debugging
-*/
-
-void modLog_transmit(const char *msg)
-{
-	uint8_t c;
-
-#ifdef mxDebug
-	if (gThe) {
-		while (0 != (c = c_read8(msg++)))
-			fx_putc(gThe, c);
-		fx_putc(gThe, 0);
-	}
-	else
-#endif
-	{
-		while (0 != (c = c_read8(msg++)))
-			ESP_putc(c);
-		ESP_putc(13);
-		ESP_putc(10);
-	}
-}
-
-
-void ESP_put(uint8_t *c, int count) {
-#if USE_USB
-	int sent = 0;
-	while (count > 0) {
-		sent = usb_serial_jtag_write_bytes(c, count, 10);
-		if (sent <= 0)
-			return;
-		c += sent;
-		count -= sent;
-	}
-#else
-	uart_write_bytes(USE_UART, (char *)c, count);
-#endif
-}
-
-void ESP_putc(int c) {
-	char cx = c;
-#if USE_USB
-	usb_serial_jtag_write_bytes(&cx, 1, 1);
-#else
-	uart_write_bytes(USE_UART, &cx, 1);
-#endif
-}
-
-int ESP_getc(void) {
-	int amt;
-	uint8_t c;
-#if USE_USB
-	amt = usb_serial_jtag_read_bytes(&c, 1, 1);
-#else
-	amt = uart_read_bytes(USE_UART, &c, 1, 0);
-#endif
-	return (1 == amt) ? c : -1;
-}
-
-uint8_t ESP_isReadable() {
-#if USE_USB
-	return true;
-#else
-	size_t s;
-	uart_get_buffered_data_len(USE_UART, &s);
-	return s > 0;
-#endif
-}
-
-uint8_t ESP_setBaud(int baud) {
-#if USE_USB
-	return 1;
-#else
-	uart_wait_tx_done(USE_UART, 5 * 1000);
-	return ESP_OK == uart_set_baudrate(USE_UART, baud);
-#endif
-}
-
 void app_main() {
 	modPrelaunch();
 
@@ -269,50 +141,7 @@ void app_main() {
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
 #endif
 
-#if USE_USB
-#ifdef mxDebug
-    xTaskCreate(debug_task, "debug", (768 + XT_STACK_EXTRA) / sizeof(StackType_t), 0, 8, NULL);
-    printf("USB CONNECTED\r\n");
-#endif
-#else // !USE_USB
-
-	esp_err_t err;
-	uart_config_t uartConfig = {0};
-#ifdef mxDebug
-	uartConfig.baud_rate = DEBUGGER_SPEED;
-#else
-	uartConfig.baud_rate = CONFIG_ESP_CONSOLE_UART_BAUDRATE;
-#endif
-	uartConfig.data_bits = UART_DATA_8_BITS;
-	uartConfig.parity = UART_PARITY_DISABLE;
-	uartConfig.stop_bits = UART_STOP_BITS_1;
-	uartConfig.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
-	uartConfig.rx_flow_ctrl_thresh = 120;		// unused. no hardware flow control.
-	uartConfig.source_clk = UART_SCLK_DEFAULT;
-
-#ifdef mxDebug
-	QueueHandle_t uartQueue;
-	uart_driver_install(USE_UART, UART_HW_FIFO_LEN(USE_UART) * 2, 0, 8, &uartQueue, 0);
-#else
-	uart_driver_install(USE_UART, UART_HW_FIFO_LEN(USE_UART) * 2, 0, 0, NULL, 0);
-#endif
-
-	err = uart_param_config(USE_UART, &uartConfig);
-	if (err)
-		printf("uart_param_config err %d\r\n", err);
-	err = uart_set_pin(USE_UART, USE_UART_TX, USE_UART_RX, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-	if (err)
-		printf("uart_set_pin err %d\r\n", err);
-
-#ifdef mxDebug
-	xTaskCreate(debug_task, "debug", (768 + XT_STACK_EXTRA) / sizeof(StackType_t), uartQueue, 8, NULL);
-	#if MODDEF_ECMA419_ENABLED
-		builtinUsePin(USE_UART_TX);
-		builtinUsePin(USE_UART_RX);
-	#endif
-#endif
-
-#endif	// ! USE_USB
+	setupDebugger();
 
 	xTaskCreate(loop_task, "main", kStack, NULL, 4, NULL);
 }

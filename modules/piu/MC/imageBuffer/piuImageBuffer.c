@@ -74,7 +74,7 @@ void PiuImageBufferDictionary(xsMachine* the, void* it)
 	PiuImageBuffer* self = it;
 	xsIntegerValue integer;
 	if (xsFindInteger(xsArg(1), xsID_imageType, &integer)) {
-		if (integer != kCommodettoBitmapFormat)
+		if ((integer != kCommodettoBitmapFormat) && (integer != kCommodettoBitmapGray16))
 			xsUnknownError("invalid imageType");
 		(*self)->bits.format = integer;
 	}
@@ -124,7 +124,10 @@ void PiuImageBufferDrawAux(void* it, PiuView* view, PiuCoordinate x, PiuCoordina
 	(*self)->bits.pixels = pixels;
 	x += (*view)->poco->xOrigin;
 	y += (*view)->poco->yOrigin;
-	PocoBitmapDraw((*view)->poco, &((*self)->bits), x, y, 0, 0, sw, sh);
+	if (kCommodettoBitmapGray16 == (*self)->bits.format)
+		PocoGrayBitmapDraw((*view)->poco, &((*self)->bits), PocoMakeColor((*view)->poco, 0, 0, 0), kPocoOpaque, x, y, 0, 0, sw, sh);
+	else
+		PocoBitmapDraw((*view)->poco, &((*self)->bits), x, y, 0, 0, sw, sh);
 	xsEndHost((*self)->the);
 }
 

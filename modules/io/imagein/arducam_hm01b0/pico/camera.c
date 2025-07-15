@@ -28,6 +28,8 @@
 
 #include "pico/hm01b0.h"
 
+char debugStr[128];
+
 #ifndef MODDEF_CAMERA_POWERDOWN
 	#define MODDEF_CAMERA_POWERDOWN -1
 #endif
@@ -68,7 +70,7 @@ struct CameraFrameRecord {
 typedef struct CameraFrameRecord CameraFrameRecord;
 typedef struct CameraFrameRecord *CameraFrame;
 
-#define kCameraFrameCount (2)
+#define kCameraFrameCount (1)
 
 struct CameraRecord {
 	xsMachine	*the;
@@ -85,7 +87,6 @@ struct CameraRecord {
 
 	uint8_t		state;
 	uint8_t		frameSize;
-	uint8_t		swap16;
 	uint8_t		format;
 	uint8_t		fps;
 	uint8_t		isJPEG;
@@ -121,6 +122,8 @@ static FramesizeRecord FrameSizes[MAX_FRAMESIZES] = {
 	1,	 320, 240,
 	2,	 320, 320
 };
+
+static void *tempBuffer;
 
 static int sizeToFrameSize(int width, int height)
 {
@@ -163,6 +166,8 @@ void xs_camera_destructor(void *it)
 
 		hm01b0_deinit();
 		c_free(camera);
+		c_free(tempBuffer);
+		tempBuffer = NULL;
 	}
 }
 
@@ -204,7 +209,7 @@ void xs_camera_constructor(xsMachine *the)
 	uint32_t height = 120;
 	uint8_t format = kIOFormatBuffer;
 	Camera camera;
-	int imageType = kCommodettoBitmapRGB565LE;
+	int imageType = kCommodettoBitmapGray16;
 	uint8_t isJPEG = 0;
 	uint8_t fps = 0;
 
@@ -282,7 +287,6 @@ void xs_camera_constructor(xsMachine *the)
 	camera->state = kStateIdle;
 
 	camera->imageType = imageType;
-	camera->swap16 = (imageType == kCommodettoBitmapRGB565LE);
 
 	if (camera->onReadable && (0 == fps)) { 
 		fps = 30;
@@ -292,6 +296,8 @@ void xs_camera_constructor(xsMachine *the)
 	if (0 != hm01b0_init(&camera->config)) {
 		xsUnknownError("camera init failed");
 	}
+
+	tempBuffer = malloc(camera->width * camera->height);
 }
 
 void xs_camera_read(xsMachine *the)
@@ -303,7 +309,7 @@ void xs_camera_read(xsMachine *the)
 	CameraFrame frame = NULL;
 
 	for (i = 0; i < kCameraFrameCount; i++) {
-		if (kCameraStateReady != camera->frames[i].state)
+		if (kCameraStateFree != camera->frames[i].state)
 			continue;
 		if (NULL == frame)
 			frame = &camera->frames[i];
@@ -313,6 +319,35 @@ void xs_camera_read(xsMachine *the)
 
 	if (NULL == frame)
 		return;
+
+	frame->state = kCameraStatePreparing;
+
+//	uint16_t *dst = (uint16_t*)frame->data;
+	uint8_t *dst = (uint8_t*)frame->data;
+	uint8_t b, c, *src = (uint8_t*)tempBuffer;
+	int j;
+
+	switch (camera->imageType) {
+		case kCommodettoBitmapGray256:
+			memcpy(dst, tempBuffer, frame->dataLength);
+			break;
+		case kCommodettoBitmapGray16:
+			for (i=0; i<frame->dataLength; i++) {
+				b = (src[i*2] >> 1) & 0xF;
+				c = (src[i*2+1] >> 1) & 0xF;
+				dst[i] = (b << 4) | c;
+			}
+			break;
+		case kCommodettoBitmapRGB565LE:
+			for (i=frame->dataLength/2; i > 0; i--) {
+				b = src[i] & 0x1F;
+				((uint16_t*)dst)[i] = (b << 11) | (b << 6) | b;
+			}
+			break;
+		default:
+			modLog("unknown imageType");
+	}
+
 
 	if (kIOFormatBufferDisposable == camera->format) {
 		xsSlot tmp;
@@ -351,48 +386,35 @@ void xs_camera_read(xsMachine *the)
 void cameraShutter(modTimer timer, void *refcon, int refconSize)
 {
 	Camera camera = *(Camera *)refcon;
-	CameraFrame frame = NULL;
-	int i;
+	int l;
 
-	for (i=0; i<kCameraFrameCount; i++) {
-		if (kCameraStateFree == camera->frames[i].state) {
-			frame = &camera->frames[i];
-			frame->id = ++camera->frameID;
-			frame->state = kCameraStatePreparing;
-			break;
-		}
-	}
+	l = camera->width * camera->height;
+	hm01b0_read_frame(tempBuffer, l);
 
-	if (frame) {
-		hm01b0_read_frame(frame->data, frame->dataLength / 2);
-
-		uint16_t *dst = (uint16_t*)frame->data;
-		uint8_t *src = (uint8_t*)frame->data;
-		uint8_t b;
-		int i;
-		for (i=frame->dataLength/2; i > 0; i--) {
-			b = src[i] & 0x1F;
-			dst[i] = (b << 11) | (b << 6) | b;
-		}
-		frame->state = kCameraStateReady;
-
-		if (camera->onReadable) { 
-			modMessagePostToMachine(camera->the, C_NULL, 0, deliverCallbacks, camera);
-		}
+	if (camera->onReadable) { 
+		modMessagePostToMachine(camera->the, C_NULL, 0, deliverCallbacks, camera);
 	}
 }
 
 void xs_camera_start(xsMachine *the)
 {
 	Camera camera = xsmcGetHostDataValidate(xsThis, (void *)&xsCameraHooks);
-	int i;
+	int i, l;
 
 	if (camera->state == kStateRunning)
 		return;
 
+	l = camera->width * camera->height;
+
+	switch (camera->imageType) {
+		case kCommodettoBitmapGray256: 			break;
+		case kCommodettoBitmapGray16: l /= 2;	break;
+		case kCommodettoBitmapRGB565LE: l *= 2;	break;
+	}
+
 	for (i=0; i<kCameraFrameCount; i++) {
 		CameraFrame frame = &camera->frames[i];
-		frame->dataLength = camera->width * camera->height * 2;	// adjust for imageFormat
+		frame->dataLength = l;
 		frame->data = malloc(frame->dataLength);
 		frame->state = kCameraStateFree;
 	}

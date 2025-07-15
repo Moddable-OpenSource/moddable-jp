@@ -248,7 +248,6 @@ void fxDebugCommand(txMachine* the)
 
 void fxDebugEval(txMachine* the, txSlot* frame, txString buffer, txInteger index)
 {
-// #if mxDebugEval
 	txSlot* result;
 	txSlot* expression;
 	mxHostInspectors.value.list.first = C_NULL;
@@ -293,13 +292,6 @@ void fxDebugEval(txMachine* the, txSlot* frame, txString buffer, txInteger index
 	}
 	mxPop();
 	mxPop();
-// #else
-// 	fxEchoStart(the);
-// 	fxEcho(the, "<result line=\"");
-// 	fxEchoInteger(the, index);
-// 	fxEcho(the, "\">not available</result>");
-// 	fxEchoStop(the);
-// #endif
 }
 
 txU1* fxDebugEvalAtom(txMachine* the, txU1* p, Atom* atom, txString t)
@@ -367,8 +359,6 @@ txBoolean fxDebugEvalExpression(txMachine* the, txSlot* frame, txSlot* expressio
 {
 	txBoolean success = 0;
 	if (mxIsFunction(expression->value.reference)) {
-	// #if mxDebugEval
-		
 		txSlot* scope = C_NULL;
 		if (frame == the->frame)
 			scope = the->scope;
@@ -491,7 +481,6 @@ txBoolean fxDebugEvalExpression(txMachine* the, txSlot* frame, txSlot* expressio
 		fxEndHost(the);
 	
 		the->debugEval = 0;
-	// #endif
 	}
 	else {
 		mxPushSlot(expression);
@@ -1907,7 +1896,7 @@ void fxEchoProperty(txMachine* the, txSlot* theProperty, txInspectorNameList* th
 			}
 			fxEcho(the, "\"/>");
 			break;
-	#ifdef mxHostFunctionPrimitive
+	#if mxHostFunctionPrimitive
 		case XS_HOST_FUNCTION_KIND:
 			fxEcho(the, " value=\"(host function)\"/>");
 			break;
@@ -2545,12 +2534,7 @@ void fxLogin(txMachine* the)
 	fxEcho(the, "LE ");
 #endif
 	fxEchoInteger(the, (txInteger)(sizeof(txID)*8));
-	fxEcho(the, "-bit ID\" flags=\"");
-#if mxDebugEval
-	fxEcho(the, "e");
-#else	
-	fxEcho(the, "E");
-#endif
+	fxEcho(the, "-bit ID\" flags=\"e");
 	fxEcho(the, "\"/>");
 	fxEchoStop(the);
 #if mxAliasInstance
@@ -3315,7 +3299,7 @@ txID fxFrameToProfilerID(txMachine* the, txSlot* frame)
 			id = mxFunctionInstanceHome(function)->ID;
 		}
 	}
-#ifdef mxHostFunctionPrimitive
+#if mxHostFunctionPrimitive
 	else if (function->kind == XS_HOST_FUNCTION_KIND)
 		id = function->value.hostFunction.profileID;
 #endif

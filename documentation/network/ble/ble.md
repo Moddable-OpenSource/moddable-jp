@@ -1,6 +1,6 @@
 # BLE
-Copyright 2017-2024 Moddable Tech, Inc.<BR>
-改訂： 2024年9月10日
+Copyright 2017-2025 Moddable Tech, Inc.<BR>
+改訂： 2025年1月25日
 
 ## このドキュメントについて
 このドキュメントは、Moddable SDKのBluetooth Low Energy (BLE) モジュールについて説明します。Espressif ESP32、Silicon Labs Blue Gecko、Qualcomm QCA4020、およびNordic nRF52デバイスで、クライアント（マスター）とサーバー（スレーブ）の両方の役割がサポートされています。
@@ -584,7 +584,8 @@ onCharacteristics(characteristics) {
 | `name` | `string` | オプションのサービスJSONで定義されたキャラクタリスティック名。キャラクタリスティックがサービスJSONで定義されていない場合、このプロパティは `undefined` です。 |
 | `type` | `string` | オプションのサービスJSONで定義されたキャラクタリスティックタイプ。キャラクタリスティックがサービスJSONで定義されていない場合、このプロパティは `undefined` です。 |
 | `descriptors` | `array` | 発見されたキャラクタリスティックディスクリプタの配列。 |
-
+| `properties` | `number` | GATT Characteristicプロパティのビットフィールド (`read` = 2, `writeNoResponse` = 4, `write` = 8, `notify` = 16, `indicate` = 32, `extended` = 128)
+                  
 ### 関数
 
 #### `discoverAllDescriptors()`

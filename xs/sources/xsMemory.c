@@ -185,6 +185,7 @@ void fxAllocate(txMachine* the, txCreation* theCreation)
 	the->firstHeap = C_NULL;
 
 #if mxNoChunks
+	the->maximumChunksSize = theCreation->initialChunkSize;
 #else
 	fxGrowChunks(the, theCreation->initialChunkSize);
 #endif
@@ -447,6 +448,11 @@ void* fxFindChunk(txMachine* the, txSize size, txBoolean *once)
 	}
 #endif
 #if mxNoChunks
+	if ((the->currentChunksSize + size > the->maximumChunksSize)) {
+		fxCollect(the, XS_COMPACT_FLAG | XS_ORGANIC_FLAG);
+		if (the->collectFlag & XS_TRASHING_CHUNKS_FLAG)
+			the->maximumChunksSize += the->minimumChunksSize;
+	}
 	chunk = c_malloc_noforcefail(size);
 	if (!chunk)
 		fxAbort(the, XS_NOT_ENOUGH_MEMORY_EXIT);

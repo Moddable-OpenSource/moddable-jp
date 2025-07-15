@@ -1,13 +1,13 @@
-# Moddable SDKでESP32を使用する
-Copyright 2016-2024 Moddable Tech, Inc.<BR>
-改訂： 2024年9月13日
+# Using the Moddable SDK with ESP32
+Copyright 2016-2025 Moddable Tech, Inc.<BR>
+Revised: February 26, 2025
 
-このドキュメントは、EspressifのESP32シリーズのSoC向けにアプリを構築するためのガイドを提供します。Moddable SDKは、[ESP32](https://www.espressif.com/en/products/socs/esp32)、[ESP32-S2](https://www.espressif.com/en/products/socs/esp32-s2)、[ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3)、[ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3)、[ESP32-C6](https://www.espressif.com/en/products/socs/esp32-c6)、および[ESP32-H2](https://www.espressif.com/en/products/socs/esp32-h2)をサポートしています。
+This document provides a guide to building apps for the ESP32 line of SoCs from Espressif. The Moddable SDK supports [ESP32](https://www.espressif.com/en/products/socs/esp32), [ESP32-S2](https://www.espressif.com/en/products/socs/esp32-s2), [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3), [ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3), [ESP32-C6](https://www.espressif.com/en/products/socs/esp32-c6), and [ESP32-H2](https://www.espressif.com/en/products/socs/esp32-h2).
 
-## 目次
+## Table of Contents
 
-* [概要](#overview)
-* [プラットフォーム](#platforms)
+* [Overview](#overview)
+* [Platforms](#platforms)
 	* [ESP32](#platforms-esp32)
 	* [ESP32-S2](#platforms-esp32-s2)
 	* [ESP32-S3](#platforms-esp32-s3)
@@ -15,209 +15,214 @@ Copyright 2016-2024 Moddable Tech, Inc.<BR>
 	* [ESP32-C3](#platforms-esp32-c3)
 	* [ESP32-C6](#platforms-esp32-c6)
 	* [ESP32-H2](#platforms-esp32-h2)
-	* [マニフェストでESP32サブクラスを指定する](#platforms-manifest)
-* [ビルドタイプ](#builds)
-	* [デバッグ](#build-debug)
-	* [instrumented](#build-instrumented)
-	* [リリース](#build-release)
-* セットアップ手順
-
+	* [Specifying ESP32 Subclass in Manifest](#platforms-manifest)
+* [Build Types](#builds)
+	* [Debug](#build-debug)
+	* [Instrumented](#build-instrumented)
+	* [Release](#build-release)
+* Setup instructions
 
 	| [![Apple logo](./../assets/moddable/mac-logo.png)](#mac) | [![Windows logo](./../assets/moddable/win-logo.png)](#win) | [![Linux logo](./../assets/moddable/lin-logo.png)](#lin) |
 	| :--- | :--- | :--- |
-	| •  [インストール](#mac-instructions)<BR>•  [トラブルシューティング](#mac-troubleshooting)<!-- <BR>•  [更新](#mac-update) --> | •  [インストール](#win-instructions)<BR>•  [トラブルシューティング](#win-troubleshooting)<!-- <BR>•  [更新](#win-update) --> | •  [インストール](#lin-instructions)<BR>•  [トラブルシューティング](#lin-troubleshooting)<!-- <BR>•  [更新](#lin-update) -->
+	| •  [Installing](#mac-instructions)<BR>•  [Troubleshooting](#mac-troubleshooting)<!-- <BR>•  [Updating](#mac-update) --> | •  [Installing](#win-instructions)<BR>•  [Troubleshooting](#win-troubleshooting)<!-- <BR>•  [Updating](#win-update) --> | •  [Installing](#lin-instructions)<BR>•  [Troubleshooting](#lin-troubleshooting)<!-- <BR>•  [Updating](#lin-update) -->
 
-* [トラブルシューティング](#troubleshooting)
-* [ESP32でのUSBの使用](#using_usb)
-	* [マルチポートデバイス](#usb_multiport)
-	* [ビルド構成](#usb_build)
+* [Troubleshooting](#troubleshooting)
+* [Using USB on ESP32](#using_usb)
+	* [Multi-port devices](#usb_multiport)
+	* [Build configuration](#usb_build)
 	* [TinyUSB](#usb_tinyusb) (esp32s2, esp32s3)
-	* [シリアル-JTAG](#usb_serial_jtag) (esp32s3, esp32c3, esp32c6, esp32h2)
+	* [Serial-JTAG](#usb_serial_jtag) (esp32s3, esp32c3, esp32c6, esp32h2)
+* [Using ESP Registry components](#idf-components)
+
 
 <a id="overview"></a>
-## 概要
+## Overview
 
-アプリケーションをビルドする前に、以下を行う必要があります：
+Before you can build applications, you need to:
 
-- Moddable SDKをインストールし、そのツールをビルドする
-- ESP32プラットフォーム用の必要なドライバと開発ツールをインストールする
+- Install the Moddable SDK and build its tools
+- Install the required drivers and development tools for the ESP32 platform
 
-以下の手順では、コマンドラインツール`mcconfig`を使用してデバイス上で`helloworld`のサンプルを実行することで、セットアップを確認します。
+The instructions below will have you verify your setup by running the `helloworld` example on your device using `mcconfig`, a command line tool that builds and runs Moddable applications.
 
-> 詳細については、[ツールのドキュメント](./../tools/tools.md)を参照してください。
+> See the [Tools documentation](./../tools/tools.md) for more information about `mcconfig`
 
-`mcconfig`を使用してビルドする際には、開発ボードの**プラットフォーム識別子**を`-p`引数に指定してデバイスターゲットを設定します。例えば、Moddable Two用にビルドするには、次のコマンドを使用します。
+
+When building with `mcconfig`, you specify your device target by providing the **platform identifier** of your development board to the `-p` argument. For example, use the following command to build for Moddable Two:
 
 ```text
 mcconfig -d -m -p esp32/moddable_two
 ```
 
-利用可能なESP32、ESP32-S2、ESP32-S3、ESP32-C3、ESP32-C6およびESP32-H2のサブプラットフォームとそのプラットフォーム識別子のリストは、以下の**プラットフォーム**セクションに記載されています。
+A list of available ESP32, ESP32-S2, ESP32-S3, ESP32-C3, ESP32-C6 and ESP32-H2 subplatforms and their platform identifiers is provided in the **Platforms** section below.
 
 <a id="platforms"></a>
-## プラットフォーム
+## Platforms
 
 <a id="platforms-esp32"></a>
 ### ESP32
 
-ESP32には以下の機能があります：
+ESP32 has the following features:
 
-- 240 MHzプロセッサ
-- デュアルコア
+- 240 MHz processor
+- Dual core
 - Wi-Fi
 - BLE
 - 520 KB RAM
-- 4 MBフラッシュ
+- 4 MB flash
 
-Moddable SDKは、ESP32上に構築された多くのデバイスをサポートしています。以下の表は、各デバイス、そのプラットフォーム識別子、デバイス固有の主要機能のリスト、および追加リソースへのリンクを示しています。
+The Moddable SDK supports many devices built on ESP32. The following table lists each device, its platform identifier, a list of key features specific to the device, and links to additional resources.
 
-| 名前 | プラットフォーム識別子 | 主要機能 | リンク |
+| Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
-| <img src="./../assets/devices/moddable-two.png" width=125><BR>Moddable Two | `esp32/moddable_two`<BR>`simulator/moddable_two` | **2.4" IPSディスプレイ**<BR>240 x 320 QVGA<BR>16ビットカラー<BR>静電容量式タッチ<BR><BR>20 外部ピン  | <li>[Moddable Two 開発者ガイド](./moddable-two.md)</li><li>[Moddable 製品ページ](https://www.moddable.com/hardware)</li> |
-| <img src="./../assets/devices/moddable-display-2.png" width=125><BR>Moddable Display 2 | `esp32/moddable_display_2`<BR>`simulator/moddable_two` | **2.4" IPSディスプレイ**<BR>240 x 320 QVGA<BR>16ビットカラー<BR>静電容量式タッチ<BR><BR>20 外部ピン  | <li>[Moddable Display 開発者ガイド](./moddable-display.md)</li><li>[Moddable 製品ページ](https://www.moddable.com/hardware)</li> |
-| ![ESP32](./../assets/devices/esp32.png)<BR>Node MCU ESP32 | `esp32/nodemcu` | |
-| ![M5Stack](./../assets/devices/m5stack.png)<BR> M5Stack | `esp32/m5stack`<BR>`esp32/m5stack_core2` | **1.8" LCDディスプレイ**<BR>320 x 240 QVGA<BR>16ビットカラー<BR><BR>オーディオ再生<BR>加速度計<BR>NeoPixels  | <li>[製品ページ](https://m5stack.com/collections/m5-core/products/basic-core-iot-development-kit)</li> |
-| ![M5Stack Fire](./../assets/devices/m5stack-fire.png)<BR>M5Stack Fire | `esp32/m5stack_fire` | **1.8" LCDディスプレイ**<BR>320 x 240 QVGA<BR>16ビットカラー<BR><BR>オーディオ再生<BR>加速度計<BR>NeoPixels | <li>[製品ページ](https://m5stack.com/collections/m5-core/products/fire-iot-development-kit?variant=16804798169178)</li> |
-| ![M5Stick C](./../assets/devices/m5stick-c.png)<BR>M5Stick C | `esp32/m5stick_c`<BR>`simulator/m5stick_c` | **0.96" LCDディスプレイ**<BR>80 x 160<BR>16ビットカラー<BR><BR>IMU<BR>マイクロフォン | <li>[製品ページ](https://m5stack.com/collections/m5-core/products/stick-c?variant=17203451265114)</li> |
-| ![M5Stick C PLUS](./../assets/devices/m5stick-cplus.png)<BR>M5Stick C PLUS | `esp32/m5stick_cplus` | **1.14" LCDディスプレイ**<BR>135 x 240<BR>16ビットカラー<BR><BR>IMU<BR>マイクロフォン | <li>[製品ページ](https://docs.m5stack.com/en/core/m5stickc_plus)</li> |
-|  ![M5Atom](./../assets/devices/m5atom.png)<BR>M5Atom | `esp32/m5atom_echo`<BR>`esp32/m5atom_lite`<BR>`esp32/m5atom_matrix` | 5 x 5 RGB LEDマトリックスパネル<BR><BR>MPU6886慣性センサー<BR>6 外部ピン | <li>[製品ページ](https://m5stack.com/collections/m5-atom/products/atom-matrix-esp32-development-kit)</li> |
-|  ![M5AtomU](./../assets/devices/m5atomu.png)<BR>M5AtomU | `esp32/m5atom_u` | Neopixel、1ボタン<BR>マイクロフォン<BR>6 外部ピン | <li>[製品ページ](https://docs.m5stack.com/en/core/atom_us)</li> |
-|  <img src="./../assets/devices/m5paper.png" width=125><BR>M5 Paper | `esp32/m5paper`<BR>`simulator/m5paper` | **960 x 540 ePaperタッチスクリーン**<BR>温度センサー | <li>[製品ページ](https://shop.m5stack.com/products/m5paper-esp32-development-kit-960x540-4-7-eink-display-235-ppi?variant=37595977908396)</li><li>[Moddable SDK ドキュメント](./m5paper.md)</li> |
-| <img src="./../assets/devices/m5coreink.png" width=125><BR>M5Core Ink | `esp32/m5core_ink ` | **200 x 200 ePaperディスプレイ**<BR>ブザー<BR>ダイヤル | <li>[製品ページ](https://shop.m5stack.com/products/m5stack-esp32-core-ink-development-kit1-54-elnk-display)</li><li>[Moddable SDK ドキュメント](./m5core_ink.md)</li> |
-|  <img src="./../assets/devices/heltecwifikit32.png" width=125><BR> Heltec WiFi Kit 32 | `esp32/heltec_wifi_kit_32` | **128 x 64 OLEDディスプレイ** | <li>[製品ページ](https://heltec.org/project/wifi-kit-32/)</li> |
-|  <img src="./../assets/devices/wemos_oled_lolin32.png" width=125><BR> Wemos OLED Lolin32 | `esp32/wemos_oled_lolin32` | **128 x 64 OLEDディスプレイ**<BR>内蔵LEDなし | <li>[追加情報](https://randomnerdtutorials.com/esp32-built-in-oled-ssd1306/)</li> |
-|  <img src="https://cdn.sparkfun.com//assets/parts/1/1/5/6/4/13907-01.jpg" width=125><BR>SparkFun Thing | `esp32/esp32_thing` | | <li>[製品ページ](https://www.sparkfun.com/products/13907)</li> |
-|  <img src="https://cdn.sparkfun.com//assets/parts/1/4/2/4/1/15663-SparkFun_Thing_Plus_-_ESP32_WROOM-01.jpg" width=125><BR>SparkFun Thing Plus | `esp32/esp32_thing_plus ` | | <li>[製品ページ](https://www.sparkfun.com/products/15663)</li> |
-| <img src="https://cdn.sparkfun.com//assets/parts/1/3/2/0/9/14917_-_356-ESP-WROVER-KIT_3_Edit.jpg" width=125><BR>ESP32 WRover Kit | `esp32/wrover_kit` | | <li>[製品ページ](https://www.adafruit.com/product/3384)</li> |
-|  <img src="https://media-cdn.seeedstudio.com/media/catalog/product/cache/b5e839932a12c6938f4f9ff16fa3726a/1/0/102991455_preview-07.png" width=125><BR> Wireless Tag WT32-ETH01 | `esp32/wt32_eth01` | **内蔵イーサネット** | <li>[製品ページ](http://www.wireless-tag.com/portfolio/wt32-eth01/)</li> |
-| <img src="./../assets/devices/lilygo-ttgo.png" width=125><BR>Lilygo TTGO | `esp32/lilygo_ttgo` | **135 x 240 IPSディスプレイ**<br>ボタン | <li>[製品ページ](https://www.lilygo.cc/products/lilygo%C2%AE-ttgo-t-display-1-14-inch-lcd-esp32-control-board)</li> |
-| Moddable Zero | `esp32/moddable_zero` | | <li>[配線ガイド](../displays/wiring-guide-generic-2.4-spi-esp32.md)</li> |
+| <img src="./../assets/devices/moddable-two.png" width=125><BR>Moddable Two | `esp32/moddable_two`<BR>`simulator/moddable_two` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>Capacitive touch<BR><BR>20 External pins  | <li>[Moddable Two developer guide](./moddable-two.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
+| <img src="./../assets/devices/moddable-display-2.png" width=125><BR>Moddable Display 2 | `esp32/moddable_display_2`<BR>`simulator/moddable_two` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>Capacitive touch<BR><BR>20 External pins  | <li>[Moddable Display developer guide](./moddable-display.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
+| ![ESP32](./../assets/devices/esp32.png)<BR>Node MCU ESP32 | `esp32/nodemcu` | | 
+| ![M5Stack](./../assets/devices/m5stack.png)<BR> M5Stack | `esp32/m5stack`<BR>`esp32/m5stack_core2` | **1.8" LCD display**<BR>320 x 240 QVGA<BR>16-bit color<BR><BR>Audio playback<BR>Accelerometer<BR>NeoPixels  | <li>[Product page](https://m5stack.com/collections/m5-core/products/basic-core-iot-development-kit)</li> |
+| ![M5Stack Fire](./../assets/devices/m5stack-fire.png)<BR>M5Stack Fire | `esp32/m5stack_fire` | **1.8" LCD display**<BR>320 x 240 QVGA<BR>16-bit color<BR><BR>Audio playback<BR>Accelerometer<BR>NeoPixels | <li>[Product page](https://m5stack.com/collections/m5-core/products/fire-iot-development-kit?variant=16804798169178)</li> |
+| ![M5Stick C](./../assets/devices/m5stick-c.png)<BR>M5Stick C | `esp32/m5stick_c`<BR>`simulator/m5stick_c` | **0.96" LCD display**<BR>80 x 160<BR>16-bit color<BR><BR>IMU<BR>Microphone | <li>[Product page](https://m5stack.com/collections/m5-core/products/stick-c?variant=17203451265114)</li> |
+| ![M5Stick C PLUS](./../assets/devices/m5stick-cplus.png)<BR>M5Stick C PLUS | `esp32/m5stick_cplus` | **1.14" LCD display**<BR>135 x 240<BR>16-bit color<BR><BR>IMU<BR>Microphone | <li>[Product page](https://docs.m5stack.com/en/core/m5stickc_plus)</li> |
+|  ![M5Atom](./../assets/devices/m5atom.png)<BR>M5Atom | `esp32/m5atom_echo`<BR>`esp32/m5atom_lite`<BR>`esp32/m5atom_matrix` | 5 x 5 RGB LED matrix panel<BR><BR>MPU6886 Inertial Sensor<BR>6 External Pins | <li>[Product page](https://m5stack.com/collections/m5-atom/products/atom-matrix-esp32-development-kit)</li> |
+|  ![M5AtomU](./../assets/devices/m5atomu.png)<BR>M5AtomU | `esp32/m5atom_u` | Neopixel, 1 button<BR>Microphone<BR>6 External Pins | <li>[Product page](https://docs.m5stack.com/en/core/atom_us)</li> |
+|  <img src="./../assets/devices/m5paper.png" width=125><BR>M5 Paper | `esp32/m5paper`<BR>`simulator/m5paper` | **960 x 540 ePaper touch screen**<BR>Temperature sensor | <li>[Product page](https://shop.m5stack.com/products/m5paper-esp32-development-kit-960x540-4-7-eink-display-235-ppi?variant=37595977908396)</li><li>[Moddable SDK docs](./m5paper.md)</li> |
+| <img src="./../assets/devices/m5coreink.png" width=125><BR>M5Core Ink | `esp32/m5core_ink ` | **200 x 200 ePaper display**<BR>Buzzer<BR>Dial | <li>[Product page](https://shop.m5stack.com/products/m5stack-esp32-core-ink-development-kit1-54-elnk-display)</li><li>[Moddable SDK docs](./m5core_ink.md)</li> |
+|  <img src="./../assets/devices/heltecwifikit32.png" width=125><BR> Heltec WiFi Kit 32 | `esp32/heltec_wifi_kit_32` | **128 x 64 OLED display** | <li>[Product page](https://heltec.org/project/wifi-kit-32/)</li> |
+|  <img src="./../assets/devices/wemos_oled_lolin32.png" width=125><BR> Wemos OLED Lolin32 | `esp32/wemos_oled_lolin32` | **128 x 64 OLED display**<BR>No built-in LED's | <li>[Additional information](https://randomnerdtutorials.com/esp32-built-in-oled-ssd1306/)</li> |
+|  <img src="https://cdn.sparkfun.com//assets/parts/1/1/5/6/4/13907-01.jpg" width=125><BR>SparkFun Thing | `esp32/esp32_thing` | | <li>[Product page](https://www.sparkfun.com/products/13907)</li> |
+|  <img src="https://cdn.sparkfun.com//assets/parts/1/4/2/4/1/15663-SparkFun_Thing_Plus_-_ESP32_WROOM-01.jpg" width=125><BR>SparkFun Thing Plus | `esp32/esp32_thing_plus ` | | <li>[Product page](https://www.sparkfun.com/products/15663)</li> |
+| <img src="https://cdn.sparkfun.com//assets/parts/1/3/2/0/9/14917_-_356-ESP-WROVER-KIT_3_Edit.jpg" width=125><BR>ESP32 WRover Kit | `esp32/wrover_kit` | | <li>[Product page](https://www.adafruit.com/product/3384)</li> |
+|  <img src="https://media-cdn.seeedstudio.com/media/catalog/product/cache/b5e839932a12c6938f4f9ff16fa3726a/1/0/102991455_preview-07.png" width=125><BR> Wireless Tag WT32-ETH01 | `esp32/wt32_eth01` | **Built-in Ethernet** | <li>[Product page](http://www.wireless-tag.com/portfolio/wt32-eth01/)</li> |
+| <img src="./../assets/devices/lilygo-ttgo.png" width=125><BR>Lilygo TTGO | `esp32/lilygo_ttgo` | **135 x 240 IPS display**<br>Button | <li>[Product page](https://www.lilygo.cc/products/lilygo%C2%AE-ttgo-t-display-1-14-inch-lcd-esp32-control-board)</li> |
+| Moddable Zero | `esp32/moddable_zero` | | <li>[Wiring guide](../displays/wiring-guide-generic-2.4-spi-esp32.md)</li> |
+
 
 <a id="platforms-esp32-s2"></a>
 ### ESP32-S2
 
-ESP32-S2には以下の機能があります：
+ESP32-S2 has the following features:
 
-- 240 MHzプロセッサ
+- 240 MHz processor
 - Wi-Fi
 - 320 KB RAM
-- 外部SRAMサポート
-- 一般的なモジュールには4 MBフラッシュ
+- External SRAM support
+- 4 MB flash on popular modules
 
-Moddable SDKはEspressifの2つのESP32-S2開発キットをサポートしています。以下の表は各デバイス、そのプラットフォーム識別子、デバイス固有の主要機能のリスト、および追加リソースへのリンクを示しています。
+The Moddable SDK supports two ESP32-S2 development kits from Espressif. The following table lists each device, its platform identifier, a list of key features specific to the device, and links to additional resources.
 
-| 名前 | プラットフォーム識別子 | 主要機能 | リンク |
+| Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
-|  <img src="https://dl.espressif.com/dl/schematics/pictures/esp32-s2-kaluga-1-kit-v1.0-3d.png" width=125><BR>Kaluga | `esp32/kaluga` | **3.2インチLCDディスプレイ**<BR>320 x 240 QVGA<BR>16ビットカラー<BR><BR>2 MB SRAM<BR>スピーカーとオーディオ再生<BR>タッチパッドパネル<BR>NeoPixel LED | <li>[Moddableブログ記事](https://blog.moddable.com/blog/espidf42/)</li><li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/hw-reference/esp32s2/user-guide-esp32-s2-kaluga-1-kit.html)</li> |
-|  <img src="./../assets/devices/esp32s2-saola.jpg" width=125><BR>Saola<BR>(WROOM & WROVERバージョン) | `esp32/saola_wroom` <BR> `esp32/saola_wrover`| NeoPixel LED<BR>2 MB SRAM (WROVERバージョンのみ)| <li>[Moddableブログ記事](https://blog.moddable.com/blog/espidf42/)</li><li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/hw-reference/esp32s2/user-guide-saola-1-v1.2.html)</li> |
-| <img src="./../assets/devices/adafruit-qtpys2.png" width=125><BR>Adafruit<BR>QT Py ESP32-S2 | `esp32/qtpys2` |  Neopixel、1ボタン、STEMMA/QWIIC | <li>[製品ページ](https://www.adafruit.com/product/5325)</li>|
-| <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `esp32/qtpys2_ili9341` | ili9341 QVGAディスプレイ<BR>320 x 240<BR>16ビットカラー | <li>[配線ガイド](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
-| <img src="./../assets/devices/lolin-s2-mini.png" width=100><BR>Lolin<BR>S2 Mini | `esp32/lolin_s2mini` |  1ボタン | <li>[製品ガイド](https://www.wemos.cc/en/latest/s2/s2_mini.html)</li>
+|  <img src="https://dl.espressif.com/dl/schematics/pictures/esp32-s2-kaluga-1-kit-v1.0-3d.png" width=125><BR>Kaluga | `esp32/kaluga` | **3.2" LCD display**<BR>320 x 240 QVGA<BR>16-bit color<BR><BR>2 MB SRAM<BR>Speaker and Audio Playback<BR>Touch Pad Panel<BR>NeoPixel LED | <li>[Moddable blog post](https://blog.moddable.com/blog/espidf42/)</li><li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/hw-reference/esp32s2/user-guide-esp32-s2-kaluga-1-kit.html)</li> |
+|  <img src="./../assets/devices/esp32s2-saola.jpg" width=125><BR>Saola<BR>(WROOM & WROVER versions) | `esp32/saola_wroom` <BR> `esp32/saola_wrover`| NeoPixel LED<BR>2 MB SRAM (WROVER version only)| <li>[Moddable blog post](https://blog.moddable.com/blog/espidf42/)</li><li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/hw-reference/esp32s2/user-guide-saola-1-v1.2.html)</li> |
+| <img src="./../assets/devices/adafruit-qtpys2.png" width=125><BR>Adafruit<BR>QT Py ESP32-S2 | `esp32/qtpys2` |  Neopixel, 1 button, STEMMA/QWIIC | <li>[Product page](https://www.adafruit.com/product/5325)</li>|
+| <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `esp32/qtpys2_ili9341` | ili9341 QVGA display<BR>320 x 240<BR>16-bit color | <li>[Wiring Guide](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
+| <img src="./../assets/devices/lolin-s2-mini.png" width=100><BR>Lolin<BR>S2 Mini | `esp32/lolin_s2mini` |  1 button | <li>[Product guide](https://www.wemos.cc/en/latest/s2/s2_mini.html)</li>
+
 
 <a id="platforms-esp32-s3"></a>
 ### ESP32-S3
 
-ESP32-S3は、オリジナルのESP32の後継機です。以下の特徴があります：
+ESP32-S3 is the successor to the original ESP32. It has the following features:
 
-- 240 MHzプロセッサ（デュアルコア）
+- 240 MHz processor (two cores)
 - Wi-Fi
 - BLE
 - 512 KB RAM
-- 外部PSRAMサポート
-- 人気のあるモジュールに8 MBフラッシュ
+- External PSRAM support
+- 8 MB flash on popular modules
 
-Moddable SDKはESP32-S3上に構築されたデバイスをサポートしています。以下の表は、各デバイス、そのプラットフォーム識別子、デバイス固有の主要機能のリスト、および追加リソースへのリンクを示しています。
+The Moddable SDK supports devices built on ESP32-S3. The following table lists each device, its platform identifier, a list of key features specific to the device, and links to additional resources.
 
-| 名前 | プラットフォーム識別子 | 主要機能 | リンク |
+| Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
-| <img src="./../assets/devices/moddable-six.jpg" width=200><BR>Moddable Six | `esp32/moddable_six`<BR>`esp32/moddable_six_cdc`<br>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit 並列ディスプレイバス<BR>静電容量式タッチ<BR>Neopixel<BR>Qwiic コネクタ<BR>追加のスピーカー<br><BR>20個の外部ピン  | <li>[Moddable Six 開発者ガイド](./moddable-six.md)</li><li>[Moddable製品ページ](https://www.moddable.com/hardware)</li> |
-| <img src="./../assets/devices/moddable-display-6.png" width=125><BR>Moddable Display 6 | `esp32/moddable_display_6`<BR>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit parallel display bus<BR>静電容量式タッチ<BR>Neopixel<BR>Qwiic コネクター<BR>追加のスピーカー<br><BR>20個の外部ピン  | <li>[Moddable Display  開発者ガイド](./moddable-display.md)</li><li>[Moddable製品ページ](https://www.moddable.com/hardware)</li> |
-|  <img src="https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/_images/esp32-s3-devkitc-1-v1.1-isometric.png" width=125><BR>ESP32-S3-DevKitC-1-N8 | `esp32/esp32s3` | |<li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html)</li> |
-|  <img src="./../assets/devices/adafruit-qt-py-eps32-s3.png" width=125><BR>Adafruit QT Py ESP32-S3 | `esp32/qtpys3` | Neopixel、1ボタン、STEMMA/QWIIC  | <li>[製品ページ](https://www.adafruit.com/product/5426)</li> |
-|  <img src="./../assets/devices/adafruit-esp32-s3-tft-feather.png" width=125><BR>Adafruit ESP32-S3 TFT Feather | `esp32/feather_s3_tft` | 1.14インチTFTディスプレイ<BR> 240 x 135 16ビットカラー | <li>[製品ページ](https://www.adafruit.com/product/5483)</li>|
-|<img src="./../assets/devices/atoms3.png" width=125><BR>AtomS3| `esp32/m5atom_s3` |  0.85インチIPSディスプレイ<BR> 128 x 128 16ビットカラー<BR> 1ボタン<BR> IMU |<li>[製品ページ](https://docs.m5stack.com/en/core/AtomS3)</li>|
-|<img src="./../assets/devices/atoms3_lite.png" width=125><BR>AtomS3 Lite| `esp32/m5atom_s3_lite` | Neopixel、1ボタン |<li>[製品ページ](https://docs.m5stack.com/en/core/AtomS3%20Lite)</li>|
-|<img src="./../assets/devices/m5dial.png" width=125><BR>M5Dial| `esp32/m5dial` | 1.28インチIPS 240×240円形ディスプレイ、タッチ、1ボタン、ロータリーエンコーダ、RTC |<li>[製品ページ](https://docs.m5stack.com/en/core/M5Dial)</li>|
-|<img src="./../assets/devices/m5stamp_s3.png" width=125><BR>M5Stamp S3| `esp32/m5stamp_s3` | Neopixel、1ボタン |<li>[製品ページ](https://shop.m5stack.com/products/m5stamp-esp32s3-module)</li>|
-| <img src="./../assets/devices/lilygo-qt-pro-s3.png" width=100><BR>Lilygo T-QT ESP32-S3 | `esp32/lilygo_t_qt` | 0.85インチLCDディスプレイ<br>128 x 128 16ビットカラー<br>2ボタン<br>Qwiicコネクタ | <li>[製品ページ](https://www.lilygo.cc/products/t-qt-v1-1)</li>|
-| <img src="./../assets/devices/lilygo-t-display-s3.png" width=100><BR>Lilygo T-Display-S3 | `esp32/lilygo_tdisplay_s3` | 1.9インチLCDディスプレイ<br>170 x 320 16ビットカラー<br>8ビットパラレルディスプレイ<br>タッチ<br>2ボタン<br>Qwiicコネクタ<br> | <li>[製品ページ](https://www.lilygo.cc/products/t-display-s3)</li>|
-| <img src="./../assets/devices/xiao-esp32c3.png" width=125><BR>Seeed Studio<BR>XIAO ESP32S3 | `esp32/xiao_esp32s3` | 1ボタン | <li>[製品ページ](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html)</li>|
-| <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `esp32/qtpys3_ili9341`<br>`esp32/xiao_esp32s3_ili9341` | ili9341 QVGAディスプレイ<BR>320 x 240<BR>16ビットカラー | <li>[配線ガイド](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
+| <img src="./../assets/devices/moddable-six.jpg" width=200><BR>Moddable Six | `esp32/moddable_six`<BR>`esp32/moddable_six_cdc`<br>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit parallel display bus<BR>Capacitive touch<BR>Neopixel<BR>Qwiic connector<BR>Optional speaker<br><BR>20 External pins  | <li>[Moddable Six developer guide](./moddable-six.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
+| <img src="./../assets/devices/moddable-display-6.png" width=125><BR>Moddable Display 6 | `esp32/moddable_display_6`<BR>`simulator/moddable_six` | **2.4" IPS display**<BR>240 x 320 QVGA<BR>16-bit color<BR>8-bit parallel display bus<BR>Capacitive touch<BR>Neopixel<BR>Qwiic connector<BR>Optional speaker<br><BR>20 External pins  | <li>[Moddable Display developer guide](./moddable-display.md)</li><li>[Moddable product page](https://www.moddable.com/hardware)</li> |
+|  <img src="./../assets/devices/esp32s3-devkitc.jpg" width=125><BR>ESP32-S3-DevKitC-1-N8 | `esp32/esp32s3` | |<li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html)</li> |
+|  <img src="./../assets/devices/adafruit-qt-py-eps32-s3.png" width=125><BR>Adafruit QT Py ESP32-S3 | `esp32/qtpys3` | Neopixel, 1 button, STEMMA/QWIIC  | <li>[Product page](https://www.adafruit.com/product/5426)</li> |
+|  <img src="./../assets/devices/adafruit-esp32-s3-tft-feather.png" width=125><BR>Adafruit ESP32-S3 TFT Feather | `esp32/feather_s3_tft` | 1.14" TFT display<BR> 240 x 135 16-bit color | <li>[Product page](https://www.adafruit.com/product/5483)</li>|
+|<img src="./../assets/devices/atoms3.png" width=125><BR>AtomS3| `esp32/m5atom_s3` |  0.85" IPS display<BR> 128 x 128 16-bit color<BR> 1 button<BR> IMU |<li>[Product page](https://docs.m5stack.com/en/core/AtomS3)</li>| 
+|<img src="./../assets/devices/atoms3_lite.png" width=125><BR>AtomS3 Lite| `esp32/m5atom_s3_lite` | Neopixel, 1 button |<li>[Product page](https://docs.m5stack.com/en/core/AtomS3%20Lite)</li>|
+|<img src="./../assets/devices/m5dial.png" width=125><BR>M5Dial| `esp32/m5dial` | 1.28" IPS 240×240 Round Display, Touch, 1 button,Rotary Encoder, RTC |<li>[Product page](https://docs.m5stack.com/en/core/M5Dial)</li>|
+|<img src="./../assets/devices/m5stamp_s3.png" width=125><BR>M5Stamp S3| `esp32/m5stamp_s3` | Neopixel, 1 button |<li>[Product page](https://shop.m5stack.com/products/m5stamp-esp32s3-module)</li>|
+| <img src="./../assets/devices/lilygo-qt-pro-s3.png" width=100><BR>Lilygo T-QT ESP32-S3 | `esp32/lilygo_t_qt` | 0.85" LCD display<br>128 x 128 16 bit color<br>2 buttons<br>Qwiic connector | <li>[Product page](https://www.lilygo.cc/products/t-qt-v1-1)</li>|
+| <img src="./../assets/devices/lilygo-t-display-s3.png" width=100><BR>Lilygo T-Display-S3 | `esp32/lilygo_tdisplay_s3` | 1.9" LCD display<br>170 x 320 16 bit color<br>8-bit parallel display<br>Touch<br>2 buttons<br>Qwiic connector<br> | <li>[Product page](https://www.lilygo.cc/products/t-display-s3)</li>|
+| <img src="./../assets/devices/xiao-esp32c3.png" width=125><BR>Seeed Studio<BR>XIAO ESP32S3 | `esp32/xiao_esp32s3` | 1 button | <li>[Product page](https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html)</li>|
+| <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `esp32/qtpys3_ili9341`<br>`esp32/xiao_esp32s3_ili9341` | ili9341 QVGA display<BR>320 x 240<BR>16-bit color | <li>[Wiring Guide](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
 
 <a id="platforms-esp32-s3-cameras"></a>
-### ESP32-S3 カメラ
+### ESP32-S3 Cameras
 
-| 名前 | プラットフォーム識別子 | 主要機能 | リンク |
+| Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
-| <img src="../assets/devices/lilygo_t_camera_plus_s3.jpg" width=140></a><BR>Lilygo T Camera Plus S3 | `esp32/lilygo_t_camera_plus_s3` | OV2640 カメラ<br>1.3" IPSディスプレイ<br>240 x 240 タッチスクリーン<br>マイク<br>スピーカー<br> | <li>[製品ページ](https://www.lilygo.cc/products/t-camera-plus-s3)</li> |
-| <img src="../assets/devices/m5atom_s3r.jpg" width=140></a><BR>M5 Atom S3R M12 | `esp32/m5atom_s3r` | OV3660 カメラ<br>マイク<br>BMI270 IMU<Br>8MB PSRAM| <li>[製品ページ](https://shop.m5stack.com/products/atoms3r-camera-kit-m12-version-ov3660)</li> |
-| <img src="../assets/devices/m5stack_cores3.jpg" width=140></a><BR>M5Stack Core S3 | `esp32/m5stack_cores3` | GC0308 カメラ<br>マイク<br>スピーカー<br>ili9341 QVGA タッチスクリーン<BR>320 x 240<BR>BMI270 IMU<Br>BM8563 RTC<BR>8MB PSRAM | <li>[製品ページ](https://shop.m5stack.com/products/m5stack-cores3-esp32s3-lotdevelopment-kit)</li> |
-| <img src="../assets/devices/xiao_esp32s3_sense.jpg" width=140></a><BR>Seed Studio<br>XIAO ESP32S3 Sense | `esp32/xiao_esp32s3_sense` | OV2640 カメラ<br>マイク<br>8MB PSRAM | <li>[Getting Started](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/)</li><li>[Display Wiring Guide](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
+| <img src="../assets/devices/lilygo_t_camera_plus_s3.jpg" width=140></a><BR>Lilygo T Camera Plus S3 | `esp32/lilygo_t_camera_plus_s3` | OV2640 Camera<br>1.3" IPS display<br>240 x 240 Touchscreen<br>Microphone<br>Speaker<br> | <li>[Product info](https://www.lilygo.cc/products/t-camera-plus-s3)</li> |
+| <img src="../assets/devices/m5atom_s3r_cam.png" width=140></a><BR>M5 Atom S3R Camera | `esp32/m5atom_s3r_cam` | GC0308 Camera<br>BMI270 IMU<Br>8MB PSRAM| <li>[Product info](https://shop.m5stack.com/products/atoms3r-camera-kit)</li> |
+| <img src="../assets/devices/m5atom_s3r_m12.png" width=140></a><BR>M5 ATOMS3R Camera Kit M12 Version | `esp32/m5atom_s3r_m12` | OV3660 Camera<br>BMI270 IMU<Br>8MB PSRAM| <li>[Product info](https://shop.m5stack.com/products/atoms3r-camera-kit-m12-version-ov3660)</li> |
+| <img src="../assets/devices/m5stack_cores3.jpg" width=140></a><BR>M5Stack Core S3 | `esp32/m5stack_cores3` | GC0308 Camera<br>Microphone<br>Speaker<br>ili9341 QVGA Touchscreen<BR>320 x 240<BR>BMI270 IMU<Br>BM8563 RTC<BR>8MB PSRAM | <li>[Product info](https://shop.m5stack.com/products/m5stack-cores3-esp32s3-lotdevelopment-kit)</li> |
+| <img src="../assets/devices/xiao_esp32s3_sense.jpg" width=140></a><BR>Seed Studio<br>XIAO ESP32S3 Sense | `esp32/xiao_esp32s3_sense` | OV2640 Camera<br>Microphone<br>8MB PSRAM | <li>[Getting Started](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/)</li><li>[Display Wiring Guide](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
 
 <a id="platforms-esp32-c3"></a>
 ### ESP32-C3
 
-ESP32-C3には以下の機能があります：
+ESP32-C3 has the following features:
 
 - 160 MHz RISC-V MCU
 - Wi-Fi
 - BLE
 - 400 KB RAM
-- 人気のあるモジュールに4 MBフラッシュメモリ
+- 4 MB flash on popular modules
 
-Moddable SDKは3つのESP32-C3開発キットをサポートしています：
+The Moddable SDK supports three ESP32-C3 development kits:
 
-| 名前 | プラットフォーム識別子 | 主な機能 | リンク |
+| Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
-|  <img src="./../assets/devices/esp32c3-devkit-m.jpg" width=125><BR>ESP32-C3-DevKitM-1 | `esp32/esp32c3` |  | <li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)</li> |
-|  <img src="./../assets/devices/esp32c3-dual.png" width=125><BR>ESP32 C3 DevKitクローン| `esp32/esp32c3_cdc` |  | <li>[製品ページ](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)</li> |
-|  <img src="./../assets/devices/c3_devkit_rust.png" width=125><BR>ESP32-C3-DevKit-RUST-1 | `esp32/c3_devkit_rust` |  | <li>[製品ページ](https://www.espressif.com/en/dev-board/esp32-c3-devkit-rust-1-en)</li> |
-| <img src="./../assets/devices/xiao-esp32c3.png" width=125><BR>Seeed Studio<BR>XIAO ESP32C3 | `esp32/xiao_esp32c3` | 1ボタン | <li>[製品ページ](https://www.seeedstudio.com/Seeed-XIAO-ESP32C3-p-5431.html)</li>|
-| <img src="./../assets/devices/adafruit-qtpyc3.png" width=125><BR>Adafruit<BR>QT Py ESP32-C3 | `esp32/qtpyc3` |  Neopixel, 1ボタン, STEMMA/QWIIC | <li>[製品ページ](https://www.adafruit.com/product/5405)</li>|
-| AI Thinker ESP-C3-32S-Kit <BR> (1 MBおよび2 MBバージョン) | `esp32/c3_32s_kit` <BR> `esp32/c3_32s_kit_2m`| RGB LED  | <li>[製品仕様](https://docs.ai-thinker.com/_media/esp32/docs/esp-c3-32s-kit-v1.0_specification.pdf)</li> |
-| <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `esp32/qtpyc3_ili9341`<br>`esp32/xiao_esp32c3_ili9341` | ili9341 QVGAディスプレイ<BR>320 x 240<BR>16ビットカラー | <li>[配線ガイド](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
-| <img src="./../assets/devices/lolin-c3-mini.png" width=100><BR>Lolin<BR>C3 Mini | `esp32/lolin_c3mini` |  1ボタン | <li>[製品ガイド](https://www.wemos.cc/en/latest/c3/c3_mini.html)</li>
-| <img src="./../assets/devices/lolin-c3-pico.png" width=100><BR>Lolin<BR>C3 Pico | `esp32/lolin_c3pico` |  Neopixel, 1ボタン | <li>[製品ガイド](https://www.wemos.cc/en/latest/c3/c3_pico.html)</li>
+|  <img src="./../assets/devices/esp32c3-devkit-m.jpg" width=125><BR>ESP32-C3-DevKitM-1 | `esp32/esp32c3` |  | <li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)</li> |
+|  <img src="./../assets/devices/esp32c3-dual.png" width=125><BR>ESP32 C3 DevKit clone| `esp32/esp32c3_cdc` |  | <li>[Product page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)</li> |
+|  <img src="./../assets/devices/c3_devkit_rust.png" width=125><BR>ESP32-C3-DevKit-RUST-1 | `esp32/c3_devkit_rust` |  | <li>[Product page](https://www.espressif.com/en/dev-board/esp32-c3-devkit-rust-1-en)</li> |
+| <img src="./../assets/devices/xiao-esp32c3.png" width=125><BR>Seeed Studio<BR>XIAO ESP32C3 | `esp32/xiao_esp32c3` | 1 button | <li>[Product page](https://www.seeedstudio.com/Seeed-XIAO-ESP32C3-p-5431.html)</li>|
+| <img src="./../assets/devices/adafruit-qtpyc3.png" width=125><BR>Adafruit<BR>QT Py ESP32-C3 | `esp32/qtpyc3` |  Neopixel, 1 button, STEMMA/QWIIC | <li>[Product page](https://www.adafruit.com/product/5405)</li>|
+| AI Thinker ESP-C3-32S-Kit <BR> (1 MB and 2 MB versions) | `esp32/c3_32s_kit` <BR> `esp32/c3_32s_kit_2m`| RGB LED  | <li>[Product specification](https://docs.ai-thinker.com/_media/esp32/docs/esp-c3-32s-kit-v1.0_specification.pdf)</li> |
+| <img src="../assets/devices/xiao-qtpy-ili9341-thumbnail.png" width=140></a><BR>ili9341 | `esp32/qtpyc3_ili9341`<br>`esp32/xiao_esp32c3_ili9341` | ili9341 QVGA display<BR>320 x 240<BR>16-bit color | <li>[Wiring Guide](../displays/images/xiao-qtpy-ili9341-wiring.png)</li> |
+| <img src="./../assets/devices/lolin-c3-mini.png" width=100><BR>Lolin<BR>C3 Mini | `esp32/lolin_c3mini` |  1 button | <li>[Product guide](https://www.wemos.cc/en/latest/c3/c3_mini.html)</li>
+| <img src="./../assets/devices/lolin-c3-pico.png" width=100><BR>Lolin<BR>C3 Pico | `esp32/lolin_c3pico` |  Neopixel, 1 button | <li>[Product guide](https://www.wemos.cc/en/latest/c3/c3_pico.html)</li>
+
 
 <a id="platforms-esp32-c6"></a>
 ### ESP32-C6
 
-ESP32-C6には以下の機能があります：
+ESP32-C6 has the following features:
 
 - 160 MHz RISC-V MCU
 - Wi-Fi
 - BLE
 - 512 KB RAM
-- 人気のあるモジュールに4 MBフラッシュメモリ
+- 4 MB flash on popular modules
 
-Moddable SDKは3つのESP32-C6開発キットをサポートしています：
+The Moddable SDK supports three ESP32-C6 development kits:
 
-| 名前 | プラットフォーム識別子 | 主な機能 | リンク |
+| Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
-|  <img src="./../assets/devices/esp32-c6-devkitc.png" width=125><BR>ESP32-C6-DevKitC-1 | `esp32/esp32c6` | NeoPixel、ボタン | <li>[製品ページ](https://docs.espressif.com/projects/espressif-esp-dev-kits/en/latest/esp32c6/esp32-c6-devkitc-1/user_guide.html)</li> |
-|  <img src="./../assets/devices/m5nanoc6.png" width=125><BR>M5NanoC6 | `esp32/m5nanoc6` | LED、NeoPixel、ボタン | <li>[製品ページ](https://docs.m5stack.com/en/core/M5NanoC6)</li> |
+|  <img src="./../assets/devices/esp32-c6-devkitc.png" width=125><BR>ESP32-C6-DevKitC-1 | `esp32/esp32c6` | NeoPixel, Button | <li>[Product page](https://docs.espressif.com/projects/espressif-esp-dev-kits/en/latest/esp32c6/esp32-c6-devkitc-1/user_guide.html)</li> |
+|  <img src="./../assets/devices/m5nanoc6.png" width=125><BR>M5NanoC6 | `esp32/m5nanoc6` | LED, NeoPixel, Button | <li>[Product page](https://docs.m5stack.com/en/core/M5NanoC6)</li> |
 
 <a id="platforms-esp32-h2"></a>
 ### ESP32-H2
 
-ESP32-H2には以下の機能があります：
+ESP32-H2 has the following features:
 
 - 96 MHz RISC-V MCU
 - BLE
 - 320 KB RAM
-- 人気のあるモジュールに4 MBフラッシュメモリ
+- 4 MB flash on popular modules
 
-Moddable SDKは3つのESP32-H2開発キットをサポートしています：
-
+The Moddable SDK supports three ESP32-H2 development kits:
 
 | Name | Platform identifier | Key features | Links |
 | :---: | :--- | :--- | :--- |
-|  <img src="./../assets/devices/esp32-h2-devkitm.png" width=125><BR>ESP32-H2-DevKitM-1 | `esp32/esp32h2` | NeoPixel、ボタン | <li>[製品ページ](https://docs.espressif.com/projects/espressif-esp-dev-kits/en/latest/esp32h2/esp32-h2-devkitm-1/user_guide.html)</li> |
+|  <img src="./../assets/devices/esp32-h2-devkitm.png" width=125><BR>ESP32-H2-DevKitM-1 | `esp32/esp32h2` | NeoPixel, Button | <li>[Product page](https://docs.espressif.com/projects/espressif-esp-dev-kits/en/latest/esp32h2/esp32-h2-devkitm-1/user_guide.html)</li> |
 
 <a id="platforms-manifest"></a>
-### マニフェストでESP32サブクラスを指定する
+### Specifying ESP32 Subclass in Manifest
 
-ビルドのターゲットESP32サブクラスは、マニフェストの`build`セクションで`ESP32_SUBCLASS`プロパティを使用して指定します。これは通常、ターゲットビルドデバイスのマニフェストによって設定されます。以下の例は、サブクラスをESP32-S2に設定する方法を示しています。
+The target ESP32 subclass for a build is specified using the `ESP32_SUBCLASS` property in the `build` section of the manifest. This is usually set by the manifest for the target build device. The following example shows how to set the subclass to ESP32-S2.
 
 
 ```
@@ -226,9 +231,9 @@ Moddable SDKは3つのESP32-H2開発キットをサポートしています：
 },
 ```
 
-| `ESP32_SUBCLASS` | デバイス |
+| `ESP32_SUBCLASS` | Device |
 |:---:|:---:|
-| `esp32` または未設定 | ESP32 |
+| `esp32` or not set | ESP32 |
 | `esp32s2` | ESP32-S2 |
 | `esp32s3` | ESP32-S3 |
 | `esp32c3` | ESP32-C3 |
@@ -236,54 +241,53 @@ Moddable SDKは3つのESP32-H2開発キットをサポートしています：
 | `esp32h2` | ESP32-H2 |
 
 <a id="builds"></a>
-## ビルドタイプ
-ESP32は、デバッグ、instrumented、およびリリースの3種類のビルドをサポートしています。各ビルドは、製品開発プロセスの異なる段階に適しています。どの種類のビルドを行うかは、コマンドラインから選択します。
+## Build Types
+The ESP32 supports three kinds of builds: debug, instrumented, and release. Each is appropriate for different stages in the product development process. You select which kind of build you want from the command line.
 
 <a id="build-debug"></a>
-### デバッグ
-デバッグビルドはJavaScriptのデバッグに使用されます。デバッグビルドでは、ESP-IDFのロギングが無効化され、GDBスタブは存在しません。
+### Debug
+A debug build is used for debugging JavaScript. In a debug build, the ESP-IDF logging is disabled and the GDB stub is not present.
 
-`mcconfig` コマンドラインで `-d` オプションを使用すると、デバッグビルドが選択されます。
+The `-d` option on the `mcconfig` command line selects a debug build.
 
 <a id="build-instrumented"></a>
-### instrumented
-instrumentedビルドはネイティブコードのデバッグに使用されます。instrumentedビルドでは、ESP-IDFのロギングが有効化され、GDBスタブが存在します。JavaScriptデバッガは無効化されます。通常、xsbugで利用可能な計測データは、1秒ごとにシリアルコンソールに出力されます。
+### Instrumented
+A debug build is used for debugging native code. In an instrumented build, the ESP-IDF logging is enabled and the GDB stub is present. The JavaScript debugger is disabled. The instrumentation data usually available in xsbug is output to the serial console once a second.
 
-`mcconfig` コマンドラインで `-i` オプションを使用すると、instrumentedビルドが選択されます。
+The `-i` option on the `mcconfig` command line selects an instrumented build.
 
 <a id="build-release"></a>
-### リリース
-リリースビルドは本番用です。リリースビルドでは、ESP-IDFのロギングが無効化され、GDBスタブは存在せず、JavaScriptデバッガは無効化され、instrumented統計は収集されず、シリアルコンソールの出力も抑制されます。
+### Release
+A release build is for production. In a release build, the ESP-IDF logging is disabled, the GDB stub is not present, the JavaScript debugger is disabled, instrumentation statistics are not collected, and serial console output is suppressed.
 
-`mcconfig` コマンドラインで `-d` および `-i` オプションを省略すると、リリースビルドが選択されます。なお、`-r` はリリースビルドの選択ではなく、回転を指定します。
+Omitting the `-d` and `-i` options on the `mcconfig` command line selects a release. Note that `-r` specifies rotation rather than selecting a release build.
 
 <a id="mac"></a>
 ## macOS
 
-Moddable SDKのESP32用ビルドは現在、ESP-IDF v5.3.1（コミット `c8fc5f64`）およびEspressifの[`idf.py`ツール](https://github.com/espressif/esp-idf/blob/master/tools/idf.py)のCMakeオプションを使用しています。
+The Moddable SDK build for ESP32 currently uses ESP-IDF v5.4 (commit `67c1de1e`) and the CMake option of Espressif's [`idf.py` tool](https://github.com/espressif/esp-idf/blob/master/tools/idf.py). 
 
 <a id="mac-instructions"></a>
-### インストール
+### Installing
 
-1. [Getting Startedドキュメント](./../Moddable%20SDK%20-%20Getting%20Started.md)に従って、Moddable SDKツールをインストールします。
+1. Install the Moddable SDK tools by following the instructions in the [Getting Started document](./../Moddable%20SDK%20-%20Getting%20Started.md).
 
-2. 必要なサードパーティのSDKおよびツールのために、ホームディレクトリに`~/esp32`という名前の`esp32`ディレクトリを作成します。
+2. Create an `esp32` directory in your home directory at `~/esp32` for required third party SDKs and tools. 
 
-3. macOS 10.15（Catalina）以前のバージョンを使用している場合は、Silicon Labsの[CP210x USB to UART VCPドライバ](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)をダウンロードしてインストールします。
+3. If you are running macOS 10.15 (Catalina) or earlier, download and install the Silicon Labs [CP210x USB to UART VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers). 
 
-	macOS Catalinaを使用している場合、VCPドライバを有効にするために追加の手順が必要です。インストール中に「システム拡張がブロックされました」というポップアップが表示された場合は、ダイアログの指示に従ってセキュリティとプライバシーのシステム環境設定で拡張機能を有効にしてください。
+	If you run macOS Catalina, an extra step is required to enable the VCP driver. If you see a popup that says "System Extension Blocked" during installation, follow the instructions in the dialog to enable the extension in Security & Privacy System Preferences.
+	
+	If you are using macOS 10.16 (Big Sur) or later, you do not need to install the VCP driver.
 
-
-もし、macOS 10.16 (Big Sur) 以降を使用している場合、VCPドライバをインストールする必要はありません。
-
-4. 初めてインストールする場合は、`ESP-IDF` GitHubリポジトリを `~/esp32` ディレクトリにクローンします。必ず `--recursive` オプションを指定してください。`v5.3.1` タグをチェックアウトすることを忘れないでください：
+4. If this is your first install, clone the `ESP-IDF` GitHub repository into your `~/esp32` directory. Make sure to specify the `--recursive` option. Be sure to checkout the `v5.4` tag:
 
 	```text
 	cd ~/esp32
-	git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.3.1
+	git clone -b v5.4 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.4
 	```
 
-5. (オプション）Homebrewを更新し、Python、cmake、ninja、pipパッケージ管理システム、およびpyserialをインストールします。すでに古いバージョンがインストールされている場合は、それらのパッケージを `brew upgrade` でアップグレードします：
+5. (Optional) Update homebrew and then install Python, cmake, ninja, the pip package management system, and pyserial. Also run a `brew upgrade` on those packages, in case you already had older versions installed:
 
 	```text
 	brew update
@@ -292,122 +296,124 @@ Moddable SDKのESP32用ビルドは現在、ESP-IDF v5.3.1（コミット `c8fc5
 	pip install pyserial
 	```
 
-6. USBケーブルを使用してESP32デバイスをmacOSホストに接続します。
+6. Connect the ESP32 device to your macOS host with a USB cable.
 
-7. シェルのスタートアップ/初期化ファイルを開きます。
+7. Open your shell startup/initialization file. 
 
-	macOS Mojave以前の場合、デフォルトのシェルは `bash` なので、`~/.profile` を開く必要があります。
+	For macOS Mojave and earlier, the default shell is `bash`, so you should open `~/.profile`. 
 
 	```text
 	open ~/.profile
 	```
-
-
-	macOS Catalinaから、[デフォルトのシェルは `zsh` です](https://support.apple.com/en-us/HT208050)。したがって、`~/.zshrc` を開いてください。
-
+	
+	Starting with macOS Catalina, the [default shell is `zsh`](https://support.apple.com/en-us/HT208050), so you should open `~/.zshrc`.
+	
 	```text
 	open ~/.zshrc
 	```
-
-8. 開いたファイルに次の行を追加して保存します。これにより、`IDF_PATH` 環境変数がESP-IDFディレクトリを指すように設定されます。
+		
+8. Add the following line to the file you just opened and save. This sets the `IDF_PATH` environment variable to point at your ESP-IDF directory.
 
 	```text
-	export IDF_PATH=$HOME/esp32/esp-idf-v5.3.1
+	export IDF_PATH=$HOME/esp32/esp-idf-v5.4
 	```
 
 	<a id="upload_port_mac"></a>
-	上級ユーザー向けにオプションの環境変数が1つあります： `UPLOAD_PORT`。
+	There is one optional environment variables for advanced users: `UPLOAD_PORT`.
 
-	ESP-IDFビルド/設定ツール `idf.py` はほとんどの場合シリアルポートを自動的に検出します。検出しない場合は、使用するポートのパスを `UPLOAD_PORT` 環境変数に設定します。
+	The ESP-IDF build/config tool `idf.py` automatically detects the serial port in most cases. If it does not, set the path of the port to use in the `UPLOAD_PORT` environment variable.
 
 	```text
 	export UPLOAD_PORT=/dev/cu.SLAB_USBtoUART
 	```
 
-	適切なシリアルポートを特定するには、ESP32デバイスを接続する前後のmacOSのシリアルデバイスのリストを確認し、新しく表示されるシリアルポートをメモします。シリアルデバイスファイルのリストを表示するには、ターミナルで次のコマンドを使用します。
+	To identify the proper serial port, examine the list of serial devices in macOS before and after plugging in your ESP32 device and note the new serial port that shows up. To see a list of serial device files, use the following command in Terminal:
+	
+	```text
+	ls /dev/cu.*
+	```
 
-```text
-ls /dev/cu.*
-```
+	The `UPLOAD_PORT` can also be specified on the `mcconfig` command line, which is useful when deploying to multiple ESP32 devices.
+	
+	```text
+	UPLOAD_PORT=/dev/cu.SLAB_USBtoUART mcconfig -d -m -p esp32
+	```
 
-`UPLOAD_PORT` は `mcconfig` コマンドラインでも指定でき、複数のESP32デバイスにデプロイする際に便利です。
+9. Adding the export statements to your `~/.profile` or `~/.zshrc` does not update the environment variables in active shell instances, so open a new shell instance (by opening a new tab/window) or manually run the export statement in your shell before proceeding.
 
-```text
-UPLOAD_PORT=/dev/cu.SLAB_USBtoUART mcconfig -d -m -p esp32
-```
+10. Run the ESP-IDF install script. This will install the proper cross-compilation toolchain and utilities needed for the ESP-IDF build.
 
-9. `~/.profile` や `~/.zshrc` にエクスポート文を追加しても、アクティブなシェルインスタンスの環境変数は更新されませんので、新しいシェルインスタンスを開く（新しいタブ/ウィンドウを開く）か、シェルで手動でエクスポート文を実行してから続行してください。
+	```text
+	cd $IDF_PATH
+	./install.sh
+	```
+	
+	If you are using a Mac with an M1 chip, you will have to take some additional steps before you can run the install script because the ESP-IDF does not yet have proper support for Darwin-arm64 hosts. [This comment](https://github.com/espressif/esp-idf/issues/6113#issuecomment-756335935) provides step by step instructions that you can follow to work around this issue.
 
-10. ESP-IDFインストールスクリプトを実行します。これにより、ESP-IDFビルドに必要な適切なクロスコンパイルツールチェーンとユーティリティがインストールされます。
-
-```text
-cd $IDF_PATH
-./install.sh
-```
-
-M1チップを搭載したMacを使用している場合、インストールスクリプトを実行する前に追加の手順が必要です。これは、ESP-IDFがまだDarwin-arm64ホストを適切にサポートしていないためです。[このコメント](https://github.com/espressif/esp-idf/issues/6113#issuecomment-756335935) には、この問題を回避するための手順が記載されています。
-
-11. ビルド環境を設定するために、ESP-IDFの`export.sh`スクリプトをソースにします。**これは新しいシェルインスタンスを開くたびに__毎回__実行する必要があります。**手動で実行するか、スタートアップスクリプトで実行してください。
+11. Set up your build environment by sourcing the ESP-IDF `export.sh` script. **This must be run __every time__ you open a new shell instance,** either manually or by a startup script. 
 
 	```text
 	source $IDF_PATH/export.sh
 	```
 
-	新しいシェルインスタンスのためにこのプロセスを自動化したい場合は、上記のステップ7-9の指示に従い、シェルのスタートアップ/初期化スクリプトの最後に`source`コマンドを追加してください。`export IDF_PATH`コマンドの後に追加することを確認してください。
+	If you prefer to automate this process for new shell instances, follow the instructions from Steps 7-9 above and add the `source` command at the end of your shell startup/initialization script. Make sure it is after the `export IDF_PATH` command.
 
-12. デバイスターゲット用に`helloworld`をビルドしてセットアップを確認します：
+12. Verify the setup by building `helloworld` for your device target:
+
 
 	```text
 	cd ${MODDABLE}/examples/helloworld
 	mcconfig -d -m -p esp32/<YOUR_SUBPLATFORM_HERE>
 	```
-
-	> ESP32ターゲット用にアプリケーションを初めてビルドする際、ツールチェーンが設定オプションの入力を求めることがあります。この場合、デフォルトを受け入れてください。
+	
+	> Note that the first time you build an application for the ESP32 target, the toolchain may prompt you to enter configuration options. If this happens, accept the defaults.
 
 <a id="mac-troubleshooting"></a>
-### トラブルシューティング
+### Troubleshooting
 
-アプリケーションをインストールしようとすると、エラーや警告の形で障害に遭遇することがあります。このセクションでは、macOSでの一般的な問題とその解決方法について説明します。
+When you're trying to install applications, you may experience roadblocks in the form of errors or warnings; this section explains some common issues on macOS and how to resolve them.
 
-他のmacOS、Windows、およびLinuxで共通の問題については、このドキュメントの下部にある[トラブルシューティングセクション](#troubleshooting)を参照してください。
+For other issues that are common on macOS, Windows, and Linux, see the [Troubleshooting section](#troubleshooting) at the bottom of this document.
 
-#### デバイスが接続されていない/認識されない
 
-次のエラーメッセージは、デバイスがコンピュータに接続されていないか、コンピュータがデバイスを認識していないことを意味します。
+#### Device not connected/recognized
+
+The following error messages mean that the device is not connected to your computer or the computer doesn't recognize the device.
 
 ```text
 error: cannot access /dev/cu.SLAB_USBtoUART
 error: cannot access /dev/usbserial-0001
 ```
 
-これが発生する理由はいくつかあります：
+There are a few reasons this can happen:
+ 
+1. Your device is not plugged into your computer. Make sure it's plugged in when you run the build commands. 
+2. You have a USB cable that is power only. Make sure you're using a data sync-capable USB cable.
+3. A different application is connected to the serial port. For example, a serial monitor may have the port opened. Close the application or disconnect the device from the application.
+4. The computer does not recognize your device. To fix this problem, follow the instructions below.
 
-1. デバイスがコンピュータに接続されていません。ビルドコマンドを実行するときに接続されていることを確認してください。
-2. 電源のみのUSBケーブルを使用しています。データ同期可能なUSBケーブルを使用していることを確認してください。
-3. 別のアプリケーションがシリアルポートに接続されています。例えば、シリアルモニターがポートを開いている可能性があります。アプリケーションを閉じるか、デバイスをアプリケーションから切断してください。
-4. コンピュータがデバイスを認識しません。この問題を解決するためには、以下の指示に従ってください。
 
-デバイスを取り外し、次のコマンドを入力します。
+Unplug the device and enter the following command.
 
 ```text
 ls /dev/cu*
 ```
 
-次に、デバイスを接続し、同じコマンドを再度実行します。ターミナル出力に新しいものが表示されない場合、デバイスはコンピュータに認識されていません。
+Then plug in the device and repeat the same command. If nothing new appears in the terminal output, the device isn't being recognized by your computer.
 
-macOS 10.15以前を使用している場合は、正しいVCPドライバがインストールされていることを確認してください。macOS 10.16以前を使用している場合は、VCPドライバをインストールする必要はありません。
+If you are running macOS 10.15 or earlier, make sure you have the correct VCP driver installed.  If you are running macOS 10.16 or earlier, you do not need to install the VCP driver. 
 
-認識された場合、デバイス名が取得され、`UPLOAD_PORT`環境変数を編集する必要があります。以下のコマンドを入力し、`/dev/cu.SLAB_USBtoUART`をシステム上のデバイス名に置き換えてください。
+If it is recognized, you now have the device name and you need to edit the `UPLOAD_PORT` environment variable. Enter the following command, replacing `/dev/cu.SLAB_USBtoUART` with the name of the device on your system.
 
 ```text
 export UPLOAD_PORT=/dev/cu.SLAB_USBtoUART
 ```
 
-#### SSL証明書エラー
+#### SSL certificate errors
 
-EspressifはPython 3への移行を推奨しています。Python 2.7は推奨されていません。
+Espressif is encouraging moving to Python 3 as 2.7 is not recommended.
 
-しかし、Python 2.7を使用していて、ESP-IDFのビルド中にSSL証明書エラーが発生する場合は、Python 2.7と必要なパッケージを手動でインストールする必要があります。追加のコンポーネントをインストールするために、[brew](https://brew.sh/)と[pip](https://pypi.org/project/pip/)を使用しました。
+However, if you are using Python 2.7 and  encounter SSL certificate errors while building the ESP-IDF, you may need to install Python 2.7 and the required packages manually. We've used [brew](https://brew.sh/) and [pip](https://pypi.org/project/pip/) to install the additional components:
 
 ```text
 brew install python
@@ -416,60 +422,60 @@ pip install future
 pip install pyserial
 pip install cryptography
 ```
+	
 
-<a id="mac-update"></a>
-### 更新
+<a id="mac-update"></a>	
+### Updating
 
-これは大幅なアップデートです。クリーンクローンから始めるのが最善です。
+This is a substantial update. We have found it best to start with a clean clone.
 
-0. ディスクスペースに余裕がある場合は、古いESP-IDFをバックアップすることをお勧めします。
+0. If you have the disk space, you may want to back up your old ESP-IDF.
 
 	```text
 	cd ~/esp32/
 	mv esp-idf esp-idf.old
-	```
+	```	
 
-1. ディレクトリを削除し、リポジトリをクローンします。
+1. Remove the directory and clone the repository.
 
 	```text
 	cd ~/esp32
 	rm -rf esp-idf
-	git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git
+	git clone -b v5.4 --recursive https://github.com/espressif/esp-idf.git
 	```
-
-2. （オプション - おそらくこれを行う必要はありません）Homebrewを更新し、必要なツールがすべて揃っていることと、それらが最新であることを確認します：
+	
+2. (Optional - you probably don't have to do this.) Update homebrew and then verify that you have all the necessary tools and that they are up to date:
 
 	```text
 	brew update
 	brew install python cmake ninja
 	brew upgrade python cmake ninja
 	pip install pyserial
-	```
-
-3. `IDF_PATH` 環境変数がシェルのユーザープロファイルファイル（例：`~/.profile` または `~/.zshrc`、シェルによって異なります）に正しく設定されていることを確認します。
+	```	
+		
+3. Verify the `IDF_PATH` environment variable is set correctly in your shell's user profile file (e.g. `~/.profile` or `~/.zshrc`, depending on your shell).
 
 	```text
    export IDF_PATH=$HOME/esp32/esp-idf
 	```
 
-4. ESP-IDFインストールスクリプトを実行します。これにより、ESP-IDFビルドに必要な適切なクロスコンパイルツールチェーンとユーティリティがインストールされます。
-
+4. Run the ESP-IDF install script. This will install the proper cross-compilation toolchain and utilities needed for the ESP-IDF build.
 
 	```text
 	cd $IDF_PATH
 	./install.sh
 	```
 
-5. ESP-IDFの`export.sh`スクリプトをソースにしてビルド環境をセットアップします。**これは新しいシェルインスタンスを開くたびに手動で、またはスタートアップスクリプトによって実行する必要があります。**
+5. Set up your build environment by sourcing the ESP-IDF `export.sh` script. **This must be run every time you open a new shell instance,** either manually or by a startup script. 
 
 	```text
 	source $IDF_PATH/export.sh
 	```
 
-	新しいシェルインスタンスのためにこのプロセスを自動化したい場合は、上記のステップ3の指示に従い、シェルのスタートアップ/初期化スクリプトの最後に`source`コマンドを追加します。`export IDF_PATH`コマンドの後に追加することを確認してください。
+	If you prefer to automate this process for new shell instances, follow the instructions from Step 3 above and add the `source` command at the end of your shell startup/initialization script. Make sure it is after the `export IDF_PATH` command.
 
 <!-- Tools autobuild now
-6. `$MODDABLE/build/bin/esp32`または`$MODDABLE/build/tmp/esp32`に既存のESP32ビルド出力がある場合は、それらのディレクトリを削除します:
+6. If you have existing ESP32 build output in `$MODDABLE/build/bin/esp32` or `$MODDABLE/build/tmp/esp32`, delete those directories:
 
     ```text
     cd $MODDABLE/build
@@ -477,187 +483,185 @@ pip install cryptography
     rm -rf tmp/esp32
     ```
 
-7. デバイスターゲット用に`helloworld`をビルドしてセットアップを確認します:
+7. Verify the setup by building `helloworld` for your device target:
 
 	```text
 	cd ${MODDABLE}/examples/helloworld
 	mcconfig -d -m -p esp32/<YOUR_SUBPLATFORM_HERE>
 	```
-
-	> ESP32ターゲット用にアプリケーションを初めてビルドする際、ツールチェーンが設定オプションの入力を求めることがあります。この場合、デフォルトを受け入れてください。
-
+	
+	> Note that the first time you build an application for the ESP32 target, the toolchain may prompt you to enter configuration options. If this happens, accept the defaults.
 
 -->
 
-<a id="win"></a>
+<a id="win"></a>	
 ## Windows
 
-Moddable SDKのESP32用ビルドは現在、ESP-IDF v5.3.1（コミット `c8fc5f64`）およびEspressifの[`idf.py`ツール](https://github.com/espressif/esp-idf/blob/master/tools/idf.py)のCMakeオプションを使用しています。
+The Moddable SDK build for ESP32 currently uses ESP-IDF v5.4 (commit `67c1de1e`) and the CMake option of Espressif's [`idf.py` tool](https://github.com/espressif/esp-idf/blob/master/tools/idf.py). 
 
 <a id="win-instructions"></a>
-### インストール
+### Installing
 
-1. [Getting Startedドキュメント](./../Moddable%20SDK%20-%20Getting%20Started.md)の指示に従って、Moddable SDKツールをインストールします。
+1. Install the Moddable SDK tools by following the instructions in the [Getting Started document](./../Moddable%20SDK%20-%20Getting%20Started.md).
 
-2. Silicon Labsの[CP210x USB to UART VCPドライバ](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)をダウンロードしてインストールします。ドライバのzipファイルには、x64およびx86バージョンのインストーラが含まれています。ほとんどの最新のPCは64ビット版のWindowsを実行しているため、x64バージョンのVCPドライバを使用する必要があります。32ビット版のWindowsを実行している場合は、x86バージョンのドライバを使用してください。（コンピュータが64ビット版のWindowsを実行しているかどうかは、システム設定の「PCの情報」で確認できます）
+2. Download and install the Silicon Labs [CP210x USB to UART VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers). The driver zip file contains x64 and x86 versions of the installer. Most modern PCs run 64-bit Windows and should use the x64 version of the VCP driver. If you run a 32-bit version of Windows, use the x86 version of the driver. (You can determine if your computer is running a 64-bit version of Windows by checking "About your PC" in System Settings.)
 
-3. Espressifの[ESP-IDF Windowsインストーラ](https://dl.espressif.com/dl/esp-idf/?idf=5.3.1)をダウンロードして実行します。これにより、ESP32 Xtensa gccツールチェーン、Ninja Build、OpenOCD、およびKConfigフロントエンドがインストールされます。このツールは、必要に応じて新しくダウンロードされたツールを含むように`PATH`を設定します。
+3. Download and run the Espressif [ESP-IDF Windows Installer](https://dl.espressif.com/dl/esp-idf/?idf=5.4). This will install the ESP32 Xtensa gcc toolchain, Ninja Build, OpenOCD, and a KConfig Frontend. This tool will also set your `PATH` to include the newly downloaded tools, as necessary.
 
-インストーラーのデフォルトオプションをすべて受け入れるか、必要に応じてインストール場所を変更しても安全です。
+    It is safe to accept all of the default options in the installer, or to change install locations as necessary.
 
-CMakeやPythonがまだインストールされていない場合、インストーラーはそれらのツールをダウンロードしてインストールするように促します（必要に応じてインストールしてください）。
+    If you do not already have CMake or Python, the installer will also prompt you to download and install those tools (you should do so if needed).
 
-インストーラーはESP-IDFのgitリポジトリをクローンするオプションを提供します。このオプションを選択する場合は、「v5.3.1（リリースバージョン）」オプションを選択し、ホームフォルダ内の`esp32\esp-idf`というディレクトリにクローンしてください。
+	The installer will offer to clone the ESP-IDF git repository for you. If you choose this option, select the "v5.4 (release version)" option and clone into a directory called `esp32\esp-idf` within your home folder.
 
-4. ESP-IDFをESP-IDF Windowsインストーラーを使用してクローンしなかった場合、ホームフォルダに`esp32`ディレクトリを作成します。これは、ファイルエクスプローラーまたはコマンドプロンプトから行います：
+
+4. If you did not clone the ESP-IDF using the ESP-IDF Windows Installer, create an `esp32` directory in your home folder, either from File Explorer or a Command Prompt:
 
     ```text
     cd %USERPROFILE%
     mkdir esp32
     ```
 
-5. ESP-IDFをESP-IDF Windowsインストーラーを使用してクローンしなかった場合、`ESP-IDF` Githubリポジトリを`~/esp32`ディレクトリにクローンします。必ず`--recursive`オプションを指定してください。その後、`v5.3.1`タグをチェックアウトします：
+5. If you did not clone the ESP-IDF using the ESP-IDF Windows Installer, clone the `ESP-IDF` Github repository into your `~/esp32` directory. Make sure to specify the `--recursive` option. Then checkout the `v5.4` tag:
 
     ```text
     cd %USERPROFILE%\esp32
-    git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git
+    git clone -b v5.4 --recursive https://github.com/espressif/esp-idf.git
     ```
 
-既にESP-IDFのクローンコピーを持っている場合、最も簡単な更新方法は既存の`esp-idf`フォルダーを削除して再度クローンすることです。[EspressifのESP-IDFの取得方法を参照](https://docs.espressif.com/projects/esp-idf/en/v5.3.1/esp32/get-started/index.html#get-started-get-esp-idf)
+	If you already have a cloned copy of the ESP-IDF, the simplest way to do the update is to delete the existing `esp-idf` folder and clone it again. [See Espressif's Get ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/v5.4/esp32/get-started/index.html#get-started-get-esp-idf)
 
-6. USBケーブルを使ってESP32デバイスをWindowsホストに接続します。
-
-7. [これらの指示](https://www.architectryan.com/2018/08/31/how-to-change-environment-variables-on-windows-10/)に従って、コントロールパネルアプリの「環境変数」ダイアログを開きます。そのダイアログから：
-	- `IDF_PATH`という名前のユーザー変数を作成し、ESP-IDFをクローンしたディレクトリに設定します。例：
-		- 変数名： `IDF_PATH`
-		- 変数値（「ディレクトリを参照。..」ボタンを使用してこの選択を行います）: `C:\Users\<user>\esp32\esp-idf`
+6. Connect the ESP32 device to your Windows host with a USB cable.
+	
+7. Open the "Environment Variables" dialog of the Control Panel app by following [these instructions](https://www.architectryan.com/2018/08/31/how-to-change-environment-variables-on-windows-10/). From that dialog:
+	- Create a User Variable called `IDF_PATH` and set it to the directory where you cloned the ESP-IDF, e.g.:
+		- Variable name: `IDF_PATH`
+		- Variable value (Use the "Browse Directory..." button to make this selection): `C:\Users\<user>\esp32\esp-idf`
 
 	<a id="upload_port_win"></a>
-	上級ユーザー向けのオプションの環境変数が1つあります：`UPLOAD_PORT`。<br><br>
-	ESP-IDFビルド/設定ツール`idf.py`はほとんどの場合シリアルポートを自動的に検出します。検出しない場合は、上記と同じ手順で`UPLOAD_PORT`環境変数に使用するポートのパスを設定します。
+	There is one optional environment variable for advanced users: `UPLOAD_PORT`.<br><br>
+	The ESP-IDF build/config tool `idf.py` automatically detects the serial port in most cases. If it does not, set the path of the port to use in the `UPLOAD_PORT` environment variable following the same procedure as above.
 
-- `UPLOAD_PORT`: デバイスのCOMポート、例：`COM3`
+    - `UPLOAD_PORT`: the COM port for your device, e.g. `COM3`
 
-  正しいシリアルポートを特定するには、Windowsデバイスマネージャを起動します。「ポート (COM & LPT)」セクションを開き、「Silicon Labs CP210x USB to UART Bridge」が表示されていることを確認し、関連するCOMポート（例：COM3）をメモします。
+	To identify the correct serial port, launch the Windows Device Manager. Open the "Ports (COM & LPT)" section, verify the "Silicon Labs CP210x USB to UART Bridge" is displayed, and note the associated COM port (e.g. COM3).
 
-8. 新しく設定された環境変数は既存のコマンドプロンプトインスタンスでは有効にならないため、これらの変更を適用した後に新しいコマンドプロンプトインスタンスを開くようにしてください。
+8. Newly-set environment variables will not take effect in existing Command Prompt instances, so be sure to open a new Command Prompt instance after applying these changes.
 
-9. ESP-IDFインストールバッチファイルを実行します。これにより、ESP-IDFビルドに使用されるユーティリティがマシンに対して設定されます。
+9. Run the ESP-IDF install batch file. This will configure utilities used by the ESP-IDF build for your machine.
 
-    ```text
-    cd %IDF_PATH%
-    install.bat
-    ```
+	```text
+	cd %IDF_PATH%
+	install.bat
+	```
+	
+10. The ESP-IDF Windows Installer provides a command prompt called "ESP-IDF 5.4 CMD" that automatically sets important environment variables and paths. We recommend building ESP32 projects with "ESP-IDF 5.4 CMD." In each new command prompt instance you will need to run the Visual Studio x86 initialization batch file manually. Adjust the path as necessary for your system.
 
-10. ESP-IDF Windowsインストーラーは、重要な環境変数とパスを自動的に設定する「ESP-IDF 5.3.1 CMD」と呼ばれるコマンドプロンプトを提供します。「ESP-IDF 5.3.1 CMD」でESP32プロジェクトをビルドすることをお勧めします。新しいコマンドプロンプトインスタンスごとに、Visual Studio x86初期化バッチファイルを手動で実行する必要があります。システムに応じてパスを調整してください。
+	```text
+	"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"
+	```
 
-```text
-"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"
-```
+	**Note for experts:** If you are comfortable editing Windows shortcuts, a convenient alternative to this manual process is to modify the "ESP-IDF 5.4 CMD" shortcut to initialize both the ESP-IDF environment and the Visual Studio x86 environment. To do this, right-click the "ESP-IDF 5.4 CMD" shortcut and select "Properties." In the "Target" field of the Properties window, you should see a command that looks like:
 
-**専門家向けの注意:** Windowsのショートカットを編集することに慣れている場合、この手動プロセスの便利な代替手段として、「ESP-IDF 5.3.1 CMD」ショートカットを変更して、ESP-IDF環境とVisual Studio x86環境の両方を初期化することができます。これを行うには、「ESP-IDF 5.3.1 CMD」ショートカットを右クリックして「プロパティ」を選択します。プロパティウィンドウの「ターゲット」フィールドには、次のようなコマンドが表示されます。
+	```text
+	C:\WINDOWS\system32\cmd.exe /k "C:\Users\<username>\.espressif\idf_cmd_init.bat"
+	```
 
-```text
-C:\WINDOWS\system32\cmd.exe /k "C:\Users\<username>\.espressif\idf_cmd_init.bat"
-```
+	You can change the Target to include the path to `vcvars32.bat` as follows. Adjust the paths as necessary for your system.
 
-ターゲットを次のように変更して、`vcvars32.bat`へのパスを含めることができます。システムに合わせてパスを調整してください。
+	```text
+	%comspec% /k ""%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat" && pushd %IDF_PATH% && "%IDF_TOOLS_PATH%\idf_cmd_init.bat" && popd"
+	```
 
-```text
-%comspec% /k ""%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat" && pushd %IDF_PATH% && "%IDF_TOOLS_PATH%\idf_cmd_init.bat" && popd"
-```
+	It is also convenient to update the "Start in" field of the shortcut to `%MODDABLE%` to start your Command Prompt session in the Moddable SDK directory.
 
-また、ショートカットの「作業フォルダー」フィールドを `%MODDABLE%` に更新して、Moddable SDKディレクトリでコマンドプロンプトセッションを開始することも便利です。
+	> Note: These instructions assume you only have one copy of the ESP-IDF installed. `idf_cmd_init.bat` can also take an argument to specify a particular ESP-IDF installation, if necessary. This argument should be set up in the default "ESP-IDF 5.4 CMD" shortcut.
 
-	> 注: これらの指示は、ESP-IDF が1つだけインストールされていることを前提としています。必要に応じて、`idf_cmd_init.bat` に特定の ESP-IDF インストールを指定する引数を渡すこともできます。この引数は、デフォルトの "ESP-IDF 5.3.1 CMD" ショートカットで設定する必要があります。
-
-11. "ESP-IDF 5.3.1 CMD" コマンドプロンプトで、デバイスターゲット用に `helloworld` をビルドしてセットアップを確認します：
+11. In the "ESP-IDF 5.4 CMD" command prompt, verify the setup by building `helloworld` for your device target:
 
 	```text
 	cd %MODDABLE%\examples\helloworld
 	mcconfig -d -m -p esp32/<YOUR_SUBPLATFORM_HERE>
 	```
-
+	
 <a id="win-troubleshooting"></a>
-### トラブルシューティング
+### Troubleshooting
 
-アプリケーションをインストールしようとすると、エラーや警告の形で障害が発生することがあります。このセクションでは、Windowsでの一般的な問題とその解決方法について説明します。
+When you're trying to install applications, you may experience roadblocks in the form of errors or warnings; this section explains some common issues on Windows and how to resolve them.
 
-macOS、Windows、およびLinuxで共通のその他の問題については、このドキュメントの最後にある[トラブルシューティングセクション](#troubleshooting)を参照してください。
+For other issues that are common on macOS, Windows, and Linux, see the [Troubleshooting section](#troubleshooting) at the bottom of this document.
 
-#### ESP-IDF のビルドが非常に遅い
+#### ESP-IDF Build is Extremely Slow
 
-Windows 10および11に含まれている組み込みのウイルス対策ソフトウェア（Microsoft Defender、以前のWindows Defender）は、ESP-IDFのビルドを大幅に遅くする可能性があります。Espressifの[ESP-IDF Windows インストーラー](https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.23.exe)には、ビルド中のリアルタイムスキャンを回避するために必要なすべての除外設定を自動的に構成するオプションが含まれています。ビルドが遅い場合は、ESP-IDF Windowsインストーラーを再実行して、そのオプションが選択されていることを確認してください。また、[これらの指示](https://support.microsoft.com/en-us/windows/add-an-exclusion-to-windows-security-811816c0-4dfd-af4a-47e4-c301afe13b26)に従って、Moddableビルドフォルダーやその他のカスタムビルド出力ディレクトリを手動で除外する必要がある場合もあります。
+The built-in anti-virus software included with Windows 10 and 11 (Microsoft Defender, formerly Windows Defender) can significantly slow down ESP-IDF builds. Espressif's [ESP-IDF Windows Installer](https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.23.exe) includes an option to automatically configure Microsoft Defender with all the exclusions needed to bypass realtime scanning during builds. If your build is slow, try re-running the ESP-IDF Windows Installer to verify that that option is selected. You may also need to manually exclude your Moddable build folder or other custom build output directories by following [these instructions](https://support.microsoft.com/en-us/windows/add-an-exclusion-to-windows-security-811816c0-4dfd-af4a-47e4-c301afe13b26).
 
+#### Python Versions
 
-#### Python バージョン
+Espressif recommends using Python 3.9 or later when building with ESP-IDF v5.4. Python 3.9 will be installed by the ESP-IDF Windows Installer.
 
-Espressifは、ESP-IDF v5.3.1でビルドする際にPython 3.9以降の使用を推奨しています。Python 3.9はESP-IDF Windowsインストーラーによってインストールされます。
+If you had a previous version of Python (such as Python 2.7) installed on your system, you may need to remove it from the System PATH so that Python 3.9 is chosen by default. Look for entries like `C:\Python27\` or `C:\Python27\Scripts\` in your PATH and remove them if you encounter Python errors during the build process. 
 
-以前のバージョンのPython（例えばPython 2.7）がシステムにインストールされていた場合、Python 3.9がデフォルトで選択されるようにするために、システムPATHからそれを削除する必要があるかもしれません。PATH内の`C:\Python27\`や`C:\Python27\Scripts\`のようなエントリを探し、ビルドプロセス中にPythonエラーが発生した場合はそれらを削除してください。
+#### Python dependencies
 
-#### Python 依存関係
+If you get an error about Python dependencies not being installed, it means that the ESP-IDF installer failed to update Python. This usually happens due to permissions issues on your machine. To correct it, run `python -m pip install -r %IDF_PATH%\requirements.txt` from the "x86 Native Tools Command Prompt for VS 2022."	
 
-Pythonの依存関係がインストールされていないというエラーが発生した場合、それはESP-IDFインストーラーがPythonを更新できなかったことを意味します。これは通常、マシンの権限の問題によって発生します。これを修正するには、「x86 Native Tools Command Prompt for VS 2022」から`python -m pip install -r %IDF_PATH%\requirements.txt`を実行してください。
+#### Device not connected/recognized
 
-#### デバイスが接続されていない/認識されない
-
-デバイスが接続されていない場合、またはUPLOAD_PORTが適切なCOMポートに設定されていない場合、ビルド後にいくつかのエラーメッセージが表示されることがあります。次のようなエラーメッセージは、デバイスがコンピュータに接続されていないか、コンピュータがデバイスを認識していないことを意味します。`could not open port 'COM3'`というメッセージに注目してください。
+If a device is not connected, or the UPLOAD_PORT isn't set to the proper COM port, a number of error messages may appear after building. An error message similar to the following means that the device is not connected to your computer or the computer doesn't recognize the device. Note the `could not open port 'COM3'` message.
 
 ```text
 raise SerialException("could not open port {!r}: {!r}".format(self.portstr, ctypes.WinError()))
 serial.serialutil.SerialException: could not open port 'COM3': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
 ```
 
-これが発生する理由はいくつかあります：
+There are a few reasons this can happen:
+ 
+1. Your device is not plugged into your computer. Make sure it's plugged in when you run the build commands. 
+2. You have a USB cable that is power only. Make sure you're using a data sync-capable USB cable.
+3. The computer does not recognize your device. To fix this problem, follow the instructions below.
 
-1. デバイスがコンピュータに接続されていない。ビルドコマンドを実行する際に接続されていることを確認してください。
-2. 電源供給のみのUSBケーブルを使用している。データ同期が可能なUSBケーブルを使用していることを確認してください。
-3. コンピュータがデバイスを認識していない。この問題を解決するには、以下の指示に従ってください。
+Check the list of USB devices in Device Manager. If your device shows up as an unknown device, make sure you have the correct VCP driver installed.
 
-デバイスマネージャーでUSBデバイスの一覧を確認します。デバイスが不明なデバイスとして表示される場合、正しいVCPドライバがインストールされていることを確認してください。
-
-デバイスがCOM3以外のCOMポートに表示される場合、`UPLOAD_PORT`環境変数を編集する必要があります。以下のコマンドを入力し、`COM3`をシステムに適したデバイスのCOMポートに置き換えてください。
+If your device shows up on a COM port other than COM3, you need to edit the `UPLOAD_PORT` environment variable. Enter the following command, replacing `COM3` with the appropriate device COM port for your system.
 
 ```text
 set UPLOAD_PORT=COM5
 ```
 
+#### Other Errors
 
-#### その他のエラー
+Many ESP32 errors on Windows can be corrected by updating the Espressif tools. This is especially true of errors reported during initialization of the "ESP-IDF CMD" Command Prompt and Python version errors during builds. 
 
-Windows上の多くのESP32エラーは、Espressifツールを更新することで修正できます。これは特に、「ESP-IDF CMD」コマンドプロンプトの初期化中に報告されるエラーや、ビルド中のPythonバージョンエラーに当てはまります。
+To update the Espressif tools, download and run the most recent [ESP-IDF Windows Installer](https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.23.exe). Do not use the tool to clone a new ESP-IDF tree if you already have one installed. Instead, choose the option to use an existing ESP-IDF tree and point it to `%IDF_PATH%`.
 
-Espressifツールを更新するには、最新の[ESP-IDF Windows Installer](https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.23.exe)をダウンロードして実行します。既にESP-IDFツリーがインストールされている場合は、新しいESP-IDFツリーをクローンしないでください。代わりに、既存のESP-IDFツリーを使用するオプションを選択し、`%IDF_PATH%`を指し示します。
+<a id="win-update"></a>	
+### Updating
 
-<a id="win-update"></a>
-### 更新
+To ensure that your build environment is up to date, perform the following steps:
 
-ビルド環境が最新であることを確認するために、以下の手順を実行します：
+1. Download and run the Espressif [ESP-IDF Windows Installer](https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.23.exe). This will update the ESP32 Xtensa gcc toolchain, Ninja Build, OpenOCD, and a KConfig Frontend. This tool will also set your `PATH` to include the newly downloaded tools, as necessary.
 
-1. Espressifの[ESP-IDF Windows Installer](https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.23.exe)をダウンロードして実行します。これにより、ESP32 Xtensa gccツールチェーン、Ninja Build、OpenOCD、およびKConfigフロントエンドが更新されます。このツールは、必要に応じて新しくダウンロードされたツールを含むように`PATH`を設定します。
+    It is safe to accept all of the default options in the installer, or to change install locations as necessary.
 
-インストーラーのデフォルトオプションをすべて受け入れるか、必要に応じてインストール場所を変更しても安全です。
+    If you do not already have CMake or Python, the installer will also prompt you to download and install those tools (you should do so if needed).
+    
+    If you choose to clone the ESP-IDF, select the `v5.4 (release version)` of the esp-idf.
 
-CMakeやPythonがまだインストールされていない場合、インストーラーはそれらのツールをダウンロードしてインストールするように促します（必要に応じてインストールしてください）。
+	If you use the installer to clone the ESP-IDF, please follow the instructions in the next step to update to the `v5.4` tag.
 
-ESP-IDFをクローンする場合は、`v5.3.1 (release version)`のesp-idfを選択してください。
 
-インストーラーを使用してESP-IDFをクローンする場合は、次のステップの指示に従って`v5.3.1`タグに更新してください。
-
-2. ESP-IDF Windows Installerを使用してESP-IDFをクローンしなかった場合、`ESP-IDF` Githubリポジトリを`~/esp32`ディレクトリにクローンします。`--recursive`オプションとブランチ`v5.3.1`タグを指定してください：
+2. If you did not clone the ESP-IDF using the ESP-IDF Windows Installer, clone  the `ESP-IDF` Github repository into your `~/esp32` directory. Make sure to specify the `--recursive` option and branch `v5.4` tag:
 
     ```text
     cd %USERPROFILE%\esp32
-	git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git
+	git clone -b v5.4 --recursive https://github.com/espressif/esp-idf.git
     ```
 
-3. コントロールパネルアプリの「環境変数」ダイアログを開き、[これらの指示](https://www.architectryan.com/2018/08/31/how-to-change-environment-variables-on-windows-10/)に従ってください。そのダイアログから、`IDF_PATH` Windows環境変数が正しく設定されていることを確認します。
+3. Open the "Environment Variables" dialog of the Control Panel app by following [these instructions](https://www.architectryan.com/2018/08/31/how-to-change-environment-variables-on-windows-10/). From that dialog, verify the `IDF_PATH` Windows environment variable is set correctly.
 
+	- `IDF_PATH` should have the value `C:\Users\<user>\esp32\esp-idf`
 
-	- `IDF_PATH` は `C:\Users\<user>\esp32\esp-idf` の値を持つ必要があります
-
-4. ESP-IDFのインストールバッチファイルを実行します。これにより、ESP-IDFビルドに使用されるユーティリティがマシンに対して構成されます。
+4. Run the ESP-IDF install batch file. This will configure utilities used by the ESP-IDF build for your machine.
 
 	```text
 	cd %IDF_PATH%
@@ -665,7 +669,7 @@ ESP-IDFをクローンする場合は、`v5.3.1 (release version)`のesp-idfを�
 	```
 
 <!--
-5. 既存の ESP32 ビルド出力が `%MODDABLE%\build\bin\esp32` または `%MODDABLE%\build\tmp\esp32` にある場合は、それらのディレクトリを削除します。例えば、「x86 Native Tools Command Prompt for VS 2022」コマンドラインコンソールを使用して:
+5. If you have existing ESP32 build output in `%MODDABLE%\build\bin\esp32` or `%MODDABLE%\build\tmp\esp32`, delete those directories. For instance, using the "x86 Native Tools Command Prompt for VS 2022" command line console:
 
     ```text
     cd %MODDABLE%\build
@@ -674,30 +678,30 @@ ESP-IDFをクローンする場合は、`v5.3.1 (release version)`のesp-idfを�
     ```
 -->
 
-6. ESP-IDF Windowsインストーラーは、重要な環境変数とパスを自動的に設定するコマンドプロンプト「ESP-IDF 5.1 CMD」を提供します。ESP32プロジェクトをビルドする際には、「ESP-IDF 5.1 CMD」を使用することをお勧めします。新しいコマンドプロンプトインスタンスごとに、Visual Studio x86初期化バッチファイルを手動で実行する必要があります。システムに合わせてパスを調整してください。
+6. The ESP-IDF Windows Installer provides a command prompt called "ESP-IDF 5.1 CMD" that automatically sets important environment variables and paths. We recommend building ESP32 projects using "ESP-IDF 5.1 CMD." In each new command prompt instance you will need to run the Visual Studio x86 initialization batch file manually. Adjust the path as necessary for your system.
 
 	```text
 	"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"
 	```
 
-	**熟練者向けの注意:** Windowsショートカットの編集に慣れている場合、この手動プロセスの便利な代替手段として、「ESP-IDF 5.1 CMD」ショートカットを変更して、ESP-IDF環境とVisual Studio x86環境の両方を初期化することができます。これを行うには、「ESP-IDF 5.1 CMD」ショートカットを右クリックし、「プロパティ」を選択します。プロパティウィンドウの「ターゲット」フィールドには、次のようなコマンドが表示されます。
+	**Note for experts:** If you are comfortable editing Windows shortcuts, a convenient alternative to this manual process is to modify the "ESP-IDF 5.1 CMD" shortcut to initialize both the ESP-IDF environment and the Visual Studio x86 environment. To do this, right-click the "ESP-IDF 5.1 CMD" shortcut and select "Properties." In the "Target" field of the Properties window, you should see a command that looks like:
 
 	```text
 	C:\WINDOWS\system32\cmd.exe /k "C:\Users\<username>\.espressif\idf_cmd_init.bat"
 	```
 
-	ターゲットを次のように変更して、`vcvars32.bat`へのパスを含めることができます。システムに合わせてパスを調整してください。
+	You can change the Target to include the path to `vcvars32.bat` as follows. Adjust the paths as necessary for your system.
 
 	```text
 	%comspec% /k ""%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat" && pushd %IDF_PATH% && "%IDF_TOOLS_PATH%\idf_cmd_init.bat" && popd"
 	```
 
-	ショートカットの「開始位置」フィールドを `%MODDABLE%` に更新して、Moddable SDKディレクトリでコマンドプロンプトセッションを開始するのも便利です。
+	It is also convenient to update the "Start in" field of the shortcut to `%MODDABLE%` to start your Command Prompt session in the Moddable SDK directory.
 
-	> 注: これらの手順は、ESP-IDF のコピーが 1 つだけインストールされていることを前提としています。必要に応じて、`idf_cmd_init.bat` に特定の ESP-IDF インストールを指定する引数を取ることもできます。この引数は、デフォルトの「ESP-IDF 5.1 CMD」ショートカットに設定する必要があります。
+	> Note: These instructions assume you only have one copy of the ESP-IDF installed. `idf_cmd_init.bat` can also take an argument to specify a particular ESP-IDF installation, if necessary. This argument should be set up in the default "ESP-IDF 5.1 CMD" shortcut.
 
 
-7. 「ESP-IDF 5.1 CMD」コマンドプロンプトで、デバイスターゲット用に `helloworld` をビルドしてセットアップを確認します：
+7. In the "ESP-IDF 5.1 CMD" command prompt, verify the setup by building `helloworld` for your device target:
 
 	```text
 	cd %MODDABLE%\examples\helloworld
@@ -707,239 +711,240 @@ ESP-IDFをクローンする場合は、`v5.3.1 (release version)`のesp-idfを�
 <a id="esp32-linux"></a>
 ## Linux
 
-Moddable SDKのESP32向けビルドは現在、ESP-IDF v5.3.1（コミット `c8fc5f64`）およびEspressifの [`idf.py` ツール](https://github.com/espressif/esp-idf/blob/master/tools/idf.py) のCMakeオプションを使用しています。
+The Moddable SDK build for ESP32 currently uses ESP-IDF v5.4 (commit `67c1de1e`) and the CMake option of Espressif's [`idf.py` tool](https://github.com/espressif/esp-idf/blob/master/tools/idf.py). 
 
 <a id="lin-instructions"></a>
-### インストール
+### Installing
 
-1. [Getting Started document](./../Moddable%20SDK%20-%20Getting%20Started.md)の指示に従って、Moddable SDKツールをインストールします。
+1. Install the Moddable SDK tools by following the instructions in the [Getting Started document](./../Moddable%20SDK%20-%20Getting%20Started.md).
 
-2. `ESP-IDF`でコンパイルするために必要なパッケージをインストールします。
+2. Install the packages required to compile with the `ESP-IDF`.
 
-	Ubuntu 20.04以降（およびPython 3をデフォルトとする他のLinuxディストリビューション）の場合：
+	For Ubuntu 20.04 or newer (and other Linux distributions that default to Python 3):
 
 	```text
 	sudo apt-get update
 	sudo apt-get install git wget flex bison gperf python-is-python3 python3-pip python3-serial python-setuptools cmake ninja-build ccache libffi-dev libssl-dev dfu-util
 	```
 
-	Ubuntu 20.04以前（およびPython 2をデフォルトとする他のLinuxディストリビューション）の場合：
+	For Ubuntu prior to 20.04 (and other Linux distributions that default to Python 2):
 
 	```text
 	sudo apt-get update
 	sudo apt-get install git wget flex bison gperf python python-pip python-setuptools python-serial cmake ninja-build ccache libffi-dev libssl-dev dfu-util
 	```
 
-	> 注: ESP-IDFビルドはPython 3を推奨しており、まもなくPython 2.7のサポートを終了します。ディストリビューションがデフォルトでPython 2.7を使用している場合は、以下のコマンドでPython 3を明示的にインストールし、デフォルトのPythonインタープリタとして設定できます。これはシステム全体の変更であり、Pythonを使用する他のアプリケーションにも影響を与えることに注意してください。
+	> Note: The ESP-IDF build recommends Python 3 and will soon stop supporting Python 2.7. If your distribution uses Python 2.7 by default, you can explicitly install Python 3 and set it as the default Python interpreter with these commands. Note that this is a system-wide change that will impact other applications that use Python.
 
 	```text
 	sudo apt-get install python3 python3-pip python3-setuptools
 	sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 	```
 
-3. 必要なサードパーティSDKとツールのために、ホームディレクトリに `esp32` ディレクトリを `~/esp32` に作成します。
+3. Create an `esp32` directory in your home directory at `~/esp32` for required third party SDKs and tools. 
 
-4. これが初めてのインストールの場合、`ESP-IDF` GitHubリポジトリを `~/esp32` ディレクトリにクローンします。`--recursive` オプションを指定することを確認してください。その後、`v5.3.1` タグをチェックアウトします：
+4. If this is your first install, clone the `ESP-IDF` GitHub repository into your `~/esp32` directory. Make sure to specify the `--recursive` option. Then checkout the `v5.4` tag:
 
-```text
-cd ~/esp32
-git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.3.1
-```
+	```text
+	cd ~/esp32
+	git clone -b v5.4 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.4
+	```
 
-5. USBケーブルを使ってESP32デバイスをLinuxホストに接続します。
+5. Connect the ESP32 device to your Linux host with a USB cable.
 
-6. シェルのスタートアップ/初期化ファイル（例：`~/.bash_profile`や`~/.zshrc`、使用しているシェルによります）を開き、次の行をファイルに追加して保存します。これにより、`IDF_PATH`環境変数がESP-IDFディレクトリを指すように設定されます。
+6. Open your shell startup/initialization file (e.g.  ` ~/.bash_profile` or `~/.zshrc`, depending on your shell), add the following line to the file, and save. This sets the `IDF_PATH` environment variable to point at your ESP-IDF directory.
 
-```text
-export IDF_PATH=$HOME/esp32/esp-idf
-```
+	```text
+	export IDF_PATH=$HOME/esp32/esp-idf
+	```
 
-<a id="upload_port_lin"></a>
-上級ユーザー向けのオプションの環境変数として、`UPLOAD_PORT`があります。
+	<a id="upload_port_lin"></a>
+	There is an optional environment variable for advanced users: `UPLOAD_PORT`.
 
-ESP-IDFビルド/設定ツール`idf.py`はほとんどの場合シリアルポートを自動的に検出します。もし検出しない場合は、使用するポートのパスを`UPLOAD_PORT`環境変数に設定します。
+	The ESP-IDF build/config tool `idf.py` automatically detects the serial port in most cases. If it does not, set the path of the port to use in the `UPLOAD_PORT` environment variable.
 
-```text
-export UPLOAD_PORT=/dev/ttyUSB0
-```
+	```text
+	export UPLOAD_PORT=/dev/ttyUSB0
+	```
 
-適切なシリアルポートを特定するには、ESP32デバイスを接続する前後のLinuxホスト上のシリアルデバイスのリストを確認し、新しく表示されるシリアルポートを確認します。シリアルデバイスファイルのリストを表示するには、次のコマンドを使用します：
+	To identify the proper serial port, examine the list of serial devices on your Linux host before and after plugging in your ESP32 device and note the new serial port that shows up. To see a list of serial device files, use the following command:
+	
+	```text
+	ls /dev/*
+	```
 
-```text
-ls /dev/*
-```
+	The `UPLOAD_PORT` can also be specified on the `mcconfig` command line, which is useful when deploying to multiple ESP32 devices.
+	
+	```text
+	UPLOAD_PORT=/dev/ttyUSB0 mcconfig -d -m -p esp32
+	```
 
-`UPLOAD_PORT`は、複数のESP32デバイスにデプロイする際に便利な`mcconfig`コマンドラインでも指定できます。
+7. Adding the export statements to your shell startup file does not update the environment variables in active shell instances, so open a new shell instance (by opening a new tab/window) or manually run the export statements in your shell before proceeding.
 
-```text
-UPLOAD_PORT=/dev/ttyUSB0 mcconfig -d -m -p esp32
-```
-
-7. シェルのスタートアップファイルにエクスポート文を追加しても、アクティブなシェルインスタンスの環境変数は更新されませんので、新しいシェルインスタンス（新しいタブ/ウィンドウを開く）を開くか、シェルでエクスポート文を手動で実行してから続行してください。
-
-8. ESP-IDFインストールスクリプトを実行します。これにより、ESP-IDFビルドに必要な適切なクロスコンパイルツールチェーンとユーティリティがインストールされます。
+8. Run the ESP-IDF install script. This will install the proper cross-compilation toolchain and utilities needed for the ESP-IDF build.
 
 	```text
 	cd $IDF_PATH
 	sh ./install.sh
 	```
 
-9. ESP-IDF `export.sh`スクリプトをソースにしてビルド環境を設定します。**これは新しいシェルインスタンスを開くたびに実行する必要があります。** 手動で実行するか、スタートアップスクリプトで実行します。
+9. Set up your build environment by sourcing the ESP-IDF `export.sh` script. **This must be run every time you open a new shell instance,** either manually or by a startup script. 
 
 	```text
 	source $IDF_PATH/export.sh
 	```
 
-	新しいシェルインスタンスのためにこのプロセスを自動化したい場合は、上記のステップ6-7の指示に従い、シェルのスタートアップ/初期化スクリプトの最後に`source`コマンドを追加します。`export IDF_PATH`コマンドの後に追加することを確認してください。
+	If you prefer to automate this process for new shell instances, follow the instructions from Steps 6-7 above and add the `source` command at the end of your shell startup/initialization script. Make sure it is after the `export IDF_PATH` command.
 
-10. デバイスターゲット用に`helloworld`をビルドしてセットアップを確認します：
+10. Verify the setup by building `helloworld` for your device target:
 
-```text
-cd $MODDABLE/examples/helloworld
-mcconfig -d -m -p esp32/<YOUR_SUBPLATFORM_HERE>
-```
+	```text
+	cd $MODDABLE/examples/helloworld
+	mcconfig -d -m -p esp32/<YOUR_SUBPLATFORM_HERE>
+	```
 
-> ESP32ターゲット用のアプリケーションを初めてビルドする際、ツールチェーンが設定オプションの入力を求めることがあります。その場合は、デフォルトを受け入れてください。
-
+	> Note that the first time you build an application for the ESP32 target, the toolchain may prompt you to enter configuration options. If this happens, accept the defaults.
+	
 <a id="lin-troubleshooting"></a>
-### トラブルシューティング
+### Troubleshooting
 
-アプリケーションをインストールしようとすると、エラーや警告の形で障害に遭遇することがあります。このセクションでは、Linux上での一般的な問題とその解決方法について説明します。
+When you're trying to install applications, you may experience roadblocks in the form of errors or warnings; this section explains some common issues on Linux and how to resolve them.
 
-macOS、Windows、およびLinuxで共通のその他の問題については、このドキュメントの下部にある[トラブルシューティングセクション](#troubleshooting)を参照してください。
+For other issues that are common on macOS, Windows, and Linux, see the [Troubleshooting section](#troubleshooting) at the bottom of this document.
 
-#### 許可が拒否されました
+#### Permission denied
 
-ESP32はttyUSB0デバイスを介してLinuxホストと通信します。Ubuntu Linuxでは、ttyUSB0デバイスは`dialout`グループによって所有されています。ESP32をフラッシュする際に**許可が拒否されましたエラー**が発生した場合は、ユーザーを`dialout`グループに追加してください：
+The ESP32 communicates with the Linux host via the ttyUSB0 device. On Ubuntu Linux the ttyUSB0 device is owned by the `dialout` group. If you get a **permission denied error** when flashing the ESP32, add your user to the `dialout` group:
 
 ```text
-sudo adduser <username> dialout
+sudo adduser <username> dialout 
 sudo reboot
 ```
 
-#### デバイスが接続されていない/認識されていない
+#### Device not connected/recognized
 
-次のエラーメッセージは、デバイスがコンピュータに接続されていないか、コンピュータがデバイスを認識していないことを意味します。
+The following error messages mean that the device is not connected to your computer or the computer doesn't recognize the device.
 
 ```text
 error: cannot access /dev/ttyUSB0
 ```
 
-これが発生する理由はいくつかあります：
+There are a few reasons this can happen:
+ 
+1. Your device is not plugged into your computer. Make sure it's plugged in when you run the build commands. 
+2. You have a USB cable that is power only. Make sure you're using a data sync-capable USB cable.
+3. The computer does not recognize your device. To fix this problem, follow the instructions below.
 
-1. デバイスがコンピュータに接続されていません。ビルドコマンドを実行する際に接続されていることを確認してください。
-2. 電源のみのUSBケーブルを使用しています。データ同期が可能なUSBケーブルを使用していることを確認してください。
-3. コンピュータがデバイスを認識していません。この問題を解決するには、以下の指示に従ってください。
 
-デバイスを取り外し、次のコマンドを入力します。
+Unplug the device and enter the following command.
 
 ```text
 ls /dev/cu*
 ```
 
-次にデバイスを接続し、同じコマンドを再度実行します。ターミナル出力に新しいものが表示されない場合、デバイスはコンピュータに認識されていません。
+Then plug in the device and repeat the same command. If nothing new appears in the terminal output, the device isn't being recognized by your computer.
 
-認識された場合、デバイス名がわかるので、`UPLOAD_PORT`環境変数を編集する必要があります。次のコマンドを入力し、`/dev/ttyUSB1`をシステム上のデバイス名に置き換えます。
+If it is recognized, you now have the device name and you need to edit the `UPLOAD_PORT` environment variable. Enter the following command, replacing `/dev/ttyUSB1` with the name of the device on your system.
 
 ```text
 export UPLOAD_PORT=/dev/ttyUSB1
 ```
-<a id="lin-update"></a>
+<a id="lin-update"></a>	
+### Updating
 
-### 更新
+This is a substantial update. We have found it best to start with a clean clone.
 
-これは大規模な更新です。クリーンなクローンから始めるのが最善です。
+0. If you have the disk space, you may want to back up your old ESP-IDF.
 
-0. ディスクスペースに余裕がある場合、古いESP-IDFをバックアップすることをお勧めします。
+	```text
+	cd ~/esp32/
+	mv esp-idf esp-idf.old
+	```	
 
-```text
-cd ~/esp32/
-mv esp-idf esp-idf.old
-```
+1. Remove the directory and clone the repository.
 
-1. ディレクトリを削除し、リポジトリをクローンします。
+	```text
+	cd ~/esp32
+	rm -rf esp-idf
+	git clone -b v5.4 --recursive https://github.com/espressif/esp-idf.git
+	```
 
-```text
-cd ~/esp32
-rm -rf esp-idf
-git clone -b v5.3.1 --recursive https://github.com/espressif/esp-idf.git
-```
+2. (optional) Update apt, then install any missing packages (and upgrade existing packages) required to compile with the `ESP-IDF`. The packages to install vary based on your distribution's default Python version.
 
-2. （オプション）aptを更新し、`ESP-IDF`のコンパイルに必要な不足しているパッケージ（および既存のパッケージのアップグレード）をインストールします。インストールするパッケージは、ディストリビューションのデフォルトのPythonバージョンによって異なります。
+	For Ubuntu 20.04 or newer (and other Linux distributions that default to Python 3):
 
-Ubuntu 20.04以降（およびPython 3をデフォルトとする他のLinuxディストリビューション）の場合：
+	```text
+	sudo apt-get update
+	sudo apt-get install git wget flex bison gperf python-is-python3 python3-pip python3-serial python-setuptools cmake ninja-build ccache libffi-dev libssl-dev dfu-util
+	```
 
-```text
-sudo apt-get update
-sudo apt-get install git wget flex bison gperf python-is-python3 python3-pip python3-serial python-setuptools cmake ninja-build ccache libffi-dev libssl-dev dfu-util
-```
+	For Ubuntu prior to 20.04 (and other Linux distributions that default to Python 2):
 
-Ubuntu 20.04以前（およびPython 2をデフォルトとする他のLinuxディストリビューション）の場合：
+	```text
+	sudo apt-get update
+	sudo apt-get install git wget flex bison gperf python python-pip python-setuptools python-serial cmake ninja-build ccache libffi-dev libssl-dev dfu-util
+	```
 
-```text
-sudo apt-get update
-sudo apt-get install git wget flex bison gperf python python-pip python-setuptools python-serial cmake ninja-build ccache libffi-dev libssl-dev dfu-util
-```
+	> Note: The ESP-IDF build recommends Python 3. If your distribution uses Python 2.7 by default, you can explicitly install Python 3 and set it as the default Python interpreter with these commands. Note that this is a system-wide change that will impact other applications that use Python.
 
-> 注: ESP-IDFのビルドはPython 3を推奨しています。ディストリビューションがデフォルトでPython 2.7を使用している場合、以下のコマンドでPython 3を明示的にインストールし、デフォルトのPythonインタープリタとして設定できます。これはシステム全体の変更であり、Pythonを使用する他のアプリケーションにも影響を与えることに注意してください。
+	```text
+	sudo apt-get install python3 python3-pip python3-setuptools
+	sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+	```
 
-```text
-sudo apt-get install python3 python3-pip python3-setuptools
-sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-```
+3. Verify the `IDF_PATH` environment variable is set correctly in your shell's user profile file (e.g. `~/.bash_profile` or `~/.zshrc`, depending on your shell).
 
-3. シェルのユーザープロファイルファイル（例：`~/.bash_profile` または `~/.zshrc`、シェルに応じて）に `IDF_PATH` 環境変数が正しく設定されていることを確認します。
+	```text
+	export IDF_PATH=$HOME/esp32/esp-idf
+	```
 
-```text
-export IDF_PATH=$HOME/esp32/esp-idf
-```
+4. Run the ESP-IDF install script. This will install the proper cross-compilation toolchain and utilities needed for the ESP-IDF build.
 
-4. ESP-IDFインストールスクリプトを実行します。これにより、ESP-IDFビルドに必要な適切なクロスコンパイルツールチェーンとユーティリティがインストールされます。
+	```text
+	cd $IDF_PATH
+	./install.sh
+	```
 
-```text
-cd $IDF_PATH
-./install.sh
-```
+5. Set up your build environment by sourcing the ESP-IDF `export.sh` script. **This must be run every time you open a new shell instance,** either manually or by a startup script. 
 
-5. ESP-IDFの `export.sh` スクリプトをソースにしてビルド環境を設定します。**これは新しいシェルインスタンスを開くたびに手動で、またはスタートアップスクリプトによって実行する必要があります。**
+	```text
+	source $IDF_PATH/export.sh
+	```
 
-```text
-source $IDF_PATH/export.sh
-```
+	If you prefer to automate this process for new shell instances, follow the instructions from Step 3 above and add the `source` command at the end of your shell startup/initialization script. Make sure it is after the `export IDF_PATH` command.
 
-新しいシェルインスタンスのためにこのプロセスを自動化したい場合は、上記のステップ3の指示に従い、シェルのスタートアップ/初期化スクリプトの最後に `source` コマンドを追加します。`export IDF_PATH` コマンドの後に追加することを確認してください。
+6. If you have existing ESP32 build output in `$MODDABLE/build/bin/esp32` or `$MODDABLE/build/tmp/esp32`, delete those directories:
 
-6. `$MODDABLE/build/bin/esp32` または `$MODDABLE/build/tmp/esp32` に既存のESP32ビルド出力がある場合は、それらのディレクトリを削除します。
+    ```text
+    cd $MODDABLE/build
+    rm -rf bin/esp32
+    rm -rf tmp/esp32
+    ```
 
-```text
-cd $MODDABLE/build
-rm -rf bin/esp32
-rm -rf tmp/esp32
-```
+7. Verify the setup by building `helloworld` for your device target:
+	
+	```text
+	cd $MODDABLE/examples/helloworld
+	mcconfig -d -m -p esp32/<YOUR_SUBPLATFORM_HERE>
+	```
 
-7. デバイスターゲット用に `helloworld` をビルドしてセットアップを確認します：
+	> Note that the first time you build an application for the ESP32 target, the toolchain may prompt you to enter configuration options. If this happens, accept the defaults.
 
-```text
-cd $MODDABLE/examples/helloworld
-mcconfig -d -m -p esp32/<YOUR_SUBPLATFORM_HERE>
-```
-
-> ESP32ターゲット用にアプリケーションを初めてビルドする際、ツールチェーンが設定オプションの入力を求めることがあります。この場合、デフォルトを受け入れてください。
 
 <a id="troubleshooting"></a>
-## トラブルシューティング
+## Troubleshooting
 
-アプリケーションをインストールしようとすると、エラーや警告の形で障害が発生することがあります。このセクションでは、一般的な問題とその解決方法について説明します。
+When you're trying to install applications, you may experience roadblocks in the form of errors or warnings; this section explains some common issues and how to resolve them.
+	
+### Incompatible baud rate
 
-### 互換性のないボーレート
-
-次の警告メッセージは通常であり、心配する必要はありません。
+The following warning message is normal and is no cause for concern.
 
 ```text
 warning: serialport_set_baudrate: baud rate 921600 may not work
 ```
 
-ただし、アップロードが開始されても完了しないことがあります。コンソールに表示される進行バーが100％に達すると、アップロードが完了したことがわかります。例えば：
+However, sometimes the upload starts but does not complete. You can tell an upload is complete after the progress bar traced to the console goes to 100%. For example:
 
 ```text
 ........................................................... [ 16% ]
@@ -951,120 +956,121 @@ warning: serialport_set_baudrate: baud rate 921600 may not work
 ..                                                         [ 100% ]
 ```
 
-アップロードが途中で失敗する理由はいくつかあります：
+There are a few reasons the upload may fail partway through:
 
-- USBケーブルが故障している。
-- 高いボーレートをサポートしていないUSBケーブルを使用している。
-- Moddable SDKが使用するデフォルトのボーレートよりも低いボーレートを必要とするボードを使用している。
+- You have a faulty USB cable.
+- You have a USB cable that does not support higher baud rates.
+- You're using a board that requires a lower baud rate than the default baud rate that the Moddable SDK uses.
 
-上記の最後の2つの問題を解決するには、次のようにしてボーレートを遅くすることができます：
+To solve the last two problems above, you can change to a slower baud rate as follows: 
 
-1. `$MODDABLE/tools/mcconfig/make.esp32.mk`を開きます。
+1. Open `$MODDABLE/tools/mcconfig/make.esp32.mk`.
 
-2. アップロード速度を921600に設定するこの行を見つけます：
+2. Find this line, which sets the upload speed to 921600:
 
-```text
-UPLOAD_SPEED ?= 921600
-```
+    ```text 
+    UPLOAD_SPEED ?= 921600
+    ```
 
-3. スピードを小さい数値に設定します。例えば：
+3. Set the speed to a smaller number. For example:
 
-```text
-UPLOAD_SPEED ?= 115200
-```
+    ```text 
+    UPLOAD_SPEED ?= 115200
+    ```
+    
+> Note: Instead of modifying the `make.esp32.mk` file, you can make a temporary change by setting the environment variable `UPLOAD_SPEED`.
+ 
+### ESP32 is not in bootloader mode
 
-> 注: `make.esp32.mk`ファイルを変更する代わりに、環境変数 `UPLOAD_SPEED` を設定して一時的に変更することができます。
+If an ESP32 is not in bootloader mode, you cannot flash the device. Most development boards built with the ESP32 include circuitry that automatically puts them into bootloader mode when you try to reflash the board. Some do not, and sometimes the auto programming will fail. This is most common on Windows machines. 
 
-### ESP32がブートローダーモードになっていない
-
-ESP32がブートローダーモードになっていない場合、デバイスにフラッシュすることはできません。ESP32を使用して構築されたほとんどの開発ボードには、ボードを再フラッシュしようとすると自動的にブートローダーモードにする回路が含まれています。一部のボードには含まれておらず、時々自動プログラミングが失敗することがあります。これは特にWindowsマシンで一般的です。
-
-ESP32がブートローダーモードになっていない場合、デバイスをフラッシュしようとするとステータスメッセージのトレースが一時的に停止し、数秒後にこのエラーメッセージがコンソールにトレースされます：
+When your ESP32 is not in bootloader mode, status messages stop being traced briefly when you attempt to flash the device, and after several seconds this error message is traced to the console:
 
 ```text
 A fatal error occurred: Failed to connect to ESP32: Timed out waiting for packet header
 ```
 
-ESP32を手動でブートローダーモードにするには、次の手順に従います：
+To manually put your ESP32 into bootloader mode, follow these steps:
 
-1. デバイスのプラグを抜きます。
-2. BOOTボタンを押し続けます。
-3. デバイスをコンピュータに接続します。
-4. `mcconfig` コマンドを入力します。
-5. 数秒待ってからBOOTボタンを離します。
+1. Unplug the device.
+2. Hold down the BOOT button.
+3. Plug the device into your computer.
+4. Enter the `mcconfig` command.
+5. Wait a few seconds and release the BOOT button.
 
 
 <a id="using_usb"></a>
-## ESP32でのUSBの使用
+## Using USB on ESP32
 
-元々、ESP32のプログラミングとデバッグはシリアル接続または**UART**を介して行われていました。一部のデバイスには統合されたシリアル-to-USBチップ（UART)が含まれており、一部は外部プログラマを使用しています。
+Originally, programming and debugging with the ESP32 was done over a serial or **UART** connection. Some devices contain an integrated serial-to-USB chip (UART), and some use an external programmer.
 
-新しいデバイスでは、EspressifはUSBサポートを追加しました。ESP32-S2からTinyUSBサポートが追加され、ESP32-S3でもTinyUSBサポートが続いています。
+In newer devices, Espressif has added USB support. Starting with the ESP32-S2, TinyUSB support was added. TinyUSB support continued with ESP32-S3.
 
-ESP32-S3から始まり、ESP32-C3、ESP32-C6、ESP32-H2に続き、USBのサポートがUSBシリアル/JTAGドライバを使用してデバイスに統合されています。組み込みドライバを使用することでバイナリが小さくなるため、シリアル/JTAGドライバの使用が推奨されます
+Starting with the ESP32-S3 and continuing with the ESP32-C3, ESP32-C6 and ESP32-H2, support for USB is integrated into the device with a USB Serial/JTAG driver. Using the Serial/JTAG driver is preferred as it uses the built-in driver which results in a smaller binary.
 
 <a id="usb_multiport"></a>
-### マルチポートデバイス
+### Multi-port devices
 
-UARTとUSB接続の両方ができる開発ボードはたくさんあります。
+There are some development boards that include both the UART and USB connections.
 
 <img src="./../assets/devices/esp32-dual-port.png" width=400>
 
-macOSでは、**UART**ポートに接続すると、デバイスは`/dev/cu.usbserial-#####` として認識されます。**USB**ポートに接続すると、`/dev/cu.usbmodem-#####`として認識されます。
+On macOS, when plugged into the **UART** port, the device is enumerated as a `/dev/cu.usbserial-#####` device. When plugged into the **USB** port, the device is enumerated as a `/dev/cu.usbmodem-#####` device.
 
-Espressif IDFはどちらに接続されていてもアプリをインストールします。しかしながら、`xsbug` 接続はアプリケーションがビルドされた方法でのみ機能します。 例えば、`esp32/esp32s3`ターゲット用にアプリをビルドすると、デバッガに接続するために**UARTポート**を使用します。`esp32/esp32s3_cdc`または`esp32/esp32s3_usb`用にアプリをビルドすると、**USB**ポート経由で接続します。
+The Espressif IDF will install the app to whatever is connected. However, the `xsbug` connection will only work in the method that the application was built for. For example, building an app for the `esp32/esp32s3` target will use the **UART** port to connect to the debugger. Building the app for `esp32/esp32s3_cdc` or `esp32/esp32s3_usb` will connect over the **USB** port.
 
-> 注意： もし、**USB**としてビルドとしていて、**UART**ポートとして接続していたなら、`xsbug`は接続できないでしょう。
+> Note: If you have built with **USB** configured and are connected to the **UART** port, `xsbug` will not be able to connect.
+
 
 <a id="usb_build"></a>
-#### ビルド構成
+#### Build configuration
 
-デバイスのmanifest.jsonファイルでは、`USE_USB`ビルドオプションがどのUSB実装を使用するかを指定します。また、`SDKCONFIGPATH`も指定して、このデバイスに特有のESP-IDF設定ファイルを取得します：
+In a device's manifest.json file, the `USE_USB` build option specifies which USB implementation to use. The `SDKCONFIGPATH` is also specified to pick up the ESP-IDF config files specific to this device:
 
 ```
-"build": {
-	"ESP32_SUBCLASS": "esp32s2",
-	"USE_USB": "1",
-	"SDKCONFIGPATH": "./sdkconfig"
-	...
+	"build": {
+		"ESP32_SUBCLASS": "esp32s2",
+		"USE_USB": "1",
+		"SDKCONFIGPATH": "./sdkconfig"
+		...
 ```
 
 <a id="usb_tinyusb"></a>
 ### `USE_USB: 1` - TinyUSB
 
-TinyUSBはESP32-S2およびESP32-S3デバイスで動作します。
+TinyUSB works with the ESP32-S2 and ESP32-S3 devices.
 
-TinyUSBを使用する場合、`UPLOAD_PORT`を設定する必要があります。例えば：
+With TinyUSB, we need to set the `UPLOAD_PORT`. For example:
 
 ```
 export UPLOAD_PORT=/dev/cu.usbmodem01
 ```
 
-> ビルドプラットフォームに関するセクションを参照してください [macOS](#upload_port_mac), [Windows](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/devices/esp32.md#upload_port_win), または [Linux](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/devices/esp32.md#upload_port_lin) で、デバイスの `UPLOAD_PORT` を見つける方法が説明されています。
+> See the section for your build platform [macOS](#upload_port_mac), [Windows](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/devices/esp32.md#upload_port_win), or [Linux](https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/devices/esp32.md#upload_port_lin) which describes how to find your device's `UPLOAD_PORT`.
 
-アプリケーションをビルドします：
+Build your application:
 
 `mcconfig -d -m -p esp32/esp32s3_usb`
 
-> 注: デバイスがプログラミングモードになっていない場合、ビルドコンソールに通知が表示されます：
+> Note: if your device is not in programming mode, there will be a notice in the build console:
 
 ```
 # looking for UPLOAD_PORT: /dev/cu.usbmodem01
 ** Put device in programming mode **
 ```
 
-コンソールに `Done` と表示されたら、デバイスの __Reset__ ボタンを押します。
+When the console says `Done`, press the __Reset__ button on the device.
 
 ```
 Executing "ninja flash"...
 Done
 ```
 
-デバイスの __Reset__ ボタンを押すと、デバイスが再起動し、`xsbug` に接続されます。
+After you press __Reset__ on the device, the device will restart and connect to `xsbug`.
 
-これらのうちいくつかデバイスはこの技術を使用します：
+These are some of the devices use this technique:
 
-| プラットフォーム | デバイス |
+| Platform | Device |
 | :---: | :--- |
 | `esp32/esp32s3_usb` | Espressif ESP32-S3-DevKitC |
 | `esp32/m5atom_s3` | M5 Atom S3 |
@@ -1075,24 +1081,25 @@ Done
 | `esp32/s3_tft_feather` | Adafruit ESP32-S3 TFT Feather |
 
 
-> Note: 注意: この端末の特徴として、プログラミングモードと実行モードのどちらにあるかに応じて、デバイスが異なる/dev/cu.usbmodem-#####として認識される点があります。
+> Note: A quirk with this variant is that the device enumerates to a different `/dev/cu.usbmodem-#####` whether it is in programming mode or run mode.
 >
-> 例えば、`esp32/esp32s3_usb`のビルドでは、 `/dev/cu.usbmodem123401`がプログラミングモードとして確認できます。実行モードでは、 `/dev/cu.usbmodem1234561`となります。 よって `DEBUGGER_PORT=/dev/cu.usbmodem1234561` および `UPLOAD_PORT=/dev/cu.usbmodem123401` と設定することで適切な接続が保証されます。
+> For example, building for `esp32/esp32s3_usb` I see `/dev/cu.usbmodem123401` in programming mode. In run-mode, I see `/dev/cu.usbmodem1234561`. So I set `DEBUGGER_PORT=/dev/cu.usbmodem1234561` and `UPLOAD_PORT=/dev/cu.usbmodem123401` to ensure the proper connections are made.
+
 
 <a id="usb_serial_jtag"></a>
 ### `USE_USB: 2` - SERIAL-JTAG
 
-内蔵のSERIAL-JTAGドライバは、ESP32-S3およびESP32-C3デバイスで使用できます。
+The built-in SERIAL-JTAG driver can be used with the ESP32-S3 and ESP32-C3 devices.
 
-通常、`UPLOAD_PORT`を設定したり、デバイスのボタンを押したりする必要はありません。ただし、複数のデバイスを同時に接続している場合は、`UPLOAD_PORT`を使用してどのデバイスを使用するかを指定する必要があります。
+There is usually no need to set the `UPLOAD_PORT`, or press buttons on your device. However, if you have multiple devices connected simultaneously, you will have to use the `UPLOAD_PORT` to specify which one to use.
 
-アプリケーションをビルドします：
+Build your application:
 
 `mcconfig -d -m -p esp32/esp32s3_cdc`
 
-これらのうちいくつかはデバイスはこの技術を使用します：
+These are some of the devices use this technique:
 
-| プラットフォーム | デバイス |
+| Platform | Device |
 | :---: | :--- |
 | `esp32/moddable_six_cdc` | Moddable Six |
 | `esp32/c3_devkit_rust` | Espressif C3 DevKit Rust |
@@ -1101,15 +1108,16 @@ Done
 | `esp32/qtpyc3` | Adafruit QT Py C3 |
 | `esp32/xiao_esp32c3` | Seeed Xiao ESP32C3 |
 
+
 <a id="idf-components"></a>
 
-## ESP Registry componentsを使用する
+## Using ESP Registry components
 
-[ESP Component Registry](https://components.espressif.com/)は多くのEspressifデバイスのコンポーネントやライブラリを公開しています。
+The [ESP Component Registry](https://components.espressif.com/) contains many components and libraries for the Espressif devices.
 
-これらのコンポーネントの機能をJavaScriptモジュール公開するモジュールを作成できます。
+You can write modules that expose the functionality of these components to your JavaScript modules.
 
-マニフェストの`platforms`:`esp32` セクションに`dependency`プロパティを追加します：
+Add a `dependency` property in the `platforms`:`esp32` section of the manifest:
 
 ```json
 	"platforms": {
@@ -1121,6 +1129,6 @@ Done
 	}
 ```
 
-依存関係からのライブラリおよびインクルードファイルは、自動的にESPレジストリから読み込まれ、プロジェクトで利用可能になります。次に、コンポーネントと連携するネイティブ部分を持つモジュールを作成できます。
+The library and include files from the dependencies will be loaded from the ESP Registry automatically and made available to your project. You can then write your module with a native part to interface with the component.
 
-[onewire module](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/drivers/onewire) `dependency`の示しています。
+The [onewire module](https://github.com/Moddable-OpenSource/moddable/tree/public/modules/drivers/onewire) demonstrates the use of `dependency`.

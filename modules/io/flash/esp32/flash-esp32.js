@@ -1,10 +1,10 @@
 class Flash @ "xs_flashstorage_destructor" {
-	constructor(options) @ "xs_flashstorage"
+	constructor() {throw new TypeError}
 	close() @ "xs_flashstorage_close"
 
 	eraseBlock(start, end) @ "xs_flashstorage_eraseBlock"
 
-	read(byeLength, byteOffset) @  "xs_flashstorage_read"
+	read(byteLength, byteOffset) @  "xs_flashstorage_read"
 	write(buffer, byteOffset) @  "xs_flashstorage_write"
 
 	status() @ "xs_flashstorage_status"

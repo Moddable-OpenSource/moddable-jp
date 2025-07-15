@@ -121,7 +121,6 @@ void fxWorkerMessage(void* machine, void* it)
 	{
 		xsVars(1);
 		xsTry {
-			xsCollectGarbage();
 			xsResult = xsDemarshall(job->argument);
 			xsVar(0) = xsAccess(*(job->reference));
 			xsCall1(xsVar(0), xsID_onmessage, xsResult);

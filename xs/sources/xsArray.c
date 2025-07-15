@@ -570,9 +570,10 @@ txIndex fxGetArrayLimit(txMachine* the, txSlot* reference)
 	if (array && (array->kind == XS_TYPED_ARRAY_KIND) && (array->ID == XS_TYPED_ARRAY_BEHAVIOR)) {
 		txSlot* view = array->next;
 		txSlot* buffer = view->next;
-		txSlot* data = buffer->value.reference->next;
-		if (data->value.arrayBuffer.address == C_NULL)
-			mxTypeError("detached buffer");
+		if (mxThis->value.reference != instance) { // iterator
+			if (fxIsDataViewOutOfBound(the, view, buffer))
+				mxTypeError("out of bound buffer");
+		}
 		return fxGetDataViewSize(the, view, buffer) >> array->value.typedArray.dispatch->shift;
 	}
 	mxPushReference(instance);

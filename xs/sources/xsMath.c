@@ -57,6 +57,9 @@ void fxBuildMath(txMachine* the)
 	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Math_cosh), 1, mxID(_cosh), XS_DONT_ENUM_FLAG);
 	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Math_exp), 1, mxID(_exp), XS_DONT_ENUM_FLAG);
 	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Math_expm1), 1, mxID(_expm1), XS_DONT_ENUM_FLAG);
+#if mxFloat16
+	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Math_f16round), 1, mxID(_f16round), XS_DONT_ENUM_FLAG);
+#endif
 	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Math_floor), 1, mxID(_floor), XS_DONT_ENUM_FLAG);
 	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Math_fround), 1, mxID(_fround), XS_DONT_ENUM_FLAG);
 	slot = fxNextHostFunctionProperty(the, slot, mxCallback(fx_Math_hypot), 2, mxID(_hypot_), XS_DONT_ENUM_FLAG);
