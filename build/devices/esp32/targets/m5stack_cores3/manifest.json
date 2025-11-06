@@ -125,7 +125,7 @@
 				"lr_pin": 33,
 				"datain": 14,
 				"pdm": 0,
-				"slot": "I2S_STD_SLOT_RIGHT"
+				"slot": "I2S_STD_SLOT_BOTH"
 			}
 		},
 		"camera": {
