@@ -23,6 +23,7 @@ import config from "mc/config";
 import Timer from "timer";
 
 import AXP2101 from "embedded:peripheral/Power/axp2101";
+import ES7210 from "embedded:peripheral/Audio/es7210";
 import AudioOut from "embedded:io/audio/out";
 
 const state = {
@@ -67,6 +68,15 @@ export default function (done) {
   // power
   globalThis.power = new Power({sensor: { ...device.I2C.internal, io: device.io.SMBus }});
   globalThis.amp = new AW88298({sensor: { ...device.I2C.internal, io: device.io.SMBus }});
+  
+  // microphone ADC
+  try {
+    globalThis.mic = new ES7210({sensor: { ...device.I2C.internal, io: device.io.SMBus }});
+    globalThis.mic.initialize();
+  } catch (e) {
+    trace("ES7210 microphone initialization failed: " + e + "\n");
+    globalThis.mic = undefined;
+  }
 
   // start-up sound
   if (config.startupSound) {

@@ -1,0 +1,8 @@
+{
+	"modules": {
+		"embedded:peripheral/Audio/es7210": "./es7210"
+	},
+	"preload": [
+		"embedded:peripheral/Audio/es7210"
+	]
+}
