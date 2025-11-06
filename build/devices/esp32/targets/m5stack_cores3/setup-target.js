@@ -70,8 +70,13 @@ export default function (done) {
   globalThis.amp = new AW88298({sensor: { ...device.I2C.internal, io: device.io.SMBus }});
   
   // microphone ADC
-  globalThis.mic = new ES7210({sensor: { ...device.I2C.internal, io: device.io.SMBus }});
-  globalThis.mic.initialize();
+  try {
+    globalThis.mic = new ES7210({sensor: { ...device.I2C.internal, io: device.io.SMBus }});
+    globalThis.mic.initialize();
+  } catch (e) {
+    trace("ES7210 microphone initialization failed: " + e + "\n");
+    globalThis.mic = undefined;
+  }
 
   // start-up sound
   if (config.startupSound) {

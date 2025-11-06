@@ -47,7 +47,11 @@ class ES7210 {
 	 */
 	initialize() {
 		// Reset
-		this.writeByte(0x00, 0xFF); // RESET_CTL
+		try {
+			this.writeByte(0x00, 0xFF); // RESET_CTL
+		} catch (e) {
+			throw new Error("ES7210 not responding on I2C");
+		}
 
 		// ES7210 register initialization sequence from M5Unified
 		const initSequence = [
