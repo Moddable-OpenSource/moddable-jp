@@ -518,7 +518,8 @@ void audioInLoop(void *pvParameter)
 #else
 	i2s_std_config_t rx_std_cfg = {
 		.clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(input->sampleRate),
-		.slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_32BIT, I2S_SLOT_MODE_MONO),
+		.slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_32BIT, 
+			(input->numChannels == 2) ? I2S_SLOT_MODE_STEREO : I2S_SLOT_MODE_MONO),
 		.gpio_cfg = {
 			.mclk = I2S_GPIO_UNUSED,
 			.bclk = MODDEF_AUDIOIN_I2S_BCK_PIN,
@@ -532,7 +533,7 @@ void audioInLoop(void *pvParameter)
 			}
 		}
 	};
-	rx_std_cfg.slot_cfg.slot_mask = I2S_STD_SLOT_RIGHT; 		//@@
+	rx_std_cfg.slot_cfg.slot_mask = MODDEF_AUDIOIN_I2S_SLOT;
 
 	err = i2s_channel_init_std_mode(input->handle, &rx_std_cfg);
 	if (err) {
